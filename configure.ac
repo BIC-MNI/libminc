@@ -14,9 +14,6 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 
 AM_PROG_CC_C_O
-AC_PROG_F77
-AM_PROG_LEX
-AC_PROG_YACC
 
 AC_HEADER_TIME
 AC_HEADER_DIRENT
@@ -24,16 +21,8 @@ AC_CHECK_HEADERS(sys/time.h sys/stat.h sys/wait.h unistd.h)
 AC_CHECK_HEADERS(fcntl.h pwd.h float.h values.h)
 
 AC_CHECK_TYPES([int32_t, int16_t])
-# dnl Build only static libs by default
 # AC_DISABLE_SHARED
 AC_PROG_LIBTOOL
-
-AC_PATH_PROGS(POD2MAN, pod2man)
-AM_CONDITIONAL(BUILD_POD_DOC, test "x$POD2MAN" != "x" )
-if test "x$POD2MAN" = "x"; then
-   AC_MSG_WARN([pod2man not installed, unable to build all manual pages])
-fi
-AC_SUBST(POD2MAN)
 
 smr_WITH_BUILD_PATH
 
@@ -61,31 +50,18 @@ else
 AC_DEFINE_UNQUOTED([MINC2],[0],[Define if MINC 2.0 is enabled.])
 fi
 
-dnl Replacement implementations for systems that lack the function.
-
-dnl need ac 2.57 for this? AC_CONFIG_LIBOBJ_DIR(libsrc)
 AC_REPLACE_FUNCS(strdup)
-
-dnl Verify existence of mkstemp, tempnam, and tmpnam
 AC_CHECK_FUNCS(mkstemp tempnam tmpnam)
-
-dnl Verify existence of some functions we'd like to use
 AC_CHECK_FUNCS(getpwnam select strerror sysconf)
 
 # Functions required for execute_decompress_command().
 AC_FUNC_FORK
 AC_CHECK_FUNCS(system popen)
 
-# Code to enable conditional build of ACR/NEMA tools
-
 AC_CONFIG_FILES([
 Makefile 
 epm-header
-testdir/Makefile 
-libsrc2/test/Makefile
-volume_io/Makefile
-volume_io/Documentation/Makefile
-volume_io/Testing/Makefile
+testdir/Makefile
 ])
 
 

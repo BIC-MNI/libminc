@@ -62,7 +62,7 @@ minc2-all-local: # CHECK!
 
 LDADD += ../../libminc2.la
 
-AM_CFLAGS += -DAPPARENTORDER
+AM_CFLAGS = -DAPPARENTORDER
 
 MINC2_TESTS =	\
 	minc2-create-test-images \
@@ -90,6 +90,6 @@ EXTRA_DIST += $(minc2_script_tests)
 
 check_PROGRAMS += $(ALL_TESTS)
 
-CLEANFILES = *.mnc
+CLEANFILES += *.mnc
 
 endif # MINC2

@@ -7,9 +7,6 @@ AM_CFLAGS =
 AM_YFLAGS = -d --debug
 
 SUBDIRS = . volume_io testdir doc
-if MINC2
-SUBDIRS += libsrc2/test
-endif
 
 # Add these to the include searches.
 #
