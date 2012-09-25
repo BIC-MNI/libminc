@@ -1,9 +1,7 @@
-dnl Process this file with autoconf to produce a configure script.
-
 AC_INIT([libminc],[2.2.00],[a.janke@gmail.com])
 
 AC_CONFIG_SRCDIR([libsrc2/minc2.h])
-AC_CONFIG_AUX_DIR(ac_config_aux)
+# AC_CONFIG_AUX_DIR(ac_config_aux)
 AM_INIT_AUTOMAKE
 AC_CONFIG_HEADERS([config.h])
 
@@ -59,9 +57,9 @@ AC_FUNC_FORK
 AC_CHECK_FUNCS(system popen)
 
 AC_CONFIG_FILES([
-Makefile 
+Makefile
 epm-header
 testdir/Makefile
 ])
 
-
+AC_OUTPUT

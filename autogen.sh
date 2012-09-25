@@ -20,6 +20,5 @@ fi
 aclocal -I m4
 autoheader
 $LIBTOOLIZE --automake
-automake --add-missing --copy
+automake --add-missing --copy --force-missing
 autoconf
-

@@ -1,4 +1,8 @@
 
+2012-09-25  Andrew L Janke <a.janke@gmail.com> + Vladimir Fonov
+   * split libminc from minc-tools
+   * started build of minc2 only for ITK
+
 -- Release of minc 2.2.00 --
 
 2012-09-24  Andrew L Janke <a.janke@gmail.com>

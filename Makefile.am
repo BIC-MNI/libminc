@@ -3,21 +3,15 @@
 AUTOMAKE_OPTIONS = check-news subdir-objects
 ACLOCAL_AMFLAGS = -I m4
 
-AM_CFLAGS = 
-AM_YFLAGS = -d --debug
-
-SUBDIRS = . volume_io testdir doc
+SUBDIRS = . testdir
 
 # Add these to the include searches.
 #
 INCLUDES = \
 	-I$(top_srcdir)/libsrc \
+	-I$(top_srcdir)/libsrc2 \
 	-I$(top_builddir)/volume_io/Include \
 	-I$(top_srcdir)/volume_io/Include
-
-if MINC2
-INCLUDES += -I$(top_srcdir)/libsrc2
-endif
 
 # Headers which must be installed.
 #
@@ -54,7 +48,6 @@ include_volume_io_HEADERS = \
 
 # Header files which must be included in the distribution but which are 
 # not part of the installation.
-#
 noinst_HEADERS = \
 	libsrc/read_file_names.h \
 	libsrc/minc_basic.h \
@@ -70,13 +63,7 @@ noinst_HEADERS = \
 	libsrc2/minc2_private.h 
 
 # Libraries which must be built and installed.
-#
 lib_LTLIBRARIES = libminc2.la libvolume_io2.la
-
-
-noinst_PROGRAMS = \
-	mincexample1 \
-	mincexample2
 
 LDADD = libvolume_io2.la libminc2.la
 
@@ -85,15 +72,11 @@ EXTRA_DIST = \
 	$(ezMINC_files) \
 	libsrc/strdup.c \
 	epm-header.in \
-	libsrc/config.h.msvc-win32 \
-	Makefile.msvc-win32 \
-	conversion/Acr_nema/dicom.txt \
 	INSTALL.minc \
 	CMakeLists.txt \
 	config.h.cmake \
 	UseLIBMINC.cmake.in \
 	LIBMIN2Config.cmake.in \
-	conversion/CMakeLists.txt \
 	cmake-modules/FindHDF5.cmake \
 	cmake-modules/FindNETCDF.cmake
 
@@ -143,7 +126,6 @@ libminc2_la_SOURCES = \
 	libsrc/minc_compat.c \
 	libsrc/minc_simple.c
 
-if MINC2
 libminc2_la_SOURCES += \
 	libsrc2/convert.c \
 	libsrc2/datatype.c \
@@ -158,22 +140,6 @@ libminc2_la_SOURCES += \
 	libsrc2/valid.c \
 	libsrc2/volprops.c \
 	libsrc2/volume.c
-else
-EXTRA_DIST += \
-	libsrc2/convert.c \
-	libsrc2/datatype.c \
-	libsrc2/dimension.c \
-	libsrc2/free.c \
-	libsrc2/grpattr.c \
-	libsrc2/hyper.c \
-	libsrc2/label.c \
-	libsrc2/m2util.c \
-	libsrc2/record.c \
-	libsrc2/slice.c \
-	libsrc2/valid.c \
-	libsrc2/volprops.c \
-	libsrc2/volume.c
-endif
 
 libvolume_io2_la_LDFLAGS = -version-info 3:0:0
 libvolume_io2_la_SOURCES = \
