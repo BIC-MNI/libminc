@@ -2376,20 +2376,4 @@ hdf_access(const char *path)
     return (status > 0);        /* Return non-zero if success */
 }
 
-#ifdef HDF_TEST
-main(int argc, char **argv)
-{
-  int dims[5] = {0,0,0,0,0};
-  int i;
-  int n;
-
-  while (--argc > 0) {
-    n = hdf_parse_dimorder(*++argv, 5, dims);
-    for (i = 0; i < n; i++) {
-      printf("%d ", dims[i]);
-    }
-    printf("\n");
-  }
-}
-#endif /* HDF_TEST defined */
 #endif /* MINC2 defined */
