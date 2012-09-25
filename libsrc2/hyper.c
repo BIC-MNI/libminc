@@ -595,7 +595,6 @@ miget_hyperslab_normalized(mihandle_t volume,
     int icv;
     int result;
     int is_signed;
-    int nctype;
 
     if (min > max) {
         return (MI_ERROR);
@@ -611,9 +610,8 @@ miget_hyperslab_normalized(mihandle_t volume,
         return (MI_ERROR);
     }
 
-    nctype = mitype_to_nctype(buffer_data_type, &is_signed);
 
-    if (nctype == NC_FLOAT || nctype == NC_DOUBLE) {
+    if (buffer_data_type == MI_TYPE_FLOAT || buffer_data_type == MI_TYPE_DOUBLE) {
         return (MI_ERROR);
     }
 

@@ -175,7 +175,8 @@ extern int mitranslate_hyperslab_origin(mihandle_t volume,
 /* From volume.c */
 extern void misave_valid_range(mihandle_t volume);
 
+#include <string.h>
 /* External */
-#include "../libsrc/minc_private.h"
+//#include "../libsrc/minc_private.h"
 
 
