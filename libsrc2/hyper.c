@@ -526,8 +526,10 @@ mirw_hyperslab_icv(int opcode,
         return (MI_ERROR);
     }
 
+    /*TODO:CNV
     miicv_inqint(icv, MI_ICV_TYPE, &nc_type);
-
+    */
+    
     nbytes = MI2typelen(nc_type);
 
     ndims = volume->number_of_dims;
@@ -615,8 +617,9 @@ miget_hyperslab_normalized(mihandle_t volume,
         return (MI_ERROR);
     }
 
+    /* TODO:CNV
     if ((icv = miicv_create()) < 0) {
-	return (MI_ERROR);
+      return (MI_ERROR);
     }
 
     result = miicv_setint(icv, MI_ICV_TYPE, nctype);
@@ -628,11 +631,13 @@ miget_hyperslab_normalized(mihandle_t volume,
 
     result = miicv_attach(icv, file_id, var_id);
     if (result == MI_NOERROR) {
-        result = mirw_hyperslab_icv(MIRW_OP_READ, volume, icv, start, count, 
+      result = mirw_hyperslab_icv(MIRW_OP_READ, volume, icv, start, count, 
                                     buffer);
-	miicv_detach(icv);
+      miicv_detach(icv);
     }
     miicv_free(icv);
+    TODO:CNV */
+    
     return (result);
 }
 

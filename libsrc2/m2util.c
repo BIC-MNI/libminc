@@ -153,10 +153,15 @@ mitype_to_hdftype(mitype_t mitype, int is_native)
     return (type_id);
 }
 
+
 /*! Convert a MINC 2 datatype into a NetCDF datatype.
  * \param mitype The MINC 2 data type to convert
  * \param is_signed Set to TRUE if the data type is signed, FALSE if unsigned.
  */
+/* TODO:CNV */
+
+#if 0
+
 int
 mitype_to_nctype(mitype_t mitype, int *is_signed)
 {
@@ -198,6 +203,7 @@ mitype_to_nctype(mitype_t mitype, int *is_signed)
     }
     return (nctype);
 }
+#endif /*TODO:CNV*/
 
 /*! Return the group or dataset ID of the last item in a "path",
  * specified like a UNIX pathname /black/white/red etc.  
@@ -475,7 +481,7 @@ mifind_spatial_dims(int mincid, int space_to_dim[], int dim_to_space[])
 {
     int imgid, dim[MI2_MAX_VAR_DIMS];
     int idim, ndims, world_index;
-    char dimname[MAX_NC_NAME];
+    char dimname[MI2_MAX_DIM_NAME];
 
     /* Set default values */
     for (idim = 0; idim < 3; idim++)
@@ -486,15 +492,18 @@ mifind_spatial_dims(int mincid, int space_to_dim[], int dim_to_space[])
 
     /* Get the dimension ids for the image variable 
      */
+    /*TODO:CNV
     imgid = ncvarid(mincid, MIimage);
     (void)ncvarinq(mincid, imgid, NULL, NULL, &ndims, dim, NULL);
+    */
 
     /* Loop over them to find the spatial ones 
      */
     for (idim = 0; idim < ndims; idim++) {
         /* Get the name and check that this is a spatial dimension 
          */
-        (void)ncdiminq(mincid, dim[idim], dimname, NULL);
+        /*TODO:CNV
+        (void)ncdiminq(mincid, dim[idim], dimname, NULL);*/
         
         if (!strcmp(dimname, MIxspace)) {
             world_index = MI2_X;

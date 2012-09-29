@@ -2,6 +2,9 @@
  * \file minc2_private.h
  * \brief MINC 2.0 private constants, types, and functions.
  */
+#ifndef __MINC2_PRIVATE_H__
+#define __MINC2_PRIVATE_H__ 1
+
 /** The root of all MINC 2.0 objects in the HDF5 hierarchy.
  */
 #define MI_ROOT_PATH "/minc-2.0"
@@ -176,7 +179,5 @@ extern int mitranslate_hyperslab_origin(mihandle_t volume,
 extern void misave_valid_range(mihandle_t volume);
 
 #include <string.h>
-/* External */
-//#include "../libsrc/minc_private.h"
 
-
+#endif /*__MINC2_PRIVATE_H__*/

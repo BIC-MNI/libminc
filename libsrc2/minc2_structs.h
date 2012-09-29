@@ -1,4 +1,4 @@
-// internal minc2 data structures
+/** internal minc2 data structures*/
 #ifndef __MINC2_STRUCTS_H__
 #define __MINC2_STRUCTS_H__ 1 
 

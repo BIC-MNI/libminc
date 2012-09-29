@@ -4,6 +4,9 @@
  *
  * Functions to create, open, and close MINC volume objects.
  ************************************************************************/
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif /*HAVE_CONFIG_H*/
 #include <stdlib.h>
 #include <hdf5.h>
 #include <limits.h>

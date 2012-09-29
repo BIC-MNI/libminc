@@ -1,4 +1,4 @@
-// minc2 definitions
+/** minc2 definitions*/
 #ifndef __MINC2_DEFS_H__
 #define __MINC2_DEFS_H__ 1
 
@@ -355,6 +355,11 @@ image dimensions */
  */
 #define MI2_MAX_VAR_DIMS 100
 
+/**
+ * Maximum length of dimension name TODO: check in HDF5 documentation
+ * */
+#define MI2_MAX_DIM_NAME 256
+
 #define MI2_CHUNK_SIZE 32 /* Length of chunk, per dimension */
 #define MI2_DEFAULT_ZLIB_LEVEL 4
 #define MI2_MAX_ZLIB_LEVEL 9
@@ -370,4 +375,4 @@ image dimensions */
 
 
 
-#endif //__MINC2_DEFS_H__
+#endif /*__MINC2_DEFS_H__*/
