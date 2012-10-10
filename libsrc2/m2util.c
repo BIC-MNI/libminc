@@ -1459,7 +1459,7 @@ minc_update_thumbnail(mihandle_t volume, hid_t loc_id, int igrp, int ogrp)
     hsize_t isize[MI2_MAX_VAR_DIMS];
     hsize_t osize[MI2_MAX_VAR_DIMS];
     hsize_t count[MI2_MAX_VAR_DIMS];
-    H5_START_T start[MI2_MAX_VAR_DIMS];
+    hsize_t start[MI2_MAX_VAR_DIMS];
     hid_t idst_id;              /* Input dataset */
     hid_t odst_id;              /* Output dataset */
     hid_t ifspc_id;             /* Input "file" dataspace */
@@ -1596,52 +1596,52 @@ minc_update_thumbnail(mihandle_t volume, hid_t loc_id, int igrp, int ogrp)
      */
     for (slice = 0; slice < osize[0]; slice++) {
         
-	start[0] = slice * scale;
-	start[1] = 0;
-	start[2] = 0;
-	count[0] = scale;
-	count[1] = isize[1];
-	count[2] = isize[2];
+      start[0] = slice * scale;
+      start[1] = 0;
+      start[2] = 0;
+      count[0] = scale;
+      count[1] = isize[1];
+      count[2] = isize[2];
 
-	H5Sselect_hyperslab(ifspc_id, H5S_SELECT_SET, start, NULL, count,
-                            NULL);
+      H5Sselect_hyperslab(ifspc_id, H5S_SELECT_SET, start, NULL, count,
+                                NULL);
 
-	H5Dread(idst_id, H5T_NATIVE_DOUBLE, imspc_id, ifspc_id, H5P_DEFAULT, 
-                in_ptr);
+      H5Dread(idst_id, H5T_NATIVE_DOUBLE, imspc_id, ifspc_id, H5P_DEFAULT, 
+                    in_ptr);
 
-        /* Scale slice from voxel to real values. */
+      /* Scale slice from voxel to real values. */
 
-        miconvert_hyperslab_to_real(volume, start, count, in_ptr);
+      miconvert_hyperslab_to_real(volume, start, count, in_ptr);
 
-        midownsample_slice(in_ptr, out_ptr, isize, osize, scale);
-	
-	start[0] = slice;
-	start[1] = 0;
-	start[2] = 0;
-	count[0] = 1;
-	count[1] = osize[1];
-	count[2] = osize[2];
-	H5Sselect_hyperslab(ofspc_id, H5S_SELECT_SET, start, NULL, count, 
-                            NULL);
-	
-        miconvert_hyperslab_to_voxel(volume, start, count, out_ptr, 
-                                     &smax, &smin);
+      midownsample_slice(in_ptr, out_ptr, isize, osize, scale);
 
-	H5Dwrite(odst_id, H5T_NATIVE_DOUBLE, omspc_id, ofspc_id, H5P_DEFAULT, 
-                 out_ptr);
+      start[0] = slice;
+      start[1] = 0;
+      start[2] = 0;
+      count[0] = 1;
+      count[1] = osize[1];
+      count[2] = osize[2];
+      H5Sselect_hyperslab(ofspc_id, H5S_SELECT_SET, start, NULL, count, 
+                                NULL);
 
-        if (volume->volume_class == MI_CLASS_REAL) {
-            /* Select the right point in tfspc_id */
-            H5Sselect_elements(tfspc_id, H5S_SELECT_SET, 1, 
-                               (const H5_START_T **) &start[0]);
+      miconvert_hyperslab_to_voxel(volume, start, count, out_ptr, 
+                                        &smax, &smin);
 
-            H5Dwrite(omax_id, H5T_NATIVE_DOUBLE, tmspc_id, tfspc_id, 
-                     H5P_DEFAULT, &smax);
+      H5Dwrite(odst_id, H5T_NATIVE_DOUBLE, omspc_id, ofspc_id, H5P_DEFAULT, 
+                    out_ptr);
 
-            H5Dwrite(omin_id, H5T_NATIVE_DOUBLE, tmspc_id, tfspc_id, 
-                     H5P_DEFAULT, &smin);
-        }
-    }
+      if (volume->volume_class == MI_CLASS_REAL) {
+                /* Select the right point in tfspc_id */
+                H5Sselect_elements(tfspc_id, H5S_SELECT_SET, 1,
+                                  (const hsize_t *) &start[0]);
+
+                H5Dwrite(omax_id, H5T_NATIVE_DOUBLE, tmspc_id, tfspc_id, 
+                        H5P_DEFAULT, &smax);
+
+                H5Dwrite(omin_id, H5T_NATIVE_DOUBLE, tmspc_id, tfspc_id, 
+                        H5P_DEFAULT, &smin);
+            }
+  }
     
     free(in_ptr);
     free(out_ptr);
