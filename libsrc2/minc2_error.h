@@ -1,6 +1,6 @@
 /* ----------------------------- MNI Header -----------------------------------
-@NAME       : minc_error.h
-@DESCRIPTION: File containing error codes for minc package.
+@NAME       : minc2_error.h
+@DESCRIPTION: File containing error codes for libminc package.
 @GLOBALS    : 
 @CALLS      : 
 @CREATED    : 17 Feburary, 2004 (Robert Vincent)
@@ -33,73 +33,82 @@
               express or implied warranty.
 ---------------------------------------------------------------------------- */
 
-#ifndef _MINC_ERROR_H_
-#define _MINC_ERROR_H_ 1
+#ifndef _MINC2_ERROR_H_
+#define _MINC2_ERROR_H_ 1
 
 /* message levels */
-#define MI_MSG_FATAL 0
-#define MI_MSG_ERROR 1
-#define MI_MSG_WARNING 2
-#define MI_MSG_INFO 3
-#define MI_MSG_DEBUG 4
+#define MI2_MSG_FATAL 0
+#define MI2_MSG_ERROR 1
+#define MI2_MSG_WARNING 2
+#define MI2_MSG_INFO 3
+#define MI2_MSG_DEBUG 4
 
-#define MI_MSG_BASE (10000)
+#define MI2_MSG_BASE (10000)
 
-typedef enum mimsgcode {
-    MI_MSG_UNCMPFAIL = MI_MSG_BASE,
-    MI_MSG_NOWRITECMP,
-    MI_MSG_OPENFILE,
-    MI_MSG_CREATEFILE,
-    MI_MSG_CLOSEFILE,
-    MI_MSG_FINDATTR,
-    MI_MSG_ATTRNOTNUM,
-    MI_MSG_READATTR,
-    MI_MSG_NOMEMATTR,
-    MI_MSG_CONVATTR,
-    MI_MSG_ATTRNOTSCALAR,
-    MI_MSG_ATTRNOTSTR,
-    MI_MSG_WRITEATTR,
-    MI_MSG_READVAR,
-    MI_MSG_WRITEVAR,
-    MI_MSG_FINDVAR,
-    MI_MSG_ATTRCOUNT,
-    MI_MSG_ATTRNAME,
-    MI_MSG_COPYATTR,
-    MI_MSG_VARINQ,
-    MI_MSG_UNLIMDIM,
-    MI_MSG_DIMINQ,
-    MI_MSG_VARCONFLICT,
-    MI_MSG_DIMDEF,
-    MI_MSG_VARDEF,
-    MI_MSG_VARMISMATCH,
-    MI_MSG_VARDIFFSIZE,
-    MI_MSG_VARCOUNT,
-    MI_MSG_OUTPUTVAR,
-    MI_MSG_COPYVAR,
-    MI_MSG_VARNOTNUM,
-    MI_MSG_OUTOFMEM,
-    MI_MSG_ATTRNOTPTR,
-    MI_MSG_VARNOTSTD,
-    MI_MSG_DIMWIDTH,
-    MI_MSG_MAXMINVARY,
-    MI_MSG_SNH,
-    MI_MSG_INTSIZE,
-    MI_MSG_FLTSIZE,
-    MI_MSG_TYPECLASS,
-    MI_MSG_NOTIMPL,
-    MI_MSG_BADTYPE,
-    MI_MSG_OPENDSET,
-    MI_MSG_READDSET,
-    MI_MSG_WRITEDSET,
-    MI_MSG_TOOMANYDIMS,
-    MI_MSG_ICVATTACHED,
-    MI_MSG_BADICV,
-    MI_MSG_BADPROP,
-    MI_MSG_ICVNOTATTACHED,
-    MI_MSG_ICVCOORDS,
-    MI_MSG_BADOP
-} mimsgcode_t;
+typedef enum mi2msgcode {
+    MI2_MSG_UNCMPFAIL = MI2_MSG_BASE,
+    MI2_MSG_NOWRITECMP,
+    MI2_MSG_OPENFILE,
+    MI2_MSG_CREATEFILE,
+    MI2_MSG_CLOSEFILE,
+    MI2_MSG_FINDATTR,
+    MI2_MSG_ATTRNOTNUM,
+    MI2_MSG_READATTR,
+    MI2_MSG_NOMEMATTR,
+    MI2_MSG_CONVATTR,
+    MI2_MSG_ATTRNOTSCALAR,
+    MI2_MSG_ATTRNOTSTR,
+    MI2_MSG_WRITEATTR,
+    MI2_MSG_READVAR,
+    MI2_MSG_WRITEVAR,
+    MI2_MSG_FINDVAR,
+    MI2_MSG_ATTRCOUNT,
+    MI2_MSG_ATTRNAME,
+    MI2_MSG_COPYATTR,
+    MI2_MSG_VARINQ,
+    MI2_MSG_UNLIMDIM,
+    MI2_MSG_DIMINQ,
+    MI2_MSG_VARCONFLICT,
+    MI2_MSG_DIMDEF,
+    MI2_MSG_VARDEF,
+    MI2_MSG_VARMISMATCH,
+    MI2_MSG_VARDIFFSIZE,
+    MI2_MSG_VARCOUNT,
+    MI2_MSG_OUTPUTVAR,
+    MI2_MSG_COPYVAR,
+    MI2_MSG_VARNOTNUM,
+    MI2_MSG_OUTOFMEM,
+    MI2_MSG_ATTRNOTPTR,
+    MI2_MSG_VARNOTSTD,
+    MI2_MSG_DIMWIDTH,
+    MI2_MSG_MAXMINVARY,
+    MI2_MSG_SNH,
+    MI2_MSG_INTSIZE,
+    MI2_MSG_FLTSIZE,
+    MI2_MSG_TYPECLASS,
+    MI2_MSG_NOTIMPL,
+    MI2_MSG_BADTYPE,
+    MI2_MSG_OPENDSET,
+    MI2_MSG_READDSET,
+    MI2_MSG_WRITEDSET,
+    MI2_MSG_TOOMANYDIMS,
+    MI2_MSG_ICVATTACHED,
+    MI2_MSG_BADICV,
+    MI2_MSG_BADPROP,
+    MI2_MSG_ICVNOTATTACHED,
+    MI2_MSG_ICVCOORDS,
+    MI2_MSG_BADOP
+} mi2msgcode_t;
 
-MNCAPI int milog_message(mimsgcode_t code, ...);
+extern int mi2log_message(mi2msgcode_t code, ...);
 
-#endif /* _MINC_ERROR_H_ not defined */
+extern int MI2_save_routine_name(char *name);
+extern int MI2_return(void);
+extern int MI2_return_error(void);
+extern void MI2_log_pkg_error2(int p1, char *p2);
+extern void MI2_log_pkg_error3(int p1, char *p2, char *p3);
+extern void MI2_log_sys_error1(char *p1);
+extern void mi2log_init(const char *name);
+
+
+#endif /* _MINC2_ERROR_H_ not defined */

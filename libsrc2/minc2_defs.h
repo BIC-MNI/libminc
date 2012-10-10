@@ -31,13 +31,14 @@
 /* Bert 10-Aug-2004 - MI_MAX_IMGDIMS used to be defined to be MAX_VAR_DIMS,
  * a constant defined in netcdf.h. For many years MAX_VAR_DIMS was 100,
  * but in netCDF 3.5.1 the value was changed to 512.
- * Unfortunately, the definitions of MI_ICV_DIM_SIZE, MI_ICV_DIM_STEP,
- * and MI_ICV_DIM_START assume that MI_MAX_IMGDIMS is less than or
+ * Unfortunately, the definitions of MI2_ICV_DIM_SIZE, MI2_ICV_DIM_STEP,
+ * and MI2_ICV_DIM_START assume that MI_MAX_IMGDIMS is less than or
  * equal to 100.  To avoid changing the MINC API, we have to define
  * MI_MAX_IMGDIMS to 100 here.  Otherwise the miicv_inqdbl() function
  * will return bogus values for these ICV properties.
  */
 #define MI_MAX_IMGDIMS 100
+#define MI2_MAX_IMGDIMS 100
 
 /* NetCDF standard attributes */
 #define MIunits       "units"
@@ -219,73 +220,6 @@
 #define MIinjection_volume      "injection_volume"
 #define MIinjection_route       "injection_route"
 
-/* Constants for image conversion variable (icv) properties */
-/* Maximum number of icv's allowed */
-/* changed to 32 as netcdf 4.x no longer defines MAX_NC_OPEN */
-/* #define MI_MAX_NUM_ICV MAX_NC_OPEN */
-#define MI_MAX_NUM_ICV 32
-
-/* Default max and min for normalization */
-#define MI_DEFAULT_MAX 1.0
-#define MI_DEFAULT_MIN 0.0
-/* For converting data type */
-#define MI_ICV_TYPE             1
-#define MI_ICV_SIGN             2
-#define MI_ICV_DO_RANGE         3
-#define MI_ICV_VALID_MAX        4
-#define MI_ICV_VALID_MIN        5
-/* For doing normalization */
-#define MI_ICV_DO_NORM          6
-#define MI_ICV_USER_NORM        7
-#define MI_ICV_IMAGE_MAX        8
-#define MI_ICV_IMAGE_MIN        9
-/* Values actually used in normalization - read-only */
-#define MI_ICV_NORM_MAX        10
-#define MI_ICV_NORM_MIN        11
-/* For doing dimension conversions */
-#define MI_ICV_DO_DIM_CONV     12
-/* For converting vector fields to scalar */
-#define MI_ICV_DO_SCALAR       13
-/* For flipping axis direction */
-#define MI_ICV_XDIM_DIR        14
-#define MI_ICV_YDIM_DIR        15
-#define MI_ICV_ZDIM_DIR        16
-/* For changing size of first two dimensions (excluding MIvector_dimension) */
-#define MI_ICV_ADIM_SIZE       17
-#define MI_ICV_BDIM_SIZE       18
-#define MI_ICV_KEEP_ASPECT     19
-/* The pixel size and location of first two dimensions (these are readonly) */
-#define MI_ICV_ADIM_STEP       20
-#define MI_ICV_BDIM_STEP       21
-#define MI_ICV_ADIM_START      22
-#define MI_ICV_BDIM_START      23
-/* Number of image dimensions for dimension conversion */
-#define MI_ICV_NUM_IMGDIMS     24
-/* Number of dimensions of image variable taking into account vector/scalar
- *   data (read-only property) */
-#define MI_ICV_NUM_DIMS        25
-/* Id of file and image variable (read-only properties) */
-#define MI_ICV_CDFID           26
-#define MI_ICV_VARID           27
-/* Names of MIimagemax and MIimagemin variables */
-#define MI_ICV_MAXVAR          28
-#define MI_ICV_MINVAR          29
-/* For setting input values to a specified fillvalue */
-#define MI_ICV_DO_FILLVALUE    30
-#define MI_ICV_FILLVALUE       31
-/* Image dimension properties. For each dimension, add the dimension 
- *   number (counting from fastest to slowest). */
-#define MI_ICV_DIM_SIZE        1000
-#define MI_ICV_DIM_STEP        1100
-#define MI_ICV_DIM_START       1200
-
-/* Constants that can be used as values for the above properties. */
-/* Possible values for MI_ICV_?DIM_DIR */
-#define MI_ICV_POSITIVE         1
-#define MI_ICV_NEGATIVE       (-1)
-#define MI_ICV_ANYDIR           0
-/* Possible value for MI_ICV_?DIM_SIZE */
-#define MI_ICV_ANYSIZE        (-1)
 
 /* Error codes.
  *   Note that they must not conflict with NetCDF error codes since
@@ -317,10 +251,22 @@ image dimensions */
 #define MI_NOERROR 0
 #endif /* MI_NOERROR not defined */
 
+#ifndef MI2_NOERROR
+/** Generic return code for successful operations. */
+#define MI2_NOERROR MI_NOERROR
+#endif /* MI2_NOERROR not defined */
+
+
 #ifndef MI_ERROR
 /** Generic return code for operations which fail for any reason. */
 #define MI_ERROR (-1)
 #endif /* MI_ERROR not defined */
+
+#ifndef MI2_ERROR
+/** Generic return code for operations which fail for any reason. */
+#define MI2_ERROR MI_ERROR
+#endif /* MI2_ERROR not defined */
+
 
 #define MI_NATIVE    "native____"
 #define MI_TALAIRACH "talairach_"
@@ -372,6 +318,103 @@ image dimensions */
 
 #define MI_VERSION_2_0 "MINC Version    2.0"
 
+
+/**
+ * MINC2 ICV
+ * 
+ * */
+#define MI2_PRIV_DEFSIGN   0
+#define MI2_PRIV_SIGNED    1
+#define MI2_PRIV_UNSIGNED  2
+
+/* Operations for MI_varaccess */
+#define MI2_PRIV_GET 10
+#define MI2_PRIV_PUT 11
+
+
+/* Constants for image conversion variable (icv) properties */
+/* Maximum number of icv's allowed */
+/* changed to 32 as netcdf 4.x no longer defines MAX_NC_OPEN */
+/* #define MI_MAX_NUM_ICV MAX_NC_OPEN */
+#define MI2_MAX_NUM_ICV 32
+
+/* Default max and min for normalization */
+#define MI2_DEFAULT_MAX 1.0
+#define MI2_DEFAULT_MIN 0.0
+/* For converting data type */
+#define MI2_ICV_TYPE             1
+#define MI2_ICV_SIGN             2
+#define MI2_ICV_DO_RANGE         3
+#define MI2_ICV_VALID_MAX        4
+#define MI2_ICV_VALID_MIN        5
+/* For doing normalization */
+#define MI2_ICV_DO_NORM          6
+#define MI2_ICV_USER_NORM        7
+#define MI2_ICV_IMAGE_MAX        8
+#define MI2_ICV_IMAGE_MIN        9
+/* Values actually used in normalization - read-only */
+#define MI2_ICV_NORM_MAX        10
+#define MI2_ICV_NORM_MIN        11
+/* For doing dimension conversions */
+#define MI2_ICV_DO_DIM_CONV     12
+/* For converting vector fields to scalar */
+#define MI2_ICV_DO_SCALAR       13
+/* For flipping axis direction */
+#define MI2_ICV_XDIM_DIR        14
+#define MI2_ICV_YDIM_DIR        15
+#define MI2_ICV_ZDIM_DIR        16
+/* For changing size of first two dimensions (excluding MIvector_dimension) */
+#define MI2_ICV_ADIM_SIZE       17
+#define MI2_ICV_BDIM_SIZE       18
+#define MI2_ICV_KEEP_ASPECT     19
+/* The pixel size and location of first two dimensions (these are readonly) */
+#define MI2_ICV_ADIM_STEP       20
+#define MI2_ICV_BDIM_STEP       21
+#define MI2_ICV_ADIM_START      22
+#define MI2_ICV_BDIM_START      23
+/* Number of image dimensions for dimension conversion */
+#define MI2_ICV_NUM_IMGDIMS     24
+/* Number of dimensions of image variable taking into account vector/scalar
+   data (read-only property) */
+#define MI2_ICV_NUM_DIMS        25
+/* Id of file and image variable (read-only properties) */
+#define MI2_ICV_CDFID           26
+#define MI2_ICV_VARID           27
+/* Names of MIimagemax and MIimagemin variables */
+#define MI2_ICV_MAXVAR          28
+#define MI2_ICV_MINVAR          29
+/* For setting input values to a specified fillvalue */
+#define MI2_ICV_DO_FILLVALUE    30
+#define MI2_ICV_FILLVALUE       31
+/* Image dimension properties. For each dimension, add the dimension 
+   number (counting from fastest to slowest). */
+#define MI2_ICV_DIM_SIZE        1000
+#define MI2_ICV_DIM_STEP        1100
+#define MI2_ICV_DIM_START       1200
+
+/* Constants that can be used as values for the above properties. */
+/* Possible values for MI2_ICV_?DIM_DIR */
+#define MI2_ICV_POSITIVE         1
+#define MI2_ICV_NEGATIVE       (-1)
+#define MI2_ICV_ANYDIR           0
+/* Possible value for MI2_ICV_?DIM_SIZE */
+#define MI2_ICV_ANYSIZE        (-1)
+
+
+
+/**
+ * Error handling macros
+ * take from minc
+ * */
+#define MI2_SAVE_ROUTINE_NAME(name) MI2_save_routine_name(name)
+#define MI2_RETURN(value) \
+   return( MI2_return() ? (value) : (value) )
+#define MI2_RETURN_ERROR(error) \
+   return( MI2_return_error() ? (error) : (error) )
+#define MI2_LOG_PKG_ERROR2(p1,p2) MI2_log_pkg_error2(p1, p2)
+#define MI2_LOG_PKG_ERROR3(p1,p2,p3) MI2_log_pkg_error3(p1, p2, p3)
+#define MI2_LOG_SYS_ERROR1(p1) MI2_log_sys_error1(p1)
+#define MI2_CHK_ERR(expr) {if ((expr)<0) MI2_RETURN_ERROR(MI_ERROR);}
 
 
 

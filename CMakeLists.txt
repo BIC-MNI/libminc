@@ -212,6 +212,8 @@ SET(minc2_LIB_SRCS
    libsrc2/valid.c
    libsrc2/volprops.c
    libsrc2/volume.c
+   libsrc2/minc2_icv.c
+   libsrc2/minc2_error.c
    )
 
 SET(minc2_HEADERS
@@ -219,6 +221,7 @@ SET(minc2_HEADERS
   libsrc2/minc2_defs.h 
   libsrc2/minc2_structs.h 
   libsrc2/minc2_api.h 
+  libsrc2/minc2_error.h
 )
 
 # volume_io2

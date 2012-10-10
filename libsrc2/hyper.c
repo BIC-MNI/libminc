@@ -8,6 +8,8 @@
 #include <hdf5.h>
 #include "minc2.h"
 #include "minc2_private.h"
+#include "minc2_defs.h"
+#include "minc2_structs.h"
 
 #define MIRW_OP_READ 1
 #define MIRW_OP_WRITE 2
@@ -641,7 +643,7 @@ miget_hyperslab_normalized(mihandle_t volume,
     return (result);
 }
 
-/** Get a hyperslab from the file, with the assistance of a MINC image
+/** Get a hyperslab from the file, with the assistance of a MINC2 image
  * conversion variable (ICV).
  */
 int
@@ -664,14 +666,14 @@ miget_hyperslab_with_icv(mihandle_t volume, /**< A MINC 2.0 volume handle */
 
     nctype = mitype_to_nctype(buffer_data_type, &is_signed);
 
-    miicv_setint(icv, MI_ICV_TYPE, nctype);
-    miicv_setstr(icv, MI_ICV_SIGN, is_signed ? MI_SIGNED : MI_UNSIGNED);
+    miicv_setint(icv, MI2_ICV_TYPE, nctype);
+    miicv_setstr(icv, MI2_ICV_SIGN, is_signed ? MI_SIGNED : MI_UNSIGNED);
 
     result = miicv_attach(icv, file_id, var_id);
     if (result == MI_NOERROR) {
         result = mirw_hyperslab_icv(MIRW_OP_READ, volume, icv, start, count, 
                                     buffer);
-	miicv_detach(icv);
+      miicv_detach(icv);
     }
     return (result);
 }
@@ -699,18 +701,18 @@ miset_hyperslab_with_icv(mihandle_t volume, /**< A MINC 2.0 volume handle */
 
     nctype = mitype_to_nctype(buffer_data_type, &is_signed);
 
-    miicv_setint(icv, MI_ICV_TYPE, nctype);
-    miicv_setstr(icv, MI_ICV_SIGN, is_signed ? MI_SIGNED : MI_UNSIGNED);
+    miicv_setint(icv, MI2_ICV_TYPE, nctype);
+    miicv_setstr(icv, MI2_ICV_SIGN, is_signed ? MI_SIGNED : MI_UNSIGNED);
 
     result = miicv_attach(icv, file_id, var_id);
     if (result == MI_NOERROR) {
-	result = mirw_hyperslab_icv(MIRW_OP_WRITE, 
+      result = mirw_hyperslab_icv(MIRW_OP_WRITE, 
                                     volume,
                                     icv, 
                                     start, 
                                     count, 
                                     (void *) buffer);
-	miicv_detach(icv);
+      miicv_detach(icv);
     }
     return (result);
 }
@@ -747,26 +749,26 @@ miget_real_value_hyperslab(mihandle_t volume,
         return (MI_ERROR);
     }
 
-    miicv_setint(icv, MI_ICV_TYPE, nctype);
-    miicv_setstr(icv, MI_ICV_SIGN, is_signed ? MI_SIGNED : MI_UNSIGNED);
-    miicv_setint(icv, MI_ICV_DO_RANGE, TRUE);
-    miicv_setint(icv, MI_ICV_DO_NORM, TRUE);
+    miicv_setint(icv, MI2_ICV_TYPE, nctype);
+    miicv_setstr(icv, MI2_ICV_SIGN, is_signed ? MI_SIGNED : MI_UNSIGNED);
+    miicv_setint(icv, MI2_ICV_DO_RANGE, TRUE);
+    miicv_setint(icv, MI2_ICV_DO_NORM, TRUE);
     //figure out whether we need to flip image    L.B May 18/2011
     for (i=0; i < volume->number_of_dims ; i++)
       {
         hdim = volume->dim_handles[i];
         switch (hdim->flipping_order) {
         case MI_FILE_ORDER:
-          miicv_setint(icv, MI_ICV_DO_DIM_CONV, FALSE);
+          miicv_setint(icv, MI2_ICV_DO_DIM_CONV, FALSE);
           break;
         case MI_COUNTER_FILE_ORDER:
         case MI_POSITIVE:
           if (hdim->step < 0)
-            miicv_setint(icv, MI_ICV_DO_DIM_CONV, TRUE);
+            miicv_setint(icv, MI2_ICV_DO_DIM_CONV, TRUE);
           break;
         case MI_NEGATIVE: 
           if (hdim->step > 0)
-            miicv_setint(icv, MI_ICV_DO_DIM_CONV, TRUE);
+            miicv_setint(icv, MI2_ICV_DO_DIM_CONV, TRUE);
           break;
         default:
           return;
@@ -814,8 +816,8 @@ miset_real_value_hyperslab(mihandle_t volume,
       return (MI_ERROR);
     }
 
-    miicv_setint(icv, MI_ICV_TYPE, nctype);
-    miicv_setstr(icv, MI_ICV_SIGN, is_signed ? MI_SIGNED : MI_UNSIGNED);
+    miicv_setint(icv, MI2_ICV_TYPE, nctype);
+    miicv_setstr(icv, MI2_ICV_SIGN, is_signed ? MI_SIGNED : MI_UNSIGNED);
 
     result = miicv_attach(icv, file_id, var_id);
     if (result == MI_NOERROR) {

@@ -1,12 +1,12 @@
 /* ----------------------------- MNI Header -----------------------------------
-@NAME       : minc_error.c
+@NAME       : minc2_error.c
 @DESCRIPTION: File containing routines to do error handling for MINC package.
               Should be called through macros in minc_private.h
 @GLOBALS    : 
 @CALLS      : 
 @CREATED    : August 7, 1992 (Peter Neelin)
 @MODIFIED   : 
- * $Log: minc_error.c,v $
+ * $Log: minc2_error.c,v $
  * Revision 6.8  2009-01-20 11:58:13  rotor
  *  * CMakeLists.txt: updated version
  *  * Updated Changelog to include releases
@@ -83,8 +83,8 @@
 
 #include <errno.h>
 #include <stdarg.h>
-#include <minc_private.h>
-#include <minc_error.h>
+#include <minc2_private.h>
+#include <minc2_error.h>
 
 struct mierror_entry {
     int level;
@@ -94,66 +94,66 @@ struct mierror_entry {
 /* MINC routine name variable, call depth counter (for keeping track of
    minc routines calling minc routines) and variable for keeping track
    of callers ncopts. All of these are for error logging. */
-static char *minc_routine_name = "MINC";
+static char *minc_routine_name = "MINC2";
 static int minc_call_depth = 0;
 static int minc_trash_var = 0;
 
 static struct mierror_entry mierror_table[] = {
-    { MI_MSG_ERROR, "Cannot uncompress the file" }, /* MI_MSG_UNCMPFAIL */
-    { MI_MSG_ERROR, "Can't write compressed file" }, /* MI_MSG_NOWRITECMP */
-    { MI_MSG_ERROR, "Unable to open file '%s'" }, /* MI_MSG_OPENFILE */
-    { MI_MSG_ERROR, "Unable to create file '%s'"}, /* MI_MSG_CREATEFILE */
-    { MI_MSG_ERROR, "Error closing file"}, /* MI_MSG_CLOSEFILE */
-    { MI_MSG_WARNING, "Attribute '%s' not found"}, /* MI_MSG_FINDATTR */
-    { MI_MSG_ERROR, "Attribute '%s' is non-numeric"}, /* MI_MSG_ATTRNOTNUM */
-    { MI_MSG_ERROR, "Can't read attribute '%s'"}, /* MI_MSG_READATTR */
-    { MI_MSG_FATAL, "No memory for attribute '%s'"}, /* MI_MSG_NOMEMATTR */
-    { MI_MSG_ERROR, "Conversion error for attribute '%s'"}, /* MI_MSG_CONVATTR */
-    { MI_MSG_ERROR, "Attribute '%s' is not a scalar"}, /* MI_MSG_ATTRNOTSCALAR */
-    { MI_MSG_ERROR, "Attribute '%s' is not a string"}, /* MI_MSG_ATTRNOTSTR */
-    { MI_MSG_ERROR, "Can't write attribute '%s'"}, /* MI_MSG_WRITEATTR */
-    { MI_MSG_ERROR, "Can't read variable ID# %d"}, /* MI_MSG_READVAR */
-    { MI_MSG_ERROR, "Can't write variable ID# %d"}, /* MI_MSG_WRITEVAR */
-    { MI_MSG_ERROR, "Can't find variable ID# %d"}, /* MI_MSG_FINDVAR */
-    { MI_MSG_ERROR, "Can't read attribute count"}, /* MI_MSG_ATTRCOUNT */
-    { MI_MSG_ERROR, "Can't read attribute name"}, /* MI_MSG_ATTRNAME */
-    { MI_MSG_ERROR, "Can't copy attribute '%s'"}, /* MI_MSG_COPYATTR */
-    { MI_MSG_ERROR, "Can't read variable information"}, /* MI_MSG_VARINQ */
-    { MI_MSG_ERROR, "Can't get unlimited dimension"}, /* MI_MSG_UNLIMDIM */
-    { MI_MSG_ERROR, "Can't get dimension information"}, /* MI_MSG_DIMINQ */
-    { MI_MSG_ERROR, "Variable already defined with different size"}, /* MI_MSG_VARCONFLICT */
-    { MI_MSG_ERROR, "Can't define dimension '%s'"}, /* MI_MSG_DIMDEF */
-    { MI_MSG_ERROR, "Can't define variable '%s'"}, /* MI_MSG_VARDEF */
-    { MI_MSG_ERROR, "Variables do not match for value copy"}, /* MI_MSG_VARMISMATCH */
-    { MI_MSG_ERROR, "Variables have dimensions of different size"}, /* MI_MSG_VARDIFFSIZE */
-    { MI_MSG_ERROR, "Can't read variable count"}, /* MI_MSG_VARCOUNT */
-    { MI_MSG_ERROR, "Variable '%s' not copied"}, /* MI_MSG_OUTPUTVAR */
-    { MI_MSG_ERROR, "Error copying variable"}, /* MI_MSG_COPYVAR */
-    { MI_MSG_ERROR, "Non-numeric datatype"}, /* MI_MSG_VARNOTNUM */
-    { MI_MSG_FATAL, "Can't allocate %d bytes"}, /* MI_MSG_OUTOFMEM */
-    { MI_MSG_ERROR, "Attribute '%s' is not a pointer"}, /* MI_MSG_ATTRNOTPTR */
-    { MI_MSG_ERROR, "Variable '%s' is not a standard MINC variable"}, /* MI_MSG_VARNOTSTD */
-    { MI_MSG_ERROR, "Bad dimension width suffix"}, /* MI_MSG_DIMWIDTH */
-    { MI_MSG_ERROR, "Imagemax/min dimensions vary over image dimensions"}, /* MI_MSG_MAXMINVARY */
-    { MI_MSG_FATAL, "Should not happen!"}, /* MI_MSG_SNH */
-    { MI_MSG_FATAL, "Unknown integer size %d"}, /* MI_MSG_INTSIZE */
-    { MI_MSG_FATAL, "Unknown float size %d"}, /* MI_MSG_FLTSIZE */
-    { MI_MSG_FATAL, "Unknown type class %d"}, /* MI_MSG_TYPECLASS */
-    { MI_MSG_ERROR, "Function '%s' not implemented"}, /* MI_MSG_NOTIMPL */
-    { MI_MSG_FATAL, "Unknown type %d"}, /* MI_MSG_BADTYPE */
-    { MI_MSG_ERROR, "Can't open dataset %s"}, /* MI_MSG_OPENDSET */
-    { MI_MSG_ERROR, "Can't read dataset %s"}, /* MI_MSG_READDSET */
-    { MI_MSG_ERROR, "Can't write dataset %s"}, /* MI_MSG_WRITEDSET */
-    { MI_MSG_ERROR, "Can't use more than %d dimensions"}, /* MI_MSG_TOOMANYDIMS */
-    { MI_MSG_ERROR, "Attempt to modify an attached image conversion variable"}, /* MI_MSG_ICVATTACHED */
-    { MI_MSG_ERROR, "Illegal ICV identifier"}, /* MI_MSG_BADICV */
-    { MI_MSG_ERROR, "Error setting ICV property: %s"}, /* MI_MSG_BADPROP */
-    { MI_MSG_ERROR, "ICV is not attached"}, /* MI_MSG_ICVNOTATTACHED */
-    { MI_MSG_ERROR, "Invalid ICV coordinates"}, /* MI_MSG_ICVCOORDS */
-    { MI_MSG_ERROR, "Illegal variable access operation" } /* MI_MSG_BADOP */
+    { MI2_MSG_ERROR, "Cannot uncompress the file" }, /* MI2_MSG_UNCMPFAIL */
+    { MI2_MSG_ERROR, "Can't write compressed file" }, /* MI2_MSG_NOWRITECMP */
+    { MI2_MSG_ERROR, "Unable to open file '%s'" }, /* MI2_MSG_OPENFILE */
+    { MI2_MSG_ERROR, "Unable to create file '%s'"}, /* MI2_MSG_CREATEFILE */
+    { MI2_MSG_ERROR, "Error closing file"}, /* MI2_MSG_CLOSEFILE */
+    { MI2_MSG_WARNING, "Attribute '%s' not found"}, /* MI2_MSG_FINDATTR */
+    { MI2_MSG_ERROR, "Attribute '%s' is non-numeric"}, /* MI2_MSG_ATTRNOTNUM */
+    { MI2_MSG_ERROR, "Can't read attribute '%s'"}, /* MI2_MSG_READATTR */
+    { MI2_MSG_FATAL, "No memory for attribute '%s'"}, /* MI2_MSG_NOMEMATTR */
+    { MI2_MSG_ERROR, "Conversion error for attribute '%s'"}, /* MI2_MSG_CONVATTR */
+    { MI2_MSG_ERROR, "Attribute '%s' is not a scalar"}, /* MI2_MSG_ATTRNOTSCALAR */
+    { MI2_MSG_ERROR, "Attribute '%s' is not a string"}, /* MI2_MSG_ATTRNOTSTR */
+    { MI2_MSG_ERROR, "Can't write attribute '%s'"}, /* MI2_MSG_WRITEATTR */
+    { MI2_MSG_ERROR, "Can't read variable ID# %d"}, /* MI2_MSG_READVAR */
+    { MI2_MSG_ERROR, "Can't write variable ID# %d"}, /* MI2_MSG_WRITEVAR */
+    { MI2_MSG_ERROR, "Can't find variable ID# %d"}, /* MI2_MSG_FINDVAR */
+    { MI2_MSG_ERROR, "Can't read attribute count"}, /* MI2_MSG_ATTRCOUNT */
+    { MI2_MSG_ERROR, "Can't read attribute name"}, /* MI2_MSG_ATTRNAME */
+    { MI2_MSG_ERROR, "Can't copy attribute '%s'"}, /* MI2_MSG_COPYATTR */
+    { MI2_MSG_ERROR, "Can't read variable information"}, /* MI2_MSG_VARINQ */
+    { MI2_MSG_ERROR, "Can't get unlimited dimension"}, /* MI2_MSG_UNLIMDIM */
+    { MI2_MSG_ERROR, "Can't get dimension information"}, /* MI2_MSG_DIMINQ */
+    { MI2_MSG_ERROR, "Variable already defined with different size"}, /* MI2_MSG_VARCONFLICT */
+    { MI2_MSG_ERROR, "Can't define dimension '%s'"}, /* MI2_MSG_DIMDEF */
+    { MI2_MSG_ERROR, "Can't define variable '%s'"}, /* MI2_MSG_VARDEF */
+    { MI2_MSG_ERROR, "Variables do not match for value copy"}, /* MI2_MSG_VARMISMATCH */
+    { MI2_MSG_ERROR, "Variables have dimensions of different size"}, /* MI2_MSG_VARDIFFSIZE */
+    { MI2_MSG_ERROR, "Can't read variable count"}, /* MI2_MSG_VARCOUNT */
+    { MI2_MSG_ERROR, "Variable '%s' not copied"}, /* MI2_MSG_OUTPUTVAR */
+    { MI2_MSG_ERROR, "Error copying variable"}, /* MI2_MSG_COPYVAR */
+    { MI2_MSG_ERROR, "Non-numeric datatype"}, /* MI2_MSG_VARNOTNUM */
+    { MI2_MSG_FATAL, "Can't allocate %d bytes"}, /* MI2_MSG_OUTOFMEM */
+    { MI2_MSG_ERROR, "Attribute '%s' is not a pointer"}, /* MI2_MSG_ATTRNOTPTR */
+    { MI2_MSG_ERROR, "Variable '%s' is not a standard MINC variable"}, /* MI2_MSG_VARNOTSTD */
+    { MI2_MSG_ERROR, "Bad dimension width suffix"}, /* MI2_MSG_DIMWIDTH */
+    { MI2_MSG_ERROR, "Imagemax/min dimensions vary over image dimensions"}, /* MI2_MSG_MAXMINVARY */
+    { MI2_MSG_FATAL, "Should not happen!"}, /* MI2_MSG_SNH */
+    { MI2_MSG_FATAL, "Unknown integer size %d"}, /* MI2_MSG_INTSIZE */
+    { MI2_MSG_FATAL, "Unknown float size %d"}, /* MI2_MSG_FLTSIZE */
+    { MI2_MSG_FATAL, "Unknown type class %d"}, /* MI2_MSG_TYPECLASS */
+    { MI2_MSG_ERROR, "Function '%s' not implemented"}, /* MI2_MSG_NOTIMPL */
+    { MI2_MSG_FATAL, "Unknown type %d"}, /* MI2_MSG_BADTYPE */
+    { MI2_MSG_ERROR, "Can't open dataset %s"}, /* MI2_MSG_OPENDSET */
+    { MI2_MSG_ERROR, "Can't read dataset %s"}, /* MI2_MSG_READDSET */
+    { MI2_MSG_ERROR, "Can't write dataset %s"}, /* MI2_MSG_WRITEDSET */
+    { MI2_MSG_ERROR, "Can't use more than %d dimensions"}, /* MI2_MSG_TOOMANYDIMS */
+    { MI2_MSG_ERROR, "Attempt to modify an attached image conversion variable"}, /* MI2_MSG_ICVATTACHED */
+    { MI2_MSG_ERROR, "Illegal ICV identifier"}, /* MI2_MSG_BADICV */
+    { MI2_MSG_ERROR, "Error setting ICV property: %s"}, /* MI2_MSG_BADPROP */
+    { MI2_MSG_ERROR, "ICV is not attached"}, /* MI2_MSG_ICVNOTATTACHED */
+    { MI2_MSG_ERROR, "Invalid ICV coordinates"}, /* MI2_MSG_ICVCOORDS */
+    { MI2_MSG_ERROR, "Illegal variable access operation" } /* MI2_MSG_BADOP */
 };
 
-SEMIPRIVATE int MI_save_routine_name(char *name)
+int MI2_save_routine_name(char *name)
 {
    /* no idea what peter was up to here */
    /* minc_trash_var = (((minc_call_depth++)==0) ? MI_save_routine_name(name) : * MI_NOERROR)) */
@@ -167,7 +167,7 @@ SEMIPRIVATE int MI_save_routine_name(char *name)
    return(TRUE);
 }
 
-SEMIPRIVATE int MI_return(void)
+int MI2_return(void)
 { 
    /* no idea what peter was up to here */
    /* return( (((--minc_call_depth)!=0) || MI_return()) ? (value) : (value)) */
@@ -175,7 +175,7 @@ SEMIPRIVATE int MI_return(void)
    return( ((--minc_call_depth)!=0) || TRUE );
 }
 
-SEMIPRIVATE int MI_return_error(void)
+int MI2_return_error(void)
 { 
    /* no idea what peter was up to here */
    /* return( (((--minc_call_depth)!=0) || MI_return_error()) ? (error) : (error)) */
@@ -185,21 +185,24 @@ SEMIPRIVATE int MI_return_error(void)
    }
    return( TRUE );
 }
-SEMIPRIVATE void MI_log_pkg_error2(int p1, char *p2)
+
+void MI2_log_pkg_error2(int p1, char *p2)
 {
   (void) fprintf(stderr, "%s: ", minc_routine_name);
   (void) fprintf(stderr, "%s", p2);
   (void) fputc('\n', stderr);
   (void) fflush(stderr);
 }
-SEMIPRIVATE void MI_log_pkg_error3(int p1, char *p2, char *p3)
+
+void MI2_log_pkg_error3(int p1, char *p2, char *p3)
 { 
   (void) fprintf(stderr, "%s: ", minc_routine_name);
   (void) fprintf(stderr, p2, p3);
   (void) fputc('\n', stderr);
   (void) fflush(stderr);
 }
-SEMIPRIVATE void MI_log_sys_error1(char *p1)
+
+void MI2_log_sys_error1(char *p1)
 {
    char *message;
    int errnum = errno;
@@ -223,49 +226,47 @@ static struct {
     int level;
     char prog[128];
     FILE *fp;
-} _MI_log = {
-    MI_MSG_ERROR, {""}, NULL
+} _MI2_log = {
+    MI2_MSG_ERROR, {""}, NULL
 };
 
-MNCAPI void milog_init(const char *name)
+void mi2log_init(const char *name)
 {
     char *fname_str = miget_cfg_str(MICFG_LOGFILE);
     int level = miget_cfg_int(MICFG_LOGLEVEL);
 
     if (fname_str == NULL) {
-	_MI_log.fp = stderr;
-    }
-    else if (!strcmp(fname_str, "stdout") || !strcmp(fname_str, "-")) {
-	_MI_log.fp = stdout;
+      _MI2_log.fp = stderr;
+    } else if (!strcmp(fname_str, "stdout") || !strcmp(fname_str, "-")) {
+      _MI2_log.fp = stdout;
     }
     else {
-	if (*fname_str == '+') {
-	    _MI_log.fp = fopen(fname_str + 1, "w+");
-	}
-	else {
-	    _MI_log.fp = fopen(fname_str, "w");
-	}
+      if (*fname_str == '+') {
+        _MI2_log.fp = fopen(fname_str + 1, "w+");
+      } else {
+        _MI2_log.fp = fopen(fname_str, "w");
+      }
     }
 
     if (level != 0) {
-        _MI_log.level = level;
+        _MI2_log.level = level;
     }
 
-    strncpy(_MI_log.prog, name, sizeof (_MI_log.prog));
+    strncpy(_MI2_log.prog, name, sizeof (_MI_log.prog));
 
     if (fname_str != NULL) {
         free(fname_str);
     }
 }
 
-MNCAPI int milog_set_verbosity(int lvl)
+ int mi2log_set_verbosity(int lvl)
 {
     int lvl_prev = _MI_log.level;
     _MI_log.level = lvl;
     return (lvl_prev);
 }
 
-MNCAPI int milog_message(mimsgcode_t code, ...)
+ int mi2log_message(mimsgcode_t code, ...)
 {
     va_list ap;
     int lvl;
@@ -275,13 +276,13 @@ MNCAPI int milog_message(mimsgcode_t code, ...)
 	_MI_log.fp = stderr;
     }
 
-    lvl = mierror_table[code-MI_MSG_BASE].level;
-    fmt = mierror_table[code-MI_MSG_BASE].msgfmt;
+    lvl = mierror_table[code-MI2_MSG_BASE].level;
+    fmt = mierror_table[code-MI2_MSG_BASE].msgfmt;
 
     /* Log the message if the the message priority
      * is less than the configured priority.  Always log fatal errors.
      */
-    if ((lvl <= _MI_log.level) || lvl == MI_MSG_FATAL) {
+    if ((lvl <= _MI_log.level) || lvl == MI2_MSG_FATAL) {
 	if (_MI_log.prog[0] != '\0') {
 	    fprintf(_MI_log.fp, "%s ", _MI_log.prog);
 	}
@@ -295,7 +296,7 @@ MNCAPI int milog_message(mimsgcode_t code, ...)
 
     /* For fatal messages, give up and exit.
      */
-    if (lvl == MI_MSG_FATAL) {
+    if (lvl == MI2_MSG_FATAL) {
 	exit(-1);
     }
 
