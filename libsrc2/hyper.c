@@ -513,7 +513,7 @@ mirw_hyperslab_icv(int opcode,
 {
     int ndims;
     int nbytes;
-    int nc_type;
+    mitype_t mi_type;
     int result = MI_ERROR;
     long icv_start[MI2_MAX_VAR_DIMS];
     long icv_count[MI2_MAX_VAR_DIMS];
@@ -527,10 +527,10 @@ mirw_hyperslab_icv(int opcode,
     }
 
     /*TODO:CNV
-    miicv_inqint(icv, MI_ICV_TYPE, &nc_type);
+    miicv_inqint(icv, MI_ICV_TYPE, &mi_type);
     */
     
-    nbytes = MI2typelen(nc_type);
+    nbytes = mitype_len(mi_type);
 
     ndims = volume->number_of_dims;
 
@@ -811,7 +811,7 @@ miset_real_value_hyperslab(mihandle_t volume,
     nctype = mitype_to_nctype(buffer_data_type, &is_signed);
 
     if ((icv = miicv_create()) < 0) {
-	return (MI_ERROR);
+      return (MI_ERROR);
     }
 
     miicv_setint(icv, MI_ICV_TYPE, nctype);
@@ -819,13 +819,13 @@ miset_real_value_hyperslab(mihandle_t volume,
 
     result = miicv_attach(icv, file_id, var_id);
     if (result == MI_NOERROR) {
-	result = mirw_hyperslab_icv(MIRW_OP_WRITE, 
+      result = mirw_hyperslab_icv(MIRW_OP_WRITE, 
                                     volume,
                                     icv, 
                                     start, 
                                     count, 
                                     (void *) buffer);
-	miicv_detach(icv);
+      miicv_detach(icv);
     }
     miicv_free(icv);
     return (result);

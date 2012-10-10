@@ -153,6 +153,38 @@ mitype_to_hdftype(mitype_t mitype, int is_native)
     return (type_id);
 }
 
+int mitype_len(mitype_t mitype )
+{
+    switch (mitype) {
+    case MI_TYPE_BYTE:
+    case MI_TYPE_UBYTE:
+        return 1;
+    case MI_TYPE_USHORT:
+    case MI_TYPE_SHORT:
+        return 2;
+    case MI_TYPE_INT:
+    case MI_TYPE_UINT:
+        return 4;
+    case MI_TYPE_FLOAT:
+        return 4;
+    case MI_TYPE_DOUBLE:
+        return 8;
+    case MI_TYPE_SCOMPLEX:
+        return 2*2;
+    case MI_TYPE_ICOMPLEX:
+        return 2*4;
+    case MI_TYPE_FCOMPLEX:
+        return 2*4;
+    case MI_TYPE_DCOMPLEX:
+        return 2*8;
+    default:
+        break;
+    }
+    fprintf(stderr, _("Unknown type %d"), mitype);
+    return (-1);
+}
+
+
 
 /*! Convert a MINC 2 datatype into a NetCDF datatype.
  * \param mitype The MINC 2 data type to convert
@@ -1459,7 +1491,7 @@ minc_update_thumbnail(mihandle_t volume, hid_t loc_id, int igrp, int ogrp)
     hsize_t isize[MI2_MAX_VAR_DIMS];
     hsize_t osize[MI2_MAX_VAR_DIMS];
     hsize_t count[MI2_MAX_VAR_DIMS];
-    hsize_t start[MI2_MAX_VAR_DIMS];
+    H5_START_T start[MI2_MAX_VAR_DIMS];
     hid_t idst_id;              /* Input dataset */
     hid_t odst_id;              /* Output dataset */
     hid_t ifspc_id;             /* Input "file" dataspace */
@@ -1633,7 +1665,7 @@ minc_update_thumbnail(mihandle_t volume, hid_t loc_id, int igrp, int ogrp)
       if (volume->volume_class == MI_CLASS_REAL) {
                 /* Select the right point in tfspc_id */
                 H5Sselect_elements(tfspc_id, H5S_SELECT_SET, 1,
-                                  (const hsize_t *) &start[0]);
+                                  (const H5_START_T *) &start[0]);
 
                 H5Dwrite(omax_id, H5T_NATIVE_DOUBLE, tmspc_id, tfspc_id, 
                         H5P_DEFAULT, &smax);
