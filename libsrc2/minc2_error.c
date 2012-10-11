@@ -80,11 +80,17 @@
               software for any purpose.  It is provided "as is" without
               express or implied warranty.
 ---------------------------------------------------------------------------- */
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif //HAVE_CONFIG_H
 
 #include <errno.h>
 #include <stdarg.h>
-#include <minc2_private.h>
-#include <minc2_error.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+#include "minc2.h"
 
 struct mierror_entry {
     int level;
@@ -252,7 +258,7 @@ void mi2log_init(const char *name)
         _MI2_log.level = level;
     }
 
-    strncpy(_MI2_log.prog, name, sizeof (_MI_log.prog));
+    strncpy(_MI2_log.prog, name, sizeof (_MI2_log.prog));
 
     if (fname_str != NULL) {
         free(fname_str);
@@ -261,19 +267,19 @@ void mi2log_init(const char *name)
 
  int mi2log_set_verbosity(int lvl)
 {
-    int lvl_prev = _MI_log.level;
-    _MI_log.level = lvl;
+    int lvl_prev = _MI2_log.level;
+    _MI2_log.level = lvl;
     return (lvl_prev);
 }
 
- int mi2log_message(mimsgcode_t code, ...)
+ int mi2log_message(mi2msgcode_t code, ...)
 {
     va_list ap;
     int lvl;
     const char *fmt;
 
-    if (_MI_log.fp == NULL) {
-	_MI_log.fp = stderr;
+    if (_MI2_log.fp == NULL) {
+	_MI2_log.fp = stderr;
     }
 
     lvl = mierror_table[code-MI2_MSG_BASE].level;
@@ -282,22 +288,22 @@ void mi2log_init(const char *name)
     /* Log the message if the the message priority
      * is less than the configured priority.  Always log fatal errors.
      */
-    if ((lvl <= _MI_log.level) || lvl == MI2_MSG_FATAL) {
-	if (_MI_log.prog[0] != '\0') {
-	    fprintf(_MI_log.fp, "%s ", _MI_log.prog);
+    if ((lvl <= _MI2_log.level) || lvl == MI2_MSG_FATAL) {
+	if (_MI2_log.prog[0] != '\0') {
+	    fprintf(_MI2_log.fp, "%s ", _MI2_log.prog);
 	}
-	fprintf(_MI_log.fp, "(from %s): ", minc_routine_name);
+	fprintf(_MI2_log.fp, "(from %s): ", minc_routine_name);
 	va_start(ap, code);
-	vfprintf(_MI_log.fp, fmt, ap);
+	vfprintf(_MI2_log.fp, fmt, ap);
 	va_end(ap);
-	fprintf(_MI_log.fp, "\n");
-	fflush(_MI_log.fp);
+	fprintf(_MI2_log.fp, "\n");
+	fflush(_MI2_log.fp);
     }
 
     /* For fatal messages, give up and exit.
      */
     if (lvl == MI2_MSG_FATAL) {
-	exit(-1);
+      exit(-1);
     }
 
     return (MI_ERROR);		/* Just for convenience */

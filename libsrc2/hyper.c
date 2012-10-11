@@ -4,6 +4,10 @@
  *
  * Functions to manipulate hyperslabs of volume image data.
  ************************************************************************/
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif //HAVE_CONFIG_H
+
 #include <stdlib.h>
 #include <hdf5.h>
 #include "minc2.h"
@@ -294,8 +298,8 @@ mitranslate_hyperslab_origin(mihandle_t volume,
 
     for(j=0; j<ndims; j++)
       {
-	hdf_count[j]=0;
-	hdf_start[j]=0;
+        hdf_count[j]=0;
+        hdf_start[j]=0;
       }
     for (file_i = 0; file_i < ndims; file_i++) {
         midimhandle_t hdim;
@@ -370,8 +374,7 @@ mitranslate_hyperslab_origin(mihandle_t volume,
  * which performs no value conversion.  It is much more efficient than
  * mirw_hyperslab_icv()
  */
-static int
-mirw_hyperslab_raw(int opcode, 
+static int mirw_hyperslab_raw(int opcode, 
                    mihandle_t volume, 
                    mitype_t midatatype, 
                    const unsigned long start[], 
@@ -468,15 +471,15 @@ mirw_hyperslab_raw(int opcode,
 
             /* Invert before calling */
             for (i = 0; i < ndims; i++) {
-	      //icount[i] = count[volume->dim_indices[i]];
-	      icount[volume->dim_indices[i]] = count[i];
+              //icount[i] = count[volume->dim_indices[i]];
+              icount[volume->dim_indices[i]] = count[i];
 
-	      //idir[i] = dir[volume->dim_indices[i]];
-	      idir[volume->dim_indices[i]] = dir[i];
+              //idir[i] = dir[volume->dim_indices[i]];
+              idir[volume->dim_indices[i]] = dir[i];
 
-	      // this one was correct the original way
-	      imap[volume->dim_indices[i]] = i;
-	      
+              // this one was correct the original way
+              imap[volume->dim_indices[i]] = i;
+              
             }
 
             restructure_array(ndims, buffer, icount, H5Tget_size(type_id), 
@@ -505,8 +508,7 @@ mirw_hyperslab_raw(int opcode,
 /** Read/write a hyperslab of data, performing dimension remapping
  * and data rescaling as needed.
  */
-static int 
-mirw_hyperslab_icv(int opcode, 
+static int mirw_hyperslab_icv(int opcode, 
                    mihandle_t volume,
                    int icv,
                    const unsigned long start[], 
@@ -528,9 +530,7 @@ mirw_hyperslab_icv(int opcode,
         return (MI_ERROR);
     }
 
-    /*TODO:CNV
-    miicv_inqint(icv, MI_ICV_TYPE, &mi_type);
-    */
+    mi2_icv_inqint(icv, MI2_ICV_TYPE, &mi_type);
     
     nbytes = mitype_len(mi_type);
 
@@ -554,7 +554,7 @@ mirw_hyperslab_icv(int opcode,
     }
 
     if (opcode == MIRW_OP_READ) {
-        result = miicv_get(icv, icv_start, icv_count, buffer);
+        result = mi2_icv_get(icv, icv_start, icv_count, buffer);
 
         /* Now we have to restructure the array.
          * Count must be in raw order here.
@@ -575,7 +575,7 @@ mirw_hyperslab_icv(int opcode,
                               volume->dim_indices, dir);
         }
 
-        result = miicv_put(icv, icv_start, icv_count, buffer);
+        result = mi2_icv_put(icv, icv_start, icv_count, buffer);
     }
 
     return (result);
@@ -585,8 +585,7 @@ mirw_hyperslab_icv(int opcode,
  *  max, mapped to the maximum representable range for the requested
  *  data type. Float type is NOT an allowed data type.  
  */
-int
-miget_hyperslab_normalized(mihandle_t volume, 
+int miget_hyperslab_normalized(mihandle_t volume, 
                            mitype_t buffer_data_type,
                            const unsigned long start[], 
                            const unsigned long count[],
@@ -609,7 +608,7 @@ miget_hyperslab_normalized(mihandle_t volume,
         return (MI_ERROR);
     }
 
-    var_id = ncvarid(file_id, MIimage);
+    var_id = hdf_varid(file_id, MIimage);
     if (var_id < 0) {
         return (MI_ERROR);
     }
@@ -619,26 +618,24 @@ miget_hyperslab_normalized(mihandle_t volume,
         return (MI_ERROR);
     }
 
-    /* TODO:CNV
-    if ((icv = miicv_create()) < 0) {
+    if ((icv = mi2_icv_create()) < 0) {
       return (MI_ERROR);
     }
 
-    result = miicv_setint(icv, MI_ICV_TYPE, nctype);
-    result = miicv_setstr(icv, MI_ICV_SIGN, is_signed ? MI_SIGNED : MI_UNSIGNED);
-    result = miicv_setdbl(icv, MI_ICV_IMAGE_MIN, min);
-    result = miicv_setdbl(icv, MI_ICV_IMAGE_MAX, max);
-    result = miicv_setint(icv, MI_ICV_USER_NORM, TRUE);
-    result = miicv_setint(icv, MI_ICV_DO_NORM, TRUE);
+    result = mi2_icv_setint(icv, MI2_ICV_TYPE, buffer_data_type);
+    result = mi2_icv_setstr(icv, MI2_ICV_SIGN, is_signed ? MI_SIGNED : MI_UNSIGNED);
+    result = mi2_icv_setdbl(icv, MI2_ICV_IMAGE_MIN, min);
+    result = mi2_icv_setdbl(icv, MI2_ICV_IMAGE_MAX, max);
+    result = mi2_icv_setint(icv, MI2_ICV_USER_NORM, TRUE);
+    result = mi2_icv_setint(icv, MI2_ICV_DO_NORM, TRUE);
 
-    result = miicv_attach(icv, file_id, var_id);
+    result = mi2_icv_attach(icv, file_id, var_id);
     if (result == MI_NOERROR) {
       result = mirw_hyperslab_icv(MIRW_OP_READ, volume, icv, start, count, 
                                     buffer);
-      miicv_detach(icv);
+      mi2_icv_detach(icv);
     }
-    miicv_free(icv);
-    TODO:CNV */
+    mi2_icv_free(icv);
     
     return (result);
 }
@@ -646,8 +643,7 @@ miget_hyperslab_normalized(mihandle_t volume,
 /** Get a hyperslab from the file, with the assistance of a MINC2 image
  * conversion variable (ICV).
  */
-int
-miget_hyperslab_with_icv(mihandle_t volume, /**< A MINC 2.0 volume handle */
+int miget_hyperslab_with_icv(mihandle_t volume, /**< A MINC 2.0 volume handle */
 			  int icv, /**< The ICV to use */
 			  mitype_t buffer_data_type, /**< Output datatype */
 			  const unsigned long start[], /**< Start coordinates  */
@@ -662,18 +658,18 @@ miget_hyperslab_with_icv(mihandle_t volume, /**< A MINC 2.0 volume handle */
 
     file_id = volume->hdf_id;
 
-    var_id = ncvarid(file_id, MIimage);
+    var_id = hdf_varid(file_id, MIimage);
 
     nctype = mitype_to_nctype(buffer_data_type, &is_signed);
 
-    miicv_setint(icv, MI2_ICV_TYPE, nctype);
-    miicv_setstr(icv, MI2_ICV_SIGN, is_signed ? MI_SIGNED : MI_UNSIGNED);
+    mi2_icv_setint(icv, MI2_ICV_TYPE, nctype);
+    mi2_icv_setstr(icv, MI2_ICV_SIGN, is_signed ? MI_SIGNED : MI_UNSIGNED);
 
-    result = miicv_attach(icv, file_id, var_id);
+    result = mi2_icv_attach(icv, file_id, var_id);
     if (result == MI_NOERROR) {
         result = mirw_hyperslab_icv(MIRW_OP_READ, volume, icv, start, count, 
                                     buffer);
-      miicv_detach(icv);
+      mi2_icv_detach(icv);
     }
     return (result);
 }
@@ -697,14 +693,14 @@ miset_hyperslab_with_icv(mihandle_t volume, /**< A MINC 2.0 volume handle */
 
     file_id = volume->hdf_id;
 
-    var_id = ncvarid(file_id, MIimage);
+    var_id = hdf_varid(file_id, MIimage);
 
     nctype = mitype_to_nctype(buffer_data_type, &is_signed);
 
-    miicv_setint(icv, MI2_ICV_TYPE, nctype);
-    miicv_setstr(icv, MI2_ICV_SIGN, is_signed ? MI_SIGNED : MI_UNSIGNED);
+    mi2_icv_setint(icv, MI2_ICV_TYPE, nctype);
+    mi2_icv_setstr(icv, MI2_ICV_SIGN, is_signed ? MI_SIGNED : MI_UNSIGNED);
 
-    result = miicv_attach(icv, file_id, var_id);
+    result = mi2_icv_attach(icv, file_id, var_id);
     if (result == MI_NOERROR) {
       result = mirw_hyperslab_icv(MIRW_OP_WRITE, 
                                     volume,
@@ -712,7 +708,7 @@ miset_hyperslab_with_icv(mihandle_t volume, /**< A MINC 2.0 volume handle */
                                     start, 
                                     count, 
                                     (void *) buffer);
-      miicv_detach(icv);
+      mi2_icv_detach(icv);
     }
     return (result);
 }
@@ -741,40 +737,40 @@ miget_real_value_hyperslab(mihandle_t volume,
 
     file_id = volume->hdf_id;
 
-    var_id = ncvarid(file_id, MIimage);
+    var_id = hdf_varid(file_id, MIimage);
 
     nctype = mitype_to_nctype(buffer_data_type, &is_signed);
 
-    if ((icv = miicv_create()) < 0) {
+    if ((icv = mi2_icv_create()) < 0) {
         return (MI_ERROR);
     }
 
-    miicv_setint(icv, MI2_ICV_TYPE, nctype);
-    miicv_setstr(icv, MI2_ICV_SIGN, is_signed ? MI_SIGNED : MI_UNSIGNED);
-    miicv_setint(icv, MI2_ICV_DO_RANGE, TRUE);
-    miicv_setint(icv, MI2_ICV_DO_NORM, TRUE);
+    mi2_icv_setint(icv, MI2_ICV_TYPE, nctype);
+    mi2_icv_setstr(icv, MI2_ICV_SIGN, is_signed ? MI_SIGNED : MI_UNSIGNED);
+    mi2_icv_setint(icv, MI2_ICV_DO_RANGE, TRUE);
+    mi2_icv_setint(icv, MI2_ICV_DO_NORM, TRUE);
     //figure out whether we need to flip image    L.B May 18/2011
     for (i=0; i < volume->number_of_dims ; i++)
       {
         hdim = volume->dim_handles[i];
         switch (hdim->flipping_order) {
         case MI_FILE_ORDER:
-          miicv_setint(icv, MI2_ICV_DO_DIM_CONV, FALSE);
+          mi2_icv_setint(icv, MI2_ICV_DO_DIM_CONV, FALSE);
           break;
         case MI_COUNTER_FILE_ORDER:
         case MI_POSITIVE:
           if (hdim->step < 0)
-            miicv_setint(icv, MI2_ICV_DO_DIM_CONV, TRUE);
+            mi2_icv_setint(icv, MI2_ICV_DO_DIM_CONV, TRUE);
           break;
         case MI_NEGATIVE: 
           if (hdim->step > 0)
-            miicv_setint(icv, MI2_ICV_DO_DIM_CONV, TRUE);
+            mi2_icv_setint(icv, MI2_ICV_DO_DIM_CONV, TRUE);
           break;
         default:
           return;
         }
       }
-    result = miicv_attach(icv, file_id, var_id);
+    result = mi2_icv_attach(icv, file_id, var_id);
     if (result == MI_NOERROR) {
       result = mirw_hyperslab_icv(MIRW_OP_READ,
                                     volume,
@@ -782,9 +778,9 @@ miget_real_value_hyperslab(mihandle_t volume,
                                     start, 
                                     count, 
                                     (void *) buffer);
-      miicv_detach(icv);
+      mi2_icv_detach(icv);
     }
-    miicv_free(icv);
+    mi2_icv_free(icv);
     return (result);
 }
 
@@ -808,18 +804,18 @@ miset_real_value_hyperslab(mihandle_t volume,
 
     file_id = volume->hdf_id;
 
-    var_id = ncvarid(file_id, MIimage);
+    var_id = hdf_varid(file_id, MIimage);
 
     nctype = mitype_to_nctype(buffer_data_type, &is_signed);
 
-    if ((icv = miicv_create()) < 0) {
+    if ((icv = mi2_icv_create()) < 0) {
       return (MI_ERROR);
     }
 
-    miicv_setint(icv, MI2_ICV_TYPE, nctype);
-    miicv_setstr(icv, MI2_ICV_SIGN, is_signed ? MI_SIGNED : MI_UNSIGNED);
+    mi2_icv_setint(icv, MI2_ICV_TYPE, nctype);
+    mi2_icv_setstr(icv, MI2_ICV_SIGN, is_signed ? MI_SIGNED : MI_UNSIGNED);
 
-    result = miicv_attach(icv, file_id, var_id);
+    result = mi2_icv_attach(icv, file_id, var_id);
     if (result == MI_NOERROR) {
       result = mirw_hyperslab_icv(MIRW_OP_WRITE, 
                                     volume,
@@ -827,9 +823,9 @@ miset_real_value_hyperslab(mihandle_t volume,
                                     start, 
                                     count, 
                                     (void *) buffer);
-      miicv_detach(icv);
+      mi2_icv_detach(icv);
     }
-    miicv_free(icv);
+    mi2_icv_free(icv);
     return (result);
 }
 

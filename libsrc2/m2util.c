@@ -1,8 +1,8 @@
 /** \file m2util.c
- * \brief MINC 2.0 Private utility functions
- * \author Leila Baghdadi, Bert Vincent
- *
- ************************************************************************/
+* \brief MINC 2.0 Private utility functions
+* \author Leila Baghdadi, Bert Vincent
+*
+************************************************************************/
 #include <stdlib.h>
 #include <math.h>
 #include <hdf5.h>
@@ -12,9 +12,9 @@
 #include "minc2_private.h"
 
 /* Uggh!!! The HDF5 team changed the definition of the H5Tconvert(),
- * H5Tregister(), and H5T_conv_t functions, and the result is that we
- * have to special-case these types.  I am bummed.
- */
+* H5Tregister(), and H5T_conv_t functions, and the result is that we
+* have to special-case these types.  I am bummed.
+*/
 #if (H5_VERS_MAJOR > 1) || (H5_VERS_MINOR > 6) || (H5_VERS_RELEASE > 2)
 #define H5_NELEMENTS_T size_t
 #else
@@ -22,8 +22,8 @@
 #endif
 
 /* They also redefined the type of the 4th argument to H5Sselect_elements.
- * This is harmless as long as sizeof(hssize_t) == sizeof(hsize_t).
- */
+* This is harmless as long as sizeof(hssize_t) == sizeof(hsize_t).
+*/
 #if (H5_VERS_MAJOR > 1) || (H5_VERS_MINOR > 6) || (H5_VERS_RELEASE > 3)
 #define H5_START_T hsize_t
 #else
@@ -31,11 +31,11 @@
 #endif
 
 /*! Convert a MINC 2 datatype into a HDF5 datatype.  Actually returns a copy
- * of the datatype, so the returned value must be explicitly freed with a
- * call to H5Tclose().
- * \param mitype The MINC 2 data type to convert
- * \param is_native Convert to native type if TRUE
- */
+* of the datatype, so the returned value must be explicitly freed with a
+* call to H5Tclose().
+* \param mitype The MINC 2 data type to convert
+* \param is_native Convert to native type if TRUE
+*/
 hid_t
 mitype_to_hdftype(mitype_t mitype, int is_native)
 {
@@ -43,8 +43,8 @@ mitype_to_hdftype(mitype_t mitype, int is_native)
 
     if (is_native) {
         /* Native types are in the byte-ordering of the native system.
-         * They are appropriate for the "in-memory" types for data.
-         */
+        * They are appropriate for the "in-memory" types for data.
+        */
         switch (mitype) {
         case MI_TYPE_BYTE:
             type_id = H5Tcopy(H5T_NATIVE_SCHAR);
@@ -97,9 +97,9 @@ mitype_to_hdftype(mitype_t mitype, int is_native)
     }
     else {
         /* The non-native types are standardized to be in
-         * "little-endian" form.  That's an arbitrary decision which
-         * could certainly be debated.
-         */
+        * "little-endian" form.  That's an arbitrary decision which
+        * could certainly be debated.
+        */
         switch (mitype) {
         case MI_TYPE_BYTE:
             type_id = H5Tcopy(H5T_STD_I8LE);
@@ -180,16 +180,16 @@ int mitype_len(mitype_t mitype )
     default:
         break;
     }
-    fprintf(stderr, _("Unknown type %d"), mitype);
+    fprintf(stderr, _("Unknown type %d"), (int)mitype);
     return (-1);
 }
 
 
 
 /*! Convert a MINC 2 datatype into a NetCDF datatype.
- * \param mitype The MINC 2 data type to convert
- * \param is_signed Set to TRUE if the data type is signed, FALSE if unsigned.
- */
+* \param mitype The MINC 2 data type to convert
+* \param is_signed Set to TRUE if the data type is signed, FALSE if unsigned.
+*/
 /* TODO:CNV */
 
 #if 0
@@ -203,60 +203,60 @@ mitype_to_nctype(mitype_t mitype, int *is_signed)
 
     switch (mitype) {
     case MI_TYPE_BYTE:
-	nctype = NC_BYTE;
-	break;
+  nctype = NC_BYTE;
+  break;
     case MI_TYPE_SHORT:
-	nctype = NC_SHORT;
-	break;
+  nctype = NC_SHORT;
+  break;
     case MI_TYPE_INT:
-	nctype = NC_INT;
-	break;
+  nctype = NC_INT;
+  break;
     case MI_TYPE_FLOAT:
-	nctype = NC_FLOAT;
-	break;
+  nctype = NC_FLOAT;
+  break;
     case MI_TYPE_DOUBLE:
-	nctype = NC_DOUBLE;
-	break;
+  nctype = NC_DOUBLE;
+  break;
     case MI_TYPE_UBYTE:
-	nctype = NC_BYTE;
-	*is_signed = 0;
-	break;
+  nctype = NC_BYTE;
+  *is_signed = 0;
+  break;
     case MI_TYPE_USHORT:
-	nctype = NC_SHORT;
-	*is_signed = 0;
-	break;
+  nctype = NC_SHORT;
+  *is_signed = 0;
+  break;
     case MI_TYPE_UINT:
-	nctype = NC_INT;
-	*is_signed = 1;
-	break;
+  nctype = NC_INT;
+  *is_signed = 1;
+  break;
     default:
-	nctype = -1;		/* ERROR!! */
-	break;
+  nctype = -1;		/* ERROR!! */
+  break;
     }
     return (nctype);
 }
 #endif /*TODO:CNV*/
 
 /*! Return the group or dataset ID of the last item in a "path",
- * specified like a UNIX pathname /black/white/red etc.  
- * \param file_id The HDF5 handle of the file (or group) at which to start
- * the search.  
- * \param path A string consisting of a slash-separated list of 
- * HDF5 groupnames
- */
+* specified like a UNIX pathname /black/white/red etc.  
+* \param file_id The HDF5 handle of the file (or group) at which to start
+* the search.  
+* \param path A string consisting of a slash-separated list of 
+* HDF5 groupnames
+*/
 hid_t
 midescend_path(hid_t file_id, const char *path)
 {
     hid_t tmp_id;
 
     /* Put H5E_BEGIN_TRY/H5E_END_TRY around this to avoid the overzealous 
-     * automatic error reporting of HDF5.
-     */
+    * automatic error reporting of HDF5.
+    */
     H5E_BEGIN_TRY {
         tmp_id = H5Dopen1(file_id, path);
 
         /* If the dataset open fails, try opening the object as a group.
-         */
+        */
         if (tmp_id < 0) {
             tmp_id = H5Gopen1(file_id, path);
         }
@@ -265,8 +265,8 @@ midescend_path(hid_t file_id, const char *path)
 }
 
 /** Get the number of voxels in the file - this is the total number,
- * not just spatial dimensions 
- */
+* not just spatial dimensions 
+*/
 mi_i64_t
 miget_voxel_count(int mincid)
 {
@@ -278,12 +278,12 @@ miget_voxel_count(int mincid)
     long length;
 
     /* Get the dimension ids for the image variable 
-     */
+    */
     imgid = ncvarid(mincid, MIimage);
     (void)ncvarinq(mincid, imgid, NULL, NULL, &ndims, dim, NULL);
 
     /* Loop over them to get the total number of voxels 
-     */
+    */
     nvoxels = 1;
     for (idim = 0; idim < ndims; idim++) {
         (void)ncdiminq(mincid, dim[idim], NULL, &length);
@@ -309,25 +309,25 @@ miset_attr_at_loc(hid_t hdf_loc, const char *name, mitype_t data_type,
 
     switch (data_type) {
     case MI_TYPE_INT:
-	ftyp_id = H5Tcopy(H5T_STD_I32LE);
+  ftyp_id = H5Tcopy(H5T_STD_I32LE);
         mtyp_id = H5Tcopy(H5T_NATIVE_INT);
-	break;
+  break;
     case MI_TYPE_FLOAT:
-	ftyp_id = H5Tcopy(H5T_IEEE_F32LE);
+  ftyp_id = H5Tcopy(H5T_IEEE_F32LE);
         mtyp_id = H5Tcopy(H5T_NATIVE_FLOAT);
-	break;
+  break;
     case MI_TYPE_DOUBLE:
-	ftyp_id = H5Tcopy(H5T_IEEE_F64LE);
+  ftyp_id = H5Tcopy(H5T_IEEE_F64LE);
         mtyp_id = H5Tcopy(H5T_NATIVE_DOUBLE);
-	break;
+  break;
     case MI_TYPE_STRING:
-	ftyp_id = H5Tcopy(H5T_C_S1);
-	H5Tset_size(ftyp_id, length);
+  ftyp_id = H5Tcopy(H5T_C_S1);
+  H5Tset_size(ftyp_id, length);
         mtyp_id = H5Tcopy(ftyp_id);
         length = 1;             /* Apparent length is one. */
-	break;
+  break;
     default:
-	return (MI_ERROR);
+  return (MI_ERROR);
     }
 
     if (length == 1) {
@@ -343,7 +343,7 @@ miset_attr_at_loc(hid_t hdf_loc, const char *name, mitype_t data_type,
     
     hdf_attr = H5Acreate1(hdf_loc, name, ftyp_id, spc_id, H5P_DEFAULT);
     if (hdf_attr < 0) {
-	return (MI_ERROR);
+  return (MI_ERROR);
     }
 
     H5Awrite(hdf_attr, mtyp_id, values);
@@ -364,23 +364,23 @@ miset_attribute(mihandle_t volume, const char *path, const char *name,
     hid_t hdf_loc;
 
     /* Get a handle to the actual HDF file 
-     */
+    */
     hdf_file = volume->hdf_id;
     if (hdf_file < 0) {
-	return (MI_ERROR);
+  return (MI_ERROR);
     }
 
     /* Search through the path, descending into each group encountered.
-     */
+    */
     hdf_loc = midescend_path(hdf_file, path);
     if (hdf_loc < 0) {
-	return (MI_ERROR);
+  return (MI_ERROR);
     }
 
     miset_attr_at_loc(hdf_loc, name, data_type, length, values);
 
     /* The hdf_loc identifier could be a group or a dataset.
-     */
+    */
     if (H5Iget_type(hdf_loc) == H5I_GROUP) {
         H5Gclose(hdf_loc);
     }
@@ -403,14 +403,14 @@ miget_attribute(mihandle_t volume, const char *path, const char *name,
     int status = MI_ERROR;      /* Guilty until proven innocent */
 
     /* Get a handle to the actual HDF file 
-     */
+    */
     hdf_file = volume->hdf_id;
     if (hdf_file < 0) {
-	return (MI_ERROR);
+  return (MI_ERROR);
     }
     
     /* Find the group or dataset referenced by the path.
-     */
+    */
     hdf_loc = midescend_path(hdf_file, path);
     if (hdf_loc < 0) {
         return (MI_ERROR);
@@ -425,21 +425,21 @@ miget_attribute(mihandle_t volume, const char *path, const char *name,
 
     switch (data_type) {
     case MI_TYPE_INT:
-	mtyp_id = H5Tcopy(H5T_NATIVE_INT);
-	break;
+  mtyp_id = H5Tcopy(H5T_NATIVE_INT);
+  break;
     case MI_TYPE_UINT:
         mtyp_id = H5Tcopy(H5T_NATIVE_UINT);
         break;
     case MI_TYPE_FLOAT:
-	mtyp_id = H5Tcopy(H5T_NATIVE_FLOAT);
-	break;
+  mtyp_id = H5Tcopy(H5T_NATIVE_FLOAT);
+  break;
     case MI_TYPE_DOUBLE:
-	mtyp_id = H5Tcopy(H5T_NATIVE_DOUBLE);
-	break;
+  mtyp_id = H5Tcopy(H5T_NATIVE_DOUBLE);
+  break;
     case MI_TYPE_STRING:
-	mtyp_id = H5Tcopy(H5T_C_S1);
-	H5Tset_size(mtyp_id, length);
-	break;
+  mtyp_id = H5Tcopy(H5T_C_S1);
+  H5Tset_size(mtyp_id, length);
+  break;
     default:
         goto cleanup;
     }
@@ -450,15 +450,15 @@ miget_attribute(mihandle_t volume, const char *path, const char *name,
     }
 
     /* If we're retrieving a vector, make certain the length passed into this
-     * function is sufficient.
-     */
+    * function is sufficient.
+    */
     if (H5Sget_simple_extent_ndims(spc_id) == 1) {
-	hsize_t hdf_dims[1];
+      hsize_t hdf_dims[1];
 
-	H5Sget_simple_extent_dims(spc_id, hdf_dims, NULL);
-	if (length < hdf_dims[0]) {
+  H5Sget_simple_extent_dims(spc_id, hdf_dims, NULL);
+  if (length < hdf_dims[0]) {
             goto cleanup;
-	}
+  }
     }
     
     if (H5Aread(hdf_attr, mtyp_id, values) < 0) {
@@ -468,7 +468,7 @@ miget_attribute(mihandle_t volume, const char *path, const char *name,
     status = MI_NOERROR;        /* We succeeded! */
 
     /* Be certain that the string is null-terminated.
-     */
+    */
     if (data_type == MI_TYPE_STRING) {
         hid_t atype;            /* Attribute type */
         int alength;
@@ -481,7 +481,7 @@ miget_attribute(mihandle_t volume, const char *path, const char *name,
         H5Tclose(atype);
     }
 
- cleanup:
+cleanup:
     if (hdf_attr >= 0) {
         H5Aclose(hdf_attr);
     }
@@ -494,7 +494,7 @@ miget_attribute(mihandle_t volume, const char *path, const char *name,
 
     if (hdf_loc >= 0) {
         /* The hdf_loc identifier could be a group or a dataset.
-         */
+        */
         if (H5Iget_type(hdf_loc) == H5I_GROUP) {
             H5Gclose(hdf_loc);
         }
@@ -506,8 +506,8 @@ miget_attribute(mihandle_t volume, const char *path, const char *name,
 }
 
 /* Get the mapping from spatial dimension - x, y, z - to file dimensions
- * and vice-versa.
- */
+* and vice-versa.
+*/
 void
 mifind_spatial_dims(int mincid, int space_to_dim[], int dim_to_space[])
 {
@@ -523,17 +523,17 @@ mifind_spatial_dims(int mincid, int space_to_dim[], int dim_to_space[])
         dim_to_space[idim] = -1;
 
     /* Get the dimension ids for the image variable 
-     */
+    */
     /*TODO:CNV
     imgid = ncvarid(mincid, MIimage);
     (void)ncvarinq(mincid, imgid, NULL, NULL, &ndims, dim, NULL);
     */
 
     /* Loop over them to find the spatial ones 
-     */
+    */
     for (idim = 0; idim < ndims; idim++) {
         /* Get the name and check that this is a spatial dimension 
-         */
+        */
         /*TODO:CNV
         (void)ncdiminq(mincid, dim[idim], dimname, NULL);*/
         
@@ -652,9 +652,9 @@ mitransform_coord(double out_coord[],
 }
 
 /** For conversions from double to integer, rounding may be performed
- * by setting this variable to non-zero.
- * However, at present, no API is available to control this.
- */
+* by setting this variable to non-zero.
+* However, at present, no API is available to control this.
+*/
 static int rounding_enabled = FALSE;
 
 static void miswap8(unsigned char *tmp_ptr)
@@ -701,18 +701,18 @@ static void miswap2(unsigned char *tmp_ptr)
 }
 
 /** Generic HDF5 integer-to-double converter.
- */
+*/
 
 static herr_t 
 mi2_int_to_dbl(hid_t src_id,
-               hid_t dst_id,
-               H5T_cdata_t *cdata,
-               H5_NELEMENTS_T nelements,
-               size_t buf_stride,
-               size_t bkg_stride,
-               void *buf_ptr,
-               void *bkg_ptr,
-               hid_t dset_xfer_plist)
+              hid_t dst_id,
+              H5T_cdata_t *cdata,
+              H5_NELEMENTS_T nelements,
+              size_t buf_stride,
+              size_t bkg_stride,
+              void *buf_ptr,
+              void *bkg_ptr,
+              hid_t dset_xfer_plist)
 {
     unsigned char *dst_ptr;
     unsigned char *src_ptr;
@@ -728,19 +728,19 @@ mi2_int_to_dbl(hid_t src_id,
     switch (cdata->command) {
     case H5T_CONV_INIT:
         cdata->need_bkg = H5T_BKG_NO;
-	src_nb = H5Tget_size(src_id);
-	if (src_nb != 1 && src_nb != 2 && src_nb != 4) {
-	    return (-1);
-	}
+  src_nb = H5Tget_size(src_id);
+  if (src_nb != 1 && src_nb != 2 && src_nb != 4) {
+      return (-1);
+  }
         dst_nb = H5Tget_size(dst_id);
         if (dst_nb != 8) {
             return (-1);
         }
-	break;
+  break;
 
     case H5T_CONV_CONV:
-	src_nb = H5Tget_size(src_id);
-	src_sg = H5Tget_sign(src_id);
+  src_nb = H5Tget_size(src_id);
+  src_sg = H5Tget_sign(src_id);
         dst_nb = H5Tget_size(dst_id);
         if (buf_stride == 0) {
             dst_cnt = dst_nb;
@@ -752,9 +752,9 @@ mi2_int_to_dbl(hid_t src_id,
         }
 
         /* Convert starting from "far side" of buffer... (Hope this works!)
-         */
+        */
         dst_ptr = ((unsigned char *) buf_ptr) + ((nelements - 1) * dst_nb);
-	src_ptr = ((unsigned char *) buf_ptr) + ((nelements - 1) * src_nb);
+  src_ptr = ((unsigned char *) buf_ptr) + ((nelements - 1) * src_nb);
 
         if (H5Tget_order(H5T_NATIVE_INT) != H5Tget_order(src_id)) {
             src_swap = 1;
@@ -770,39 +770,39 @@ mi2_int_to_dbl(hid_t src_id,
             dst_swap = 0;
         }
 
-	if (src_sg == H5T_SGN_2) {
+  if (src_sg == H5T_SGN_2) {
             switch (src_nb) {
             case 4:
                 while (nelements-- > 0) {
                     if (src_swap) {
                         miswap4(src_ptr);
                     }
-		    t = *(int *)src_ptr;
+        t = *(int *)src_ptr;
                     *(double *)dst_ptr = t;
                     if (dst_swap) {
                         miswap8(dst_ptr);
                     }
                     src_ptr -= src_cnt;
                     dst_ptr -= dst_cnt;
-		}
+    }
                 break;
             case 2:
                 while (nelements-- > 0) {
                     if (src_swap) {
                         miswap2(src_ptr);
                     }
-		    t = *(short *)src_ptr;
+        t = *(short *)src_ptr;
                     *(double *)dst_ptr = t;
                     if (dst_swap) {
                         miswap8(dst_ptr);
                     }
                     src_ptr -= src_cnt;
                     dst_ptr -= dst_cnt;
-		}
+    }
                 break;
             case 1:
                 while (nelements-- > 0) {
-		    t = *(char *)src_ptr;
+        t = *(char *)src_ptr;
                     *(double *)dst_ptr = t;
                     if (dst_swap) {
                         miswap8(dst_ptr);
@@ -814,41 +814,41 @@ mi2_int_to_dbl(hid_t src_id,
             default:
                 /* Should not happen! */
                 break;
-	    }
-	}
-	else {
+      }
+  }
+  else {
             switch (src_nb) {
             case 4:
                 while (nelements-- > 0) {
                     if (src_swap) {
                         miswap4(src_ptr);
                     }
-		    t = *(unsigned int *)src_ptr;
+        t = *(unsigned int *)src_ptr;
                     *(double *)dst_ptr = t;
                     if (dst_swap) {
                         miswap8(dst_ptr);
                     }
                     src_ptr -= src_cnt;
                     dst_ptr -= dst_cnt;
-		}
+    }
                 break;
             case 2:
                 while (nelements-- > 0) {
                     if (src_swap) {
                         miswap2(src_ptr);
                     }
-		    t = *(unsigned short *)src_ptr;
+        t = *(unsigned short *)src_ptr;
                     *(double *)dst_ptr = t;
                     if (dst_swap) {
                         miswap8(dst_ptr);
                     }
                     src_ptr -= src_cnt;
                     dst_ptr -= dst_cnt;
-		}
+    }
                 break;
             case 1:
                 while (nelements-- > 0) {
-		    t = *(unsigned char *)src_ptr;
+        t = *(unsigned char *)src_ptr;
                     *(double *)dst_ptr = t;
                     if (dst_swap) {
                         miswap8(dst_ptr);
@@ -860,32 +860,32 @@ mi2_int_to_dbl(hid_t src_id,
             default:
                 /* Should not happen! */
                 break;
-	    }
-	}
-	break;
+      }
+  }
+  break;
 
     case H5T_CONV_FREE:
-	break;
+  break;
 
     default:
-	/* Unknown command */
-	return (-1);
+  /* Unknown command */
+  return (-1);
     }
     return (0);
 }
 
 /** Generic HDF5 double-to-integer converter.
- */
+*/
 static herr_t 
 mi2_dbl_to_int(hid_t src_id,
-               hid_t dst_id,
-               H5T_cdata_t *cdata,
-               H5_NELEMENTS_T nelements,
-               size_t buf_stride,
-               size_t bkg_stride,
-               void *buf_ptr,
-               void *bkg_ptr,
-               hid_t dset_xfer_plist)
+              hid_t dst_id,
+              H5T_cdata_t *cdata,
+              H5_NELEMENTS_T nelements,
+              size_t buf_stride,
+              size_t bkg_stride,
+              void *buf_ptr,
+              void *bkg_ptr,
+              hid_t dset_xfer_plist)
 {
     unsigned char *dst_ptr;
     unsigned char *src_ptr;
@@ -902,23 +902,23 @@ mi2_dbl_to_int(hid_t src_id,
     case H5T_CONV_INIT:
         cdata->need_bkg = H5T_BKG_NO;
         /* Verify that we can handle this conversion.
-         */
-	src_nb = H5Tget_size(src_id);
-	if (src_nb != 8) {
-	    return (-1);
-	}
+        */
+  src_nb = H5Tget_size(src_id);
+  if (src_nb != 8) {
+      return (-1);
+  }
         dst_nb = H5Tget_size(dst_id);
         if (dst_nb != 4 && dst_nb != 2 && dst_nb != 1) {
             return (-1);
         }
-	break;
+  break;
 
     case H5T_CONV_CONV:
-	dst_nb = H5Tget_size(dst_id);
-	dst_sg = H5Tget_sign(dst_id);
+  dst_nb = H5Tget_size(dst_id);
+  dst_sg = H5Tget_sign(dst_id);
         src_nb = H5Tget_size(src_id);
-	dst_ptr = (unsigned char *) buf_ptr;
-	src_ptr = (unsigned char *) buf_ptr;
+  dst_ptr = (unsigned char *) buf_ptr;
+  src_ptr = (unsigned char *) buf_ptr;
         
         if (H5Tget_order(H5T_NATIVE_DOUBLE) != H5Tget_order(src_id)) {
             src_swap = 1;
@@ -935,10 +935,10 @@ mi2_dbl_to_int(hid_t src_id,
         }
 
         /* The logic of HDF5 seems to be that if a stride is specified,
-         * both the source and destination pointers should advance by that
-         * amount.  This seems wrong to me, but I've examined the HDF5 sources
-         * and that's what their own type converters do.
-         */
+        * both the source and destination pointers should advance by that
+        * amount.  This seems wrong to me, but I've examined the HDF5 sources
+        * and that's what their own type converters do.
+        */
         if (buf_stride == 0) {
             dst_cnt = dst_nb;
             src_cnt = src_nb;
@@ -1209,22 +1209,22 @@ mi2_dbl_to_int(hid_t src_id,
                 }
             }
         }
-	break;
+  break;
 
     case H5T_CONV_FREE:
-	break;
+  break;
 
     default:
-	/* Unknown command */
-	return (-1);
+  /* Unknown command */
+  return (-1);
     }
     return (0);
 }
 
 
 /** Initialize some critical pieces of the library.  For now all this does
- is install the double-to-integer and integer-to-double conversion functions.
- */
+is install the double-to-integer and integer-to-double conversion functions.
+*/
 void
 miinit(void)
 {
@@ -1236,18 +1236,18 @@ miinit(void)
 }
 
 /** HDF5 type conversion function for converting an arbitrary integer type to
- * an arbitrary enumerated type.  The beauty part of this is that it is
- * not necessary to actually perform any real conversion!
- */
+* an arbitrary enumerated type.  The beauty part of this is that it is
+* not necessary to actually perform any real conversion!
+*/
 herr_t mi2_null_conv(hid_t src_id,
-                     hid_t dst_id,
-                     H5T_cdata_t *cdata,
-                     H5_NELEMENTS_T nelements,
-                     size_t buf_stride,
-                     size_t bkg_stride,
-                     void *buf_ptr,
-                     void *bkg_ptr,
-                     hid_t dset_xfer_plist)
+                    hid_t dst_id,
+                    H5T_cdata_t *cdata,
+                    H5_NELEMENTS_T nelements,
+                    size_t buf_stride,
+                    size_t bkg_stride,
+                    void *buf_ptr,
+                    void *bkg_ptr,
+                    hid_t dset_xfer_plist)
 {
     switch (cdata->command) {
     case H5T_CONV_INIT:
@@ -1255,19 +1255,19 @@ herr_t mi2_null_conv(hid_t src_id,
     case H5T_CONV_CONV:
         break;
     case H5T_CONV_FREE:
-	break;
+  break;
 
     default:
-	/* Unknown command */
-	return (-1);
+  /* Unknown command */
+  return (-1);
     }
     return (0);
 }
 
 /** 
- This function should be called when a labeled volume is created or opened
- in order to facilitate conversions from the integer to the enumerated type.
- */
+This function should be called when a labeled volume is created or opened
+in order to facilitate conversions from the integer to the enumerated type.
+*/
 void
 miinit_enum(hid_t type_id)
 {
@@ -1288,9 +1288,9 @@ minc_create_thumbnail(mihandle_t volume, int grp)
     hid_t grp_id;
 
     /* Don't handle negative or overly large numbers!
-     */
+    */
     if (grp <= 0 || grp > MI2_MAX_RESOLUTION_GROUP) {
-	return (MI_ERROR);
+  return (MI_ERROR);
     }
 
     sprintf(path, "/minc-2.0/image/%d", grp);
@@ -1303,12 +1303,12 @@ minc_create_thumbnail(mihandle_t volume, int grp)
 }
 
 /** Function to downsample a single slice of an image.
- * \param in_ptr the 3D input slice, scale x isize[1] x isize[2]
- * \param out_ptr the 2D output slice, osize[1] x osize[2]
- */
+* \param in_ptr the 3D input slice, scale x isize[1] x isize[2]
+* \param out_ptr the 2D output slice, osize[1] x osize[2]
+*/
 static void
 midownsample_slice(double *in_ptr, double *out_ptr, hsize_t isize[], 
-                   hsize_t osize[], int scale)
+                  hsize_t osize[], int scale)
 {
     int j, k;
     int x, y, z;
@@ -1318,14 +1318,14 @@ midownsample_slice(double *in_ptr, double *out_ptr, hsize_t isize[],
     total = scale * scale * scale;
 
     /* These two loops iterate over all of the voxels in the 2D output
-     * image.
-     */
+    * image.
+    */
     for (j = 0; j < osize[1]; j++) {
         for (k = 0; k < osize[2]; k++) {
             /* The three inner loops iterate all scale^3 
-             * voxels in the input image which will be averaged
-             * to form the output image.
-             */
+            * voxels in the input image which will be averaged
+            * to form the output image.
+            */
             d = 0;
             for (x = 0; x < scale; x++) {
                 for (y = 0; y < scale; y++) {
@@ -1347,18 +1347,18 @@ midownsample_slice(double *in_ptr, double *out_ptr, hsize_t isize[],
 }
 
 /** Convert the hyperslab from real to voxel values, calculating and
- * returning the minimum and maximum real values for the slab.  This
- * could form the basis for a public function one day, but for now it
- * is considered private.
- */
+* returning the minimum and maximum real values for the slab.  This
+* could form the basis for a public function one day, but for now it
+* is considered private.
+*/
 static void
 miconvert_hyperslab_to_voxel(mihandle_t volume, hssize_t start[], 
-                             hsize_t count[], double *slab_ptr,
-                             double *max_ptr, double *min_ptr)
+                            hsize_t count[], double *slab_ptr,
+                            double *max_ptr, double *min_ptr)
 {
     /* This code is not intended to be a general hyperslab-to-voxel
-     * converter yet.  That is why it is not public.
-     */
+    * converter yet.  That is why it is not public.
+    */
     double real_min, real_max;  /* Minimum and maximum values */
     hsize_t index;
     hsize_t total;
@@ -1376,7 +1376,7 @@ miconvert_hyperslab_to_voxel(mihandle_t volume, hssize_t start[],
     }
 
     /* Find the global minimum and maximum for this hyperslab.
-     */
+    */
     for (index = 0; index < total; index++) {
         tmp_val = slab_ptr[index];
         if (tmp_val > real_max) {
@@ -1408,16 +1408,16 @@ miconvert_hyperslab_to_voxel(mihandle_t volume, hssize_t start[],
 }
 
 /** Convert the hyperslab from voxel to real values.  This could form
- * the basis for a public function one day, but for now it is
- * considered private.
- */
+* the basis for a public function one day, but for now it is
+* considered private.
+*/
 static void
 miconvert_hyperslab_to_real(mihandle_t volume, hssize_t start[],
                             hsize_t count[], double *slab_ptr)
 {
     /* This code is not intended to be a general hyperslab-to-real
-     * converter yet.  That is why it is not public.
-     */
+    * converter yet.  That is why it is not public.
+    */
     double real_min, real_max;  /* Minimum and maximum values */
     hsize_t index;
     hsize_t total;
@@ -1438,7 +1438,7 @@ miconvert_hyperslab_to_real(mihandle_t volume, hssize_t start[],
     voxel_range = volume->valid_max - volume->valid_min;
 
     /* Get the initial real minimum & maximum.
-     */
+    */
     r = miget_slice_range(volume, pos, volume->number_of_dims,
                           &real_max, &real_min);
     if (r == MI_ERROR) {
@@ -1451,13 +1451,13 @@ miconvert_hyperslab_to_real(mihandle_t volume, hssize_t start[],
 
     for (index = 0; index < total; index++) {
         /* Since this calculation may cross slice boundaries, I need to
-         * grab the correct real minimum and maximum for the coordinates
-         * I happen to be in at the time.
-         *
-         * This next loop attempts to keep track of the current position,
-         * and reloads the minimum and maximum whenever we change any other
-         * than the fastest-varying dimension.
-         */
+        * grab the correct real minimum and maximum for the coordinates
+        * I happen to be in at the time.
+        *
+        * This next loop attempts to keep track of the current position,
+        * and reloads the minimum and maximum whenever we change any other
+        * than the fastest-varying dimension.
+        */
         for (i = volume->number_of_dims - 1; i >= 0; i--) {
             pos[i]++;
             if (pos[i] >= count[i]) {
@@ -1482,9 +1482,9 @@ miconvert_hyperslab_to_real(mihandle_t volume, hssize_t start[],
 }
 
 /** Update an individual thumbnail for the \a volume.  Updates group
- * number \a ogrp from source group \a igrp.  The whole image tree must
- * be rooted at \a loc_id.
- */
+* number \a ogrp from source group \a igrp.  The whole image tree must
+* be rooted at \a loc_id.
+*/
 int
 minc_update_thumbnail(mihandle_t volume, hid_t loc_id, int igrp, int ogrp)
 {
@@ -1524,10 +1524,10 @@ minc_update_thumbnail(mihandle_t volume, hid_t loc_id, int igrp, int ogrp)
 
     /* Calculate scale factor (always a power of 2) */
     for (i = igrp, scale = 1; i < ogrp; i++, scale <<= 1)
-	;
+  ;
 
     /* Open the input path.
-     */
+    */
     sprintf(path, "%d/image", igrp);
     idst_id = H5Dopen1(loc_id, path);
     
@@ -1536,30 +1536,30 @@ minc_update_thumbnail(mihandle_t volume, hid_t loc_id, int igrp, int ogrp)
     }
 
     /* Get the input type.
-     */
+    */
     typ_id = H5Dget_type(idst_id);
 
     /* Get the input dataspace.
-     */
+    */
     ifspc_id = H5Dget_space(idst_id);
 
     /* Get the input dataset creation property list
-     */
+    */
     dcpl_id = H5Dget_create_plist(idst_id);
 
     ndims = H5Sget_simple_extent_ndims(ifspc_id);
     H5Sget_simple_extent_dims(ifspc_id, isize, NULL);
 
     /* Calculate the size of the new thumbnail.
-     */
+    */
     for (i = 0; i < ndims; i++) {
-	osize[i] = isize[i] / scale;
-	if (osize[i] == 0) {	/* Too small? */
-	    return (MI_ERROR);
-	}
+  osize[i] = isize[i] / scale;
+  if (osize[i] == 0) {	/* Too small? */
+      return (MI_ERROR);
+  }
     }
     /* Create dataspace for new resolution
-     */
+    */
     ofspc_id = H5Screate_simple(ndims, osize, NULL);
     
     sprintf(path, "%d/image", ogrp);
@@ -1578,8 +1578,8 @@ minc_update_thumbnail(mihandle_t volume, hid_t loc_id, int igrp, int ogrp)
 
     if (volume->volume_class == MI_CLASS_REAL) {
         /* TODO: This is a bit of a hack - I need a better way to get the
-         * dimensionality of the source image-min and image-max.
-         */
+        * dimensionality of the source image-min and image-max.
+        */
     
         tfspc_id = H5Screate_simple(1, &osize[0], NULL);
 
@@ -1606,7 +1606,7 @@ minc_update_thumbnail(mihandle_t volume, hid_t loc_id, int igrp, int ogrp)
     }
     
     /* Calculate the input buffer size - scale slices.
-     */
+    */
     in_bytes = scale * isize[1] * isize[2] * sizeof(double);
     in_ptr = malloc(in_bytes);
 
@@ -1624,8 +1624,8 @@ minc_update_thumbnail(mihandle_t volume, hid_t loc_id, int igrp, int ogrp)
     omspc_id = H5Screate_simple(ndims, count, NULL);
 
     /*
-     * read image & TODO: convert to "real" range.
-     */
+    * read image & TODO: convert to "real" range.
+    */
     for (slice = 0; slice < osize[0]; slice++) {
         
       start[0] = slice * scale;
@@ -1694,8 +1694,8 @@ minc_update_thumbnail(mihandle_t volume, hid_t loc_id, int igrp, int ogrp)
 }
 
 /** Cycle through and update each of the lower-resolution images in 
- * the file.
- */
+* the file.
+*/
 int
 minc_update_thumbnails(mihandle_t volume)
 {
@@ -1766,7 +1766,7 @@ free2d(int n, double **mat)
 }
 
 /** Function for create a NON-STANDARD dataset other than --> (acquisition, patient, study)
- */
+*/
 
 int
 create_dataset(hid_t hdf_file, const char *name)
@@ -1786,7 +1786,7 @@ create_dataset(hid_t hdf_file, const char *name)
     return (MI_ERROR);
   }
   dataset_info = H5Dcreate1(grp_info, name, 
-			   H5T_STD_I32LE, dataspace_info, H5P_DEFAULT);
+        H5T_STD_I32LE, dataspace_info, H5P_DEFAULT);
   if (dataset_info < 0) {
     return (MI_ERROR);
   }
@@ -1798,7 +1798,7 @@ create_dataset(hid_t hdf_file, const char *name)
 }
 
 /** Function for create a dataset (acquisition, patient, study)
- */
+*/
 
 int
 create_standard_dataset(hid_t hdf_file, const char *name)
@@ -1818,7 +1818,7 @@ create_standard_dataset(hid_t hdf_file, const char *name)
   }
   
   dataset_info = H5Dcreate1(grp_info, name, 
-			   H5T_STD_I32LE, dataspace_info, H5P_DEFAULT);
+        H5T_STD_I32LE, dataspace_info, H5P_DEFAULT);
   if (dataset_info < 0) {
     return (MI_ERROR);
   }
@@ -1837,7 +1837,7 @@ create_standard_dataset(hid_t hdf_file, const char *name)
   if (result < 0){
     return (MI_ERROR);
   }
-   
+  
   H5Dclose(dataset_info);
   H5Sclose(dataspace_info);
   H5Gclose(grp_info);
@@ -1852,10 +1852,10 @@ create_standard_dataset(hid_t hdf_file, const char *name)
 */
 int
 scaled_maximal_pivoting_gaussian_elimination(int   n,
-                                             int   row[],
-                                             double **a,
-                                             int   n_values,
-                                             double **solution )
+                                            int   row[],
+                                            double **a,
+                                            int   n_values,
+                                            double **solution )
 {
     int i, j, k, p, v, tmp;
     double *s, val, best_val, m, scale_factor;
@@ -1870,7 +1870,7 @@ scaled_maximal_pivoting_gaussian_elimination(int   n,
         s[i] = fabs( a[i][0] );
         for ( j = 1; j < n; j++ ) {
             if ( fabs(a[i][j]) > s[i] )
-               s[i] = fabs(a[i][j]);
+              s[i] = fabs(a[i][j]);
         }
 
         if ( s[i] == 0.0 ) {
@@ -1985,7 +1985,7 @@ scaled_maximal_pivoting_gaussian_elimination_real(int n,
 }
 
 /** Computes the inverse of a square matrix.
- */
+*/
 static int
 invert_4x4_matrix(double matrix[4][4], /**< Input matrix */
                   double inverse[4][4]) /**< Output (inverted) matrix */
@@ -2025,7 +2025,7 @@ invert_4x4_matrix(double matrix[4][4], /**< Input matrix */
 }
 
 /** Fills in the transform with the identity matrix.
- */
+*/
 static void
 mimake_identity_transform(mi_lin_xfm_t transform)
 {
@@ -2040,7 +2040,7 @@ mimake_identity_transform(mi_lin_xfm_t transform)
 }
 
 /** Function for inverting a MINC linear transform.
- */
+*/
 int 
 miinvert_transform(mi_lin_xfm_t transform, mi_lin_xfm_t inverse )
 {
@@ -2054,8 +2054,8 @@ miinvert_transform(mi_lin_xfm_t transform, mi_lin_xfm_t inverse )
 }
 
 /** Function to read a scalar variable of HDF5 type \a type_id from the given
- *  \a path relative to the HDF5 file or group \a loc_id.
- */
+*  \a path relative to the HDF5 file or group \a loc_id.
+*/
 int
 miget_scalar(hid_t loc_id, hid_t type_id, const char *path, void *data)
 {

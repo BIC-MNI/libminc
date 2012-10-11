@@ -169,13 +169,99 @@
               software for any purpose.  It is provided "as is" without
               express or implied warranty.
 ---------------------------------------------------------------------------- */
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif //HAVE_CONFIG_H
 
-#include "minc2_private.h"
+#include <stdlib.h>
+#include <limits.h>
+#include <float.h>
+#include <string.h>
+#include "minc2.h"
+
+/* --------- memory allocation macros -------------------------- */
+
+#define  MALLOC( n_items, type ) \
+         ( (type *) malloc( (size_t) (n_items) * sizeof(type) ) )
+
+#define  CALLOC( n_items, type ) \
+         ( (type *) calloc( (size_t) (n_items), sizeof(type) ) )
+
+#define  REALLOC( ptr, n_items, type ) \
+         ( (type *) realloc( (void *) ptr, (size_t) (n_items) * sizeof(type) ) )
+
+#define  FREE( ptr ) \
+         free( (void *) ptr )
+
+
+#define MI2_FROM_DOUBLE(dvalue, type, sign, ptr) \
+   switch (type) { \
+   case MI_TYPE_BYTE : \
+   case MI_TYPE_UBYTE : \
+      switch (sign) { \
+      case MI2_PRIV_UNSIGNED : \
+         dvalue = MAX(0, dvalue); \
+         dvalue = MIN(UCHAR_MAX, dvalue); \
+         *((unsigned char *) ptr) = ROUND(dvalue); \
+         break; \
+      case MI2_PRIV_SIGNED : \
+         dvalue = MAX(SCHAR_MIN, dvalue); \
+         dvalue = MIN(SCHAR_MAX, dvalue); \
+         *((signed char *) ptr) = ROUND(dvalue); \
+         break; \
+      } \
+      break; \
+   case MI_TYPE_SHORT : \
+      switch (sign) { \
+      case MI2_PRIV_UNSIGNED : \
+         dvalue = MAX(0, dvalue); \
+         dvalue = MIN(USHRT_MAX, dvalue); \
+         *((unsigned short *) ptr) = ROUND(dvalue); \
+         break; \
+      case MI2_PRIV_SIGNED : \
+         dvalue = MAX(SHRT_MIN, dvalue); \
+         dvalue = MIN(SHRT_MAX, dvalue); \
+         *((signed short *) ptr) = ROUND(dvalue); \
+         break; \
+      } \
+      break; \
+   case MI_TYPE_INT : \
+      switch (sign) { \
+      case MI2_PRIV_UNSIGNED : \
+         dvalue = MAX(0, dvalue); \
+         dvalue = MIN(UINT_MAX, dvalue); \
+         *((unsigned int *) ptr) = ROUND(dvalue); \
+         break; \
+      case MI2_PRIV_SIGNED : \
+         dvalue = MAX(INT_MIN, dvalue); \
+         dvalue = MIN(INT_MAX, dvalue); \
+         *((signed int *) ptr) = ROUND(dvalue); \
+         break; \
+      } \
+      break; \
+   case MI_TYPE_FLOAT : \
+      dvalue = MAX(-FLT_MAX,dvalue); \
+      *((float *) ptr) = MIN(FLT_MAX,dvalue); \
+      break; \
+   case MI_TYPE_DOUBLE : \
+      *((double *) ptr) = dvalue; \
+      break; \
+   case MI_TYPE_UNKNOWN : \
+      MI_LOG_PKG_ERROR2(MI_ERR_NONNUMERIC, \
+         "Attempt to convert to MI_TYPE_UNKNOWN from double"); \
+      dvalue = 0; \
+      break; \
+   }
+
+/**/
+#define _(x) x      /* For future gettext */
+         
+         
 
 /* Private functions */
 static int MI2_icv_get_type(mi2_icv_type *icvp, int cdfid, int varid);
 static int MI2_icv_get_vrange(mi2_icv_type *icvp, int cdfid, int varid);
-static double MI2_get_default_range(char *what, nc_type datatype, int sign);
+static double MI2_get_default_range(char *what, mitype_t datatype, int sign);
 static int MI2_icv_get_norm(mi2_icv_type *icvp, int cdfid, int varid);
 static int MI2_icv_access(int operation, mi2_icv_type *icvp, long start[], 
                           long count[], void *values);
@@ -185,6 +271,8 @@ static int MI2_icv_coords_tovar(mi2_icv_type *icvp,
                                 long var_start[], long var_count[]);
 static int MI2_icv_calc_scale(int operation, mi2_icv_type *icvp, long coords[]);
 
+static mi2_icv_type *MI2_icv_chkid(int icvid);
+
 /* Array of pointers to image conversion structures */
 static int minc_icv_list_nalloc = 0;
 static mi2_icv_type **minc_icv_list = NULL;
@@ -193,7 +281,7 @@ static mi2_icv_type **minc_icv_list = NULL;
 @NAME       : mi2_icv_create
 @INPUT      : (none)
 @OUTPUT     : (none)
-@RETURNS    : icv id or MI2_ERROR when an error occurs
+@RETURNS    : icv id or MI_ERROR when an error occurs
 @DESCRIPTION: Creates an image conversion variable (icv) and returns
               a handle to it.
 @METHOD     : 
@@ -232,7 +320,7 @@ MNCAPI int mi2_icv_create()
       /* Check that the allocation was successful */
       if (minc_icv_list == NULL) {
          MI2_LOG_SYS_ERROR1("mi2_icv_create");
-         MI2_RETURN(MI2_ERROR);
+         MI2_RETURN(MI_ERROR);
       }
       /* Put in NULL pointers */
       for (new_icv=minc_icv_list_nalloc; new_icv<new_nalloc; new_icv++)
@@ -247,7 +335,7 @@ MNCAPI int mi2_icv_create()
    /* Allocate a new structure */
    if ((minc_icv_list[new_icv]=MALLOC(1, mi2_icv_type))==NULL) {
       MI2_LOG_SYS_ERROR1("mi2_icv_create");
-      MI2_RETURN(MI2_ERROR);
+      MI2_RETURN(MI_ERROR);
    }
    icvp=minc_icv_list[new_icv];
 
@@ -261,7 +349,7 @@ MNCAPI int mi2_icv_create()
    icvp->fill_valid_max = DBL_MAX;
 
    /* User defaults */
-   icvp->user_type = NC_SHORT;
+   icvp->user_type = MI_TYPE_SHORT;
    icvp->user_typelen = nctypelen(icvp->user_type);
    icvp->user_sign = MI2_PRIV_SIGNED;
    icvp->user_do_range = TRUE;
@@ -289,8 +377,8 @@ MNCAPI int mi2_icv_create()
    }
 
    /* Variable values */
-   icvp->cdfid = MI2_ERROR;            /* Set so that we can recognise an */
-   icvp->varid = MI2_ERROR;            /* unattached icv */
+   icvp->cdfid = MI_ERROR;            /* Set so that we can recognise an */
+   icvp->varid = MI_ERROR;            /* unattached icv */
 
    /* Values that can be read by user */
    icvp->derv_imgmax = MI2_DEFAULT_MAX;
@@ -307,7 +395,7 @@ MNCAPI int mi2_icv_create()
 @NAME       : mi2_icv_free
 @INPUT      : icvid
 @OUTPUT     : (none)
-@RETURNS    : MI2_ERROR if an error occurs
+@RETURNS    : MI_ERROR if an error occurs
 @DESCRIPTION: Frees the image conversion variable (icv)
 @METHOD     : 
 @GLOBALS    : 
@@ -322,12 +410,12 @@ MNCAPI int mi2_icv_free(int icvid)
    MI2_SAVE_ROUTINE_NAME("mi2_icv_free");
 
    /* Check icv id */
-   if ((icvp=MI2_icv_chkid(icvid)) == NULL) MI2_RETURN(MI2_ERROR);
+   if ((icvp=MI2_icv_chkid(icvid)) == NULL) MI2_RETURN(MI_ERROR);
 
    /* Detach the icv if it is attached */
-   if (icvp->cdfid != MI2_ERROR) {
+   if (icvp->cdfid != MI_ERROR) {
        if (mi2_icv_detach(icvid) < 0) {
-           MI2_RETURN(MI2_ERROR);
+           MI2_RETURN(MI_ERROR);
        }
    }
 
@@ -349,7 +437,7 @@ MNCAPI int mi2_icv_free(int icvid)
       minc_icv_list_nalloc=0;
    }
 
-   MI2_RETURN(MI2_NOERROR);
+   MI2_RETURN(MI_NOERROR);
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -358,7 +446,7 @@ MNCAPI int mi2_icv_free(int icvid)
               icv_property - property of icv to set
               value        - value to set it to
 @OUTPUT     : (none)
-@RETURNS    : MI2_ERROR if an error occurs
+@RETURNS    : MI_ERROR if an error occurs
 @DESCRIPTION: Sets a property of an icv to a given double value
               Properties cannot be modified while the icv is attached to a 
               cdf file and variable (see mi2_icv_attach and mi2_icv_detach).
@@ -376,18 +464,18 @@ MNCAPI int mi2_icv_setdbl(int icvid, int icv_property, double value)
    MI2_SAVE_ROUTINE_NAME("mi2_icv_setdbl");
 
    /* Check icv id */
-   if ((icvp=MI2_icv_chkid(icvid)) == NULL) MI2_RETURN(MI2_ERROR);
+   if ((icvp=MI2_icv_chkid(icvid)) == NULL) MI2_RETURN(MI_ERROR);
 
    /* Check that the icv is not attached to a file */
-   if (icvp->cdfid != MI2_ERROR) {
+   if (icvp->cdfid != MI_ERROR) {
        milog_message(MI2_MSG_ICVATTACHED);
-       MI2_RETURN(MI2_ERROR);
+       MI2_RETURN(MI_ERROR);
    }
 
    /* Set the property */
    switch (icv_property) {
    case MI2_ICV_TYPE:
-      icvp->user_type   = (nc_type) (int) value;
+      icvp->user_type   = (mitype_t) value;
       icvp->user_typelen= nctypelen(icvp->user_type);
       icvp->user_vmax   = MI2_get_default_range(MIvalid_max, icvp->user_type,
                                                icvp->user_sign);
@@ -435,7 +523,7 @@ MNCAPI int mi2_icv_setdbl(int icvid, int icv_property, double value)
       ival = value;
       if ((ival<0) || (ival>MI2_MAX_IMGDIMS)) {
           milog_message(MI2_MSG_BADPROP, _("MI2_ICV_NUM_IMGDIMS out of range"));
-         MI2_RETURN(MI2_ERROR);
+         MI2_RETURN(MI_ERROR);
       }
       icvp->user_num_imgdims = ival;
       break;
@@ -450,7 +538,7 @@ MNCAPI int mi2_icv_setdbl(int icvid, int icv_property, double value)
    case MI2_ICV_MINVAR:
        milog_message(MI2_MSG_BADPROP, 
                      _("Can't store a number in a string value"));
-       MI2_RETURN(MI2_ERROR);
+       MI2_RETURN(MI_ERROR);
        break;
    default:
       /* Check for image dimension properties */
@@ -461,12 +549,12 @@ MNCAPI int mi2_icv_setdbl(int icvid, int icv_property, double value)
       }
       else {
           milog_message(MI2_MSG_BADPROP, "Unknown code");
-          MI2_RETURN(MI2_ERROR);
+          MI2_RETURN(MI_ERROR);
       }
       break;
    }
 
-   MI2_RETURN(MI2_NOERROR);
+   MI2_RETURN(MI_NOERROR);
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -475,7 +563,7 @@ MNCAPI int mi2_icv_setdbl(int icvid, int icv_property, double value)
               icv_property - property of icv to set
               value        - value to set it to
 @OUTPUT     : (none)
-@RETURNS    : MI2_ERROR if an error occurs
+@RETURNS    : MI_ERROR if an error occurs
 @DESCRIPTION: Sets a property of an icv to a given integer value.
               Properties cannot be modified while the icv is attached to a 
               cdf file and variable (see mi2_icv_attach and mi2_icv_detach).
@@ -492,10 +580,10 @@ MNCAPI int mi2_icv_setint(int icvid, int icv_property, int value)
    MI2_SAVE_ROUTINE_NAME("mi2_icv_setint");
 
    if (mi2_icv_setdbl(icvid, icv_property, (double) value) < 0) {
-       MI2_RETURN(MI2_ERROR);
+       MI2_RETURN(MI_ERROR);
    }
 
-   MI2_RETURN(MI2_NOERROR);
+   MI2_RETURN(MI_NOERROR);
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -504,7 +592,7 @@ MNCAPI int mi2_icv_setint(int icvid, int icv_property, int value)
               icv_property - property of icv to set
               value        - value to set it to
 @OUTPUT     : (none)
-@RETURNS    : MI2_ERROR if an error occurs
+@RETURNS    : MI_ERROR if an error occurs
 @DESCRIPTION: Sets a property of an icv to a given long integer value.
               Properties cannot be modified while the icv is attached to a 
               cdf file and variable (see mi2_icv_attach and mi2_icv_detach).
@@ -520,10 +608,10 @@ MNCAPI int mi2_icv_setlong(int icvid, int icv_property, long value)
    MI2_SAVE_ROUTINE_NAME("mi2_icv_setlong");
 
    if (mi2_icv_setdbl(icvid, icv_property, (double) value) < 0) {
-       MI2_RETURN(MI2_ERROR);
+       MI2_RETURN(MI_ERROR);
    }
 
-   MI2_RETURN(MI2_NOERROR);
+   MI2_RETURN(MI_NOERROR);
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -532,7 +620,7 @@ MNCAPI int mi2_icv_setlong(int icvid, int icv_property, long value)
               icv_property - property of icv to set
               value        - value to set it to
 @OUTPUT     : (none)
-@RETURNS    : MI2_ERROR if an error occurs
+@RETURNS    : MI_ERROR if an error occurs
 @DESCRIPTION: Sets a property of an icv to a given string value. 
               Properties cannot be modified while the icv is attached to a 
               cdf file and variable (see mi2_icv_attach and mi2_icv_detach).
@@ -549,12 +637,12 @@ MNCAPI int mi2_icv_setstr(int icvid, int icv_property, char *value)
    MI2_SAVE_ROUTINE_NAME("mi2_icv_setstr");
 
    /* Check icv id */
-   if ((icvp=MI2_icv_chkid(icvid)) == NULL) MI2_RETURN(MI2_ERROR);
+   if ((icvp=MI2_icv_chkid(icvid)) == NULL) MI2_RETURN(MI_ERROR);
 
    /* Check that the icv is not attached to a file */
-   if (icvp->cdfid != MI2_ERROR) {
+   if (icvp->cdfid != MI_ERROR) {
        milog_message(MI2_MSG_ICVATTACHED);
-       MI2_RETURN(MI2_ERROR);
+       MI2_RETURN(MI_ERROR);
    }
 
    /* Set the property */
@@ -596,23 +684,23 @@ MNCAPI int mi2_icv_setstr(int icvid, int icv_property, char *value)
    case MI2_ICV_BDIM_SIZE:
    case MI2_ICV_KEEP_ASPECT:
        milog_message(MI2_MSG_BADPROP, "Can't store a string in a numeric property");
-       MI2_RETURN(MI2_ERROR);
+       MI2_RETURN(MI_ERROR);
       break;
    default:
       /* Check for image dimension properties */
       if ((icv_property>=MI2_ICV_DIM_SIZE) && 
           (icv_property<MI2_ICV_DIM_SIZE+MI2_MAX_IMGDIMS)) {
           milog_message(MI2_MSG_BADPROP, "Can't store a string in a numeric property");
-          MI2_RETURN(MI2_ERROR);
+          MI2_RETURN(MI_ERROR);
       }
       else {
           milog_message(MI2_MSG_BADPROP, "Unknown code");
-          MI2_RETURN(MI2_ERROR);
+          MI2_RETURN(MI_ERROR);
       }
       break;
    }
 
-   MI2_RETURN(MI2_NOERROR);
+   MI2_RETURN(MI_NOERROR);
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -620,7 +708,7 @@ MNCAPI int mi2_icv_setstr(int icvid, int icv_property, char *value)
 @INPUT      : icvid        - icv id
               icv_property - icv property to get
 @OUTPUT     : value        - value returned
-@RETURNS    : MI2_ERROR if an error occurs
+@RETURNS    : MI_ERROR if an error occurs
 @DESCRIPTION: Gets the value of an icv property
 @METHOD     : 
 @GLOBALS    : 
@@ -636,7 +724,7 @@ MNCAPI int mi2_icv_inqdbl(int icvid, int icv_property, double *value)
    MI2_SAVE_ROUTINE_NAME("mi2_icv_inqdbl");
 
    /* Check icv id */
-   if ((icvp=MI2_icv_chkid(icvid)) == NULL) MI2_RETURN(MI2_ERROR);
+   if ((icvp=MI2_icv_chkid(icvid)) == NULL) MI2_RETURN(MI_ERROR);
 
    /* Set the property */
    switch (icv_property) {
@@ -703,7 +791,7 @@ MNCAPI int mi2_icv_inqdbl(int icvid, int icv_property, double *value)
    case MI2_ICV_MINVAR:
        milog_message(MI2_MSG_BADPROP,
                      _("Tried to get icv string property as a number"));
-      MI2_RETURN(MI2_ERROR);
+      MI2_RETURN(MI_ERROR);
       break;
    default:
       /* Check for image dimension properties */
@@ -724,12 +812,12 @@ MNCAPI int mi2_icv_inqdbl(int icvid, int icv_property, double *value)
       }
       else {
          milog_message(MI2_MSG_BADPROP, _("Tried to get unknown icv property"));
-         MI2_RETURN(MI2_ERROR);
+         MI2_RETURN(MI_ERROR);
       }
       break;
    }
 
-   MI2_RETURN(MI2_NOERROR);
+   MI2_RETURN(MI_NOERROR);
 }
 
 
@@ -738,7 +826,7 @@ MNCAPI int mi2_icv_inqdbl(int icvid, int icv_property, double *value)
 @INPUT      : icvid        - icv id
               icv_property - icv property to get
 @OUTPUT     : value        - value returned
-@RETURNS    : MI2_ERROR if an error occurs
+@RETURNS    : MI_ERROR if an error occurs
 @DESCRIPTION: Gets the value of an icv property
 @METHOD     : 
 @GLOBALS    : 
@@ -753,12 +841,12 @@ MNCAPI int mi2_icv_inqint(int icvid, int icv_property, int *value)
    MI2_SAVE_ROUTINE_NAME("mi2_icv_inqint");
 
    if (mi2_icv_inqdbl(icvid, icv_property, &dvalue) < 0) {
-       MI2_RETURN(MI2_ERROR);
+       MI2_RETURN(MI_ERROR);
    }
 
    *value = dvalue;
 
-   MI2_RETURN(MI2_NOERROR);
+   MI2_RETURN(MI_NOERROR);
 }
 
 
@@ -767,7 +855,7 @@ MNCAPI int mi2_icv_inqint(int icvid, int icv_property, int *value)
 @INPUT      : icvid        - icv id
               icv_property - icv property to get
 @OUTPUT     : value        - value returned
-@RETURNS    : MI2_ERROR if an error occurs
+@RETURNS    : MI_ERROR if an error occurs
 @DESCRIPTION: Gets the value of an icv property
 @METHOD     : 
 @GLOBALS    : 
@@ -782,12 +870,12 @@ MNCAPI int mi2_icv_inqlong(int icvid, int icv_property, long *value)
    MI2_SAVE_ROUTINE_NAME("mi2_icv_inqlong");
 
    if (mi2_icv_inqdbl(icvid, icv_property, &dvalue) < 0) {
-       MI2_RETURN(MI2_ERROR);
+       MI2_RETURN(MI_ERROR);
    }
 
    *value = dvalue;
 
-   MI2_RETURN(MI2_NOERROR);
+   MI2_RETURN(MI_NOERROR);
 }
 
 
@@ -797,7 +885,7 @@ MNCAPI int mi2_icv_inqlong(int icvid, int icv_property, long *value)
               icv_property - icv property to get
 @OUTPUT     : value        - value returned. Caller must allocate enough 
                  space for return string.
-@RETURNS    : MI2_ERROR if an error occurs
+@RETURNS    : MI_ERROR if an error occurs
 @DESCRIPTION: Gets the value of an icv property
 @METHOD     : 
 @GLOBALS    : 
@@ -812,17 +900,17 @@ MNCAPI int mi2_icv_inqstr(int icvid, int icv_property, char *value)
    MI2_SAVE_ROUTINE_NAME("mi2_icv_inqstr");
 
    /* Check icv id */
-   if ((icvp=MI2_icv_chkid(icvid)) == NULL) MI2_RETURN(MI2_ERROR);
+   if ((icvp=MI2_icv_chkid(icvid)) == NULL) MI2_RETURN(MI_ERROR);
 
    /* Set the property */
    switch (icv_property) {
    case MI2_ICV_SIGN:
       if (icvp->user_sign==MI2_PRIV_SIGNED)
-         (void) strcpy(value, MI2_SIGNED);
+         (void) strcpy(value, MI_SIGNED);
       else if (icvp->user_sign==MI2_PRIV_UNSIGNED)
-         (void) strcpy(value, MI2_UNSIGNED);
+         (void) strcpy(value, MI_UNSIGNED);
       else
-         (void) strcpy(value, MI2_EMPTY_STRING);
+         (void) strcpy(value, MI_EMPTY_STRING);
       break;
    case MI2_ICV_MAXVAR:
       (void) strcpy(value, icvp->user_maxvar);
@@ -858,7 +946,7 @@ MNCAPI int mi2_icv_inqstr(int icvid, int icv_property, char *value)
    case MI2_ICV_VARID:
        milog_message(MI2_MSG_BADPROP, 
                      _("Tried to get icv numeric property as a string"));
-      MI2_RETURN(MI2_ERROR);
+      MI2_RETURN(MI_ERROR);
       break;
    default:
       /* Check for image dimension properties */
@@ -870,17 +958,17 @@ MNCAPI int mi2_icv_inqstr(int icvid, int icv_property, char *value)
            (icv_property<MI2_ICV_DIM_START+MI2_MAX_IMGDIMS))) {
          milog_message(MI2_MSG_BADPROP,
                        _("Tried to get icv numeric property as a string"));
-         MI2_RETURN(MI2_ERROR);
+         MI2_RETURN(MI_ERROR);
       }
       else {
          milog_message(MI2_MSG_BADPROP,
                        _("Tried to get unknown icv property"));
-         MI2_RETURN(MI2_ERROR);
+         MI2_RETURN(MI_ERROR);
       }
       break;
    }
 
-   MI2_RETURN(MI2_NOERROR);
+   MI2_RETURN(MI_NOERROR);
 }
 
 
@@ -890,7 +978,7 @@ MNCAPI int mi2_icv_inqstr(int icvid, int icv_property, char *value)
               cdfid - cdf file id
               varid - cdf variable id
 @OUTPUT     : (none)
-@RETURNS    : MI2_ERROR if an error occurs
+@RETURNS    : MI_ERROR if an error occurs
 @DESCRIPTION: Attaches an open cdf file and variable to an image conversion
               variable for subsequent access through miicvget and miicvput.
               File must be in data mode. This routine differs from 
@@ -911,18 +999,18 @@ MNCAPI int mi2_icv_ndattach(int icvid, int cdfid, int varid)
    MI2_SAVE_ROUTINE_NAME("mi2_icv_ndattach");
 
    /* Check icv id */
-   if ((icvp=MI2_icv_chkid(icvid)) == NULL) MI2_RETURN(MI2_ERROR);
+   if ((icvp=MI2_icv_chkid(icvid)) == NULL) MI2_RETURN(MI_ERROR);
 
    /* If the icv is attached, then detach it */
-   if (icvp->cdfid != MI2_ERROR) {
+   if (icvp->cdfid != MI_ERROR) {
        if (mi2_icv_detach(icvid) < 0) {
-           MI2_RETURN(MI2_ERROR);
+           MI2_RETURN(MI_ERROR);
        }
    }
 
    /* Inquire about the variable's type, sign and number of dimensions */
    if (MI2_icv_get_type(icvp, cdfid, varid) < 0) {
-       MI2_RETURN(MI2_ERROR);
+       MI2_RETURN(MI_ERROR);
    }
 
    /* If not doing range calculations, just set derv_firstdim for
@@ -934,12 +1022,12 @@ MNCAPI int mi2_icv_ndattach(int icvid, int cdfid, int varid)
    else {
       /* Get valid range */
        if (MI2_icv_get_vrange(icvp, cdfid, varid) < 0) {
-           MI2_RETURN(MI2_ERROR);
+           MI2_RETURN(MI_ERROR);
        }
           
       /* Get normalization info */
        if (MI2_icv_get_norm(icvp, cdfid, varid) < 0) {
-           MI2_RETURN(MI2_ERROR);
+           MI2_RETURN(MI_ERROR);
        }
    }
 
@@ -981,7 +1069,7 @@ MNCAPI int mi2_icv_ndattach(int icvid, int cdfid, int varid)
    icvp->cdfid = cdfid;
    icvp->varid = varid;
 
-   MI2_RETURN(MI2_NOERROR);
+   MI2_RETURN(MI_NOERROR);
 }
 
 
@@ -991,7 +1079,7 @@ MNCAPI int mi2_icv_ndattach(int icvid, int cdfid, int varid)
               cdfid - cdf file id
               varid - variable id
 @OUTPUT     : (none)
-@RETURNS    : MI2_ERROR if an error occurs
+@RETURNS    : MI_ERROR if an error occurs
 @DESCRIPTION: Gets the type and sign of a variable for mi2_icv_attach.
 @METHOD     : 
 @GLOBALS    : 
@@ -1002,7 +1090,7 @@ MNCAPI int mi2_icv_ndattach(int icvid, int cdfid, int varid)
 static int MI2_icv_get_type(mi2_icv_type *icvp, int cdfid, int varid)
 {
    int oldncopts;            /* For saving value of ncopts */
-   char stringa[MI2_MAX_ATTSTR_LEN];
+   char stringa[MI_MAX_ATTSTR_LEN];
    char *string=stringa;     /* String for sign info */
 
    MI2_SAVE_ROUTINE_NAME("MI2_icv_get_type");
@@ -1010,26 +1098,26 @@ static int MI2_icv_get_type(mi2_icv_type *icvp, int cdfid, int varid)
    /* Inquire about the variable */
    if (ncvarinq(cdfid, varid, NULL, &(icvp->var_type), 
                 &(icvp->var_ndims), icvp->var_dim, NULL) < 0) {
-       MI2_RETURN(MI2_ERROR);
+       MI2_RETURN(MI_ERROR);
    }
 
    /* Check that the variable type is numeric */
-   if (icvp->var_type==NC_CHAR) {
+   if (icvp->var_type==MI_TYPE_BYTE) {
        milog_message(MI2_MSG_VARNOTNUM);
-       MI2_RETURN(MI2_ERROR);
+       MI2_RETURN(MI_ERROR);
    }
 
    /* Try to find out the sign of the variable using MIsigntype. */
-   oldncopts = ncopts; ncopts = 0;
-   string=miattgetstr(cdfid, varid, MIsigntype, MI2_MAX_ATTSTR_LEN, string);
-   ncopts = oldncopts;
+//TODO:CNV   oldncopts = ncopts; ncopts = 0;
+   string=miattgetstr(cdfid, varid, MIsigntype, MI_MAX_ATTSTR_LEN, string);
+//TODO:CNV   ncopts = oldncopts;
    icvp->var_sign  = MI2_get_sign_from_string(icvp->var_type, string);
 
    /* Get type lengths */
    icvp->var_typelen = nctypelen(icvp->var_type);
    icvp->user_typelen = nctypelen(icvp->user_type);
 
-   MI2_RETURN(MI2_NOERROR);
+   MI2_RETURN(MI_NOERROR);
 }
 
 
@@ -1039,7 +1127,7 @@ static int MI2_icv_get_type(mi2_icv_type *icvp, int cdfid, int varid)
               cdfid - cdf file id
               varid - variable id
 @OUTPUT     : (none)
-@RETURNS    : MI2_ERROR if an error occurs
+@RETURNS    : MI_ERROR if an error occurs
 @DESCRIPTION: Gets the valid range of a variable
 @METHOD     : 
 @GLOBALS    : 
@@ -1053,13 +1141,13 @@ static int MI2_icv_get_vrange(mi2_icv_type *icvp, int cdfid, int varid)
 
    MI2_SAVE_ROUTINE_NAME("MI2_icv_get_vrange");
 
-   if (miget_valid_range(cdfid, varid, vrange) == MI2_ERROR) {
-      MI2_RETURN(MI2_ERROR);
+   if (miget_valid_range(cdfid, varid, vrange) == MI_ERROR) {
+      MI2_RETURN(MI_ERROR);
    }
    icvp->var_vmin = vrange[0];
    icvp->var_vmax = vrange[1];
 
-   MI2_RETURN(MI2_NOERROR);
+   MI2_RETURN(MI_NOERROR);
 }
 
 
@@ -1079,7 +1167,7 @@ static int MI2_icv_get_vrange(mi2_icv_type *icvp, int cdfid, int varid)
 @CREATED    : August 10, 1992 (Peter Neelin)
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
-static double MI2_get_default_range(char *what, nc_type datatype, int sign)
+static double MI2_get_default_range(char *what, mitype_t datatype, int sign)
 {
    double range[2];
 
@@ -1094,7 +1182,7 @@ static double MI2_get_default_range(char *what, nc_type datatype, int sign)
       MI2_RETURN(range[0]);
    }
    else {
-      ncopts = NC_VERBOSE | NC_FATAL;
+//TODO:CNV      ncopts = NC_VERBOSE | NC_FATAL;
       MI2_LOG_PKG_ERROR2(-1,"MINC bug - this line should never be printed");
    }
 
@@ -1108,7 +1196,7 @@ static double MI2_get_default_range(char *what, nc_type datatype, int sign)
               cdfid - cdf file id
               varid - variable id
 @OUTPUT     : (none)
-@RETURNS    : MI2_ERROR if an error occurs
+@RETURNS    : MI_ERROR if an error occurs
 @DESCRIPTION: Gets the normalization info for a variable
 @METHOD     : 
 @GLOBALS    : 
@@ -1122,7 +1210,7 @@ static int MI2_icv_get_norm(mi2_icv_type *icvp, int cdfid, int varid)
    int oldncopts;             /* For saving value of ncopts */
    int vid[2];                /* Variable ids for max and min */
    int ndims;                 /* Number of dimensions for image max and min */
-   int dim[MAX_VAR_DIMS];     /* Dimensions */
+   int dim[MI2_MAX_VAR_DIMS];     /* Dimensions */
    int imm;                   /* Counter for looping through max and min */
    double image_range[2];
    int idim, i;
@@ -1131,20 +1219,20 @@ static int MI2_icv_get_norm(mi2_icv_type *icvp, int cdfid, int varid)
 
    /* Check for floating point or double precision values for user or
       in variable - set flag to not do normalization if needed */
-   icvp->derv_var_float = ((icvp->var_type == NC_DOUBLE) ||
-                           (icvp->var_type == NC_FLOAT));
-   icvp->derv_usr_float = ((icvp->user_type == NC_DOUBLE) ||
-                           (icvp->user_type == NC_FLOAT));
+   icvp->derv_var_float = ((icvp->var_type == MI_TYPE_DOUBLE) ||
+                           (icvp->var_type == MI_TYPE_FLOAT));
+   icvp->derv_usr_float = ((icvp->user_type == MI_TYPE_DOUBLE) ||
+                           (icvp->user_type == MI_TYPE_FLOAT));
 
    /* Initialize first dimension over which MIimagemax or MIimagemin
       vary - assume that they don't vary at all */
    icvp->derv_firstdim=(-1);
 
    /* Look for image max, image min variables */
-   oldncopts=ncopts; ncopts=0;
+//TODO:CNV   oldncopts=ncopts; ncopts=0;
    icvp->imgmaxid=ncvarid(cdfid, icvp->user_maxvar);
    icvp->imgminid=ncvarid(cdfid, icvp->user_minvar);
-   ncopts = oldncopts;
+//TODO:CNV   ncopts = oldncopts;
 
    /* Check to see if normalization to variable max, min should be done */
    if (!icvp->user_do_norm) {
@@ -1161,7 +1249,7 @@ static int MI2_icv_get_norm(mi2_icv_type *icvp, int cdfid, int varid)
       }
       else {
           if (miget_image_range(cdfid, image_range) < 0) {
-              MI2_RETURN(MI2_ERROR);
+              MI2_RETURN(MI_ERROR);
           }
          icvp->derv_imgmin = image_range[0];
          icvp->derv_imgmax = image_range[1];
@@ -1171,10 +1259,10 @@ static int MI2_icv_get_norm(mi2_icv_type *icvp, int cdfid, int varid)
          which is the fastest varying dimension of the image variable. */
       vid[0]=icvp->imgminid;
       vid[1]=icvp->imgmaxid;
-      if ((vid[0] != MI2_ERROR) && (vid[1] != MI2_ERROR)) {
+      if ((vid[0] != MI_ERROR) && (vid[1] != MI_ERROR)) {
          for (imm=0; imm < 2; imm++) {
              if (ncvarinq(cdfid, vid[imm], NULL, NULL, &ndims, dim, NULL) < 0) {
-                 MI2_RETURN(MI2_ERROR);
+                 MI2_RETURN(MI_ERROR);
              }
             for (idim=0; idim<ndims; idim++) {
                for (i=0; i<icvp->var_ndims; i++) {
@@ -1187,7 +1275,7 @@ static int MI2_icv_get_norm(mi2_icv_type *icvp, int cdfid, int varid)
 
    }
 
-   MI2_RETURN(MI2_NOERROR);
+   MI2_RETURN(MI_NOERROR);
 }
 
 
@@ -1195,7 +1283,7 @@ static int MI2_icv_get_norm(mi2_icv_type *icvp, int cdfid, int varid)
 @NAME       : mi2_icv_detach
 @INPUT      : icvid - icv id
 @OUTPUT     : (none)
-@RETURNS    : MI2_ERROR if an error occurs
+@RETURNS    : MI_ERROR if an error occurs
 @DESCRIPTION: Detaches the cdf file and variable from the image conversion
               variable, allowing modifications to the icv.
 @METHOD     : 
@@ -1212,11 +1300,11 @@ MNCAPI int mi2_icv_detach(int icvid)
    MI2_SAVE_ROUTINE_NAME("mi2_icv_detach");
 
    /* Check icv id */
-   if ((icvp=MI2_icv_chkid(icvid)) == NULL) MI2_RETURN(MI2_ERROR);
+   if ((icvp=MI2_icv_chkid(icvid)) == NULL) MI2_RETURN(MI_ERROR);
 
    /* Check that the icv is in fact attached */
-   if (icvp->cdfid == MI2_ERROR)
-      MI2_RETURN(MI2_NOERROR);
+   if (icvp->cdfid == MI_ERROR)
+      MI2_RETURN(MI_NOERROR);
 
    /* Free the pixel offset arrays */
    if (icvp->derv_var_pix_off != NULL) FREE(icvp->derv_var_pix_off);
@@ -1230,11 +1318,11 @@ MNCAPI int mi2_icv_detach(int icvid)
       icvp->derv_dim_start[idim] = 0.0;
    }
 
-   /* Set cdfid field to MI2_ERROR to indicate that icv is detached */
-   icvp->cdfid = MI2_ERROR;
-   icvp->varid = MI2_ERROR;
+   /* Set cdfid field to MI_ERROR to indicate that icv is detached */
+   icvp->cdfid = MI_ERROR;
+   icvp->varid = MI_ERROR;
 
-   MI2_RETURN(MI2_NOERROR);
+   MI2_RETURN(MI_NOERROR);
 }
 
 
@@ -1244,7 +1332,7 @@ MNCAPI int mi2_icv_detach(int icvid)
               start  - coordinates of start of hyperslab (see ncvarget)
               count  - size of hyperslab (see ncvarget)
 @OUTPUT     : values - array of values returned
-@RETURNS    : MI2_ERROR if an error occurs
+@RETURNS    : MI_ERROR if an error occurs
 @DESCRIPTION: Gets a hyperslab of values from a netcdf variable through
               the image conversion variable (icvid) 
 @METHOD     : 
@@ -1260,14 +1348,14 @@ MNCAPI int mi2_icv_get(int icvid, long start[], long count[], void *values)
    MI2_SAVE_ROUTINE_NAME("mi2_icv_get");
 
    /* Check icv id */
-   if ((icvp=MI2_icv_chkid(icvid)) == NULL) MI2_RETURN(MI2_ERROR);
+   if ((icvp=MI2_icv_chkid(icvid)) == NULL) MI2_RETURN(MI_ERROR);
 
    /* Get the data */
    if (MI2_icv_access(MI2_PRIV_GET, icvp, start, count, values) < 0) {
-       MI2_RETURN(MI2_ERROR);
+       MI2_RETURN(MI_ERROR);
    }
 
-   MI2_RETURN(MI2_NOERROR);
+   MI2_RETURN(MI_NOERROR);
 }
 
 
@@ -1278,7 +1366,7 @@ MNCAPI int mi2_icv_get(int icvid, long start[], long count[], void *values)
               count  - size of hyperslab (see ncvarput)
               values - array of values to store
 @OUTPUT     : (none)
-@RETURNS    : MI2_ERROR if an error occurs
+@RETURNS    : MI_ERROR if an error occurs
 @DESCRIPTION: Stores a hyperslab of values in a netcdf variable through
               the image conversion variable (icvid)
 @METHOD     : 
@@ -1294,14 +1382,14 @@ MNCAPI int mi2_icv_put(int icvid, long start[], long count[], void *values)
    MI2_SAVE_ROUTINE_NAME("mi2_icv_put");
 
    /* Check icv id */
-   if ((icvp=MI2_icv_chkid(icvid)) == NULL) MI2_RETURN(MI2_ERROR);
+   if ((icvp=MI2_icv_chkid(icvid)) == NULL) MI2_RETURN(MI_ERROR);
 
 
    if (MI2_icv_access(MI2_PRIV_PUT, icvp, start, count, values) < 0) {
-       MI2_RETURN(MI2_ERROR);
+       MI2_RETURN(MI_ERROR);
    }
 
-   MI2_RETURN(MI2_NOERROR);
+   MI2_RETURN(MI_NOERROR);
 }
 
 
@@ -1313,7 +1401,7 @@ MNCAPI int mi2_icv_put(int icvid, long start[], long count[], void *values)
               count     - size of hyperslab (see ncvarput)
               values    - array of values to put
 @OUTPUT     : values    - array of values to get
-@RETURNS    : MI2_ERROR if an error occurs
+@RETURNS    : MI_ERROR if an error occurs
 @DESCRIPTION: Does the work of getting or putting values from an icv.
 @METHOD     : 
 @GLOBALS    : 
@@ -1327,34 +1415,34 @@ static int MI2_icv_access(int operation, mi2_icv_type *icvp, long start[],
    int *bufsize_step;                /* Pointer to array giving increments
                                         for allocating variable buffer
                                         (NULL if we don't care) */
-   long chunk_count[MAX_VAR_DIMS];   /* Number of elements to get for chunk */
-   long chunk_start[MAX_VAR_DIMS];   /* Starting index for getting a chunk */
+   long chunk_count[MI2_MAX_VAR_DIMS];   /* Number of elements to get for chunk */
+   long chunk_start[MI2_MAX_VAR_DIMS];   /* Starting index for getting a chunk */
    long chunk_size;                  /* Size of chunk in bytes */
    void *chunk_values;               /* Pointer to next chunk to get */
-   long var_start[MAX_VAR_DIMS];     /* Coordinates of first var element */
-   long var_count[MAX_VAR_DIMS];     /* Edge lengths in variable */
-   long var_end[MAX_VAR_DIMS];       /* Coordinates of last var element */
+   long var_start[MI2_MAX_VAR_DIMS];     /* Coordinates of first var element */
+   long var_count[MI2_MAX_VAR_DIMS];     /* Edge lengths in variable */
+   long var_end[MI2_MAX_VAR_DIMS];       /* Coordinates of last var element */
    int firstdim;
    int idim, ndims;
 
    MI2_SAVE_ROUTINE_NAME("MI2_icv_access");
 
    /* Check that icv is attached to a variable */
-   if (icvp->cdfid == MI2_ERROR) {
+   if (icvp->cdfid == MI_ERROR) {
        milog_message(MI2_MSG_ICVNOTATTACHED);
 
-       MI2_RETURN(MI2_ERROR);
+       MI2_RETURN(MI_ERROR);
    }
 
    /* Zero the user's buffer if needed */
    if ((operation == MI2_PRIV_GET) && (icvp->derv_do_zero))
        if (MI2_icv_zero_buffer(icvp, count, values) < 0) {
-           MI2_RETURN(MI2_ERROR);
+           MI2_RETURN(MI_ERROR);
        }
 
    /* Translate icv coordinates to variable coordinates */
    if (MI2_icv_coords_tovar(icvp, start, count, var_start, var_count) < 0) {
-       MI2_RETURN(MI2_ERROR);
+       MI2_RETURN(MI_ERROR);
    }
 
    /* Save icv coordinates for future reference (for dimension conversion
@@ -1411,7 +1499,7 @@ static int MI2_icv_access(int operation, mi2_icv_type *icvp, long start[],
       /* Calculate scale factor */
       if (icvp->do_scale) {
           if (MI2_icv_calc_scale(operation, icvp, chunk_start) < 0) {
-              MI2_RETURN(MI2_ERROR);
+              MI2_RETURN(MI_ERROR);
           }
       }
 
@@ -1422,7 +1510,7 @@ static int MI2_icv_access(int operation, mi2_icv_type *icvp, long start[],
                        chunk_start, chunk_count,
                        icvp->user_type, icvp->user_sign,
                        chunk_values, bufsize_step, icvp) < 0) {
-          MI2_RETURN(MI2_ERROR);
+          MI2_RETURN(MI_ERROR);
       }
 
       /* Increment the start counter */
@@ -1438,7 +1526,7 @@ static int MI2_icv_access(int operation, mi2_icv_type *icvp, long start[],
 
    }
 
-   MI2_RETURN(MI2_NOERROR);
+   MI2_RETURN(MI_NOERROR);
 }
 
 
@@ -1448,7 +1536,7 @@ static int MI2_icv_access(int operation, mi2_icv_type *icvp, long start[],
               count     - count vector
               values    - pointer to user's buffer
 @OUTPUT     : 
-@RETURNS    : MI2_ERROR if an error occurs
+@RETURNS    : MI_ERROR if an error occurs
 @DESCRIPTION: Zeros the user's buffer, with a size given by the vector count.
 @METHOD     : 
 @GLOBALS    : 
@@ -1493,7 +1581,7 @@ static int MI2_icv_zero_buffer(mi2_icv_type *icvp, long count[], void *values)
       *bufptr = *zeroptr;
    }
 
-   MI2_RETURN(MI2_NOERROR);
+   MI2_RETURN(MI_NOERROR);
 }
 
 
@@ -1504,7 +1592,7 @@ static int MI2_icv_zero_buffer(mi2_icv_type *icvp, long count[], void *values)
               icv_count - count vector for icv
 @OUTPUT     : var_start - start vector for variable
               var_count - count vector for variable
-@RETURNS    : MI2_ERROR if an error occurs
+@RETURNS    : MI_ERROR if an error occurs
 @DESCRIPTION: Converts a start and count vector for referencing an icv
               to the corresponding vectors for referencing a NetCDF variable.
 @METHOD     : 
@@ -1530,7 +1618,7 @@ static int MI2_icv_coords_tovar(mi2_icv_type *icvp,
          var_count[i] = icv_count[i];
          var_start[i] = icv_start[i];
       }
-      MI2_RETURN(MI2_NOERROR);
+      MI2_RETURN(MI_NOERROR);
    }
 
    /* Get the number of non image dimensions */
@@ -1555,7 +1643,7 @@ static int MI2_icv_coords_tovar(mi2_icv_type *icvp,
           (last_coord<0) || (last_coord>=icv_dim_size) ||
           (icv_count[i]<0)) {
           milog_message(MI2_MSG_ICVCOORDS);
-          MI2_RETURN(MI2_ERROR);
+          MI2_RETURN(MI_ERROR);
       }
       /* Remove offset */
       coord = icv_start[i]-icvp->derv_dim_off[j];
@@ -1596,7 +1684,7 @@ static int MI2_icv_coords_tovar(mi2_icv_type *icvp,
       }
    }
 
-   MI2_RETURN(MI2_NOERROR);
+   MI2_RETURN(MI_NOERROR);
 }
 
 
@@ -1606,7 +1694,7 @@ static int MI2_icv_coords_tovar(mi2_icv_type *icvp,
               icvp      - icv structure pointer
               coords    - coordinates of first value to get or put
 @OUTPUT     : icvp      - fields scale and offset set
-@RETURNS    : MI2_ERROR if an error occurs
+@RETURNS    : MI_ERROR if an error occurs
 @DESCRIPTION: Calculates the scale and offset needed for getting or putting
               values, starting at index coords (assumes that scale is constant
               over that range).
@@ -1618,7 +1706,7 @@ static int MI2_icv_coords_tovar(mi2_icv_type *icvp,
 ---------------------------------------------------------------------------- */
 static int MI2_icv_calc_scale(int operation, mi2_icv_type *icvp, long coords[])
 {
-   long mmcoords[MAX_VAR_DIMS];   /* Coordinates for max/min variable */
+   long mmcoords[MI2_MAX_VAR_DIMS];   /* Coordinates for max/min variable */
    double usr_imgmax, usr_imgmin;
    double var_imgmax, var_imgmin;
    double var_imgmax_true, var_imgmin_true;
@@ -1650,21 +1738,21 @@ static int MI2_icv_calc_scale(int operation, mi2_icv_type *icvp, long coords[])
       slice_imgmax = MI2_DEFAULT_MAX;
       slice_imgmin = MI2_DEFAULT_MIN;
       if ((!icvp->derv_var_float || !icvp->user_do_norm) &&
-          (icvp->imgmaxid!=MI2_ERROR) && (icvp->imgminid!=MI2_ERROR)) {
+          (icvp->imgmaxid!=MI_ERROR) && (icvp->imgminid!=MI_ERROR)) {
          if (mitranslate_coords(icvp->cdfid, icvp->varid, coords, 
                                 icvp->imgmaxid, mmcoords) == NULL)
-            MI2_RETURN(MI2_ERROR);
+            MI2_RETURN(MI_ERROR);
          if (mivarget1(icvp->cdfid, icvp->imgmaxid, mmcoords,
-                       NC_DOUBLE, NULL, &slice_imgmax) < 0) {
-             MI2_RETURN(MI2_ERROR);
+                       MI_TYPE_DOUBLE, NULL, &slice_imgmax) < 0) {
+             MI2_RETURN(MI_ERROR);
          }
          if (mitranslate_coords(icvp->cdfid, icvp->varid, coords, 
                                 icvp->imgminid, mmcoords) == NULL) {
-            MI2_RETURN(MI2_ERROR);
+            MI2_RETURN(MI_ERROR);
          }
          if (mivarget1(icvp->cdfid, icvp->imgminid, mmcoords,
-                       NC_DOUBLE, NULL, &slice_imgmin) < 0) {
-             MI2_RETURN(MI2_ERROR);
+                       MI_TYPE_DOUBLE, NULL, &slice_imgmin) < 0) {
+             MI2_RETURN(MI_ERROR);
          }
       }
 
@@ -1792,7 +1880,7 @@ static int MI2_icv_calc_scale(int operation, mi2_icv_type *icvp, long coords[])
 
    }       /* If scale == 0.0 */
 
-   MI2_RETURN(MI2_NOERROR);
+   MI2_RETURN(MI_NOERROR);
 }
 
 
@@ -1805,11 +1893,11 @@ static int MI2_icv_calc_scale(int operation, mi2_icv_type *icvp, long coords[])
               structure.
 @METHOD     : 
 @GLOBALS    : 
-@CALLS      : NetCDF routines
+@CALLS      : 
 @CREATED    : August 7, 1992 (Peter Neelin)
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
-mi2_icv_type *MI2_icv_chkid(int icvid)
+static mi2_icv_type *MI2_icv_chkid(int icvid)
 {
    MI2_SAVE_ROUTINE_NAME("MI2_icv_chkid");
 
