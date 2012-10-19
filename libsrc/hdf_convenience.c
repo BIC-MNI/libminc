@@ -178,35 +178,33 @@ hdf_var_add(struct m2_file *file, const char *name, const char *path,
 
     new = (struct m2_var *) malloc(sizeof(struct m2_var));
     if (new != NULL) {
-        new->id = file->nvars++;
-	strncpy(new->name, name, NC_MAX_NAME - 1);
-	strncpy(new->path, path, NC_MAX_NAME - 1);
-        new->is_cmpd = 0;
-        new->dset_id = H5Dopen1(file->fd, path);
-        new->ftyp_id = H5Dget_type(new->dset_id);
-        new->mtyp_id = H5Tget_native_type(new->ftyp_id, H5T_DIR_ASCEND);
-        new->fspc_id = H5Dget_space(new->dset_id);
-	new->ndims = ndims;
-	if (ndims != 0) {
-	    new->dims = (hsize_t *) malloc(sizeof (hsize_t) * ndims);
-	    if (new->dims != NULL) {
-		int i;
-		for (i = 0; i < ndims; i++) {
-		    new->dims[i] = dims[i];
-		}
-	    }
-	    else {
-		milog_message(MI_MSG_OUTOFMEM, sizeof(hsize_t) * ndims);
-	    }
-	}
-	else {
-	    new->dims = NULL;
-	}
-        file->vars[new->id] = new;
-    }
-    else {
-	milog_message(MI_MSG_OUTOFMEM, sizeof (struct m2_var));
-	exit(-1);
+      new->id = file->nvars++;
+      strncpy(new->name, name, NC_MAX_NAME - 1);
+      strncpy(new->path, path, NC_MAX_NAME - 1);
+      new->is_cmpd = 0;
+      new->dset_id = H5Dopen1(file->fd, path);
+      new->ftyp_id = H5Dget_type(new->dset_id);
+      new->mtyp_id = H5Tget_native_type(new->ftyp_id, H5T_DIR_ASCEND);
+      new->fspc_id = H5Dget_space(new->dset_id);
+      new->ndims = ndims;
+      if (ndims != 0) {
+          new->dims = (hsize_t *) malloc(sizeof (hsize_t) * ndims);
+          if (new->dims != NULL) {
+            int i;
+            for (i = 0; i < ndims; i++) {
+              new->dims[i] = dims[i];
+            }
+          } else {
+            milog_message(MI_MSG_OUTOFMEM, sizeof(hsize_t) * ndims);
+          }
+      }
+      else {
+          new->dims = NULL;
+      }
+      file->vars[new->id] = new;
+    } else {
+      milog_message(MI_MSG_OUTOFMEM, sizeof (struct m2_var));
+      exit(-1);
     }
     return (new);
 }

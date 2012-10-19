@@ -15,7 +15,7 @@
 struct milistframe {
   struct milistframe *next;
   hid_t grp_id;
-  int att_idx;
+  unsigned int att_idx;
   int grp_idx;
   char relpath[MILIST_MAX_PATH];
 };
@@ -187,7 +187,7 @@ milist_attr_next ( mihandle_t vol, milisthandle_t handle,
 
     H5E_BEGIN_TRY {
       r = H5Aiterate1 ( data->frame_ptr->grp_id,
-      &data->frame_ptr->att_idx, milist_attr_op, data );
+        &data->frame_ptr->att_idx, milist_attr_op, data );
     } H5E_END_TRY;
 
     if ( r > 0 ) {

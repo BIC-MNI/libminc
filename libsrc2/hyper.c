@@ -285,7 +285,7 @@ int
 mitranslate_hyperslab_origin(mihandle_t volume,
                              const unsigned long start[],
                              const unsigned long count[],
-                             hssize_t hdf_start[],
+                             hsize_t hdf_start[],
                              hsize_t hdf_count[],
                              int dir[]) /* direction vector in file order */
 {
@@ -829,8 +829,7 @@ cleanup:
  * with no range conversions or normalization.  Type conversions will
  * be performed if necessary.
  */
-int
-miget_voxel_value_hyperslab(mihandle_t volume,
+int miget_voxel_value_hyperslab(mihandle_t volume,
                             mitype_t buffer_data_type,
                             const unsigned long start[],
                             const unsigned long count[],
@@ -844,8 +843,7 @@ miget_voxel_value_hyperslab(mihandle_t volume,
  * with no range conversions or normalization.  Type conversions will
  * be performed if necessary.
  */
-int
-miset_voxel_value_hyperslab(mihandle_t volume,
+int miset_voxel_value_hyperslab(mihandle_t volume,
                             mitype_t buffer_data_type,
                             const unsigned long start[],
                             const unsigned long count[],

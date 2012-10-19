@@ -10,8 +10,11 @@
 
 #include <stdlib.h>
 #include <hdf5.h>
+#include <sys/types.h>
+#include <unistd.h>
 #include <limits.h>
 #include <float.h>
+#include <time.h>
 #include <math.h>
 #include "minc2.h"
 #include "minc2_private.h"
@@ -29,6 +32,233 @@ static void miread_valid_range(mihandle_t volume, double *valid_max,
 
 static int _miset_volume_class(mihandle_t volume, miclass_t volclass);
 static int _miget_volume_class(mihandle_t volume, miclass_t *volclass);
+
+/* ported from hdf_convinience.c*/
+/**
+ * Supposedly declare new variable 
+ */
+static int _hdf_var_declare(hid_t fd,const char *varnm,const char *varpath, int ndims, hsize_t *sizes)
+{
+  hid_t dset_id,ftyp_id,mtyp_id,fspc_id;
+  dset_id = H5Dopen1(fd, varpath);
+  ftyp_id = H5Dget_type(dset_id);
+  mtyp_id = H5Tget_native_type(ftyp_id, H5T_DIR_ASCEND);
+  fspc_id = H5Dget_space(dset_id);
+  
+  //TODO: figure out how to actually declare variable in HDF5
+  return MI_NOERROR;
+}
+
+
+/**
+ * Creates a (hopefully) unique identifier to associate with a
+ *              MINC file, by concatenating various information about the
+ *              system, process, etc.
+ * returns the length of identifier 
+ */
+
+static int _generate_ident( char * id_str, size_t length )
+{
+  static int identx = 1;      /* Static ID counter */
+  time_t now;
+  struct tm tm_buf;
+  char host_str[128];
+  char user_str[128];
+  char *temp_ptr;
+  char time_str[26];
+  int result;
+  
+  if (gethostname(host_str, sizeof(host_str)) != 0) {
+    strcpy(host_str, "unknown");
+  }
+  
+  temp_ptr = getenv("LOGNAME");
+  if (temp_ptr != NULL) {
+    strcpy(user_str, temp_ptr);
+  }
+  else {
+    strcpy(user_str, "nobody");
+  }
+  
+  
+  time(&now);
+#ifdef _MSC_VER
+  memcpy(&tm_buf, localtime(&now), sizeof(tm_buf));
+#else
+  localtime_r(&now, &tm_buf);
+#endif
+  strftime(time_str, sizeof(time_str), "%Y.%m.%d.%H.%M.%S", &tm_buf);
+  
+  result = snprintf(id_str, length, "%s:%s:%s:%u:%u", 
+                    user_str, 
+                    host_str, 
+                    time_str, 
+                    getpid(), 
+                    identx++);
+  return result;
+}
+
+/**
+ * open HDF5 file 
+ */
+static hid_t _hdf_open(const char *path, int mode)
+{
+  hid_t fd;
+  hid_t grp_id;
+  hid_t dset_id;
+  //struct m2_file *file;
+  //hsize_t dims[MAX_NC_DIMS];
+  int ndims;
+  //struct m2_var *var;
+  
+  H5E_BEGIN_TRY {
+    #if HDF5_MMAP_TEST
+    if (mode & 0x8000) {
+      hid_t prp_id;
+      
+      prp_id = H5Pcreate(H5P_FILE_ACCESS);
+      H5Pset_fapl_mmap(prp_id, 8192, 1);
+      fd = H5Fopen(path, mode & 0x7FFF, prp_id);
+      H5Pclose(prp_id);
+    } else {
+      fd = H5Fopen(path, mode, H5P_DEFAULT);
+    }
+    #else
+    fd = H5Fopen(path, mode, H5P_DEFAULT);
+    #endif
+  } H5E_END_TRY;
+  
+  if (fd < 0) {
+    return MI_ERROR;
+  }
+  
+  /* Open the image variables.
+   */
+  //TODO: convert
+  
+//   H5E_BEGIN_TRY 
+//   {
+//     dset_id = H5Dopen1(fd, "/minc-2.0/image/0/image");
+//     if (dset_id >= 0) {
+//       hid_t type_id;
+//       int is_compound = 0;
+//       
+//       hdf_get_diminfo(dset_id, &ndims, dims);
+//       
+//       #ifndef NO_EMULATE_VECTOR_DIMENSION
+//       /* See if a vector_dimension needs to be emulated.
+//        */
+//       type_id = H5Dget_type(dset_id);
+//       if (type_id >= 0) {
+//         if (H5Tget_class(type_id) == H5T_COMPOUND) {
+//           /* OK, it's compound type. */
+//           struct m2_dim *dim = hdf_dim_add(file, MIvector_dimension, 
+//                                            H5Tget_nmembers(type_id));
+//           dim->is_fake = 1;
+//           dims[ndims++] = H5Tget_nmembers(type_id);
+//           is_compound = 1;
+//         }
+//         H5Tclose(type_id);
+//       }
+//       #endif /* NO_EMULATE_VECTOR_DIMENSION */
+//       
+//       var = hdf_var_add(file, MIimage, "/minc-2.0/image/0/image", 
+//                         ndims, dims);
+//       var->is_cmpd = is_compound;
+//       
+//       H5Dclose(dset_id);
+//     }
+//     
+//     dset_id = H5Dopen1(fd, "/minc-2.0/image/0/image-min");
+//     if (dset_id >= 0) {
+//       hdf_get_diminfo(dset_id, &ndims, dims);
+//       hdf_var_add(file, MIimagemin, "/minc-2.0/image/0/image-min", 
+//                   ndims, dims);
+//       H5Dclose(dset_id);
+//     }
+//     
+//     dset_id = H5Dopen1(fd, "/minc-2.0/image/0/image-max");
+//     if (dset_id >= 0) {
+//       hdf_get_diminfo(dset_id, &ndims, dims);
+//       hdf_var_add(file, MIimagemax, "/minc-2.0/image/0/image-max", 
+//                   ndims, dims);
+//       H5Dclose(dset_id);
+//     }
+//   } H5E_END_TRY;
+//   
+//   /* Open all of the datasets in the "dimensions" category.
+//    */
+//   grp_id = H5Gopen2(fd, "/minc-2.0/dimensions", H5P_DEFAULT);
+//   hdf_open_dsets(file, grp_id, "/minc-2.0/dimensions/", 1);
+//   H5Gclose(grp_id);
+//   
+//   /* Open all of the datasets in the "info" category.
+//    */
+//   grp_id = H5Gopen2(fd, "/minc-2.0/info", H5P_DEFAULT);
+//   hdf_open_dsets(file, grp_id, "/minc-2.0/info/", 0);
+//   H5Gclose(grp_id);
+  return fd;
+}
+
+
+/** 
+ * Create an HDF5 file. 
+ */
+static hid_t _hdf_create(const char *path, int cmode)
+{
+  hid_t grp_id;
+  hid_t fd;
+  hid_t tmp_id;
+    
+  H5E_BEGIN_TRY {
+    fd = H5Fcreate(path, cmode, H5P_DEFAULT, H5P_DEFAULT);
+  } H5E_END_TRY;
+  
+  if (fd < 0) {
+    return MI_ERROR;
+  }
+  
+  /* Create the default groups.
+   * Should we use a non-zero value for size_hint (parameter 3)???
+   */
+  if ((grp_id = H5Gcreate1(fd, "/minc-2.0", 0)) < 0) {
+    return (MI_ERROR);
+  }
+  
+  if ((tmp_id = H5Gcreate1(grp_id, "dimensions", 0)) < 0) {
+    return (MI_ERROR);
+  }
+  H5Gclose(tmp_id);
+  
+  if ((tmp_id = H5Gcreate1(grp_id, "info", 0)) < 0) {
+    return (MI_ERROR);
+  }
+  H5Gclose(tmp_id);
+  
+  if ((tmp_id = H5Gcreate1(grp_id, "image", 0)) < 0) {
+    return (MI_ERROR);
+  }
+  H5Gclose(tmp_id);
+  
+  if ((tmp_id = H5Gcreate1(grp_id, "image/0", 0)) < 0) {
+    return (MI_ERROR);
+  }
+  H5Gclose(tmp_id);
+  
+  H5Gclose(grp_id);
+  
+  return fd;
+}
+
+static int _hdf_close(hid_t fd)
+{
+  //TODO: make sure we save all that is needed
+  
+  H5Fclose(fd);
+  return MI_NOERROR;
+}
+
+
 
 /** Create the actual image for the volume.
     Note that the image dataset muct be created in the hierarchy
@@ -65,7 +295,7 @@ micreate_volume_image(mihandle_t volume)
   /* Create a SIMPLE dataspace  */
   dataspace_id = H5Screate_simple(volume->number_of_dims, hdf_size, NULL);
   if (dataspace_id < 0) {
-    return (MI_ERROR);
+    return MI_ERROR;
   }
 
   dset_id = H5Dcreate1(volume->hdf_id, "/minc-2.0/image/0/image",
@@ -78,7 +308,7 @@ micreate_volume_image(mihandle_t volume)
 
   volume->image_id = dset_id;
 
-  hdf_var_declare(volume->hdf_id, "image", "/minc-2.0/image/0/image",
+  _hdf_var_declare(volume->hdf_id, "image", "/minc-2.0/image/0/image",
                   volume->number_of_dims, hdf_size);
   /* Create the dimorder attribute, ordered comma-separated
     list of dimension names.
@@ -135,7 +365,7 @@ micreate_volume_image(mihandle_t volume)
                         strlen(dimorder), dimorder);
     }
     volume->imin_id = dset_id;
-    hdf_var_declare(volume->hdf_id, "image-min", "/minc-2.0/image/0/image-min", ndims, hdf_size);
+    _hdf_var_declare(volume->hdf_id, "image-min", "/minc-2.0/image/0/image-min", ndims, hdf_size);
 
 
     /* Create the image maximum dataset for FULL-RESOLUTION storage of data
@@ -150,7 +380,7 @@ micreate_volume_image(mihandle_t volume)
                         strlen(dimorder), dimorder);
     }
     volume->imax_id = dset_id;
-    hdf_var_declare(volume->hdf_id, "image-max", "/minc-2.0/image/0/image-max", ndims, hdf_size);
+    _hdf_var_declare(volume->hdf_id, "image-max", "/minc-2.0/image/0/image-max", ndims, hdf_size);
     H5Sclose(dataspace_id);
     H5Pclose(dcpl_id);
   }
@@ -354,14 +584,14 @@ micreate_volume(const char *filename, int number_of_dimensions,
     and create ID and ID access as default.
   */
 
-  file_id = hdf_create(filename, H5F_ACC_TRUNC, NULL);
+  file_id = _hdf_create(filename, H5F_ACC_TRUNC);
   if (file_id < 0) {
     return (MI_ERROR);
   }
 
   handle->hdf_id = file_id;
 
-  micreate_ident(ident_str, sizeof(ident_str));
+  _generate_ident(ident_str, sizeof(ident_str));
   miset_attribute(handle, MI_ROOT_PATH, "ident", MI_TYPE_STRING,
                   strlen(ident_str), ident_str);
   miset_attribute(handle, MI_ROOT_PATH, "minc_version", MI_TYPE_STRING,
@@ -1031,7 +1261,7 @@ miopen_volume(const char *filename, int mode, mihandle_t *volume)
     return (MI_ERROR);
   }
   /* Open the hdf file using the given filename and mode */
-  file_id = hdf_open(filename, hdf_mode);
+  file_id = _hdf_open(filename, hdf_mode);
   if (file_id < 0) {
     return (MI_ERROR);
   }
@@ -1221,8 +1451,7 @@ miopen_volume(const char *filename, int mode, mihandle_t *volume)
 /** Writes any changes associated with the volume to disk.
     \ingroup mi2Vol
 */
-int
-miflush_volume(mihandle_t volume)
+int miflush_volume(mihandle_t volume)
 {
   if ((volume->mode & MI2_OPEN_RDWR) != 0) {
     H5Fflush(volume->hdf_id, H5F_SCOPE_GLOBAL);
@@ -1236,8 +1465,7 @@ miflush_volume(mihandle_t volume)
 *  the open volume and frees memory associated with the volume handle.
 *  \ingroup mi2Vol
 */
-int
-miclose_volume(mihandle_t volume)
+int miclose_volume(mihandle_t volume)
 {
   if (volume == NULL) {
     return (MI_ERROR);
@@ -1268,8 +1496,7 @@ miclose_volume(mihandle_t volume)
   if (volume->plist_id > 0) {
     H5Pclose(volume->plist_id);
   }
-  //if (H5Fclose(volume->hdf_id) < 0) {
-  if (hdf_close(volume->hdf_id) < 0) {
+  if (_hdf_close(volume->hdf_id) < 0) {
     return (MI_ERROR);
   }
   if (volume->dim_handles != NULL) {
@@ -1290,8 +1517,7 @@ miclose_volume(mihandle_t volume)
 
 /* Internal functions
 */
-static void
-miinit_default_range(mitype_t mitype, double *valid_max, double *valid_min)
+static void miinit_default_range(mitype_t mitype, double *valid_max, double *valid_min)
 {
   switch (mitype) {
   case MI_TYPE_BYTE:
@@ -1333,15 +1559,13 @@ miinit_default_range(mitype_t mitype, double *valid_max, double *valid_min)
   }
 }
 
-static void
-miread_valid_range(mihandle_t volume, double *valid_max, double *valid_min)
+static void miread_valid_range(mihandle_t volume, double *valid_max, double *valid_min)
 {
   int r;
   double range[2];
 
   H5E_BEGIN_TRY {
-    r = miget_attribute(volume, "/minc-2.0/image/0/image", "valid_range",
-    MI_TYPE_DOUBLE, 2, range);
+    r = miget_attribute(volume, "/minc-2.0/image/0/image", "valid_range", MI_TYPE_DOUBLE, 2, range);
   } H5E_END_TRY;
   if (r == MI_NOERROR) {
     if (range[0] < range[1]) {

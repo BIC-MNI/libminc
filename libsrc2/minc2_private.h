@@ -172,7 +172,7 @@ extern int create_standard_dataset(hid_t hdf_file, const char *path);
 extern int mitranslate_hyperslab_origin(mihandle_t volume, 
                                         const unsigned long start[], 
                                         const unsigned long count[],
-                                        hssize_t hdf_start[],
+                                        hsize_t hdf_start[],
                                         hsize_t hdf_count[],
                                         int dir[]);
 /* From volume.c */

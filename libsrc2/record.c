@@ -2,6 +2,9 @@
  * \brief MINC 2.0 Record Functions
  * \author Bert Vincent
  */
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif /*HAVE_CONFIG_H*/
 
 #include <hdf5.h>
 #include "minc2.h"

@@ -8,5 +8,6 @@
 #include "minc2_defs.h"
 #include "minc2_structs.h"
 #include "minc2_error.h"
+#include "minc2_api.h"
 
 #endif /* _MINC2_H_ */

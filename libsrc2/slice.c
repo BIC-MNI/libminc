@@ -14,6 +14,10 @@
  * If slice scaling is not enabled, the slice scaling functions will
  * use the appropriate global volume scale value.
  ************************************************************************/
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif /*HAVE_CONFIG_H*/
+
 #include <stdlib.h>
 #include <hdf5.h>
 #include "minc2.h"
@@ -39,7 +43,7 @@ mirw_slice_minmax(int opcode, mihandle_t volume,
     hid_t dset_id;
     hid_t fspc_id;
     hid_t mspc_id;
-    hssize_t hdf_start[MI2_MAX_VAR_DIMS];
+    hsize_t hdf_start[MI2_MAX_VAR_DIMS];//VF: should it be hssize_t ?
     hsize_t hdf_count[MI2_MAX_VAR_DIMS];
     unsigned long count[MI2_MAX_VAR_DIMS];
     int dir[MI2_MAX_VAR_DIMS];
@@ -83,10 +87,9 @@ mirw_slice_minmax(int opcode, mihandle_t volume,
                                  hdf_count,
                                  dir);
                                  
-    result = H5Sselect_elements(fspc_id, H5S_SELECT_SET, 1, 
-				(const hsize_t **) &hdf_start);
+    result = H5Sselect_elements(fspc_id, H5S_SELECT_SET, 1, hdf_start);
     if (result < 0) {
-	return (MI_ERROR);
+      return (MI_ERROR);
     }
 
     /* Create a trivial scalar space to read the single value.
@@ -94,16 +97,16 @@ mirw_slice_minmax(int opcode, mihandle_t volume,
     mspc_id = H5Screate(H5S_SCALAR);
 
     if (opcode & MIRW_SCALE_SET) {
-	result = H5Dwrite(dset_id, H5T_NATIVE_DOUBLE, mspc_id, fspc_id, 
-			  H5P_DEFAULT, value);
+        result = H5Dwrite(dset_id, H5T_NATIVE_DOUBLE, mspc_id, fspc_id, 
+          H5P_DEFAULT, value);
     }
     else {
-	result = H5Dread(dset_id, H5T_NATIVE_DOUBLE, mspc_id, fspc_id, 
-			 H5P_DEFAULT, value);
+      result = H5Dread(dset_id, H5T_NATIVE_DOUBLE, mspc_id, fspc_id, 
+        H5P_DEFAULT, value);
     }
 
     if (result < 0) {
-	return (MI_ERROR);
+      return (MI_ERROR);
     }
 
     H5Sclose(fspc_id);

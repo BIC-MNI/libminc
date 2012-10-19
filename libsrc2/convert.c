@@ -16,6 +16,7 @@
 #include "minc2.h"
 #include "minc2_private.h"
 
+
 /** Convert values between real (scaled) values and voxel (unscaled)
  * values.  The voxel value is the unscaled value, and corresponds to the
  * value actually stored in the file, whereas the "real" value is the

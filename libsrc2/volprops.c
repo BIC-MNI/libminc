@@ -13,6 +13,10 @@
  * managing properties is also believed to be more readily extensible than 
  * any obvious alternative.
  ************************************************************************/
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif /*HAVE_CONFIG_H*/
+
 #define _GNU_SOURCE 1
 #include <stdlib.h>
 #include <hdf5.h>

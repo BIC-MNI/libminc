@@ -243,8 +243,7 @@ mitype_to_nctype(mitype_t mitype, int *is_signed)
 * \param path A string consisting of a slash-separated list of
 * HDF5 groupnames
 */
-hid_t
-midescend_path(hid_t file_id, const char *path)
+hid_t midescend_path(hid_t file_id, const char *path)
 {
   hid_t tmp_id;
 
@@ -264,8 +263,7 @@ midescend_path(hid_t file_id, const char *path)
 }
 
 
-int
-miset_attr_at_loc(hid_t hdf_loc, const char *name, mitype_t data_type,
+int miset_attr_at_loc(hid_t hdf_loc, const char *name, mitype_t data_type,
                   int length, const void *values)
 {
   hid_t ftyp_id;
@@ -327,8 +325,7 @@ miset_attr_at_loc(hid_t hdf_loc, const char *name, mitype_t data_type,
 }
 
 /** Set an attribute from a minc file */
-int
-miset_attribute(mihandle_t volume, const char *path, const char *name,
+int miset_attribute(mihandle_t volume, const char *path, const char *name,
                 mitype_t data_type, int length, const void *values)
 {
   hid_t hdf_file;
@@ -361,8 +358,7 @@ miset_attribute(mihandle_t volume, const char *path, const char *name,
 }
 
 /** Get a double attribute from a minc file */
-int
-miget_attribute(mihandle_t volume, const char *path, const char *name,
+int miget_attribute(mihandle_t volume, const char *path, const char *name,
                 mitype_t data_type, int length, void *values)
 {
   hid_t hdf_file;
@@ -477,49 +473,47 @@ cleanup:
 /* Get the mapping from spatial dimension - x, y, z - to file dimensions
 * and vice-versa.
 */
-void
-mifind_spatial_dims(int mincid, int space_to_dim[], int dim_to_space[])
-{
-  int imgid, dim[MI2_MAX_VAR_DIMS];
-  int idim, ndims, world_index;
-  char dimname[MI2_MAX_DIM_NAME];
-
-  /* Set default values */
-  for (idim = 0; idim < 3; idim++)
-    space_to_dim[idim] = -1;
-
-  for (idim = 0; idim < MI2_MAX_VAR_DIMS; idim++)
-    dim_to_space[idim] = -1;
-
-  /* Get the dimension ids for the image variable
-  */
-  /*TODO:CNV
-  imgid = ncvarid(mincid, MIimage);
-  (void)ncvarinq(mincid, imgid, NULL, NULL, &ndims, dim, NULL);
-  */
-
-  /* Loop over them to find the spatial ones
-  */
-  for (idim = 0; idim < ndims; idim++) {
-    /* Get the name and check that this is a spatial dimension
-    */
-    /*TODO:CNV
-    (void)ncdiminq(mincid, dim[idim], dimname, NULL);*/
-
-    if (!strcmp(dimname, MIxspace)) {
-      world_index = MI2_X;
-    } else if (!strcmp(dimname, MIyspace)) {
-      world_index = MI2_Y;
-    } else if (!strcmp(dimname, MIzspace)) {
-      world_index = MI2_Z;
-    } else {
-      continue;
-    }
-
-    space_to_dim[world_index] = idim;
-    dim_to_space[idim] = world_index;
-  }
-}
+// void
+// mifind_spatial_dims(int mincid, int space_to_dim[], int dim_to_space[])
+// {
+//   int imgid;
+//   int dim[MI2_MAX_VAR_DIMS];
+//   int idim, ndims, world_index;
+//   char dimname[MI2_MAX_DIM_NAME];
+// 
+//   /* Set default values */
+//   for (idim = 0; idim < 3; idim++)
+//     space_to_dim[idim] = -1;
+// 
+//   for (idim = 0; idim < MI2_MAX_VAR_DIMS; idim++)
+//     dim_to_space[idim] = -1;
+// 
+//   /* Get the dimension ids for the image variable
+//   */
+//   imgid = ncvarid(mincid, MIimage);
+//   ncvarinq(mincid, imgid, NULL, NULL, &ndims, dim, NULL);
+// 
+//   /* Loop over them to find the spatial ones
+//   */
+//   for (idim = 0; idim < ndims; idim++) {
+//     /* Get the name and check that this is a spatial dimension
+//     */
+//     ncdiminq(mincid, dim[idim], dimname, NULL);
+// 
+//     if (!strcmp(dimname, MIxspace)) {
+//       world_index = MI2_X;
+//     } else if (!strcmp(dimname, MIyspace)) {
+//       world_index = MI2_Y;
+//     } else if (!strcmp(dimname, MIzspace)) {
+//       world_index = MI2_Z;
+//     } else {
+//       continue;
+//     }
+// 
+//     space_to_dim[world_index] = idim;
+//     dim_to_space[idim] = world_index;
+//   }
+// }
 
 /** Get the voxel to world transform (for column vectors) */
 void
@@ -1295,7 +1289,7 @@ midownsample_slice(double *in_ptr, double *out_ptr, hsize_t isize[],
 * is considered private.
 */
 static void
-miconvert_hyperslab_to_voxel(mihandle_t volume, hssize_t start[],
+miconvert_hyperslab_to_voxel(mihandle_t volume, H5_START_T start[],
                              hsize_t count[], double *slab_ptr,
                              double *max_ptr, double *min_ptr)
 {
@@ -1355,7 +1349,7 @@ miconvert_hyperslab_to_voxel(mihandle_t volume, hssize_t start[],
 * considered private.
 */
 static void
-miconvert_hyperslab_to_real(mihandle_t volume, hssize_t start[],
+miconvert_hyperslab_to_real(mihandle_t volume, H5_START_T start[],
                             hsize_t count[], double *slab_ptr)
 {
   /* This code is not intended to be a general hyperslab-to-real
@@ -1717,7 +1711,6 @@ create_dataset(hid_t hdf_file, const char *name)
   hid_t dataset_info;
   hid_t dataspace_info;
   hid_t grp_info;
-  int result;
 
   grp_info = H5Gopen1(hdf_file, "/minc-2.0/info");
   if (grp_info < 0) {

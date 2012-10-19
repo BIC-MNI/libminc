@@ -9,6 +9,10 @@
  * 12-bit data type in MINC, we may use these functions to set the valid range
  * in the image to 0..4095.
  ************************************************************************/
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif /*HAVE_CONFIG_H*/
+
 #include <stdlib.h>
 #include <hdf5.h>
 #include "minc2.h"
