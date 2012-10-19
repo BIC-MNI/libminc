@@ -123,6 +123,7 @@ struct mivolume {
 extern hid_t midescend_path(hid_t file_id, const char *path);
 extern hid_t mitype_to_hdftype(mitype_t, int);
 extern int mitype_len ( mitype_t mitype );
+extern const char * mitype_sign ( mitype_t mitype );
 
 extern int mitype_to_nctype(mitype_t, int *is_signed);
 
@@ -180,21 +181,6 @@ extern int mitranslate_hyperslab_origin(mihandle_t volume,
 /* From volume.c */
 extern void misave_valid_range(mihandle_t volume);
 
-/* From minc2_icv.c */
-extern int mi2_icv_create(void);
-extern int mi2_icv_free(int icvid);
-extern int mi2_icv_setdbl(int icvid, int icv_property, double value);
-extern int mi2_icv_setint(int icvid, int icv_property, int value);
-extern int mi2_icv_setlong(int icvid, int icv_property, long value);
-extern int mi2_icv_setstr(int icvid, int icv_property, char *value);
-extern int mi2_icv_inqdbl(int icvid, int icv_property, double *value);
-extern int mi2_icv_inqint(int icvid, int icv_property, int *value);
-extern int mi2_icv_inqlong(int icvid, int icv_property, long *value);
-extern int mi2_icv_inqstr(int icvid, int icv_property, char *value);
-extern int mi2_icv_ndattach(int icvid, int cdfid, int varid);
-extern int mi2_icv_detach(int icvid);
-extern int mi2_icv_get(int icvid, long start[], long count[], void *values);
-extern int mi2_icv_put(int icvid, long start[], long count[], void *values);
 
 #include <string.h>
 

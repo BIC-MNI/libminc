@@ -186,6 +186,31 @@ int mitype_len ( mitype_t mitype )
   return ( -1 );
 }
 
+/** get string identifying if datatype is signed
+ */
+const char * mitype_sign ( mitype_t mitype )
+{
+  switch ( mitype ) {
+    case MI_TYPE_BYTE:
+    case MI_TYPE_SHORT:
+    case MI_TYPE_INT:
+    case MI_TYPE_FLOAT:
+    case MI_TYPE_DOUBLE:
+    case MI_TYPE_SCOMPLEX:
+    case MI_TYPE_ICOMPLEX:
+    case MI_TYPE_FCOMPLEX:
+    case MI_TYPE_DCOMPLEX:
+      return MI_SIGNED;
+    case MI_TYPE_UBYTE:
+    case MI_TYPE_USHORT:
+    case MI_TYPE_UINT:
+      return MI_UNSIGNED;
+    default:
+      break;
+  }
+  fprintf ( stderr, _ ( "Unknown type %d" ), ( int ) mitype );
+  return MI_SIGNED;
+}
 
 
 /*! Convert a MINC 2 datatype into a NetCDF datatype.
