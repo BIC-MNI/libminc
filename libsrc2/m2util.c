@@ -263,33 +263,6 @@ midescend_path(hid_t file_id, const char *path)
   return (tmp_id);
 }
 
-/** Get the number of voxels in the file - this is the total number,
-* not just spatial dimensions
-*/
-mi_i64_t
-miget_voxel_count(int mincid)
-{
-  int imgid;
-  int dim[MI2_MAX_VAR_DIMS];
-  int idim;
-  int ndims;
-  mi_i64_t nvoxels;
-  long length;
-
-  /* Get the dimension ids for the image variable
-  */
-  imgid = ncvarid(mincid, MIimage);
-  (void)ncvarinq(mincid, imgid, NULL, NULL, &ndims, dim, NULL);
-
-  /* Loop over them to get the total number of voxels
-  */
-  nvoxels = 1;
-  for (idim = 0; idim < ndims; idim++) {
-    (void)ncdiminq(mincid, dim[idim], NULL, &length);
-    nvoxels *= length;
-  }
-  return (nvoxels);
-}
 
 int
 miset_attr_at_loc(hid_t hdf_loc, const char *name, mitype_t data_type,

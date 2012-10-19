@@ -429,4 +429,9 @@ image dimensions */
 #define MI2_ROOTVARIABLE_ID (NC_MAX_VARS + 1) /* Impossible value */
 
 
+/* stupid macro which was never put to use*/
+#ifndef _
+#define _(x) x      /* For future gettext */
+#endif 
+
 #endif /*__MINC2_DEFS_H__*/

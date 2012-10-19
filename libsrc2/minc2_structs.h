@@ -278,5 +278,21 @@ struct mi2_icv_struct {
    double  derv_dim_start[MI2_MAX_IMGDIMS];
 };
 
+/* Structure for passing values for MI_icv_dimconvert */
+typedef struct {
+   int do_compress, do_expand;
+   long end[MI2_MAX_VAR_DIMS];
+   long in_pix_num,     out_pix_num; /* Variables for compressing/expanding */
+   long *in_pix_off,   *out_pix_off;
+   void *in_pix_first, *out_pix_first;
+   void *in_pix_last,  *out_pix_last;
+   mitype_t intype, outtype;     /* Variable types and signs */
+   int insign, outsign;
+   long buf_step[MI2_MAX_VAR_DIMS];    /* Step sizes for pointers */
+   long usr_step[MI2_MAX_VAR_DIMS];
+   long *istep, *ostep;
+   void *istart, *ostart;       /* Beginning of buffers */
+} mi2_icv_dimconv_type;
+
 
 #endif //__MINC2_STRUCTS_H__
