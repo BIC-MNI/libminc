@@ -9,8 +9,7 @@
  \param name_ptr A pointer to the space to be freed.
  */
 
-int 
-mifree_name(char *name_ptr)
+int mifree_name(char *name_ptr)
 {
   if (name_ptr == NULL) {
     return (MI_ERROR);
@@ -22,8 +21,7 @@ mifree_name(char *name_ptr)
 /*!
   not certain we really need this...
 */
-int
-mifree_names(char **name_pptr)
+int mifree_names(char **name_pptr)
 {
   if (name_pptr == NULL) {
     return (MI_ERROR);

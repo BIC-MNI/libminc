@@ -212,7 +212,7 @@ SET(minc2_LIB_SRCS
    libsrc2/valid.c
    libsrc2/volprops.c
    libsrc2/volume.c
-#   libsrc2/minc2_icv.c
+   libsrc2/minc2_icv.c
    libsrc2/minc2_error.c
    )
 

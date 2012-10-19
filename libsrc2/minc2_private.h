@@ -122,6 +122,8 @@ struct mivolume {
 /* From m2util.c */
 extern hid_t midescend_path(hid_t file_id, const char *path);
 extern hid_t mitype_to_hdftype(mitype_t, int);
+extern int mitype_len ( mitype_t mitype );
+
 extern int mitype_to_nctype(mitype_t, int *is_signed);
 
 extern int miget_attribute(mihandle_t volume, const char *varpath, 

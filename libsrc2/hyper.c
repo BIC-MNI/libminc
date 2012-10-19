@@ -9,11 +9,8 @@
 #endif //HAVE_CONFIG_H
 
 #include <stdlib.h>
-#include <hdf5.h>
 #include "minc2.h"
 #include "minc2_private.h"
-#include "minc2_defs.h"
-#include "minc2_structs.h"
 
 #define MIRW_OP_READ 1
 #define MIRW_OP_WRITE 2
@@ -499,331 +496,329 @@ cleanup:
 /** Read/write a hyperslab of data, performing dimension remapping
  * and data rescaling as needed.
  */
-// static int mirw_hyperslab_icv(int opcode,
-//                               mihandle_t volume,
-//                               int icv,
-//                               const unsigned long start[],
-//                               const unsigned long count[],
-//                               void *buffer)
-// {
-//   int ndims;
-//   int nbytes;
-//   mitype_t mi_type;
-//   int result = MI_ERROR;
-//   long icv_start[MI2_MAX_VAR_DIMS];
-//   long icv_count[MI2_MAX_VAR_DIMS];
-//   int dir[MI2_MAX_VAR_DIMS];  /* Direction, 1 or -1, in file order */
-//   int n_different = 0;
-// 
-//   /* Disallow write operations to anything but the highest resolution.
-//    */
-//   if (opcode == MIRW_OP_WRITE && volume->selected_resolution != 0) {
-//     return (MI_ERROR);
-//   }
-// 
-//   mi2_icv_inqint(icv, MI2_ICV_TYPE, &mi_type);
-// 
-//   nbytes = mitype_len(mi_type);
-// 
-//   ndims = volume->number_of_dims;
-// 
-//   if (ndims != 0) {
-//     int i;
-//     hssize_t hdf_start[MI2_MAX_VAR_DIMS];
-//     hsize_t hdf_count[MI2_MAX_VAR_DIMS];
-// 
-//     n_different = mitranslate_hyperslab_origin(volume,
-//                   start,
-//                   count,
-//                   hdf_start,
-//                   hdf_count,
-//                   dir);
-//     
-//     for (i = 0; i < ndims; i++) {
-//       icv_start[i] = hdf_start[i];
-//       icv_count[i] = hdf_count[i];
-//     }
-//   }
-// 
-//   if (opcode == MIRW_OP_READ) {
-//     result = mi2_icv_get(icv, icv_start, icv_count, buffer);
-// 
-//     /* Now we have to restructure the array.
-//      * Count must be in raw order here.
-//      */
-//     if (result == MI_NOERROR && n_different != 0) {
-//       restructure_array(ndims, buffer, count, nbytes,
-//                         volume->dim_indices, dir);
-//     }
-//   } else {
-//     volume->is_dirty = TRUE; /* Flag as modified */
-// 
-//     /* Restructure the data before writing.
-//      * Count must be in raw order here.
-//      */
-//     if (n_different != 0) {
-//       restructure_array(ndims, buffer, count, nbytes,
-//                         volume->dim_indices, dir);
-//     }
-// 
-//     result = mi2_icv_put(icv, icv_start, icv_count, buffer);
-//   }
-// 
-//   return (result);
-// }
-// 
-// /** Reads the real values in the volume from the interval min through
-//  *  max, mapped to the maximum representable range for the requested
-//  *  data type. Float type is NOT an allowed data type.
-//  */
-// int miget_hyperslab_normalized(mihandle_t volume,
-//                                mitype_t buffer_data_type,
-//                                const unsigned long start[],
-//                                const unsigned long count[],
-//                                double min,
-//                                double max,
-//                                void *buffer)
-// {
-//   char path[MI2_MAX_PATH];
-//   hid_t dset_id;
-//   hid_t fspc_id;
-//   int icv;
-//   int result;
-//   int is_signed;
-// 
-//   if (min > max) {
-//     return (MI_ERROR);
-//   }
-// 
-//   sprintf(path, "/minc-2.0/image/%d/image", volume->selected_resolution);
-//   /* Open the dataset with the specified path
-//   */
-//   dset_id = H5Dopen1(volume->hdf_id, path);
-//   if (dset_id < 0) {
-//     return (MI_ERROR);
-//   }
-//   /* Get an Id to the copy of the dataspace */
-//   fspc_id = H5Dget_space(dset_id);
-//   if (fspc_id < 0) {
-//     return (MI_ERROR);
-//   }
-// 
-//   if (buffer_data_type == MI_TYPE_FLOAT || buffer_data_type == MI_TYPE_DOUBLE) {
-//     return (MI_ERROR);
-//   }
-// 
-//   if ((icv = mi2_icv_create()) < 0) {
-//     return (MI_ERROR);
-//   }
-// 
-//   result = mi2_icv_setint(icv, MI2_ICV_TYPE, buffer_data_type);
-//   result = mi2_icv_setstr(icv, MI2_ICV_SIGN, is_signed ? MI_SIGNED : MI_UNSIGNED);
-//   result = mi2_icv_setdbl(icv, MI2_ICV_IMAGE_MIN, min);
-//   result = mi2_icv_setdbl(icv, MI2_ICV_IMAGE_MAX, max);
-//   result = mi2_icv_setint(icv, MI2_ICV_USER_NORM, TRUE);
-//   result = mi2_icv_setint(icv, MI2_ICV_DO_NORM, TRUE);
-//   result = mi2_icv_attach(icv, dset_id, fspc_id);
-//   
-//   if (result == MI_NOERROR) 
-//   {
-//     result = mirw_hyperslab_icv(MIRW_OP_READ, volume, icv, start, count,
-//                                 buffer);
-//     mi2_icv_detach(icv);
-//   }
-//   mi2_icv_free(icv);
-// 
-//   return (result);
-// }
-// 
-// /** Get a hyperslab from the file, with the assistance of a MINC2 image
-//  * conversion variable (ICV).
-//  */
-// int miget_hyperslab_with_icv(mihandle_t volume, /**< A MINC 2.0 volume handle */
-//                              int icv, /**< The ICV to use */
-//                              mitype_t buffer_data_type, /**< Output datatype */
-//                              const unsigned long start[], /**< Start coordinates  */
-//                              const unsigned long count[], /**< Lengths of edges  */
-//                              void *buffer) /**< Output memory buffer */
-// {
-//   hid_t file_id;
-//   int var_id;
-//   int result;
-//   int is_signed;
-//   int nctype;
-// 
-//   file_id = volume->hdf_id;
-// 
-//   var_id = hdf_varid(file_id, MIimage);
-// 
-//   nctype = mitype_to_nctype(buffer_data_type, &is_signed);
-// 
-//   mi2_icv_setint(icv, MI2_ICV_TYPE, nctype);
-//   mi2_icv_setstr(icv, MI2_ICV_SIGN, is_signed ? MI_SIGNED : MI_UNSIGNED);
-// 
-//   result = mi2_icv_attach(icv, file_id, var_id);
-//   if (result == MI_NOERROR) {
-//     result = mirw_hyperslab_icv(MIRW_OP_READ, volume, icv, start, count,
-//                                 buffer);
-//     mi2_icv_detach(icv);
-//   }
-//   return (result);
-// }
-// 
-// /** Write a hyperslab to the file, with the assistance of a MINC image
-//  * conversion variable (ICV).
-//  */
-// int
-// miset_hyperslab_with_icv(mihandle_t volume, /**< A MINC 2.0 volume handle */
-//                          int icv, /**< The ICV to use */
-//                          mitype_t buffer_data_type, /**< Output datatype */
-//                          const unsigned long start[], /**< Start coordinates  */
-//                          const unsigned long count[], /**< Lengths of edges  */
-//                          void *buffer) /**< Output memory buffer */
-// {
-//   hid_t file_id;
-//   int var_id;
-//   int result;
-//   int is_signed;
-//   int nctype;
-// 
-//   file_id = volume->hdf_id;
-// 
-//   var_id = hdf_varid(file_id, MIimage);
-// 
-//   nctype = mitype_to_nctype(buffer_data_type, &is_signed);
-// 
-//   mi2_icv_setint(icv, MI2_ICV_TYPE, nctype);
-//   mi2_icv_setstr(icv, MI2_ICV_SIGN, is_signed ? MI_SIGNED : MI_UNSIGNED);
-// 
-//   result = mi2_icv_attach(icv, file_id, var_id);
-//   
-//   if (result == MI_NOERROR) 
-//   {
-//     result = mirw_hyperslab_icv(MIRW_OP_WRITE,
-//                                 volume,
-//                                 icv,
-//                                 start,
-//                                 count,
-//                                 (void *) buffer);
-//     mi2_icv_detach(icv);
-//   }
-//   return (result);
-// }
-// 
-// /** Read a hyperslab from the file into the preallocated buffer,
-//  *  converting from the stored "voxel" data range to the desired
-//  * "real" (float or double) data range.
-//  */
-// int
-// miget_real_value_hyperslab(mihandle_t volume,
-//                            mitype_t buffer_data_type,
-//                            const unsigned long start[],
-//                            const unsigned long count[],
-//                            void *buffer)
-// {
-//   hid_t file_id;
-//   int var_id;
-//   int icv;
-//   int result;
-//   int is_signed;
-//   int nctype;
-//   int i;
-// 
-//   midimhandle_t hdim;
-// 
-// 
-//   file_id = volume->hdf_id;
-// 
-//   var_id = hdf_varid(file_id, MIimage);
-// 
-//   nctype = mitype_to_nctype(buffer_data_type, &is_signed);
-// 
-//   if ((icv = mi2_icv_create()) < 0) {
-//     return (MI_ERROR);
-//   }
-// 
-//   mi2_icv_setint(icv, MI2_ICV_TYPE, nctype);
-//   mi2_icv_setstr(icv, MI2_ICV_SIGN, is_signed ? MI_SIGNED : MI_UNSIGNED);
-//   mi2_icv_setint(icv, MI2_ICV_DO_RANGE, TRUE);
-//   mi2_icv_setint(icv, MI2_ICV_DO_NORM, TRUE);
-//   //figure out whether we need to flip image    L.B May 18/2011
-//   for (i=0; i < volume->number_of_dims ; i++) {
-//     hdim = volume->dim_handles[i];
-//     switch (hdim->flipping_order) {
-//     case MI_FILE_ORDER:
-//       mi2_icv_setint(icv, MI2_ICV_DO_DIM_CONV, FALSE);
-//       break;
-//     case MI_COUNTER_FILE_ORDER:
-//     case MI_POSITIVE:
-//       if (hdim->step < 0)
-//         mi2_icv_setint(icv, MI2_ICV_DO_DIM_CONV, TRUE);
-//       break;
-//     case MI_NEGATIVE:
-//       if (hdim->step > 0)
-//         mi2_icv_setint(icv, MI2_ICV_DO_DIM_CONV, TRUE);
-//       break;
-//     default:
-//       return;
-//     }
-//   }
-//   result = mi2_icv_attach(icv, file_id, var_id);
-//   if (result == MI_NOERROR) {
-//     result = mirw_hyperslab_icv(MIRW_OP_READ,
-//                                 volume,
-//                                 icv,
-//                                 start,
-//                                 count,
-//                                 (void *) buffer);
-//     mi2_icv_detach(icv);
-//   }
-//   mi2_icv_free(icv);
-//   return (result);
-// }
-// 
-// /** Write a hyperslab to the file from the preallocated buffer,
-//  *  converting from the stored "voxel" data range to the desired
-//  * "real" (float or double) data range.
-//  */
-// int
-// miset_real_value_hyperslab(mihandle_t volume,
-//                            mitype_t buffer_data_type,
-//                            const unsigned long start[],
-//                            const unsigned long count[],
-//                            void *buffer)
-// {
-//   hid_t file_id;
-//   int var_id;
-//   int icv;
-//   int result;
-//   int is_signed;
-//   int nctype;
-// 
-//   file_id = volume->hdf_id;
-// 
-//   var_id = hdf_varid(file_id, MIimage);
-// 
-//   nctype = mitype_to_nctype(buffer_data_type, &is_signed);
-// 
-//   if ((icv = mi2_icv_create()) < 0) {
-//     return (MI_ERROR);
-//   }
-// 
-//   mi2_icv_setint(icv, MI2_ICV_TYPE, nctype);
-//   mi2_icv_setstr(icv, MI2_ICV_SIGN, is_signed ? MI_SIGNED : MI_UNSIGNED);
-// 
-//   result = mi2_icv_attach(icv, file_id, var_id);
-//   if (result == MI_NOERROR) {
-//     result = mirw_hyperslab_icv(MIRW_OP_WRITE,
-//                                 volume,
-//                                 icv,
-//                                 start,
-//                                 count,
-//                                 (void *) buffer);
-//     mi2_icv_detach(icv);
-//   }
-//   mi2_icv_free(icv);
-//   return (result);
-// }
+static int mirw_hyperslab_icv(int opcode,
+                              mihandle_t volume,
+                              int icv,
+                              const unsigned long start[],
+                              const unsigned long count[],
+                              void *buffer)
+{
+  int ndims;
+  int nbytes;
+  mitype_t mi_type;
+  int result = MI_ERROR;
+  long icv_start[MI2_MAX_VAR_DIMS];
+  long icv_count[MI2_MAX_VAR_DIMS];
+  int dir[MI2_MAX_VAR_DIMS];  /* Direction, 1 or -1, in file order */
+  int n_different = 0;
+
+  /* Disallow write operations to anything but the highest resolution.
+   */
+  if (opcode == MIRW_OP_WRITE && volume->selected_resolution != 0) {
+    return (MI_ERROR);
+  }
+
+  mi2_icv_inqint(icv, MI2_ICV_TYPE, &mi_type);
+
+  nbytes = mitype_len(mi_type);
+
+  ndims = volume->number_of_dims;
+
+  if (ndims != 0) {
+    int i;
+    hssize_t hdf_start[MI2_MAX_VAR_DIMS];
+    hsize_t hdf_count[MI2_MAX_VAR_DIMS];
+
+    n_different = mitranslate_hyperslab_origin(volume,
+                  start,
+                  count,
+                  hdf_start,
+                  hdf_count,
+                  dir);
+    
+    for (i = 0; i < ndims; i++) {
+      icv_start[i] = hdf_start[i];
+      icv_count[i] = hdf_count[i];
+    }
+  }
+
+  if (opcode == MIRW_OP_READ) {
+    result = mi2_icv_get(icv, icv_start, icv_count, buffer);
+
+    /* Now we have to restructure the array.
+     * Count must be in raw order here.
+     */
+    if (result == MI_NOERROR && n_different != 0) {
+      restructure_array(ndims, buffer, count, nbytes,
+                        volume->dim_indices, dir);
+    }
+  } else {
+    volume->is_dirty = TRUE; /* Flag as modified */
+
+    /* Restructure the data before writing.
+     * Count must be in raw order here.
+     */
+    if (n_different != 0) {
+      restructure_array(ndims, buffer, count, nbytes,
+                        volume->dim_indices, dir);
+    }
+
+    result = mi2_icv_put(icv, icv_start, icv_count, buffer);
+  }
+
+  return (result);
+}
+
+/** Reads the real values in the volume from the interval min through
+ *  max, mapped to the maximum representable range for the requested
+ *  data type. Float type is NOT an allowed data type.
+ */
+int miget_hyperslab_normalized(mihandle_t volume,
+                               mitype_t buffer_data_type,
+                               const unsigned long start[],
+                               const unsigned long count[],
+                               double min,
+                               double max,
+                               void *buffer)
+{
+  char path[MI2_MAX_PATH];
+  hid_t dset_id;
+  hid_t fspc_id;
+  int icv;
+  int result;
+  int is_signed;
+
+  if (min > max) {
+    return (MI_ERROR);
+  }
+
+  sprintf(path, "/minc-2.0/image/%d/image", volume->selected_resolution);
+  /* Open the dataset with the specified path
+  */
+  dset_id = H5Dopen1(volume->hdf_id, path);
+  if (dset_id < 0) {
+    return (MI_ERROR);
+  }
+  /* Get an Id to the copy of the dataspace */
+  fspc_id = H5Dget_space(dset_id);
+  if (fspc_id < 0) {
+    return (MI_ERROR);
+  }
+
+  if (buffer_data_type == MI_TYPE_FLOAT || buffer_data_type == MI_TYPE_DOUBLE) {
+    return (MI_ERROR);
+  }
+
+  if ((icv = mi2_icv_create()) < 0) {
+    return (MI_ERROR);
+  }
+
+  result = mi2_icv_setint(icv, MI2_ICV_TYPE, buffer_data_type);
+  result = mi2_icv_setstr(icv, MI2_ICV_SIGN, is_signed ? MI_SIGNED : MI_UNSIGNED);
+  result = mi2_icv_setdbl(icv, MI2_ICV_IMAGE_MIN, min);
+  result = mi2_icv_setdbl(icv, MI2_ICV_IMAGE_MAX, max);
+  result = mi2_icv_setint(icv, MI2_ICV_USER_NORM, TRUE);
+  result = mi2_icv_setint(icv, MI2_ICV_DO_NORM, TRUE);
+  result = mi2_icv_attach(icv, dset_id, fspc_id);
+  
+  if (result == MI_NOERROR) 
+  {
+    result = mirw_hyperslab_icv(MIRW_OP_READ, volume, icv, start, count,
+                                buffer);
+    mi2_icv_detach(icv);
+  }
+  mi2_icv_free(icv);
+
+  return (result);
+}
+
+/** Get a hyperslab from the file, with the assistance of a MINC2 image
+ * conversion variable (ICV).
+ */
+int miget_hyperslab_with_icv(mihandle_t volume, /**< A MINC 2.0 volume handle */
+                             int icv, /**< The ICV to use */
+                             mitype_t buffer_data_type, /**< Output datatype */
+                             const unsigned long start[], /**< Start coordinates  */
+                             const unsigned long count[], /**< Lengths of edges  */
+                             void *buffer) /**< Output memory buffer */
+{
+  hid_t file_id;
+  int var_id;
+  int result;
+  int is_signed;
+  int nctype;
+
+  nctype = mitype_to_nctype(buffer_data_type, &is_signed);
+
+  mi2_icv_setint(icv, MI2_ICV_TYPE, nctype);
+  mi2_icv_setstr(icv, MI2_ICV_SIGN, is_signed ? MI_SIGNED : MI_UNSIGNED);
+
+  result = mi2_icv_attach(icv, volume);
+  
+  if (result == MI_NOERROR) 
+  {
+    result = mirw_hyperslab_icv(MIRW_OP_READ, volume, icv, start, count,
+                                buffer);
+    mi2_icv_detach(icv);
+  }
+  return (result);
+}
+
+/** Write a hyperslab to the file, with the assistance of a MINC image
+ * conversion variable (ICV).
+ */
+int
+miset_hyperslab_with_icv(mihandle_t volume, /**< A MINC 2.0 volume handle */
+                         int icv, /**< The ICV to use */
+                         mitype_t buffer_data_type, /**< Output datatype */
+                         const unsigned long start[], /**< Start coordinates  */
+                         const unsigned long count[], /**< Lengths of edges  */
+                         void *buffer) /**< Output memory buffer */
+{
+  hid_t file_id;
+  int var_id;
+  int result;
+  int is_signed;
+  int nctype;
+
+  file_id = volume->hdf_id;
+
+  var_id = hdf_varid(file_id, MIimage);
+
+  nctype = mitype_to_nctype(buffer_data_type, &is_signed);
+
+  mi2_icv_setint(icv, MI2_ICV_TYPE, nctype);
+  mi2_icv_setstr(icv, MI2_ICV_SIGN, is_signed ? MI_SIGNED : MI_UNSIGNED);
+
+  result = mi2_icv_attach(icv, file_id, var_id);
+  
+  if (result == MI_NOERROR) 
+  {
+    result = mirw_hyperslab_icv(MIRW_OP_WRITE,
+                                volume,
+                                icv,
+                                start,
+                                count,
+                                (void *) buffer);
+    mi2_icv_detach(icv);
+  }
+  return (result);
+}
+
+/** Read a hyperslab from the file into the preallocated buffer,
+ *  converting from the stored "voxel" data range to the desired
+ * "real" (float or double) data range.
+ */
+int
+miget_real_value_hyperslab(mihandle_t volume,
+                           mitype_t buffer_data_type,
+                           const unsigned long start[],
+                           const unsigned long count[],
+                           void *buffer)
+{
+  hid_t file_id;
+  int var_id;
+  int icv;
+  int result;
+  int is_signed;
+  int nctype;
+  int i;
+
+  midimhandle_t hdim;
+
+
+  file_id = volume->hdf_id;
+
+  var_id = hdf_varid(file_id, MIimage);
+
+  nctype = mitype_to_nctype(buffer_data_type, &is_signed);
+
+  if ((icv = mi2_icv_create()) < 0) {
+    return (MI_ERROR);
+  }
+
+  mi2_icv_setint(icv, MI2_ICV_TYPE, nctype);
+  mi2_icv_setstr(icv, MI2_ICV_SIGN, is_signed ? MI_SIGNED : MI_UNSIGNED);
+  mi2_icv_setint(icv, MI2_ICV_DO_RANGE, TRUE);
+  mi2_icv_setint(icv, MI2_ICV_DO_NORM, TRUE);
+  //figure out whether we need to flip image    L.B May 18/2011
+  for (i=0; i < volume->number_of_dims ; i++) {
+    hdim = volume->dim_handles[i];
+    switch (hdim->flipping_order) {
+    case MI_FILE_ORDER:
+      mi2_icv_setint(icv, MI2_ICV_DO_DIM_CONV, FALSE);
+      break;
+    case MI_COUNTER_FILE_ORDER:
+    case MI_POSITIVE:
+      if (hdim->step < 0)
+        mi2_icv_setint(icv, MI2_ICV_DO_DIM_CONV, TRUE);
+      break;
+    case MI_NEGATIVE:
+      if (hdim->step > 0)
+        mi2_icv_setint(icv, MI2_ICV_DO_DIM_CONV, TRUE);
+      break;
+    default:
+      return;
+    }
+  }
+  result = mi2_icv_attach(icv, file_id, var_id);
+  if (result == MI_NOERROR) {
+    result = mirw_hyperslab_icv(MIRW_OP_READ,
+                                volume,
+                                icv,
+                                start,
+                                count,
+                                (void *) buffer);
+    mi2_icv_detach(icv);
+  }
+  mi2_icv_free(icv);
+  return (result);
+}
+
+/** Write a hyperslab to the file from the preallocated buffer,
+ *  converting from the stored "voxel" data range to the desired
+ * "real" (float or double) data range.
+ */
+int
+miset_real_value_hyperslab(mihandle_t volume,
+                           mitype_t buffer_data_type,
+                           const unsigned long start[],
+                           const unsigned long count[],
+                           void *buffer)
+{
+  hid_t file_id;
+  int var_id;
+  int icv;
+  int result;
+  int is_signed;
+  int nctype;
+
+  file_id = volume->hdf_id;
+
+  var_id = hdf_varid(file_id, MIimage);
+
+  nctype = mitype_to_nctype(buffer_data_type, &is_signed);
+
+  if ((icv = mi2_icv_create()) < 0) {
+    return (MI_ERROR);
+  }
+
+  mi2_icv_setint(icv, MI2_ICV_TYPE, nctype);
+  mi2_icv_setstr(icv, MI2_ICV_SIGN, is_signed ? MI_SIGNED : MI_UNSIGNED);
+
+  result = mi2_icv_attach(icv, file_id, var_id);
+  if (result == MI_NOERROR) {
+    result = mirw_hyperslab_icv(MIRW_OP_WRITE,
+                                volume,
+                                icv,
+                                start,
+                                count,
+                                (void *) buffer);
+    mi2_icv_detach(icv);
+  }
+  mi2_icv_free(icv);
+  return (result);
+}
 
 /** Read a hyperslab from the file into the preallocated buffer,
  * with no range conversions or normalization.  Type conversions will

@@ -111,7 +111,8 @@ extern int miset_dimension_widths(midimhandle_t dimension, unsigned long array_l
 
 
 /* VOLUME FUNCTIONS */
-extern int micreate_volume(const char *filename, int number_of_dimensions,
+extern int micreate_volume(const char *filename, 
+                           int number_of_dimensions,
                            midimhandle_t dimensions[],
                            mitype_t volume_type,
                            miclass_t volume_class,
@@ -230,7 +231,6 @@ extern int miset_voxel_value_hyperslab(mihandle_t volume,
                                        void *buffer);
 
 
-
 /* CONVERT FUNCTIONS */
 extern int miconvert_real_to_voxel(mihandle_t volume,
                                    const unsigned long coords[],
@@ -298,6 +298,27 @@ extern int miget_label_name(mihandle_t volume, int value, char **name);
 extern int miget_label_value(mihandle_t volume, const char *name, int *value);
 extern int miget_number_of_defined_labels(mihandle_t volume, int *number_of_labels);
 extern int miget_label_value_by_index(mihandle_t volume, int idx, int *value);
+
+
+/*ICV functions*/
+extern int mi2_icv_create(void);
+extern int mi2_icv_free(int icvid);
+extern int mi2_icv_ndattach(int icvid, mihandle_t volume);
+extern int mi2_icv_attach(int icvid, mihandle_t volume);
+extern int mi2_icv_detach(int icvid);
+
+extern int mi2_icv_setdbl(int icvid, int icv_property, double value);
+extern int mi2_icv_setint(int icvid, int icv_property, int value);
+extern int mi2_icv_setlong(int icvid, int icv_property, long value);
+extern int mi2_icv_setstr(int icvid, int icv_property, char *value);
+extern int mi2_icv_inqdbl(int icvid, int icv_property, double *value);
+extern int mi2_icv_inqint(int icvid, int icv_property, int *value);
+extern int mi2_icv_inqlong(int icvid, int icv_property, long *value);
+extern int mi2_icv_inqstr(int icvid, int icv_property, char *value);
+extern int mi2_icv_get(int icvid, long start[], long count[], void *values);
+extern int mi2_icv_put(int icvid, long start[], long count[], void *values);
+
+
 
 #ifdef __cplusplus
 }

@@ -36,8 +36,7 @@
 * \param mitype The MINC 2 data type to convert
 * \param is_native Convert to native type if TRUE
 */
-hid_t
-mitype_to_hdftype ( mitype_t mitype, int is_native )
+hid_t mitype_to_hdftype ( mitype_t mitype, int is_native )
 {
   hid_t type_id;
 
@@ -153,6 +152,8 @@ mitype_to_hdftype ( mitype_t mitype, int is_native )
   return ( type_id );
 }
 
+/** get byte size of a specific data type
+ */
 int mitype_len ( mitype_t mitype )
 {
   switch ( mitype ) {
@@ -195,8 +196,7 @@ int mitype_len ( mitype_t mitype )
 
 #if 0
 
-int
-mitype_to_nctype ( mitype_t mitype, int *is_signed )
+int mitype_to_nctype ( mitype_t mitype, int *is_signed )
 {
   int nctype;
 

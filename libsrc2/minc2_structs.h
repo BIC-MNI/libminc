@@ -12,6 +12,7 @@
 struct mivolprops;
 struct midimension;
 struct mivolume;
+
 /** \typedef mivolumeprops_t 
  * Opaque pointer to volume properties.
  */
@@ -221,10 +222,12 @@ struct mi2_icv_struct {
    double  user_fillvalue;    /* Fillvalue that user wants */
 
    /* Fields that hold values from real variable */
-   int     cdfid;          /* Id of cdf */
-   int     varid;          /* Id of variable */
-   int     imgmaxid;       /* Id of MIimagemax */
-   int     imgminid;       /* Id of Miimagemin */
+   mihandle_t  volume;     /* handle to the volume */
+   
+   hid_t     varid;          /* Id of variable */
+   hid_t     imgmaxid;       /* Id of MIimagemax */
+   hid_t     imgminid;       /* Id of Miimagemin */
+   
    int     var_ndims;      /* Number of dimensions of variable */
    int     var_dim[MI2_MAX_VAR_DIMS]; /* Dimensions of variable */
    mitype_t var_type;       /* Variable type */

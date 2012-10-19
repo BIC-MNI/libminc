@@ -106,10 +106,7 @@ static hid_t _hdf_open(const char *path, int mode)
   hid_t fd;
   hid_t grp_id;
   hid_t dset_id;
-  //struct m2_file *file;
-  //hsize_t dims[MAX_NC_DIMS];
   int ndims;
-  //struct m2_var *var;
   
   H5E_BEGIN_TRY {
     #if HDF5_MMAP_TEST
@@ -265,8 +262,7 @@ static int _hdf_close(hid_t fd)
     before the image data can be added.
     \ingroup mi2Vol
 */
-int
-micreate_volume_image(mihandle_t volume)
+int micreate_volume_image(mihandle_t volume)
 {
   char dimorder[MI2_CHAR_LENGTH];
   int i;
@@ -390,8 +386,7 @@ micreate_volume_image(mihandle_t volume)
 
 /** Set up the array of conversions from voxel to world coordinate order.
 */
-static int
-miset_volume_world_indices(mihandle_t hvol)
+static int miset_volume_world_indices(mihandle_t hvol)
 {
   int i;
 
@@ -422,8 +417,7 @@ miset_volume_world_indices(mihandle_t hvol)
 
 /** Create and initialize a MINC 2.0 volume structure.
 */
-static mihandle_t
-mialloc_volume_handle(void)
+static mihandle_t mialloc_volume_handle(void)
 {
   mihandle_t handle = (mihandle_t) malloc(sizeof(struct mivolume));
 
@@ -450,8 +444,7 @@ mialloc_volume_handle(void)
     type, class, volume properties and retrieve the volume handle.
     \ingroup mi2Vol
 */
-int
-micreate_volume(const char *filename, int number_of_dimensions,
+int micreate_volume(const char *filename, int number_of_dimensions,
                 midimhandle_t dimensions[], mitype_t volume_type,
                 miclass_t volume_class, mivolumeprops_t create_props,
                 mihandle_t *volume)
@@ -976,8 +969,7 @@ micreate_volume(const char *filename, int number_of_dimensions,
 /** Return the number of dimensions associated with this volume.
     \ingroup mi2Vol
 */
-int
-miget_volume_dimension_count(mihandle_t volume, midimclass_t cls,
+int miget_volume_dimension_count(mihandle_t volume, midimclass_t cls,
                              midimattr_t attr, int *number_of_dimensions)
 {
   int i, count=0;
@@ -1003,8 +995,7 @@ miget_volume_dimension_count(mihandle_t volume, midimclass_t cls,
 /** Returns the number of voxels in the volume.
     \ingroup mi2Vol
 */
-int
-miget_volume_voxel_count(mihandle_t volume, int *number_of_voxels)
+int miget_volume_voxel_count(mihandle_t volume, int *number_of_voxels)
 {
   char path[MI2_MAX_PATH];
   hid_t dset_id;
@@ -1042,8 +1033,7 @@ miget_volume_voxel_count(mihandle_t volume, int *number_of_voxels)
 }
 
 /* Get the number of dimensions in the file */
-static int
-_miget_file_dimension_count(hid_t file_id)
+static int _miget_file_dimension_count(hid_t file_id)
 {
   hid_t dset_id;
   hid_t space_id;
@@ -1069,8 +1059,7 @@ _miget_file_dimension_count(hid_t file_id)
 }
 
 /* Get dimension variable attributes for the given dimension name */
-static int
-_miset_volume_class(mihandle_t volume, miclass_t volume_class)
+static int _miset_volume_class(mihandle_t volume, miclass_t volume_class)
 {
   const char *class_ptr;
 
@@ -1098,8 +1087,7 @@ _miset_volume_class(mihandle_t volume, miclass_t volume_class)
   return (MI_NOERROR);
 }
 
-static int
-_miget_volume_class(mihandle_t volume, miclass_t *volume_class)
+static int _miget_volume_class(mihandle_t volume, miclass_t *volume_class)
 {
   char class_buf[MI2_CHAR_LENGTH];
 
@@ -1121,8 +1109,7 @@ _miget_volume_class(mihandle_t volume, miclass_t *volume_class)
 }
 
 /* Get dimension variable attributes for the given dimension name */
-static int
-_miget_file_dimension(mihandle_t volume, const char *dimname,
+static int _miget_file_dimension(mihandle_t volume, const char *dimname,
                       midimhandle_t *hdim_ptr)
 {
   char path[MI2_CHAR_LENGTH];
@@ -1233,8 +1220,7 @@ _miget_file_dimension(mihandle_t volume, const char *dimname,
     MI2_OPEN_READ, or read-write access if mode argument is MI2_OPEN_RDWR.
     \ingroup mi2Vol
 */
-int
-miopen_volume(const char *filename, int mode, mihandle_t *volume)
+int miopen_volume(const char *filename, int mode, mihandle_t *volume)
 {
   hid_t file_id;
   hid_t dset_id;
@@ -1262,6 +1248,7 @@ miopen_volume(const char *filename, int mode, mihandle_t *volume)
   }
   /* Open the hdf file using the given filename and mode */
   file_id = _hdf_open(filename, hdf_mode);
+  
   if (file_id < 0) {
     return (MI_ERROR);
   }
@@ -1316,6 +1303,7 @@ miopen_volume(const char *filename, int mode, mihandle_t *volume)
     /* Open the dataset image-max at the specified path*/
     dset_id = H5Dopen1(file_id, "/minc-2.0/image/0/image-max");
   } H5E_END_TRY;
+  
   if (dset_id >= 0) {
     /* Get the Id of the copy of the dataspace of the dataset */
     space_id = H5Dget_space(dset_id);
@@ -1515,7 +1503,7 @@ int miclose_volume(mihandle_t volume)
 
 
 
-/* Internal functions
+/** \internal
 */
 static void miinit_default_range(mitype_t mitype, double *valid_max, double *valid_min)
 {
@@ -1559,6 +1547,8 @@ static void miinit_default_range(mitype_t mitype, double *valid_max, double *val
   }
 }
 
+/** \internal
+ */
 static void miread_valid_range(mihandle_t volume, double *valid_max, double *valid_min)
 {
   int r;
@@ -1584,12 +1574,12 @@ static void miread_valid_range(mihandle_t volume, double *valid_max, double *val
 /** \internal
 * This function saves the current valid range set for a MINC file.
 */
-void
-misave_valid_range(mihandle_t volume)
+void misave_valid_range(mihandle_t volume)
 {
   double range[2];
   range[0] = volume->valid_min;
   range[1] = volume->valid_max;
+  
   miset_attribute(volume, "/minc-2.0/image/0/image", "valid_range",
                   MI_TYPE_DOUBLE, 2, range);
 }

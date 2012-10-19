@@ -105,10 +105,10 @@
 
 
 /* Private functions */
-static int MI2_icv_get_type(mi2_icv_type *icvp, hid_t dset_id,  hid_t fspc_id);
-static int MI2_icv_get_vrange(mi2_icv_type *icvp, hid_t dset_id,  hid_t fspc_id);
+static int MI2_icv_get_type(mi2_icv_type *icvp, mihandle_t volume);
+static int MI2_icv_get_vrange(mi2_icv_type *icvp, mihandle_t volume);
 static double MI2_get_default_range(char *what, mitype_t datatype, int sign);
-static int MI2_icv_get_norm(mi2_icv_type *icvp, hid_t dset_id,  hid_t fspc_id);
+static int MI2_icv_get_norm(mi2_icv_type *icvp, mihandle_t volume);
 static int MI2_icv_access(int operation, mi2_icv_type *icvp, long start[],
                           long count[], void *values);
 static int MI2_icv_zero_buffer(mi2_icv_type *icvp, long count[], void *values);
@@ -133,9 +133,6 @@ static int MI2_icv_dimconv_init(int operation, mi2_icv_type *icvp,
                                 long start[], long count[], void *values,
                                 long bufstart[], long bufcount[], void *buffer);
 
-
-
-
 /* Array of pointers to image conversion structures */
 static int minc_icv_list_nalloc = 0;
 static mi2_icv_type **minc_icv_list = NULL;
@@ -153,7 +150,7 @@ static mi2_icv_type **minc_icv_list = NULL;
 @CREATED    : August 7, 1992 (Peter Neelin)
 @MODIFIED   :
 ---------------------------------------------------------------------------- */
-MNCAPI int mi2_icv_create()
+int mi2_icv_create()
 {
   int new_icv;       /* Id of newly created icv */
   mi2_icv_type *icvp;  /* Pointer to new icv structure */
@@ -212,7 +209,7 @@ MNCAPI int mi2_icv_create()
 
   /* User defaults */
   icvp->user_type = MI_TYPE_SHORT;
-  icvp->user_typelen = nctypelen(icvp->user_type);
+  icvp->user_typelen = mitype_len(icvp->user_type);
   icvp->user_sign = MI2_PRIV_SIGNED;
   icvp->user_do_range = TRUE;
   icvp->user_vmax = MI2_get_default_range(MIvalid_max, icvp->user_type,
@@ -234,13 +231,15 @@ MNCAPI int mi2_icv_create()
   icvp->user_keep_aspect = TRUE;
   icvp->user_do_fillvalue = FALSE;
   icvp->user_fillvalue = -DBL_MAX;
+  
   for (idim=0; idim<MI2_MAX_IMGDIMS; idim++) {
     icvp->user_dim_size[idim]=MI2_ICV_ANYSIZE;
   }
 
   /* Variable values */
-  icvp->cdfid = MI_ERROR;            /* Set so that we can recognise an */
-  icvp->varid = MI_ERROR;            /* unattached icv */
+  icvp->volume= 0;
+  icvp->varid = 0;            /* Set so that we can recognise an */
+  icvp->imgmaxid = 0;         /* unattached icv */
 
   /* Values that can be read by user */
   icvp->derv_imgmax = MI2_DEFAULT_MAX;
@@ -265,7 +264,7 @@ MNCAPI int mi2_icv_create()
 @CREATED    : August 7, 1992 (Peter Neelin)
 @MODIFIED   :
 ---------------------------------------------------------------------------- */
-MNCAPI int mi2_icv_free(int icvid)
+ int mi2_icv_free(int icvid)
 {
   mi2_icv_type *icvp;
 
@@ -275,7 +274,7 @@ MNCAPI int mi2_icv_free(int icvid)
   if ((icvp=MI2_icv_chkid(icvid)) == NULL) MI2_RETURN(MI_ERROR);
 
   /* Detach the icv if it is attached */
-  if (icvp->cdfid != MI_ERROR) {
+  if (icvp->volume) {
     if (mi2_icv_detach(icvid) < 0) {
       MI2_RETURN(MI_ERROR);
     }
@@ -318,7 +317,7 @@ MNCAPI int mi2_icv_free(int icvid)
 @CREATED    : August 7, 1992 (Peter Neelin)
 @MODIFIED   :
 ---------------------------------------------------------------------------- */
-MNCAPI int mi2_icv_setdbl(int icvid, int icv_property, double value)
+ int mi2_icv_setdbl(int icvid, int icv_property, double value)
 {
   int ival, idim;
   mi2_icv_type *icvp;
@@ -338,7 +337,7 @@ MNCAPI int mi2_icv_setdbl(int icvid, int icv_property, double value)
   switch (icv_property) {
   case MI2_ICV_TYPE:
     icvp->user_type   = (mitype_t) value;
-    icvp->user_typelen= nctypelen(icvp->user_type);
+    icvp->user_typelen= mitype_len(icvp->user_type);
     icvp->user_vmax   = MI2_get_default_range(MIvalid_max, icvp->user_type,
                         icvp->user_sign);
     icvp->user_vmin   = MI2_get_default_range(MIvalid_min, icvp->user_type,
@@ -449,7 +448,7 @@ MNCAPI int mi2_icv_setdbl(int icvid, int icv_property, double value)
 @MODIFIED   : January 22, 1993 (P.N.)
                  - modified handling of icv properties
 ---------------------------------------------------------------------------- */
-MNCAPI int mi2_icv_setint(int icvid, int icv_property, int value)
+ int mi2_icv_setint(int icvid, int icv_property, int value)
 {
 
   MI2_SAVE_ROUTINE_NAME("mi2_icv_setint");
@@ -477,7 +476,7 @@ MNCAPI int mi2_icv_setint(int icvid, int icv_property, int value)
 @CREATED    : January 22, 1993 (Peter Neelin)
 @MODIFIED   :
 ---------------------------------------------------------------------------- */
-MNCAPI int mi2_icv_setlong(int icvid, int icv_property, long value)
+ int mi2_icv_setlong(int icvid, int icv_property, long value)
 {
 
   MI2_SAVE_ROUTINE_NAME("mi2_icv_setlong");
@@ -505,7 +504,7 @@ MNCAPI int mi2_icv_setlong(int icvid, int icv_property, long value)
 @CREATED    : January 22, 1993 (Peter Neelin)
 @MODIFIED   :
 ---------------------------------------------------------------------------- */
-MNCAPI int mi2_icv_setstr(int icvid, int icv_property, char *value)
+ int mi2_icv_setstr(int icvid, int icv_property, char *value)
 {
   mi2_icv_type *icvp;
 
@@ -590,7 +589,7 @@ MNCAPI int mi2_icv_setstr(int icvid, int icv_property, char *value)
 @CREATED    : January 22, 1993 (Peter Neelin)
 @MODIFIED   :
 ---------------------------------------------------------------------------- */
-MNCAPI int mi2_icv_inqdbl(int icvid, int icv_property, double *value)
+ int mi2_icv_inqdbl(int icvid, int icv_property, double *value)
 {
   int idim;
   mi2_icv_type *icvp;
@@ -732,7 +731,7 @@ MNCAPI int mi2_icv_inqdbl(int icvid, int icv_property, double *value)
 @CREATED    : January 22, 1993 (Peter Neelin)
 @MODIFIED   :
 ---------------------------------------------------------------------------- */
-MNCAPI int mi2_icv_inqint(int icvid, int icv_property, int *value)
+ int mi2_icv_inqint(int icvid, int icv_property, int *value)
 {
   double dvalue;
 
@@ -761,7 +760,7 @@ MNCAPI int mi2_icv_inqint(int icvid, int icv_property, int *value)
 @CREATED    : January 22, 1993 (Peter Neelin)
 @MODIFIED   :
 ---------------------------------------------------------------------------- */
-MNCAPI int mi2_icv_inqlong(int icvid, int icv_property, long *value)
+ int mi2_icv_inqlong(int icvid, int icv_property, long *value)
 {
   double dvalue;
 
@@ -791,7 +790,7 @@ MNCAPI int mi2_icv_inqlong(int icvid, int icv_property, long *value)
 @CREATED    :
 @MODIFIED   :
 ---------------------------------------------------------------------------- */
-MNCAPI int mi2_icv_inqstr(int icvid, int icv_property, char *value)
+ int mi2_icv_inqstr(int icvid, int icv_property, char *value)
 {
   mi2_icv_type *icvp;
 
@@ -888,7 +887,7 @@ MNCAPI int mi2_icv_inqstr(int icvid, int icv_property, char *value)
 @CREATED    : September 9, 1992 (Peter Neelin)
 @MODIFIED   :
 ---------------------------------------------------------------------------- */
-MNCAPI int mi2_icv_ndattach(int icvid,hid_t dset_id,  hid_t fspc_id)
+int mi2_icv_ndattach(int icvid, mihandle_t volume)
 {
   mi2_icv_type *icvp;         /* Pointer to icv structure */
   int idim;
@@ -899,14 +898,14 @@ MNCAPI int mi2_icv_ndattach(int icvid,hid_t dset_id,  hid_t fspc_id)
   if ((icvp=MI2_icv_chkid(icvid)) == NULL) MI2_RETURN(MI_ERROR);
 
   /* If the icv is attached, then detach it */
-  if (icvp->cdfid != MI_ERROR) {
+  if (icvp->volume) {
     if (mi2_icv_detach(icvid) < 0) {
       MI2_RETURN(MI_ERROR);
     }
   }
 
   /* Inquire about the variable's type, sign and number of dimensions */
-  if (MI2_icv_get_type(icvp, dset_id, fspc_id) < 0) {
+  if (MI2_icv_get_type(icvp, volume) < 0) {
     MI2_RETURN(MI_ERROR);
   }
 
@@ -1010,8 +1009,8 @@ static int MI2_icv_get_type(mi2_icv_type *icvp, hid_t dset_id,  hid_t fspc_id)
   icvp->var_sign  = MI2_get_sign_from_string(icvp->var_type, string);
 
   /* Get type lengths */
-  icvp->var_typelen = nctypelen(icvp->var_type);
-  icvp->user_typelen = nctypelen(icvp->user_type);
+  icvp->var_typelen = mitype_len(icvp->var_type);
+  icvp->user_typelen = mitype_len(icvp->user_type);
 
   MI2_RETURN(MI_NOERROR);
 }
@@ -1184,7 +1183,7 @@ static int MI2_icv_get_norm(mi2_icv_type *icvp, int cdfid, int varid)
 @CREATED    : August 10, 1992 (Peter Neelin)
 @MODIFIED   :
 ---------------------------------------------------------------------------- */
-MNCAPI int mi2_icv_detach(int icvid)
+ int mi2_icv_detach(int icvid)
 {
   mi2_icv_type *icvp;
   int idim;
@@ -1195,7 +1194,7 @@ MNCAPI int mi2_icv_detach(int icvid)
   if ((icvp=MI2_icv_chkid(icvid)) == NULL) MI2_RETURN(MI_ERROR);
 
   /* Check that the icv is in fact attached */
-  if (icvp->cdfid == MI_ERROR)
+  if ( !icvp->volume )
     MI2_RETURN(MI_NOERROR);
 
   /* Free the pixel offset arrays */
@@ -1210,9 +1209,8 @@ MNCAPI int mi2_icv_detach(int icvid)
     icvp->derv_dim_start[idim] = 0.0;
   }
 
-  /* Set cdfid field to MI_ERROR to indicate that icv is detached */
-  icvp->cdfid = MI_ERROR;
-  icvp->varid = MI_ERROR;
+  icvp->volume = 0;
+  icvp->varid  = -1;
 
   MI2_RETURN(MI_NOERROR);
 }
@@ -1233,7 +1231,7 @@ MNCAPI int mi2_icv_detach(int icvid)
 @CREATED    : August 10, 1992 (Peter Neelin)
 @MODIFIED   :
 ---------------------------------------------------------------------------- */
-MNCAPI int mi2_icv_get(int icvid, long start[], long count[], void *values)
+ int mi2_icv_get(int icvid, long start[], long count[], void *values)
 {
   mi2_icv_type *icvp;
 
@@ -1267,7 +1265,7 @@ MNCAPI int mi2_icv_get(int icvid, long start[], long count[], void *values)
 @CREATED    :
 @MODIFIED   :
 ---------------------------------------------------------------------------- */
-MNCAPI int mi2_icv_put(int icvid, long start[], long count[], void *values)
+ int mi2_icv_put(int icvid, long start[], long count[], void *values)
 {
   mi2_icv_type *icvp;
 
@@ -1366,7 +1364,7 @@ static int MI2_icv_access(int operation, mi2_icv_type *icvp, long start[],
   /* Get size of chunk in user's buffer. Dimension conversion routines
      don't need the buffer pointer incremented - they do it themselves */
   if (!icvp->do_dimconvert)
-    chunk_size = nctypelen(icvp->user_type);
+    chunk_size = mitype_len(icvp->user_type);
   else
     chunk_size = 0;
   for (idim=MAX(icvp->derv_firstdim+1,0); idim < icvp->var_ndims; idim++) {
@@ -1805,16 +1803,16 @@ static mi2_icv_type *MI2_icv_chkid(int icvid)
               varid - cdf variable id
 @OUTPUT     : (none)
 @RETURNS    : MI_ERROR if an error occurs
-@DESCRIPTION: Attaches an open cdf file and variable to an image conversion
+@DESCRIPTION: Attaches an open MINC file and variable to an image conversion
               variable for subsequent access through miicvget and miicvput.
-              File must be in data mode.
+              
 @METHOD     :
 @GLOBALS    :
-@CALLS      : NetCDF routines
+@CALLS      : MINC2 routines
 @CREATED    : September 9, 1992 (Peter Neelin)
 @MODIFIED   :
 ---------------------------------------------------------------------------- */
-MNCAPI int mi2_icv_attach(int icvid, int cdfid, int varid)
+int mi2_icv_attach(int icvid, mihandle_t volume)
 {
   mi2_icv_type *icvp;         /* Pointer to icv structure */
   long size_diff, user_dim_size;
@@ -1828,7 +1826,7 @@ MNCAPI int mi2_icv_attach(int icvid, int cdfid, int varid)
   /* Call routine to set variables for everything except dimension
      conversion */
   {
-    MI_CHK_ERR(mi2_icv_ndattach(icvid, cdfid, varid))
+    MI2_CHK_ERR(mi2_icv_ndattach(icvid, volume))
   }
 
   /* Check to see if we need to worry about dimension conversion */
@@ -1838,12 +1836,12 @@ MNCAPI int mi2_icv_attach(int icvid, int cdfid, int varid)
 
   /* Reset cdfid and varid in icv structure in case something goes wrong
      in dimension conversion calculations */
-  icvp->cdfid = MI_ERROR;
+  icvp->volume = 0;
   icvp->varid = MI_ERROR;
 
   /* Get dimensions info */
   {
-    MI2_CHK_ERR(MI_icv_get_dim(icvp, cdfid, varid))
+    MI2_CHK_ERR(MI_icv_get_dim(icvp, volume))
   }
 
   /* Set the do_dimconvert field of icv structure
@@ -1876,7 +1874,7 @@ MNCAPI int mi2_icv_attach(int icvid, int cdfid, int varid)
   }
 
   /* Set the cdfid and varid fields */
-  icvp->cdfid = cdfid;
+  icvp->volume = volume;
   icvp->varid = varid;
 
   MI2_RETURN(MI_NOERROR);

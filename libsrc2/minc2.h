@@ -5,6 +5,7 @@
 #ifndef _MINC2_H_ /* Avoid multiple inclusions */
 #define _MINC2_H_ 1
 
+#include <hdf5.h>
 #include "minc2_defs.h"
 #include "minc2_structs.h"
 #include "minc2_error.h"
