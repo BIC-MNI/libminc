@@ -25,8 +25,6 @@
 
 /* Forward declarations */
 
-static void miinit_default_range(mitype_t mitype, double *valid_max,
-                                 double *valid_min);
 static void miread_valid_range(mihandle_t volume, double *valid_max,
                                double *valid_min);
 
@@ -1505,7 +1503,7 @@ int miclose_volume(mihandle_t volume)
 
 /** \internal
 */
-static void miinit_default_range(mitype_t mitype, double *valid_max, double *valid_min)
+void miinit_default_range(mitype_t mitype, double *valid_max, double *valid_min)
 {
   switch (mitype) {
   case MI_TYPE_BYTE:

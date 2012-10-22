@@ -280,10 +280,8 @@ extern int miget_volume_valid_max(mihandle_t volume, double *valid_max);
 extern int miset_volume_valid_max(mihandle_t volume, double valid_max);
 extern int miget_volume_valid_min(mihandle_t volume, double *valid_min);
 extern int miset_volume_valid_min(mihandle_t volume, double valid_min);
-extern int miget_volume_valid_range(mihandle_t volume,
-                                    double *valid_max, double *valid_min);
-extern int miset_volume_valid_range(mihandle_t volume, 
-                                    double valid_max, double valid_min);
+extern int miget_volume_valid_range(mihandle_t volume, double *valid_max, double *valid_min);
+extern int miset_volume_valid_range(mihandle_t volume, double valid_max, double valid_min);
 
 /* RECORD functions */
 extern int miget_record_name(mihandle_t volume, char **name);
@@ -310,7 +308,7 @@ extern int mi2_icv_detach(int icvid);
 extern int mi2_icv_setdbl(int icvid, int icv_property, double value);
 extern int mi2_icv_setint(int icvid, int icv_property, int value);
 extern int mi2_icv_setlong(int icvid, int icv_property, long value);
-extern int mi2_icv_setstr(int icvid, int icv_property, char *value);
+extern int mi2_icv_setstr(int icvid, int icv_property, const char *value);
 extern int mi2_icv_inqdbl(int icvid, int icv_property, double *value);
 extern int mi2_icv_inqint(int icvid, int icv_property, int *value);
 extern int mi2_icv_inqlong(int icvid, int icv_property, long *value);

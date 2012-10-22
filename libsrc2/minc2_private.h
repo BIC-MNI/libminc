@@ -181,6 +181,9 @@ extern int mitranslate_hyperslab_origin(mihandle_t volume,
 /* From volume.c */
 extern void misave_valid_range(mihandle_t volume);
 
+/* From valid.c*/
+extern void miinit_default_range(mitype_t mitype, double *valid_max, double *valid_min);
+
 
 #include <string.h>
 

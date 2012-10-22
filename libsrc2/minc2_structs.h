@@ -227,6 +227,7 @@ struct mi2_icv_struct {
    hid_t     varid;          /* Id of variable */
    hid_t     imgmaxid;       /* Id of MIimagemax */
    hid_t     imgminid;       /* Id of Miimagemin */
+   miboolean_t slice_scaling; /* Slice scaling enabled */
    
    int     var_ndims;      /* Number of dimensions of variable */
    int     var_dim[MI2_MAX_VAR_DIMS]; /* Dimensions of variable */

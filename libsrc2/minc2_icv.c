@@ -27,7 +27,7 @@
 #include <float.h>
 #include <string.h>
 #include "minc2.h"
-#include <hdf5.h>
+#include "minc2_private.h"
 
 /* --------- memory allocation macros -------------------------- */
 
@@ -104,10 +104,13 @@
    }
 
 
+#define MI2_STRINGS_EQUAL(str1,str2) (strcmp(str1,str2)==0)
+   
+   
 /* Private functions */
 static int MI2_icv_get_type ( mi2_icv_type *icvp, mihandle_t volume );
 static int MI2_icv_get_vrange ( mi2_icv_type *icvp, mihandle_t volume );
-static double MI2_get_default_range ( char *what, mitype_t datatype, int sign );
+static double MI2_get_default_range ( char *what, mitype_t datatype);
 static int MI2_icv_get_norm ( mi2_icv_type *icvp, mihandle_t volume );
 static int MI2_icv_access ( int operation, mi2_icv_type *icvp, long start[],
                             long count[], void *values );
@@ -215,10 +218,8 @@ int mi2_icv_create()
   icvp->user_typelen = mitype_len ( icvp->user_type );
   icvp->user_sign = MI2_PRIV_SIGNED;
   icvp->user_do_range = TRUE;
-  icvp->user_vmax = MI2_get_default_range ( MIvalid_max, icvp->user_type,
-                    icvp->user_sign );
-  icvp->user_vmin = MI2_get_default_range ( MIvalid_min, icvp->user_type,
-                    icvp->user_sign );
+  icvp->user_vmax = MI2_get_default_range ( MIvalid_max, icvp->user_type);
+  icvp->user_vmin = MI2_get_default_range ( MIvalid_min, icvp->user_type);
   icvp->user_do_norm = FALSE;
   icvp->user_user_norm = FALSE;
   icvp->user_maxvar = strdup ( MIimagemax );
@@ -336,7 +337,7 @@ int mi2_icv_setdbl ( int icvid, int icv_property, double value )
     MI2_RETURN ( MI_ERROR );
 
   /* Check that the icv is not attached to a file */
-  if ( icvp->cdfid != MI_ERROR ) {
+  if ( icvp->varid != MI_ERROR ) {
     milog_message ( MI2_MSG_ICVATTACHED );
     MI2_RETURN ( MI_ERROR );
   }
@@ -346,10 +347,8 @@ int mi2_icv_setdbl ( int icvid, int icv_property, double value )
   case MI2_ICV_TYPE:
     icvp->user_type   = ( mitype_t ) value;
     icvp->user_typelen = mitype_len ( icvp->user_type );
-    icvp->user_vmax   = MI2_get_default_range ( MIvalid_max, icvp->user_type,
-                        icvp->user_sign );
-    icvp->user_vmin   = MI2_get_default_range ( MIvalid_min, icvp->user_type,
-                        icvp->user_sign );
+    icvp->user_vmax   = MI2_get_default_range ( MIvalid_max, icvp->user_type );
+    icvp->user_vmin   = MI2_get_default_range ( MIvalid_min, icvp->user_type );
     break;
   case MI2_ICV_DO_RANGE:
     icvp->user_do_range = value;
@@ -516,7 +515,7 @@ int mi2_icv_setlong ( int icvid, int icv_property, long value )
 @CREATED    : January 22, 1993 (Peter Neelin)
 @MODIFIED   :
 ---------------------------------------------------------------------------- */
-int mi2_icv_setstr ( int icvid, int icv_property, char *value )
+int mi2_icv_setstr ( int icvid, int icv_property, const char *value )
 {
   mi2_icv_type *icvp;
 
@@ -527,7 +526,7 @@ int mi2_icv_setstr ( int icvid, int icv_property, char *value )
     MI2_RETURN ( MI_ERROR );
 
   /* Check that the icv is not attached to a file */
-  if ( icvp->cdfid != MI_ERROR ) {
+  if ( icvp->varid != MI_ERROR ) {
     milog_message ( MI2_MSG_ICVATTACHED );
     MI2_RETURN ( MI_ERROR );
   }
@@ -536,10 +535,8 @@ int mi2_icv_setstr ( int icvid, int icv_property, char *value )
   switch ( icv_property ) {
   case MI2_ICV_SIGN:
     icvp->user_sign   = MI2_get_sign_from_string ( icvp->user_type, value );
-    icvp->user_vmax   = MI2_get_default_range ( MIvalid_max, icvp->user_type,
-                        icvp->user_sign );
-    icvp->user_vmin   = MI2_get_default_range ( MIvalid_min, icvp->user_type,
-                        icvp->user_sign );
+    icvp->user_vmax   = MI2_get_default_range ( MIvalid_max, icvp->user_type );
+    icvp->user_vmin   = MI2_get_default_range ( MIvalid_min, icvp->user_type );
     break;
   case MI2_ICV_MAXVAR:
 
@@ -682,12 +679,12 @@ int mi2_icv_inqdbl ( int icvid, int icv_property, double *value )
       ( *value )--;
 
     break;
-  case MI2_ICV_CDFID:
-    *value = icvp->cdfid;
-    break;
-  case MI2_ICV_VARID:
-    *value = icvp->varid;
-    break;
+//   case MI2_ICV_CDFID:
+//     *value = icvp->cdfid;
+//     break;
+//   case MI2_ICV_VARID:
+//     *value = icvp->varid;
+//     break;
   case MI2_ICV_ADIM_SIZE:
     *value = icvp->user_dim_size[0];
     break;
@@ -950,12 +947,12 @@ int mi2_icv_ndattach ( int icvid, mihandle_t volume )
     icvp->derv_firstdim = -1;
   } else {
     /* Get valid range */
-    if ( MI2_icv_get_vrange ( icvp, dset_id, fspc_id ) < 0 ) {
+    if ( MI2_icv_get_vrange ( icvp, volume ) < 0 ) {
       MI2_RETURN ( MI_ERROR );
     }
 
     /* Get normalization info */
-    if ( MI2_icv_get_norm ( icvp, dset_id, fspc_id ) < 0 ) {
+    if ( MI2_icv_get_norm ( icvp, volume ) < 0 ) {
       MI2_RETURN ( MI_ERROR );
     }
   }
@@ -996,8 +993,7 @@ int mi2_icv_ndattach ( int icvid, mihandle_t volume )
   icvp->do_dimconvert = FALSE;
 
   /* Set the cdfid and varid fields */
-  icvp->cdfid = cdfid;
-  icvp->varid = varid;
+  icvp->volume = volume;
 
   MI2_RETURN ( MI_NOERROR );
 }
@@ -1017,31 +1013,27 @@ int mi2_icv_ndattach ( int icvid, mihandle_t volume )
 @CREATED    :
 @MODIFIED   :
 ---------------------------------------------------------------------------- */
-static int MI2_icv_get_type ( mi2_icv_type *icvp, hid_t dset_id,  hid_t fspc_id )
+static int MI2_icv_get_type ( mi2_icv_type *icvp,  mihandle_t volume )
 {
   int oldncopts;            /* For saving value of ncopts */
-  char stringa[MI_MAX_ATTSTR_LEN];
-  char *string = stringa;   /* String for sign info */
+  const char *sign_string = NULL;   /* String for sign info */
 
   MI2_SAVE_ROUTINE_NAME ( "MI2_icv_get_type" );
 
   /* Inquire about the variable */
-  if ( ncvarinq ( cdfid, varid, NULL, & ( icvp->var_type ),
-                  & ( icvp->var_ndims ), icvp->var_dim, NULL ) < 0 ) {
-    MI2_RETURN ( MI_ERROR );
-  }
+//   if ( ncvarinq ( cdfid, varid, NULL, & ( icvp->var_type ),
+//                   & ( icvp->var_ndims ), icvp->var_dim, NULL ) < 0 ) {
+//     MI2_RETURN ( MI_ERROR );
+//   }
+  miget_data_type(volume,&icvp->var_type);
+  sign_string=mitype_sign(icvp->var_type);
 
   /* Check that the variable type is numeric */
+  /* VF: I don't uderstand this*/
   if ( icvp->var_type == MI_TYPE_BYTE ) {
     milog_message ( MI2_MSG_VARNOTNUM );
     MI2_RETURN ( MI_ERROR );
   }
-
-  /* Try to find out the sign of the variable using MIsigntype. */
-//TODO:CNV   oldncopts = ncopts; ncopts = 0;
-  string = miattgetstr ( cdfid, varid, MIsigntype, MI_MAX_ATTSTR_LEN, string );
-//TODO:CNV   ncopts = oldncopts;
-  icvp->var_sign  = MI2_get_sign_from_string ( icvp->var_type, string );
 
   /* Get type lengths */
   icvp->var_typelen = mitype_len ( icvp->var_type );
@@ -1065,13 +1057,13 @@ static int MI2_icv_get_type ( mi2_icv_type *icvp, hid_t dset_id,  hid_t fspc_id 
 @CREATED    : August 10, 1992 (Peter Neelin)
 @MODIFIED   :
 ---------------------------------------------------------------------------- */
-static int MI2_icv_get_vrange ( mi2_icv_type *icvp, int cdfid, int varid )
+static int MI2_icv_get_vrange ( mi2_icv_type *icvp, mihandle_t volume )
 {
   double vrange[2];         /* Valid range buffer */
 
   MI2_SAVE_ROUTINE_NAME ( "MI2_icv_get_vrange" );
 
-  if ( miget_valid_range ( cdfid, varid, vrange ) == MI_ERROR ) {
+  if ( miget_volume_valid_range ( volume, &vrange[0],&vrange[1] ) == MI_ERROR ) {
     MI2_RETURN ( MI_ERROR );
   }
 
@@ -1098,18 +1090,18 @@ static int MI2_icv_get_vrange ( mi2_icv_type *icvp, int cdfid, int varid )
 @CREATED    : August 10, 1992 (Peter Neelin)
 @MODIFIED   :
 ---------------------------------------------------------------------------- */
-static double MI2_get_default_range ( char *what, mitype_t datatype, int sign )
+static double MI2_get_default_range ( char *what, mitype_t datatype)
 {
   double range[2];
 
   MI2_SAVE_ROUTINE_NAME ( "MI2_get_default_range" );
 
-  ( void ) miget_default_range ( datatype, ( sign == MI2_PRIV_SIGNED ), range );
+  miinit_default_range ( datatype, &range[0] ,&range[1]);
 
-  if ( STRINGS_EQUAL ( what, MIvalid_max ) ) {
+  if ( MI2_STRINGS_EQUAL ( what, MIvalid_max ) ) {
     MI2_RETURN ( range[1] );
   } else
-    if ( STRINGS_EQUAL ( what, MIvalid_min ) ) {
+    if ( MI2_STRINGS_EQUAL ( what, MIvalid_min ) ) {
       MI2_RETURN ( range[0] );
     } else {
 //TODO:CNV      ncopts = NC_VERBOSE | NC_FATAL;
@@ -1123,8 +1115,6 @@ static double MI2_get_default_range ( char *what, mitype_t datatype, int sign )
 /* ----------------------------- MNI Header -----------------------------------
 @NAME       : MI2_icv_get_norm
 @INPUT      : icvp  - pointer to icv structure
-              cdfid - cdf file id
-              varid - variable id
 @OUTPUT     : (none)
 @RETURNS    : MI_ERROR if an error occurs
 @DESCRIPTION: Gets the normalization info for a variable
@@ -1134,7 +1124,7 @@ static double MI2_get_default_range ( char *what, mitype_t datatype, int sign )
 @CREATED    : August 10, 1992 (Peter Neelin)
 @MODIFIED   :
 ---------------------------------------------------------------------------- */
-static int MI2_icv_get_norm ( mi2_icv_type *icvp, int cdfid, int varid )
+static int MI2_icv_get_norm ( mi2_icv_type *icvp, mihandle_t volume )
 /* ARGSUSED */
 {
   int oldncopts;             /* For saving value of ncopts */
@@ -1144,6 +1134,7 @@ static int MI2_icv_get_norm ( mi2_icv_type *icvp, int cdfid, int varid )
   int imm;                   /* Counter for looping through max and min */
   double image_range[2];
   int idim, i;
+  
 
   MI2_SAVE_ROUTINE_NAME ( "MI2_icv_get_norm" );
 
@@ -1159,10 +1150,11 @@ static int MI2_icv_get_norm ( mi2_icv_type *icvp, int cdfid, int varid )
   icvp->derv_firstdim = ( -1 );
 
   /* Look for image max, image min variables */
-//TODO:CNV   oldncopts=ncopts; ncopts=0;
-  icvp->imgmaxid = ncvarid ( cdfid, icvp->user_maxvar );
-  icvp->imgminid = ncvarid ( cdfid, icvp->user_minvar );
-//TODO:CNV   ncopts = oldncopts;
+  miget_slice_scaling_flag(volume,&icvp->slice_scaling);
+  
+//   icvp->imgmaxid = ncvarid ( cdfid, icvp->user_maxvar );
+//   icvp->imgminid = ncvarid ( cdfid, icvp->user_minvar );
+
 
   /* Check to see if normalization to variable max, min should be done */
   if ( !icvp->user_do_norm ) {
@@ -1172,11 +1164,12 @@ static int MI2_icv_get_norm ( mi2_icv_type *icvp, int cdfid, int varid )
 
     /* Get the image min and max, either from the user definition or
        from the file. */
-    if ( icvp->user_user_norm ) {
+    if ( icvp->user_user_norm ) 
+    {
       icvp->derv_imgmax = icvp->user_imgmax;
       icvp->derv_imgmin = icvp->user_imgmin;
     } else {
-      if ( miget_image_range ( cdfid, image_range ) < 0 ) {
+      if ( miget_volume_range ( volume, &image_range[0],&image_range[1] ) < 0 ) {
         MI2_RETURN ( MI_ERROR );
       }
 
@@ -1189,21 +1182,24 @@ static int MI2_icv_get_norm ( mi2_icv_type *icvp, int cdfid, int varid )
     vid[0] = icvp->imgminid;
     vid[1] = icvp->imgmaxid;
 
-    if ( ( vid[0] != MI_ERROR ) && ( vid[1] != MI_ERROR ) ) {
+    if ( ( vid[0] != MI_ERROR ) && ( vid[1] != MI_ERROR ) ) 
+    {
       for ( imm = 0; imm < 2; imm++ ) {
-        if ( ncvarinq ( cdfid, vid[imm], NULL, NULL, &ndims, dim, NULL ) < 0 ) {
+        if ( ncvarinq ( cdfid, vid[imm], NULL, NULL, &ndims, dim, NULL ) < 0 ) 
+        {
           MI2_RETURN ( MI_ERROR );
         }
 
-        for ( idim = 0; idim < ndims; idim++ ) {
-          for ( i = 0; i < icvp->var_ndims; i++ ) {
+        for ( idim = 0; idim < ndims; idim++ ) 
+        {
+          for ( i = 0; i < icvp->var_ndims; i++ ) 
+          {
             if ( icvp->var_dim[i] == dim[idim] )
               icvp->derv_firstdim = MAX ( icvp->derv_firstdim, i );
           }
         }
       }
     }
-
   }
 
   MI2_RETURN ( MI_NOERROR );
@@ -2003,7 +1999,7 @@ static int MI2_icv_get_dim ( mi2_icv_type *icvp, int cdfid, int varid )
   /* Check the first dimensions of the variable */
   MI_CHK_ERR ( ncdiminq ( cdfid, icvp->var_dim[icvp->var_ndims - 1], dimname,
                           & ( icvp->var_vector_size ) ) )
-  icvp->var_is_vector = STRINGS_EQUAL ( dimname, MIvector_dimension );
+  icvp->var_is_vector = MI2_STRINGS_EQUAL ( dimname, MIvector_dimension );
 
   /* Check that the variable has at least icvp->user_num_imgdims+1
      dimensions if it is a vector field */
@@ -2096,16 +2092,16 @@ static int MI2_get_dim_flip ( mi2_icv_type *icvp, int cdfid, int dimvid[],
     /* Should we look for dimension flipping? */
     icvp->derv_dim_flip[idim] = FALSE;
 
-    if ( STRINGS_EQUAL ( dimname, MIxspace ) ||
-         STRINGS_EQUAL ( dimname, MIxfrequency ) )
+    if ( MI2_STRINGS_EQUAL ( dimname, MIxspace ) ||
+         MI2_STRINGS_EQUAL ( dimname, MIxfrequency ) )
       dim_dir = icvp->user_xdim_dir;
     else
-      if ( STRINGS_EQUAL ( dimname, MIyspace ) ||
-           STRINGS_EQUAL ( dimname, MIyfrequency ) )
+      if ( MI2_STRINGS_EQUAL ( dimname, MIyspace ) ||
+           MI2_STRINGS_EQUAL ( dimname, MIyfrequency ) )
         dim_dir = icvp->user_ydim_dir;
       else
-        if ( STRINGS_EQUAL ( dimname, MIzspace ) ||
-             STRINGS_EQUAL ( dimname, MIzfrequency ) )
+        if ( MI2_STRINGS_EQUAL ( dimname, MIzspace ) ||
+             MI2_STRINGS_EQUAL ( dimname, MIzfrequency ) )
           dim_dir = icvp->user_zdim_dir;
         else
           dim_dir = MI_ICV_ANYDIR;
@@ -2312,7 +2308,7 @@ static int MI2_get_dim_bufsize_step ( mi2_icv_type *icvp, int subsc[] )
   MI2_SAVE_ROUTINE_NAME ( "MI2_get_dim_bufsize_step" );
 
   /* Set default buffer size step */
-  for ( idim = 0; idim < MAX_VAR_DIMS; idim++ )
+  for ( idim = 0; idim < MI2_MAX_VAR_DIMS; idim++ )
     icvp->derv_bufsize_step[idim] = 1;
 
   /* Check for converting vector to scalar */
@@ -2428,14 +2424,14 @@ static int MI2_icv_dimconvert ( int operation, mi2_icv_type *icvp,
                                 long start[], long count[], void *values,
                                 long bufstart[], long bufcount[], void *buffer )
 {
-  mi_icv_dimconv_type dim_conv_struct;
-  mi_icv_dimconv_type *dcp;
+  mi2_icv_dimconv_type dim_conv_struct;
+  mi2_icv_dimconv_type *dcp;
   double sum0, sum1;           /* Counters for averaging values */
   double dvalue;               /* Pixel value */
-  long counter[MAX_VAR_DIMS];  /* Dimension loop counter */
+  long counter[MI2_MAX_VAR_DIMS];  /* Dimension loop counter */
   void *ptr, *iptr, *optr;     /* Pointers for looping through fastest dim */
-  void *ivecptr[MAX_VAR_DIMS]; /* Pointers to start of each dimension */
-  void *ovecptr[MAX_VAR_DIMS];
+  void *ivecptr[MI2_MAX_VAR_DIMS]; /* Pointers to start of each dimension */
+  void *ovecptr[MI2_MAX_VAR_DIMS];
   long *end;                   /* Pointer to array of dimension ends */
   int fastdim;                 /* Dimension that varies fastest */
   long ipix;                   /* Buffer subscript */
