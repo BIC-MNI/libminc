@@ -350,8 +350,7 @@ mifree_dimension_handle ( midimhandle_t dim_ptr )
   return ( MI_NOERROR );
 }
 
-/*!
-  Retrieve the list of dimensions defined in a MINC volume,
+/** Retrieve the list of dimensions defined in a MINC volume,
  * with the same class \a class and attribute \a attr.
  \param volume The volume handle.
  \param class  The class of the dimensions.
@@ -372,8 +371,7 @@ mifree_dimension_handle ( midimhandle_t dim_ptr )
  * before calling this function with MI_DIMORDER_APPARENT flag.
  * \ingroup mi2Dim
  */
-int
-miget_volume_dimensions ( mihandle_t volume, midimclass_t class, midimattr_t attr,
+int miget_volume_dimensions ( mihandle_t volume, midimclass_t class, midimattr_t attr,
                           miorder_t order, int array_length,
                           midimhandle_t dimensions[] )
 {

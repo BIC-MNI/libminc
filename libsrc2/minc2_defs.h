@@ -40,6 +40,10 @@
 #define MI_MAX_IMGDIMS 100
 #define MI2_MAX_IMGDIMS 100
 
+/* Epsilon for detecting fillvalues */
+#define MI2_FILLVALUE_EPSILON (10.0 * FLT_EPSILON)
+
+
 /* NetCDF standard attributes */
 #define MIunits       "units"
 #define MIlong_name   "long_name"

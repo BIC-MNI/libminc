@@ -222,12 +222,10 @@ struct mi2_icv_struct {
    double  user_fillvalue;    /* Fillvalue that user wants */
 
    /* Fields that hold values from real variable */
-   mihandle_t  volume;     /* handle to the volume */
-   
-   hid_t     varid;          /* Id of variable */
-   hid_t     imgmaxid;       /* Id of MIimagemax */
-   hid_t     imgminid;       /* Id of Miimagemin */
-   miboolean_t slice_scaling; /* Slice scaling enabled */
+   mihandle_t      volume;     /* handle to the volume */
+   midimhandle_t   imgmaxid;       /* Id of MIimagemax */
+   midimhandle_t   imgminid;       /* Id of Miimagemin */
+   miboolean_t     slice_scaling; /* Slice scaling enabled */
    
    int     var_ndims;      /* Number of dimensions of variable */
    int     var_dim[MI2_MAX_VAR_DIMS]; /* Dimensions of variable */

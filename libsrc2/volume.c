@@ -54,7 +54,6 @@ static int _hdf_var_declare(hid_t fd,const char *varnm,const char *varpath, int 
  *              system, process, etc.
  * returns the length of identifier 
  */
-
 static int _generate_ident( char * id_str, size_t length )
 {
   static int identx = 1;      /* Static ID counter */

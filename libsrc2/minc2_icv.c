@@ -122,10 +122,10 @@ static int MI2_icv_calc_scale ( int operation, mi2_icv_type *icvp, long coords[]
 
 static mi2_icv_type *MI2_icv_chkid ( int icvid );
 
-static int MI2_icv_get_dim ( mi2_icv_type *icvp, int cdfid, int varid );
-static int MI2_get_dim_flip ( mi2_icv_type *icvp, int cdfid, int dimvid[],
+static int MI2_icv_get_dim ( mi2_icv_type *icvp, mihandle_t volume );
+static int MI2_get_dim_flip ( mi2_icv_type *icvp, mihandle_t volume, int dimvid[],
                               int subsc[] );
-static int MI2_get_dim_scale ( mi2_icv_type *icvp, int cdfid, int dimvid[] );
+static int MI2_get_dim_scale ( mi2_icv_type *icvp, mihandle_t volume, int dimvid[] );
 static int MI2_get_dim_bufsize_step ( mi2_icv_type *icvp, int subsc[] );
 static int MI2_icv_get_dim_conversion ( mi2_icv_type *icvp, int subsc[] );
 static int MI2_icv_dimconvert ( int operation, mi2_icv_type *icvp,
@@ -241,9 +241,9 @@ int mi2_icv_create()
   }
 
   /* Variable values */
-  icvp->volume = 0;
-  icvp->varid = 0;            /* Set so that we can recognise an */
-  icvp->imgmaxid = 0;         /* unattached icv */
+  icvp->volume = NULL;            /* Set so that we can recognise an */
+  icvp->imgmaxid = NULL;         /* unattached icv */
+  icvp->imgminid = NULL;
 
   /* Values that can be read by user */
   icvp->derv_imgmax = MI2_DEFAULT_MAX;
@@ -1126,7 +1126,7 @@ static int MI2_icv_get_norm ( mi2_icv_type *icvp, mihandle_t volume )
   int oldncopts;             /* For saving value of ncopts */
   int vid[2];                /* Variable ids for max and min */
   int ndims;                 /* Number of dimensions for image max and min */
-  int dim[MI2_MAX_VAR_DIMS];     /* Dimensions */
+  midimhandle_t dim[MI2_MAX_VAR_DIMS];     /* Dimensions */
   int imm;                   /* Counter for looping through max and min */
   double image_range[2];
   int idim, i;
@@ -1177,10 +1177,10 @@ static int MI2_icv_get_norm ( mi2_icv_type *icvp, mihandle_t volume )
     vid[0] = icvp->imgminid;
     vid[1] = icvp->imgmaxid;
 
-    /*TODO: convert to MINC2 call*/
     if ( ( vid[0] != MI_ERROR ) && ( vid[1] != MI_ERROR ) ) {
       for ( imm = 0; imm < 2; imm++ ) {
-        if ( ncvarinq ( cdfid, vid[imm], NULL, NULL, &ndims, dim, NULL ) < 0 ) {
+        if ( miget_volume_dimensions(volume, MI_DIMCLASS_ANY, MI_DIMATTR_ALL,
+                                MI_DIMORDER_FILE, MI2_MAX_VAR_DIMS, dim) < 0 ) {
           MI2_RETURN ( MI_ERROR );
         }
 
@@ -1353,7 +1353,7 @@ static int MI2_icv_access ( int operation, mi2_icv_type *icvp, long start[],
   MI2_SAVE_ROUTINE_NAME ( "MI2_icv_access" );
 
   /* Check that icv is attached to a variable */
-  if ( icvp->cdfid == MI_ERROR ) {
+  if ( icvp->varid == MI_ERROR ) {
     milog_message ( MI2_MSG_ICVNOTATTACHED );
 
     MI2_RETURN ( MI_ERROR );
@@ -1968,7 +1968,7 @@ int mi2_icv_attach ( int icvid, mihandle_t volume )
 @CREATED    : August 10, 1992 (Peter Neelin)
 @MODIFIED   :
 ---------------------------------------------------------------------------- */
-static int MI2_icv_get_dim ( mi2_icv_type *icvp, int cdfid, int varid )
+static int MI2_icv_get_dim ( mi2_icv_type *icvp, mihandle_t volume )
 /* ARGSUSED */
 {
   int oldncopts;             /* For saving value of ncopts */
@@ -2015,11 +2015,11 @@ static int MI2_icv_get_dim ( mi2_icv_type *icvp, int cdfid, int varid )
       MI_CHK_ERR ( ncdiminq ( cdfid, icvp->var_dim[subsc[idim]], dimname,
                               & ( icvp->var_dim_size[idim] ) ) )
     };
-    oldncopts = ncopts;
-    ncopts = 0;
+    /*oldncopts = ncopts;
+    ncopts = 0;*/
     /*TODO: convert to MINC2 call*/
     dimvid[idim] = ncvarid ( cdfid, dimname );
-    ncopts = oldncopts;
+    /*ncopts = oldncopts;*/
   }
 
   /* Check for flipping */
@@ -2061,11 +2061,11 @@ static int MI2_icv_get_dim ( mi2_icv_type *icvp, int cdfid, int varid )
 @CREATED    : September 1, 1992 (Peter Neelin)
 @MODIFIED   :
 ---------------------------------------------------------------------------- */
-static int MI2_get_dim_flip ( mi2_icv_type *icvp, int cdfid, int dimvid[],
+static int MI2_get_dim_flip ( mi2_icv_type *icvp, mihandle_t volume, int dimvid[],
                               int subsc[] )
 {
   int oldncopts;             /* For saving value of ncopts */
-  char dimname[MAX_NC_NAME]; /* Dimensions name */
+  char dimname[MI2_MAX_DIM_NAME]; /* Dimensions name */
   int dim_dir;               /* Desired direction for current dimension */
   double dimstep;            /* Dimension step size (and direction) */
   int idim;
@@ -2140,7 +2140,7 @@ static int MI2_get_dim_flip ( mi2_icv_type *icvp, int cdfid, int dimvid[],
 @CREATED    : September 1, 1992 (Peter Neelin)
 @MODIFIED   :
 ---------------------------------------------------------------------------- */
-static int MI2_get_dim_scale ( mi2_icv_type *icvp, int cdfid, int dimvid[] )
+static int MI2_get_dim_scale ( mi2_icv_type *icvp, mihandle_t volume, int dimvid[] )
 {
   int oldncopts;             /* For saving value of ncopts */
   int min_grow, dim_grow;
@@ -2453,7 +2453,7 @@ static int MI2_icv_dimconvert ( int operation, mi2_icv_type *icvp,
   fastdim = icvp->derv_dimconv_fastdim;
   dmax = icvp->fill_valid_max;
   dmin = icvp->fill_valid_min;
-  epsilon = ( dmax - dmin ) * FILLVALUE_EPSILON;
+  epsilon = ( dmax - dmin ) * MI2_FILLVALUE_EPSILON;
   epsilon = fabs ( epsilon );
   dmax += epsilon;
   dmin -= epsilon;
@@ -2809,7 +2809,7 @@ static int MI2_icv_dimconv_init ( int operation, mi2_icv_type *icvp,
   }           /* if compress/expand */
 
   /* Set input and output variables */
-  if ( operation == MI_PRIV_GET ) {      /* For a GET */
+  if ( operation == MI2_PRIV_GET ) {      /* For a GET */
     dcp->in_pix_num = icvp->derv_var_pix_num;
     dcp->in_pix_off = icvp->derv_var_pix_off;
     dcp->in_pix_first = buffer;
