@@ -32,85 +32,85 @@
 /* --------- memory allocation macros -------------------------- */
 
 #define  MALLOC( n_items, type ) \
-         ( (type *) malloc( (size_t) (n_items) * sizeof(type) ) )
+  ( (type *) malloc( (size_t) (n_items) * sizeof(type) ) )
 
 #define  CALLOC( n_items, type ) \
-         ( (type *) calloc( (size_t) (n_items), sizeof(type) ) )
+  ( (type *) calloc( (size_t) (n_items), sizeof(type) ) )
 
 #define  REALLOC( ptr, n_items, type ) \
-         ( (type *) realloc( (void *) ptr, (size_t) (n_items) * sizeof(type) ) )
+  ( (type *) realloc( (void *) ptr, (size_t) (n_items) * sizeof(type) ) )
 
 #define  FREE( ptr ) \
-         free( (void *) ptr )
+  free( (void *) ptr )
 
 
 #define MI2_FROM_DOUBLE(dvalue, type, sign, ptr) \
-   switch (type) { \
-   case MI_TYPE_BYTE : \
-   case MI_TYPE_UBYTE : \
-      switch (sign) { \
-      case MI2_PRIV_UNSIGNED : \
-         dvalue = MAX(0, dvalue); \
-         dvalue = MIN(UCHAR_MAX, dvalue); \
-         *((unsigned char *) ptr) = ROUND(dvalue); \
-         break; \
-      case MI2_PRIV_SIGNED : \
-         dvalue = MAX(SCHAR_MIN, dvalue); \
-         dvalue = MIN(SCHAR_MAX, dvalue); \
-         *((signed char *) ptr) = ROUND(dvalue); \
-         break; \
-      } \
+  switch (type) { \
+  case MI_TYPE_BYTE : \
+  case MI_TYPE_UBYTE : \
+    switch (sign) { \
+    case MI2_PRIV_UNSIGNED : \
+      dvalue = MAX(0, dvalue); \
+      dvalue = MIN(UCHAR_MAX, dvalue); \
+      *((unsigned char *) ptr) = ROUND(dvalue); \
       break; \
-   case MI_TYPE_SHORT : \
-      switch (sign) { \
-      case MI2_PRIV_UNSIGNED : \
-         dvalue = MAX(0, dvalue); \
-         dvalue = MIN(USHRT_MAX, dvalue); \
-         *((unsigned short *) ptr) = ROUND(dvalue); \
-         break; \
-      case MI2_PRIV_SIGNED : \
-         dvalue = MAX(SHRT_MIN, dvalue); \
-         dvalue = MIN(SHRT_MAX, dvalue); \
-         *((signed short *) ptr) = ROUND(dvalue); \
-         break; \
-      } \
+    case MI2_PRIV_SIGNED : \
+      dvalue = MAX(SCHAR_MIN, dvalue); \
+      dvalue = MIN(SCHAR_MAX, dvalue); \
+      *((signed char *) ptr) = ROUND(dvalue); \
       break; \
-   case MI_TYPE_INT : \
-      switch (sign) { \
-      case MI2_PRIV_UNSIGNED : \
-         dvalue = MAX(0, dvalue); \
-         dvalue = MIN(UINT_MAX, dvalue); \
-         *((unsigned int *) ptr) = ROUND(dvalue); \
-         break; \
-      case MI2_PRIV_SIGNED : \
-         dvalue = MAX(INT_MIN, dvalue); \
-         dvalue = MIN(INT_MAX, dvalue); \
-         *((signed int *) ptr) = ROUND(dvalue); \
-         break; \
-      } \
+    } \
+    break; \
+  case MI_TYPE_SHORT : \
+    switch (sign) { \
+    case MI2_PRIV_UNSIGNED : \
+      dvalue = MAX(0, dvalue); \
+      dvalue = MIN(USHRT_MAX, dvalue); \
+      *((unsigned short *) ptr) = ROUND(dvalue); \
       break; \
-   case MI_TYPE_FLOAT : \
-      dvalue = MAX(-FLT_MAX,dvalue); \
-      *((float *) ptr) = MIN(FLT_MAX,dvalue); \
+    case MI2_PRIV_SIGNED : \
+      dvalue = MAX(SHRT_MIN, dvalue); \
+      dvalue = MIN(SHRT_MAX, dvalue); \
+      *((signed short *) ptr) = ROUND(dvalue); \
       break; \
-   case MI_TYPE_DOUBLE : \
-      *((double *) ptr) = dvalue; \
+    } \
+    break; \
+  case MI_TYPE_INT : \
+    switch (sign) { \
+    case MI2_PRIV_UNSIGNED : \
+      dvalue = MAX(0, dvalue); \
+      dvalue = MIN(UINT_MAX, dvalue); \
+      *((unsigned int *) ptr) = ROUND(dvalue); \
       break; \
-   case MI_TYPE_UNKNOWN : \
-      MI_LOG_PKG_ERROR2(MI_ERR_NONNUMERIC, \
-         "Attempt to convert to MI_TYPE_UNKNOWN from double"); \
-      dvalue = 0; \
+    case MI2_PRIV_SIGNED : \
+      dvalue = MAX(INT_MIN, dvalue); \
+      dvalue = MIN(INT_MAX, dvalue); \
+      *((signed int *) ptr) = ROUND(dvalue); \
       break; \
-   }
+    } \
+    break; \
+  case MI_TYPE_FLOAT : \
+    dvalue = MAX(-FLT_MAX,dvalue); \
+    *((float *) ptr) = MIN(FLT_MAX,dvalue); \
+    break; \
+  case MI_TYPE_DOUBLE : \
+    *((double *) ptr) = dvalue; \
+    break; \
+  case MI_TYPE_UNKNOWN : \
+    MI_LOG_PKG_ERROR2(MI_ERR_NONNUMERIC, \
+                      "Attempt to convert to MI_TYPE_UNKNOWN from double"); \
+    dvalue = 0; \
+    break; \
+  }
 
 
 #define MI2_STRINGS_EQUAL(str1,str2) (strcmp(str1,str2)==0)
-   
-   
+
+
 /* Private functions */
 static int MI2_icv_get_type ( mi2_icv_type *icvp, mihandle_t volume );
 static int MI2_icv_get_vrange ( mi2_icv_type *icvp, mihandle_t volume );
-static double MI2_get_default_range ( char *what, mitype_t datatype);
+static double MI2_get_default_range ( char *what, mitype_t datatype );
 static int MI2_icv_get_norm ( mi2_icv_type *icvp, mihandle_t volume );
 static int MI2_icv_access ( int operation, mi2_icv_type *icvp, long start[],
                             long count[], void *values );
@@ -218,8 +218,8 @@ int mi2_icv_create()
   icvp->user_typelen = mitype_len ( icvp->user_type );
   icvp->user_sign = MI2_PRIV_SIGNED;
   icvp->user_do_range = TRUE;
-  icvp->user_vmax = MI2_get_default_range ( MIvalid_max, icvp->user_type);
-  icvp->user_vmin = MI2_get_default_range ( MIvalid_min, icvp->user_type);
+  icvp->user_vmax = MI2_get_default_range ( MIvalid_max, icvp->user_type );
+  icvp->user_vmin = MI2_get_default_range ( MIvalid_min, icvp->user_type );
   icvp->user_do_norm = FALSE;
   icvp->user_user_norm = FALSE;
   icvp->user_maxvar = strdup ( MIimagemax );
@@ -720,20 +720,18 @@ int mi2_icv_inqdbl ( int icvid, int icv_property, double *value )
          ( icv_property < MI2_ICV_DIM_SIZE + MI2_MAX_IMGDIMS ) ) {
       idim = icv_property - MI2_ICV_DIM_SIZE;
       *value = icvp->user_dim_size[idim];
-    } else
-      if ( ( icv_property >= MI2_ICV_DIM_STEP ) &&
-           ( icv_property < MI2_ICV_DIM_STEP + MI2_MAX_IMGDIMS ) ) {
-        idim = icv_property - MI2_ICV_DIM_STEP;
-        *value = icvp->derv_dim_step[idim];
-      } else
-        if ( ( icv_property >= MI2_ICV_DIM_START ) &&
-             ( icv_property < MI2_ICV_DIM_START + MI2_MAX_IMGDIMS ) ) {
-          idim = icv_property - MI2_ICV_DIM_START;
-          *value = icvp->derv_dim_start[idim];
-        } else {
-          milog_message ( MI2_MSG_BADPROP, _ ( "Tried to get unknown icv property" ) );
-          MI2_RETURN ( MI_ERROR );
-        }
+    } else if ( ( icv_property >= MI2_ICV_DIM_STEP ) &&
+                ( icv_property < MI2_ICV_DIM_STEP + MI2_MAX_IMGDIMS ) ) {
+      idim = icv_property - MI2_ICV_DIM_STEP;
+      *value = icvp->derv_dim_step[idim];
+    } else if ( ( icv_property >= MI2_ICV_DIM_START ) &&
+                ( icv_property < MI2_ICV_DIM_START + MI2_MAX_IMGDIMS ) ) {
+      idim = icv_property - MI2_ICV_DIM_START;
+      *value = icvp->derv_dim_start[idim];
+    } else {
+      milog_message ( MI2_MSG_BADPROP, _ ( "Tried to get unknown icv property" ) );
+      MI2_RETURN ( MI_ERROR );
+    }
 
     break;
   }
@@ -830,11 +828,10 @@ int mi2_icv_inqstr ( int icvid, int icv_property, char *value )
 
     if ( icvp->user_sign == MI2_PRIV_SIGNED )
       ( void ) strcpy ( value, MI_SIGNED );
+    else if ( icvp->user_sign == MI2_PRIV_UNSIGNED )
+      ( void ) strcpy ( value, MI_UNSIGNED );
     else
-      if ( icvp->user_sign == MI2_PRIV_UNSIGNED )
-        ( void ) strcpy ( value, MI_UNSIGNED );
-      else
-        ( void ) strcpy ( value, MI_EMPTY_STRING );
+      ( void ) strcpy ( value, MI_EMPTY_STRING );
 
     break;
   case MI2_ICV_MAXVAR:
@@ -1025,8 +1022,8 @@ static int MI2_icv_get_type ( mi2_icv_type *icvp,  mihandle_t volume )
 //                   & ( icvp->var_ndims ), icvp->var_dim, NULL ) < 0 ) {
 //     MI2_RETURN ( MI_ERROR );
 //   }
-  miget_data_type(volume,&icvp->var_type);
-  sign_string=mitype_sign(icvp->var_type);
+  miget_data_type ( volume, &icvp->var_type );
+  sign_string = mitype_sign ( icvp->var_type );
 
   /* Check that the variable type is numeric */
   /* VF: I don't uderstand this*/
@@ -1063,7 +1060,7 @@ static int MI2_icv_get_vrange ( mi2_icv_type *icvp, mihandle_t volume )
 
   MI2_SAVE_ROUTINE_NAME ( "MI2_icv_get_vrange" );
 
-  if ( miget_volume_valid_range ( volume, &vrange[0],&vrange[1] ) == MI_ERROR ) {
+  if ( miget_volume_valid_range ( volume, &vrange[0], &vrange[1] ) == MI_ERROR ) {
     MI2_RETURN ( MI_ERROR );
   }
 
@@ -1090,23 +1087,22 @@ static int MI2_icv_get_vrange ( mi2_icv_type *icvp, mihandle_t volume )
 @CREATED    : August 10, 1992 (Peter Neelin)
 @MODIFIED   :
 ---------------------------------------------------------------------------- */
-static double MI2_get_default_range ( char *what, mitype_t datatype)
+static double MI2_get_default_range ( char *what, mitype_t datatype )
 {
   double range[2];
 
   MI2_SAVE_ROUTINE_NAME ( "MI2_get_default_range" );
 
-  miinit_default_range ( datatype, &range[0] ,&range[1]);
+  miinit_default_range ( datatype, &range[0] , &range[1] );
 
   if ( MI2_STRINGS_EQUAL ( what, MIvalid_max ) ) {
     MI2_RETURN ( range[1] );
-  } else
-    if ( MI2_STRINGS_EQUAL ( what, MIvalid_min ) ) {
-      MI2_RETURN ( range[0] );
-    } else {
+  } else if ( MI2_STRINGS_EQUAL ( what, MIvalid_min ) ) {
+    MI2_RETURN ( range[0] );
+  } else {
 //TODO:CNV      ncopts = NC_VERBOSE | NC_FATAL;
-      MI2_LOG_PKG_ERROR2 ( -1, "MINC bug - this line should never be printed" );
-    }
+    MI2_LOG_PKG_ERROR2 ( -1, "MINC bug - this line should never be printed" );
+  }
 
   MI2_RETURN ( MI2_DEFAULT_MIN );
 }
@@ -1134,7 +1130,7 @@ static int MI2_icv_get_norm ( mi2_icv_type *icvp, mihandle_t volume )
   int imm;                   /* Counter for looping through max and min */
   double image_range[2];
   int idim, i;
-  
+
 
   MI2_SAVE_ROUTINE_NAME ( "MI2_icv_get_norm" );
 
@@ -1150,8 +1146,8 @@ static int MI2_icv_get_norm ( mi2_icv_type *icvp, mihandle_t volume )
   icvp->derv_firstdim = ( -1 );
 
   /* Look for image max, image min variables */
-  miget_slice_scaling_flag(volume,&icvp->slice_scaling);
-  
+  miget_slice_scaling_flag ( volume, &icvp->slice_scaling );
+
 //   icvp->imgmaxid = ncvarid ( cdfid, icvp->user_maxvar );
 //   icvp->imgminid = ncvarid ( cdfid, icvp->user_minvar );
 
@@ -1164,12 +1160,11 @@ static int MI2_icv_get_norm ( mi2_icv_type *icvp, mihandle_t volume )
 
     /* Get the image min and max, either from the user definition or
        from the file. */
-    if ( icvp->user_user_norm ) 
-    {
+    if ( icvp->user_user_norm ) {
       icvp->derv_imgmax = icvp->user_imgmax;
       icvp->derv_imgmin = icvp->user_imgmin;
     } else {
-      if ( miget_volume_range ( volume, &image_range[0],&image_range[1] ) < 0 ) {
+      if ( miget_volume_range ( volume, &image_range[0], &image_range[1] ) < 0 ) {
         MI2_RETURN ( MI_ERROR );
       }
 
@@ -1183,18 +1178,14 @@ static int MI2_icv_get_norm ( mi2_icv_type *icvp, mihandle_t volume )
     vid[1] = icvp->imgmaxid;
 
     /*TODO: convert to MINC2 call*/
-    if ( ( vid[0] != MI_ERROR ) && ( vid[1] != MI_ERROR ) ) 
-    {
+    if ( ( vid[0] != MI_ERROR ) && ( vid[1] != MI_ERROR ) ) {
       for ( imm = 0; imm < 2; imm++ ) {
-        if ( ncvarinq ( cdfid, vid[imm], NULL, NULL, &ndims, dim, NULL ) < 0 ) 
-        {
+        if ( ncvarinq ( cdfid, vid[imm], NULL, NULL, &ndims, dim, NULL ) < 0 ) {
           MI2_RETURN ( MI_ERROR );
         }
 
-        for ( idim = 0; idim < ndims; idim++ ) 
-        {
-          for ( i = 0; i < icvp->var_ndims; i++ ) 
-          {
+        for ( idim = 0; idim < ndims; idim++ ) {
+          for ( i = 0; i < icvp->var_ndims; i++ ) {
             if ( icvp->var_dim[i] == dim[idim] )
               icvp->derv_firstdim = MAX ( icvp->derv_firstdim, i );
           }
@@ -1826,16 +1817,15 @@ static int MI2_icv_calc_scale ( int operation, mi2_icv_type *icvp, long coords[]
         if ( icvp->derv_usr_float ) {
           icvp->fill_valid_min = var_imgmin_true;
           icvp->fill_valid_max = var_imgmax_true;
-        } else
-          if ( usr_scale != 0.0 ) {
-            icvp->fill_valid_min =
-              usr_vmin + ( var_imgmin_true - usr_imgmin ) / usr_scale;
-            icvp->fill_valid_max =
-              usr_vmin + ( var_imgmax_true - usr_imgmin ) / usr_scale;
-          } else {
-            icvp->fill_valid_min = usr_vmin;
-            icvp->fill_valid_max = usr_vmax;
-          }
+        } else if ( usr_scale != 0.0 ) {
+          icvp->fill_valid_min =
+            usr_vmin + ( var_imgmin_true - usr_imgmin ) / usr_scale;
+          icvp->fill_valid_max =
+            usr_vmin + ( var_imgmax_true - usr_imgmin ) / usr_scale;
+        } else {
+          icvp->fill_valid_min = usr_vmin;
+          icvp->fill_valid_max = usr_vmax;
+        }
       }        /* If output operation */
 
     }        /* If not pure floating point */
@@ -1987,7 +1977,7 @@ static int MI2_icv_get_dim ( mi2_icv_type *icvp, int cdfid, int varid )
   int subsc[MI2_MAX_IMGDIMS]; /* Subscripts for fastest image dims */
   int dimvid[MI2_MAX_IMGDIMS]; /* Variable ids for dimensions */
 
-  MI2_SAVE_ROUTINE_NAME( "MI2_icv_get_dim" );
+  MI2_SAVE_ROUTINE_NAME ( "MI2_icv_get_dim" );
 
   /* Check that the variable has at least icvp->user_num_imgdims dimensions */
   if ( icvp->var_ndims < icvp->user_num_imgdims ) {
@@ -2099,16 +2089,14 @@ static int MI2_get_dim_flip ( mi2_icv_type *icvp, int cdfid, int dimvid[],
     if ( MI2_STRINGS_EQUAL ( dimname, MIxspace ) ||
          MI2_STRINGS_EQUAL ( dimname, MIxfrequency ) )
       dim_dir = icvp->user_xdim_dir;
+    else if ( MI2_STRINGS_EQUAL ( dimname, MIyspace ) ||
+              MI2_STRINGS_EQUAL ( dimname, MIyfrequency ) )
+      dim_dir = icvp->user_ydim_dir;
+    else if ( MI2_STRINGS_EQUAL ( dimname, MIzspace ) ||
+              MI2_STRINGS_EQUAL ( dimname, MIzfrequency ) )
+      dim_dir = icvp->user_zdim_dir;
     else
-      if ( MI2_STRINGS_EQUAL ( dimname, MIyspace ) ||
-           MI2_STRINGS_EQUAL ( dimname, MIyfrequency ) )
-        dim_dir = icvp->user_ydim_dir;
-      else
-        if ( MI2_STRINGS_EQUAL ( dimname, MIzspace ) ||
-             MI2_STRINGS_EQUAL ( dimname, MIzfrequency ) )
-          dim_dir = icvp->user_zdim_dir;
-        else
-          dim_dir = MI2_ICV_ANYDIR;
+      dim_dir = MI2_ICV_ANYDIR;
 
     /* Look for variable corresponding to dimension */
     if ( dim_dir != MI2_ICV_ANYDIR ) { /* Look for flipping? */
@@ -2129,9 +2117,8 @@ static int MI2_get_dim_flip ( mi2_icv_type *icvp, int cdfid, int dimvid[],
 
       if ( dim_dir == MI2_ICV_POSITIVE )
         icvp->derv_dim_flip[idim] = ( dimstep < 0.0 );
-      else
-        if ( dim_dir == MI2_ICV_NEGATIVE )
-          icvp->derv_dim_flip[idim] = ( dimstep > 0.0 );
+      else if ( dim_dir == MI2_ICV_NEGATIVE )
+        icvp->derv_dim_flip[idim] = ( dimstep > 0.0 );
     }                          /* if look for flipping */
 
   }                           /* for each dimension */
@@ -2263,7 +2250,7 @@ static int MI2_get_dim_scale ( mi2_icv_type *icvp, int cdfid, int dimvid[] )
     /*oldncopts = ncopts;
     ncopts = 0;
     dimstep = 1.0;*/
-    
+
     /*TODO: convert to MINC2 call*/
     miattget1 ( cdfid, dimvid[idim], MIstep, NC_DOUBLE, &dimstep );
 
@@ -2511,14 +2498,13 @@ static int MI2_icv_dimconvert ( int operation, mi2_icv_type *icvp,
             dvalue = ( ( icvp->scale == 0.0 ) ?
                        0.0 : ( dvalue - icvp->offset ) / icvp->scale );
           }
-        } else
-          if ( ptr > dcp->in_pix_last ) {
-            continue;
-          } else {
-            {
-              MI2_TO_DOUBLE ( dvalue, dcp->intype, dcp->insign, ptr )
-            }
+        } else if ( ptr > dcp->in_pix_last ) {
+          continue;
+        } else {
+          {
+            MI2_TO_DOUBLE ( dvalue, dcp->intype, dcp->insign, ptr )
           }
+        }
 
         /* Add in the value, checking for range if needed */
         if ( icvp->do_fillvalue && ( ( dvalue < dmin ) || ( dvalue > dmax ) ) ) {
@@ -2539,10 +2525,9 @@ static int MI2_icv_dimconvert ( int operation, mi2_icv_type *icvp,
     /* Check for out of range values and scale result */
     if ( out_of_range ) {
       dvalue = icvp->user_fillvalue;
-    } else
-      if ( icvp->do_scale ) {
-        dvalue = icvp->scale * dvalue + icvp->offset;
-      }
+    } else if ( icvp->do_scale ) {
+      dvalue = icvp->scale * dvalue + icvp->offset;
+    }
 
     /* Expand data if needed */
     if ( !dcp->do_expand ) {
