@@ -316,6 +316,11 @@ extern int mi2_icv_inqstr(int icvid, int icv_property, char *value);
 extern int mi2_icv_get(int icvid, long start[], long count[], void *values);
 extern int mi2_icv_put(int icvid, long start[], long count[], void *values);
 
+extern int MI2_varaccess(int operation, mihandle_t volume, 
+                             long start[], long count[],
+                             mitype_t datatype, int sign, void *values,
+                             int *bufsize_step, mi2_icv_type *icvp);
+
 
 
 #ifdef __cplusplus

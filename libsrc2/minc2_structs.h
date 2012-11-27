@@ -296,5 +296,19 @@ typedef struct {
    void *istart, *ostart;       /* Beginning of buffers */
 } mi2_icv_dimconv_type;
 
+/* Structure for passing values for MI2_varaccess */
+typedef struct {
+   int operation;
+   mihandle_t  volume;     /* handle to the volume */
+   mitype_t var_type, call_type;
+   int var_sign, call_sign;
+   int var_value_size, call_value_size;
+   mi2_icv_type *icvp;
+   int do_scale;
+   int do_dimconvert;
+   int do_fillvalue;
+   long *start, *count;
+   void *values;
+} mi2_varaccess_type;
 
 #endif //__MINC2_STRUCTS_H__
