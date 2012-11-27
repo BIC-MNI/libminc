@@ -76,7 +76,7 @@ struct midimension {
   char *name;                   /* Dimension name */
   double *offsets;              /* Offsets (if irregular) */
   double step;                  /* Step size */
-  unsigned int length;         /* Length */
+  unsigned int length;          /* Length */
   double start;                 /* Start value */
   char *units;                  /* Units string */
   double width;                 /* Sample width (if regular) */

@@ -35,7 +35,7 @@ static int mirw_volume_minmax ( int opcode, mihandle_t volume, double *value );
 
 /** Get the minimum or maximum value for the slice containing the given point.
  */
-static int
+static int 
 mirw_slice_minmax ( int opcode, mihandle_t volume,
                     const unsigned long start_positions[],
                     int array_length, double *value )

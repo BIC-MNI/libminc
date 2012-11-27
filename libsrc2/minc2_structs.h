@@ -80,13 +80,13 @@ typedef enum {
  * all dimensions regardless of class.
  */
 typedef enum {
-  MI_DIMCLASS_ANY = 0,  /**< Don't care (or unknown) */
-  MI_DIMCLASS_SPATIAL = 1,  /**< Spatial dimensions (x, y, z) */
-  MI_DIMCLASS_TIME = 2, /**< Time dimension */
+  MI_DIMCLASS_ANY = 0,        /**< Don't care (or unknown) */
+  MI_DIMCLASS_SPATIAL = 1,    /**< Spatial dimensions (x, y, z) */
+  MI_DIMCLASS_TIME = 2,       /**< Time dimension */
   MI_DIMCLASS_SFREQUENCY = 3, /**< Spatial frequency dimensions */
   MI_DIMCLASS_TFREQUENCY = 4, /**< Temporal frequency dimensions */
-  MI_DIMCLASS_USER = 5, /**< Arbitrary user-defined dimension */
-  MI_DIMCLASS_RECORD = 6  /**< Record as dimension */
+  MI_DIMCLASS_USER = 5,       /**< Arbitrary user-defined dimension */
+  MI_DIMCLASS_RECORD = 6      /**< Record as dimension */
 } midimclass_t;
 
 /** Dimension order refers to the idea that data can be structured in 

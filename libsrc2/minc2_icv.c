@@ -1423,13 +1423,13 @@ static int MI2_icv_access ( int operation, mi2_icv_type *icvp, long start[],
        a get. We must do it inside the loop since the scale factor
        calculation can change it if the scale is zero. (Fillvalue checking
        is always done if the the scale is zero.) */
-    icvp->do_fillvalue =
-      icvp->user_do_fillvalue && ( operation == MI2_PRIV_GET );
+    icvp->do_fillvalue   = icvp->user_do_fillvalue && ( operation == MI2_PRIV_GET );
     icvp->fill_valid_min = icvp->var_vmin;
     icvp->fill_valid_max = icvp->var_vmax;
 
     /* Calculate scale factor */
-    if ( icvp->do_scale ) {
+    if ( icvp->do_scale ) 
+    {
       if ( MI2_icv_calc_scale ( operation, icvp, chunk_start ) < 0 ) {
         MI2_RETURN ( MI_ERROR );
       }
@@ -1448,8 +1448,8 @@ static int MI2_icv_access ( int operation, mi2_icv_type *icvp, long start[],
     /* Increment the start counter */
     chunk_start[firstdim] += chunk_count[firstdim];
 
-    for ( idim = firstdim;
-          ( idim > 0 ) && ( chunk_start[idim] >= var_end[idim] ); idim-- ) {
+    for ( idim = firstdim; ( idim > 0 ) && ( chunk_start[idim] >= var_end[idim] ); idim-- ) 
+    {
       chunk_start[idim] = var_start[idim];
       chunk_start[idim - 1]++;
     }
