@@ -255,6 +255,7 @@ miset_real_value(mihandle_t volume,
     double voxel;
 
     if ((volume->mode & MI2_OPEN_RDWR) == 0) {
+        //TODO: report that file is not open properly
         return (MI_ERROR);
     }
 

@@ -94,6 +94,7 @@ restructure_array(int ndims,    /* Dimension count */
   int i;
 
   if ((temp = malloc(el_size)) == NULL) {
+    //TODO: report MEMORY error somehow
     return;
   }
 
@@ -119,6 +120,7 @@ restructure_array(int ndims,    /* Dimension count */
    **/
   bitmap = calloc((total + 8 - 1) / 8, 1); /* bit array */
   if (bitmap == NULL) {
+    //TODO: report MEMORY error somehow
     return;
   }
 
@@ -191,6 +193,7 @@ restructure_array(int ndims,    /* Dimension count */
                  lengths[0],lengths[1],lengths[2]);
           printf("index %ld,%ld,%ld\n",
                  index_perm[0], index_perm[0], index_perm[2]);
+          //TODO: report MEMORY error somehow
           exit(-1);
         }
 #endif
@@ -245,16 +248,34 @@ restructure_array(int ndims,    /* Dimension count */
 
 /** Calculates and returns the number of bytes required to store the
  * hyperslab specified by the \a n_dimensions and the
- * \a count parameters.
+ * \a count parameters, using hdf type id
  */
-int
-miget_hyperslab_size(mitype_t volume_data_type, /**< Data type of a voxel. */
-                     int n_dimensions, /**< Dimensionality */
-                     const unsigned long count[], /**< Dimension lengths  */
-                     misize_t *size_ptr) /**< Returned byte count */
+extern void miget_hyperslab_size_hdf(hid_t hdf_type_id, int n_dimensions, 
+                                const unsigned long count[], 
+                                misize_t *size_ptr)
 {
   int voxel_size;
   misize_t temp;
+  voxel_size = H5Tget_size(hdf_type_id);
+
+  temp = 1;
+  for (i = 0; i < n_dimensions; i++) {
+    temp *= count[i];
+  }
+  *size_ptr = (temp * voxel_size);
+}
+
+
+/** Calculates and returns the number of bytes required to store the
+ * hyperslab specified by the \a n_dimensions and the
+ * \a count parameters.
+ */
+int
+miget_hyperslab_size(mitype_t volume_data_type,   /**< Data type of a voxel. */
+                     int n_dimensions,            /**< Dimensionality */
+                     const unsigned long count[], /**< Dimension lengths  */
+                     misize_t *size_ptr)          /**< Returned byte count */
+{
   int i;
   hid_t type_id;
 
@@ -262,14 +283,9 @@ miget_hyperslab_size(mitype_t volume_data_type, /**< Data type of a voxel. */
   if (type_id < 0) {
     return (MI_ERROR);
   }
+  
+  miget_hyperslab_size_hdf(type_id,n_dimensions,count,size_ptr);
 
-  voxel_size = H5Tget_size(type_id);
-
-  temp = 1;
-  for (i = 0; i < n_dimensions; i++) {
-    temp *= count[i];
-  }
-  *size_ptr = (temp * voxel_size);
   H5Tclose(type_id);
   return (MI_NOERROR);
 }
@@ -311,27 +327,22 @@ mitranslate_hyperslab_origin(mihandle_t volume,
     }
 
     hdim = volume->dim_handles[user_i];
-    //hdim = volume->dim_handles[file_i];
     switch (hdim->flipping_order) {
     case MI_FILE_ORDER:
-      //hdf_start[file_i] = start[user_i];
       hdf_start[user_i] = start[file_i];
       dir[file_i] = 1;    /* Set direction positive */
       break;
 
     case MI_COUNTER_FILE_ORDER:
-      //hdf_start[file_i] = hdim->length - start[user_i] - count[user_i];
       hdf_start[user_i] = hdim->length - start[file_i] - count[file_i];
       dir[file_i] = -1;   /* Set direction negative */
       break;
 
     case MI_POSITIVE:
       if (hdim->step > 0) { /* Positive? */
-        //hdf_start[file_i] = start[user_i]; /* Use raw file order. */
         hdf_start[user_i] = start[file_i];
         dir[file_i] = 1; /* Set direction positive */
       } else {
-        //hdf_start[file_i] = hdim->length - start[user_i] - count[user_i];
         hdf_start[user_i] = hdim->length - start[file_i] - count[file_i];
         dir[file_i] = -1; /* Set direction negative */
       }
@@ -339,17 +350,14 @@ mitranslate_hyperslab_origin(mihandle_t volume,
 
     case MI_NEGATIVE:
       if (hdim->step < 0) { /* Negative? */
-        //hdf_start[file_i] = start[user_i]; /* Use raw file order */
         hdf_start[user_i] = start[file_i];
         dir[file_i] = 1; /* Set direction positive */
       } else {
-        //hdf_start[file_i] = hdim->length - start[user_i] - count[user_i];
         hdf_start[user_i] = hdim->length - start[file_i] - count[file_i];
         dir[file_i] = -1; /* Set direction negative */
       }
       break;
     }
-    //hdf_count[file_i] = count[user_i];
     hdf_count[user_i] = count[file_i];
   }
   return (n_different);
@@ -443,6 +451,7 @@ static int mirw_hyperslab_raw(int opcode,
     volume->is_dirty = TRUE; /* Mark as modified. */
 
     /* Restructure array before writing to file.
+     * TODO: use temporary buffer for that!
      */
 
     if (n_different != 0) {
@@ -500,35 +509,49 @@ static int mirw_hyperslab_icv(int opcode,
   hid_t fspc_id = -1;
   hid_t volume_type_id = -1;
   hid_t buffer_type_id = -1;
+  htri_t datatype_conversion_required=FALSE;
   int result = MI_ERROR;
   hsize_t hdf_start[MI2_MAX_VAR_DIMS];
   hsize_t hdf_count[MI2_MAX_VAR_DIMS];
   int dir[MI2_MAX_VAR_DIMS];  /* Direction vector in file order */
   int ndims;
   int n_different = 0;
-
+  double volume_valid_min, volume_valid_max;
+  misize_t buffer_size,volume_size;
+  void *temp_buffer=NULL;
+  unsigned long icount[MI2_MAX_VAR_DIMS];
+  int idir[MI2_MAX_VAR_DIMS];
+  int imap[MI2_MAX_VAR_DIMS];
+  int i;
 
   /* Disallow write operations to anything but the highest resolution.
    */
   if (opcode == MIRW_OP_WRITE && volume->selected_resolution != 0) {
+    /*TODO: report error that we are not dealing with the rihgt image here*/
     return (MI_ERROR);
   }
 
   dset_id = volume->image_id;
   if (dset_id < 0) {
+    /*TODO: report the image was not opened*/
     goto cleanup;
   }
 
   fspc_id = H5Dget_space(dset_id);
   if (fspc_id < 0) {
+    /*TODO: report can't get dataset*/
     goto cleanup;
   }
 
   volume_type_id = H5Tcopy(volume->mtype_id);
   buffer_type_id = mitype_to_hdftype(midatatype, TRUE);
-
   ndims = volume->number_of_dims;
-
+  
+  datatype_conversion_required=H5Tequal(volume_type_id,buffer_type_id);
+  
+  miget_hyperslab_size_hdf(volume_type_id,ndims,count,&volume_size);
+  miget_hyperslab_size_hdf(buffer_type_id,ndims,count,&buffer_size);
+  
   if (ndims == 0) {
     /* A scalar volume is possible but extremely unlikely, not to
      * mention useless!
@@ -554,63 +577,119 @@ static int mirw_hyperslab_icv(int opcode,
   if (result < 0) {
     goto cleanup;
   }
-
+  
+  miget_volume_valid_range(volume, &volume_valid_max, &volume_valid_min);
+  
   if (opcode == MIRW_OP_READ) {
-    result = H5Dread(dset_id, volume_type_id, mspc_id, fspc_id, H5P_DEFAULT,
-                     buffer);
     
-    /*TODO apply interslice scaling here*/
-    
-    /* Restructure the array after reading the data in file orientation.
-     */
-    if (n_different != 0) {
-      restructure_array(ndims, buffer, count, H5Tget_size(volume_type_id),
-                        volume->dim_indices, dir);
+    if(volume_size==buffer_size)
+    {
+      result = H5Dread(dset_id, volume_type_id, mspc_id, fspc_id, H5P_DEFAULT,
+                      buffer);
+      if(result<0)
+      {
+        /*TODO: report read error somehow*/
+        goto cleanup;
+      }
+      
+      if(datatype_conversion_required)
+      {
+        /*TODO: run data type conversion & interslice normalization inplace here*/
+      }
+      
+      /* TODO apply interslice scaling here*/
+      /* Restructure the array after reading the data in file orientation.
+      */
+      if (n_different != 0 ) {
+        restructure_array(ndims, buffer, count, H5Tget_size(volume_type_id),
+                          volume->dim_indices, dir);
+        /*TODO: check if we managed to restructure the array*/
+      }
+    } else { // we need to allocate temporary buffer and then convert data types
+      temp_buffer=malloc(volume_size);
+      
+      result = H5Dread(dset_id, volume_type_id, mspc_id, fspc_id, H5P_DEFAULT,
+                      temp_buffer);
+      if(result<0)
+      {
+        /*TODO: report read error somehow*/
+        goto cleanup;
+      }
+      /*Assume that we are always going to perform data type conversion in this case*/
+      /*TODO: restructure and convert array here*/
     }
   } else {
 
     volume->is_dirty = TRUE; /* Mark as modified. */
-
-    /* Restructure array before writing to file.
-     */
-
-    if (n_different != 0) {
-      unsigned long icount[MI2_MAX_VAR_DIMS];
-      int idir[MI2_MAX_VAR_DIMS];
-      int imap[MI2_MAX_VAR_DIMS];
-      int i;
-
+    
+    if (n_different != 0 ) {
       /* Invert before calling */
       for (i = 0; i < ndims; i++) {
         icount[volume->dim_indices[i]] = count[i];
-
         idir[volume->dim_indices[i]] = dir[i];
-
-        // this one was correct the original way
+        /* this one was correct the original way*/
         imap[volume->dim_indices[i]] = i;
 
       }
-
-      restructure_array(ndims, buffer, icount, H5Tget_size(volume_type_id),
-                        imap, idir);
-      
-    /*TODO apply interslice scaling here*/
     }
-
-    result = H5Dwrite(dset_id, volume_type_id, mspc_id, fspc_id, H5P_DEFAULT,
-                      buffer);
+    /* Restructure array before writing to file.
+     */
+    if (volume_size==buffer_size)
+    {
+      
+        /*TODO: don't touch the input ARRAY!*/
+        if (n_different != 0 ) {
+          restructure_array(ndims, buffer, icount, H5Tget_size(volume_type_id), imap, idir);
+        }
+        
+        if(datatype_conversion_required)
+        {
+          /*TODO: perform inplace data type conversion*/
+          /*TODO apply interslice scaling here*/
+        }
+        result = H5Dwrite(dset_id, volume_type_id, mspc_id, fspc_id, H5P_DEFAULT,
+                        buffer);
+        if(result<0)
+        {
+          /*TODO: report write error somehow*/
+          goto cleanup;
+        }
+      } else {
+        /*we need to use intermediate array*/
+        temp_buffer=malloc(volume_size);
+        /*TODO: restructure and convert array here*/ 
+        
+        /*TODO: should we update slice/volume min/max here?*/
+        
+        result = H5Dwrite(dset_id, volume_type_id, mspc_id, fspc_id, H5P_DEFAULT,
+                        temp_buffer);
+        if(result<0)
+        {
+          /*TODO: report write error somehow*/
+          goto cleanup;
+        }
+      }
+    }
   }
 
 cleanup:
 
-  if (type_id >= 0) {
-    H5Tclose(type_id);
+  if (volume_type_id >= 0) {
+    H5Tclose(volume_type_id);
+  }
+  if (buffer_type_id >= 0) {
+    H5Tclose(buffer_type_id);
   }
   if (mspc_id >= 0) {
     H5Sclose(mspc_id);
   }
   if (fspc_id >= 0) {
     H5Sclose(fspc_id);
+  }
+  
+  if(temp_buffer!=NULL)
+  {
+    free(temp_buffer);
   }
   return (result);
 }
