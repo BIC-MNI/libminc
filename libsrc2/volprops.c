@@ -503,3 +503,4 @@ miset_props_template(mivolumeprops_t props, int template_flag)
 }
 
 
+// kate: indent-mode cstyle; indent-width 2; replace-tabs on; 

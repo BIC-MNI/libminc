@@ -579,8 +579,8 @@ void miget_voxel_to_world ( mihandle_t volume, mi_lin_xfm_t voxel_to_world )
   for ( j = 0; j < volume->number_of_dims; j++ ) {
     midimhandle_t hdim = volume->dim_handles[j];
 
-    if ( hdim->class == MI_DIMCLASS_SPATIAL ||
-         hdim->class == MI_DIMCLASS_SFREQUENCY ) {
+    if ( hdim->dim_class == MI_DIMCLASS_SPATIAL ||
+         hdim->dim_class == MI_DIMCLASS_SFREQUENCY ) {
       k = hdim->world_index;
     } else {
       continue;

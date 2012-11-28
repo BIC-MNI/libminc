@@ -66,7 +66,7 @@ micopy_dimension ( midimhandle_t dim_ptr, midimhandle_t *new_dim_ptr )
   }
 
   handle->attr = dim_ptr->attr;
-  handle->class = dim_ptr->class;
+  handle->dim_class = dim_ptr->dim_class;
   /* Copy direction cosines */
   handle->direction_cosines[MI2_X] = dim_ptr->direction_cosines[0];
   handle->direction_cosines[MI2_Y] = dim_ptr->direction_cosines[1];
@@ -200,7 +200,7 @@ micreate_dimension ( const char *name, midimclass_t class, midimattr_t attr,
 
   switch ( class ) {
   case MI_DIMCLASS_SPATIAL:
-    handle->class  = MI_DIMCLASS_SPATIAL;
+    handle->dim_class  = MI_DIMCLASS_SPATIAL;
 
     if ( strcmp ( name, MIxspace ) == 0 ) {
       handle->direction_cosines[MI2_X] = 1.0;
@@ -228,10 +228,10 @@ micreate_dimension ( const char *name, midimclass_t class, midimattr_t attr,
 
     break;
   case MI_DIMCLASS_TIME:
-    handle->class  = MI_DIMCLASS_TIME;
+    handle->dim_class  = MI_DIMCLASS_TIME;
     break;
   case MI_DIMCLASS_SFREQUENCY:
-    handle->class  = MI_DIMCLASS_SFREQUENCY;
+    handle->dim_class  = MI_DIMCLASS_SFREQUENCY;
 
     if ( strcmp ( name, "xfrequency" ) == 0 ) {
       handle->direction_cosines[MI2_X] = 1.0;
@@ -255,13 +255,13 @@ micreate_dimension ( const char *name, midimclass_t class, midimattr_t attr,
 
     break;
   case MI_DIMCLASS_TFREQUENCY:
-    handle->class  = MI_DIMCLASS_TFREQUENCY;
+    handle->dim_class  = MI_DIMCLASS_TFREQUENCY;
     break;
   case MI_DIMCLASS_USER:
-    handle->class  = MI_DIMCLASS_USER;
+    handle->dim_class  = MI_DIMCLASS_USER;
     break;
   case MI_DIMCLASS_RECORD:
-    handle->class  = MI_DIMCLASS_RECORD;
+    handle->dim_class  = MI_DIMCLASS_RECORD;
     break;
   case MI_DIMCLASS_ANY:
   default:
@@ -414,7 +414,7 @@ int miget_volume_dimensions ( mihandle_t volume, midimclass_t class, midimattr_t
       hdim = volume->dim_handles[i];
     }
 
-    if ( class == MI_DIMCLASS_ANY || class == hdim->class ) {
+    if ( class == MI_DIMCLASS_ANY || class == hdim->dim_class ) {
       if ( attr ==  MI_DIMATTR_ALL || hdim->attr == attr ) {
         dimensions[num_ret_dims++] = hdim;
 
@@ -627,7 +627,7 @@ miset_apparent_record_dimension_flag ( mihandle_t volume, int record_flag )
     return ( MI_ERROR );
   }
 
-  handle->class = MI_DIMCLASS_RECORD;
+  handle->dim_class = MI_DIMCLASS_RECORD;
   handle->volume_handle = volume;
 
   volume->dim_handles[volume->number_of_dims] = handle;
@@ -767,7 +767,7 @@ miget_dimension_class ( midimhandle_t dimension, midimclass_t *class )
     return ( MI_ERROR );
   }
 
-  switch ( dimension->class ) {
+  switch ( dimension->dim_class ) {
   case MI_DIMCLASS_ANY:
     *class = MI_DIMCLASS_ANY;
     break;
@@ -814,25 +814,25 @@ miset_dimension_class ( midimhandle_t dimension, midimclass_t class )
 
   switch ( class ) {
   case MI_DIMCLASS_ANY:
-    dimension->class = MI_DIMCLASS_ANY;
+    dimension->dim_class = MI_DIMCLASS_ANY;
     break;
   case MI_DIMCLASS_SPATIAL:
-    dimension->class = MI_DIMCLASS_SPATIAL;
+    dimension->dim_class = MI_DIMCLASS_SPATIAL;
     break;
   case MI_DIMCLASS_TIME:
-    dimension->class = MI_DIMCLASS_TIME;
+    dimension->dim_class = MI_DIMCLASS_TIME;
     break;
   case MI_DIMCLASS_SFREQUENCY:
-    dimension->class = MI_DIMCLASS_SFREQUENCY;
+    dimension->dim_class = MI_DIMCLASS_SFREQUENCY;
     break;
   case MI_DIMCLASS_TFREQUENCY:
-    dimension->class = MI_DIMCLASS_TFREQUENCY;
+    dimension->dim_class = MI_DIMCLASS_TFREQUENCY;
     break;
   case MI_DIMCLASS_USER:
-    dimension->class = MI_DIMCLASS_USER;
+    dimension->dim_class = MI_DIMCLASS_USER;
     break;
   case MI_DIMCLASS_RECORD:
-    dimension->class = MI_DIMCLASS_RECORD;
+    dimension->dim_class = MI_DIMCLASS_RECORD;
     break;
   default:
     return ( MI_ERROR );
@@ -855,8 +855,8 @@ miset_dimension_class ( midimhandle_t dimension, midimclass_t class )
 int
 miget_dimension_cosines ( midimhandle_t dimension, double direction_cosines[3] )
 {
-  if ( dimension == NULL || ( dimension->class != MI_DIMCLASS_SPATIAL &&
-                              dimension->class != MI_DIMCLASS_SFREQUENCY ) ) {
+  if ( dimension == NULL || ( dimension->dim_class != MI_DIMCLASS_SPATIAL &&
+                              dimension->dim_class != MI_DIMCLASS_SFREQUENCY ) ) {
     return ( MI_ERROR );
   }
 
@@ -881,8 +881,8 @@ miset_dimension_cosines ( midimhandle_t dimension,
                           const double direction_cosines[3] )
 {
 
-  if ( dimension == NULL || ( dimension->class != MI_DIMCLASS_SPATIAL &&
-                              dimension->class != MI_DIMCLASS_SFREQUENCY ) ) {
+  if ( dimension == NULL || ( dimension->dim_class != MI_DIMCLASS_SPATIAL &&
+                              dimension->dim_class != MI_DIMCLASS_SFREQUENCY ) ) {
     return ( MI_ERROR );
   }
 

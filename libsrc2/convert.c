@@ -133,7 +133,7 @@ mireorder_voxel_to_xyz(mihandle_t volume,
     for (i = 0; i < volume->number_of_dims; i++) {
         midimhandle_t hdim = volume->dim_handles[i];
         axis = hdim->world_index;
-        if ( axis >= 0 && dimclass == hdim->class) {
+        if ( axis >= 0 && dimclass == hdim->dim_class) {
             xyz[axis] = voxel[i];
         }
     }
@@ -152,7 +152,7 @@ mireorder_xyz_to_voxel(mihandle_t volume,
     for (i = 0; i < volume->number_of_dims; i++) {
         midimhandle_t hdim = volume->dim_handles[i];
         axis = hdim->world_index;
-        if ( axis >= 0 && dimclass == hdim->class) {
+        if ( axis >= 0 && dimclass == hdim->dim_class) {
             voxel[i] = xyz[axis];
         }
     }
@@ -427,8 +427,8 @@ miset_world_origin(mihandle_t volume, /**< A volume handle */
     convert_transform_origin_to_starts(volume, world, starts);
     for (i = 0; i < volume->number_of_dims; i++) {
         midimhandle_t hdim = volume->dim_handles[i];
-        if (hdim->class == MI_DIMCLASS_SPATIAL || 
-            hdim->class == MI_DIMCLASS_SFREQUENCY) {
+        if (hdim->dim_class == MI_DIMCLASS_SPATIAL || 
+            hdim->dim_class == MI_DIMCLASS_SFREQUENCY) {
             hdim->start = starts[hdim->world_index];
         }
     }
@@ -582,3 +582,4 @@ miget_volume_real_range(mihandle_t volume, double real_range[])
     return (MI_NOERROR);
 }
 
+// kate: indent-mode cstyle; indent-width 2; replace-tabs on; 

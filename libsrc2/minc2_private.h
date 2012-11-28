@@ -70,7 +70,7 @@ struct mivolprops {
  */
 struct midimension {
   midimattr_t attr;             /* Dimension attributes */
-  midimclass_t class;           /* Dimension class */
+  midimclass_t dim_class;           /* Dimension class */
   double direction_cosines[3];  /* Direction cosines */
   miflipping_t flipping_order;
   char *name;                   /* Dimension name */

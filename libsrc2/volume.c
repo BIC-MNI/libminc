@@ -391,7 +391,7 @@ static int miset_volume_world_indices(mihandle_t hvol)
     midimhandle_t hdim = hvol->dim_handles[i];
 
     hdim->world_index = -1;
-    if (hdim->class == MI_DIMCLASS_SPATIAL) {
+    if (hdim->dim_class == MI_DIMCLASS_SPATIAL) {
       if (!strcmp(hdim->name, MIxspace)) {
         hdim->world_index = MI2_X;
       } else if (!strcmp(hdim->name, MIyspace)) {
@@ -399,7 +399,7 @@ static int miset_volume_world_indices(mihandle_t hvol)
       } else if (!strcmp(hdim->name, MIzspace)) {
         hdim->world_index = MI2_Z;
       }
-    } else if (hdim->class == MI_DIMCLASS_SFREQUENCY) {
+    } else if (hdim->dim_class == MI_DIMCLASS_SFREQUENCY) {
       if (!strcmp(hdim->name, MIxfrequency)) {
         hdim->world_index = MI2_X;
       } else if (!strcmp(hdim->name, MIyfrequency)) {
@@ -770,7 +770,7 @@ int micreate_volume(const char *filename, int number_of_dimensions,
     miset_attr_at_loc(dataset_id, "spacing", MI_TYPE_STRING,
                       strlen(name), name);
 
-    switch (dimensions[i]->class) {
+    switch (dimensions[i]->dim_class) {
     case MI_DIMCLASS_SPATIAL:
       name = "spatial";
       break;
@@ -979,7 +979,7 @@ int miget_volume_dimension_count(mihandle_t volume, midimclass_t cls,
     increment the dimension count
   */
   for (i=0; i< volume->number_of_dims; i++) {
-    if ((cls == MI_DIMCLASS_ANY || volume->dim_handles[i]->class == cls) &&
+    if ((cls == MI_DIMCLASS_ANY || volume->dim_handles[i]->dim_class == cls) &&
         (attr == MI_DIMATTR_ALL || volume->dim_handles[i]->attr == attr)) {
       count++;
     }
@@ -1140,26 +1140,26 @@ static int _miget_file_dimension(mihandle_t volume, const char *dimname,
     if (r < 0) {
       /* Get the default class. */
       if (!strcmp(dimname, "time")) {
-        hdim->class = MI_DIMCLASS_TIME;
+        hdim->dim_class = MI_DIMCLASS_TIME;
       } else if (!strcmp(dimname, "vector_dimension")) {
-        hdim->class = MI_DIMCLASS_RECORD;
+        hdim->dim_class = MI_DIMCLASS_RECORD;
         hdim->step = 0.0;
       } else {
-        hdim->class =  MI_DIMCLASS_SPATIAL;
+        hdim->dim_class =  MI_DIMCLASS_SPATIAL;
       }
     } else {
       if (!strcmp(temp, "spatial")) {
-        hdim->class = MI_DIMCLASS_SPATIAL;
+        hdim->dim_class = MI_DIMCLASS_SPATIAL;
       } else if (!strcmp(temp, "time___")) {
-        hdim->class = MI_DIMCLASS_TIME;
+        hdim->dim_class = MI_DIMCLASS_TIME;
       } else if (!strcmp(temp, "sfreq__")) {
-        hdim->class = MI_DIMCLASS_SFREQUENCY;
+        hdim->dim_class = MI_DIMCLASS_SFREQUENCY;
       } else if (!strcmp(temp, "tfreq__")) {
-        hdim->class = MI_DIMCLASS_TFREQUENCY;
+        hdim->dim_class = MI_DIMCLASS_TFREQUENCY;
       } else if (!strcmp(temp, "user___")) {
-        hdim->class = MI_DIMCLASS_USER;
+        hdim->dim_class = MI_DIMCLASS_USER;
       } else if (!strcmp(temp, "record_")) {
-        hdim->class = MI_DIMCLASS_RECORD;
+        hdim->dim_class = MI_DIMCLASS_RECORD;
       } else {
         /* TODO: error message?? */
       }
@@ -1227,7 +1227,7 @@ int miopen_volume(const char *filename, int mode, mihandle_t *volume)
   char dimorder[MI2_CHAR_LENGTH];
   int i,r;
   char *p1, *p2;
-  H5T_class_t class;
+  H5T_class_t hdf_class;
   size_t nbytes;
   int is_signed;
 
@@ -1387,11 +1387,11 @@ int miopen_volume(const char *filename, int mode, mihandle_t *volume)
   /* Convert the type to a MINC type.
   */
   /* Get the class Id for the datatype */
-  class = H5Tget_class(handle->ftype_id);
+  hdf_class = H5Tget_class(handle->ftype_id);
   /* Get the size of the datatype */
   nbytes = H5Tget_size(handle->ftype_id);
 
-  switch (class) {
+  switch (hdf_class) {
   case H5T_INTEGER:
   case H5T_ENUM:              /* label images */
     is_signed = (H5Tget_sign(handle->ftype_id) == H5T_SGN_2);
@@ -1581,3 +1581,4 @@ void misave_valid_range(mihandle_t volume)
                   MI_TYPE_DOUBLE, 2, range);
 }
 
+// kate: indent-mode cstyle; indent-width 2; replace-tabs on; 

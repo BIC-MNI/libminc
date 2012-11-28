@@ -118,3 +118,4 @@ miset_record_field_name(mihandle_t volume,
     return (MI_NOERROR);
 }
 
+// kate: indent-mode cstyle; indent-width 2; replace-tabs on; 

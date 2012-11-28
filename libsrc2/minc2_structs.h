@@ -38,20 +38,20 @@ typedef void *milisthandle_t;
  * stored</b> by MINC 2.0.  If a volume is 
  */
 typedef enum {
-  MI_TYPE_BYTE = 1,   /**< 8-bit signed integer */
-  MI_TYPE_SHORT = 3,    /**< 16-bit signed integer */
-  MI_TYPE_INT = 4,    /**< 32-bit signed integer */
-  MI_TYPE_FLOAT = 5,    /**< 32-bit floating point */
-  MI_TYPE_DOUBLE = 6,   /**< 64-bit floating point */
-  MI_TYPE_STRING = 7,   /**< ASCII string */
-  MI_TYPE_UBYTE = 100,    /**< 8-bit unsigned integer */
-  MI_TYPE_USHORT = 101,   /**< 16-bit unsigned integer */
-  MI_TYPE_UINT = 102,   /**< 32-bit unsigned integer */
+  MI_TYPE_BYTE = 1,         /**< 8-bit signed integer */
+  MI_TYPE_SHORT = 3,        /**< 16-bit signed integer */
+  MI_TYPE_INT = 4,          /**< 32-bit signed integer */
+  MI_TYPE_FLOAT = 5,        /**< 32-bit floating point */
+  MI_TYPE_DOUBLE = 6,       /**< 64-bit floating point */
+  MI_TYPE_STRING = 7,       /**< ASCII string */
+  MI_TYPE_UBYTE = 100,      /**< 8-bit unsigned integer */
+  MI_TYPE_USHORT = 101,     /**< 16-bit unsigned integer */
+  MI_TYPE_UINT = 102,       /**< 32-bit unsigned integer */
   MI_TYPE_SCOMPLEX = 1000,  /**< 16-bit signed integer complex */
   MI_TYPE_ICOMPLEX = 1001,  /**< 32-bit signed integer complex */
   MI_TYPE_FCOMPLEX = 1002,  /**< 32-bit floating point complex */
   MI_TYPE_DCOMPLEX = 1003,  /**< 64-bit floating point complex */
-  MI_TYPE_UNKNOWN  = -1         /**< when the type is a record */
+  MI_TYPE_UNKNOWN  = -1     /**< when the type is a record */
 } mitype_t;
 
 /** 
