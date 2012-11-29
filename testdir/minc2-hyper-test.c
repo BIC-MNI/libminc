@@ -84,18 +84,20 @@ main(int argc, char **argv)
     count[0] = CX;
     count[1] = CY;
     count[2] = CZ;
-    result = miset_voxel_value_hyperslab(hvol, MI_TYPE_SHORT, start, count, 
-                                         stmp2);
+    result = miset_voxel_value_hyperslab(hvol, MI_TYPE_SHORT, start, count, stmp2);
     if (result < 0) {
         TESTRPT("unable to set hyperslab", result);
     }
+    /*let's close the volume!*/
+    //miclose_volume(hvol);
+    //miopen_volume("tst-hyper.mnc",H5F_ACC_RDWR,&hvol);
+    
     
     start[0] = start[1] = start[2] = 0;
     count[0] = CX;
     count[1] = CY;
     count[2] = CZ;
-    result = miget_real_value_hyperslab(hvol, MI_TYPE_DOUBLE, start, count,
-                                        dtemp);
+    result = miget_real_value_hyperslab(hvol, MI_TYPE_DOUBLE, start, count, dtemp);
         
     printf("miget_real_value_hyperslab()\n");
 
@@ -119,6 +121,7 @@ main(int argc, char **argv)
                      * not be exact.
                      */
                     if (fabs(r - dtemp[i][j][k]) > 1.0e-15) {
+                        printf("%f != %f at %d,%d,%d",r,dtemp[i][j][k],i,j,k);
                         TESTRPT("Value error!", 0);
                         break;
                     }
@@ -210,7 +213,7 @@ main(int argc, char **argv)
                 for (k = 0; k < CY; k++) {
                     short t = (j*XP)+(k*YP)+(((CZ-1)-i)*ZP);
                     if (stemp[i][j][k] != t) {
-                        printf("%d != %d: ", stemp[i][j][k], t);
+                        printf("%d != %d: @ %d,%d,%d", stemp[i][j][k], t,i,j,k);
                         TESTRPT("Value error", 0);
                         break;
                     }
@@ -287,8 +290,7 @@ main(int argc, char **argv)
     count[0] = CZ;
     count[1] = CX;
     count[2] = CY;
-    result = miget_hyperslab_normalized(hvol, MI_TYPE_UBYTE, start, count,
-                                        NORM_MIN, NORM_MAX, btemp);
+    result = miget_hyperslab_normalized(hvol, MI_TYPE_UBYTE, start, count, NORM_MIN, NORM_MAX, btemp);
     if (result < 0) {
         TESTRPT("Can't read normalized hyperslab", result);
     }
@@ -323,6 +325,7 @@ main(int argc, char **argv)
                     }
 
                     if (btemp[i][j][k] != (unsigned char)rint(r)) {
+                        printf("%d != %d: @ %d,%d,%d", (int)btemp[i][j][k], rint(r),i,j,k);
                         TESTRPT("Value error!", 0);
                         break;
                     }
