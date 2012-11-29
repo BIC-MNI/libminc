@@ -623,7 +623,9 @@ static int mirw_hyperslab_icv(int opcode,
 
   miget_volume_valid_range( volume, &volume_valid_max, &volume_valid_min);
 
-  printf("Volume:%x valid_max:%f valid_min:%f scaling:%d\n",volume,volume_valid_max,volume_valid_min,volume->has_slice_scaling);
+#ifdef _DEBUG
+  printf("mirw_hyperslab_icv:Volume:%x valid_max:%f valid_min:%f scaling:%d\n",volume,volume_valid_max,volume_valid_min,volume->has_slice_scaling);
+#endif  
   
   if(volume->has_slice_scaling)
   {
@@ -640,7 +642,13 @@ static int mirw_hyperslab_icv(int opcode,
       return ( MI_ERROR );
     }
 
-    slice_ndims = H5Sget_simple_extent_ndims ( volume->imax_id );
+    slice_ndims = H5Sget_simple_extent_ndims ( image_max_fspc_id );
+    if(slice_ndims<0)
+    {
+      /*TODO: report read error somehow*/
+      fprintf(stderr,"H5Sget_simple_extent_ndims: Fail %s:%d\n",__FILE__,__LINE__);
+      goto cleanup;
+    }
 
     if ( slice_ndims > ndims ) { /*Can this really happen?*/
       slice_ndims = slice_ndims;
@@ -671,14 +679,31 @@ static int mirw_hyperslab_icv(int opcode,
     
     if( H5Sselect_hyperslab(image_max_fspc_id, H5S_SELECT_SET, image_slice_start, NULL, image_slice_count, NULL)>=0 )
     {
-      H5Dread(volume->imax_id, H5T_NATIVE_DOUBLE, scaling_mspc_id, image_max_fspc_id, H5P_DEFAULT,image_slice_max_buffer);
-    } 
+      if(H5Dread(volume->imax_id, H5T_NATIVE_DOUBLE, scaling_mspc_id, image_max_fspc_id, H5P_DEFAULT,image_slice_max_buffer)<0)
+      {
+        /*TODO: report read error somehow*/
+        fprintf(stderr,"H5Dread: Fail %s:%d\n",__FILE__,__LINE__);
+        goto cleanup;
+      }
+    } else {
+      /*TODO: report read error somehow*/
+      fprintf(stderr,"H5Sselect_hyperslab: Fail %s:%d\n",__FILE__,__LINE__);
+      goto cleanup;
+    }
     
     if( H5Sselect_hyperslab(image_min_fspc_id, H5S_SELECT_SET, image_slice_start, NULL, image_slice_count, NULL)>=0 )
     {
-      H5Dread(volume->imin_id, H5T_NATIVE_DOUBLE, scaling_mspc_id, image_min_fspc_id, H5P_DEFAULT,image_slice_max_buffer);
-    } 
-    
+      if(H5Dread(volume->imin_id, H5T_NATIVE_DOUBLE, scaling_mspc_id, image_min_fspc_id, H5P_DEFAULT,image_slice_max_buffer)<0)
+      {
+        /*TODO: report read error somehow*/
+        fprintf(stderr,"H5Dread: Fail %s:%d\n",__FILE__,__LINE__);
+        goto cleanup;
+      }
+    } else {
+      /*TODO: report read error somehow*/
+      fprintf(stderr,"H5Sselect_hyperslab: Fail %s:%d\n",__FILE__,__LINE__);
+      goto cleanup;
+    }
     H5Sclose(scaling_mspc_id);
     H5Sclose(image_max_fspc_id);
   } else {
@@ -692,9 +717,13 @@ static int mirw_hyperslab_icv(int opcode,
     for (i = 0; i < ndims; i++) {
       image_slice_length *= hdf_count[i];
     }
-    printf("Real max:%f min:%f\n",*image_slice_max_buffer,*image_slice_min_buffer);
+#ifdef _DEBUG    
+    printf("mirw_hyperslab_icv:Real max:%f min:%f\n",*image_slice_max_buffer,*image_slice_min_buffer);
+#endif    
   }
-  printf("Slice_ndim:%d total_number_of_slices:%d image_slice_length:%d\n",slice_ndims,total_number_of_slices,image_slice_length);
+#ifdef _DEBUG  
+  printf("mirw_hyperslab_icv:Slice_ndim:%d total_number_of_slices:%d image_slice_length:%d\n",slice_ndims,total_number_of_slices,image_slice_length);
+#endif
 
   if (opcode == MIRW_OP_READ) 
   {
@@ -956,15 +985,21 @@ int miget_real_value_hyperslab(mihandle_t volume,       /**< A MINC 2.0 volume h
       // TODO: fix this
     case MI_FILE_ORDER:
 //       mi2_icv_setint(icv, MI2_ICV_DO_DIM_CONV, FALSE);
+      printf("Dim %d flip:File order is expected\n",i);
       break;
     case MI_COUNTER_FILE_ORDER:
+      printf("Dim %d flip:MI_COUNTER_FILE_ORDER is expected\n",i);
+      break;
     case MI_POSITIVE:
 //       if (hdim->step < 0)
 //         mi2_icv_setint(icv, MI2_ICV_DO_DIM_CONV, TRUE);
+      printf("Dim %d flip:MI_POSITIVE is expected\n",i);
+      
       break;
     case MI_NEGATIVE:
 //       if (hdim->step > 0)
 //         mi2_icv_setint(icv, MI2_ICV_DO_DIM_CONV, TRUE);
+      printf("Dim flip:MI_NEGATIVE is expected\n",i);
       break;
     default:
       return;
