@@ -325,7 +325,7 @@ main(int argc, char **argv)
                     }
 
                     if (btemp[i][j][k] != (unsigned char)rint(r)) {
-                        printf("%d != %d: @ %d,%d,%d", (int)btemp[i][j][k], rint(r),i,j,k);
+                        printf("%d != %d: @ %d,%d,%d ", (int)btemp[i][j][k], (int)rint(r), i,j,k);
                         TESTRPT("Value error!", 0);
                         break;
                     }

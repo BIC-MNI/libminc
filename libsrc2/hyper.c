@@ -984,22 +984,26 @@ int miget_real_value_hyperslab(mihandle_t volume,       /**< A MINC 2.0 volume h
     switch (hdim->flipping_order) {
       // TODO: fix this
     case MI_FILE_ORDER:
-//       mi2_icv_setint(icv, MI2_ICV_DO_DIM_CONV, FALSE);
+#ifdef _DEBUG
       printf("Dim %d flip:File order is expected\n",i);
+#endif       
       break;
     case MI_COUNTER_FILE_ORDER:
+#ifdef _DEBUG
       printf("Dim %d flip:MI_COUNTER_FILE_ORDER is expected\n",i);
+#endif       
       break;
     case MI_POSITIVE:
-//       if (hdim->step < 0)
-//         mi2_icv_setint(icv, MI2_ICV_DO_DIM_CONV, TRUE);
-      printf("Dim %d flip:MI_POSITIVE is expected\n",i);
-      
+#ifdef _DEBUG
+       if (hdim->step < 0)
+          printf("Dim %d flip:MI_POSITIVE is expected\n",i);
+#endif       
       break;
     case MI_NEGATIVE:
-//       if (hdim->step > 0)
-//         mi2_icv_setint(icv, MI2_ICV_DO_DIM_CONV, TRUE);
-      printf("Dim flip:MI_NEGATIVE is expected\n",i);
+#ifdef _DEBUG
+      if (hdim->step > 0)
+        printf("Dim flip:MI_NEGATIVE is expected\n",i);
+#endif       
       break;
     default:
       return;
