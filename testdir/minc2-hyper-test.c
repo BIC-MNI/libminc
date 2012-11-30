@@ -121,7 +121,7 @@ main(int argc, char **argv)
                      * not be exact.
                      */
                     if (fabs(r - dtemp[i][j][k]) > 1.0e-15) {
-                        printf("%f != %f at %d,%d,%d",r,dtemp[i][j][k],i,j,k);
+                        printf("%f != %f at %d,%d,%d ",r,dtemp[i][j][k],i,j,k);
                         TESTRPT("Value error!", 0);
                         break;
                     }
