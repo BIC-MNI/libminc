@@ -75,8 +75,9 @@ void create_test_file ( void )
     max += 0.1;
     r = miset_slice_range ( hvol, start, 3, max, min );
   }
-
+  
   r = miclose_volume ( hvol );
+  free(buf);
 }
 
 int main ( int argc, char **argv )
@@ -183,6 +184,7 @@ int main ( int argc, char **argv )
 
   /* close volume*/
   miclose_volume ( vol );
+  free(buffer);
 
   if ( error_cnt != 0 ) {
     fprintf ( stderr, "%d error%s reported\n",

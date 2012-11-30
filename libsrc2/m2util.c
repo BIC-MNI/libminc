@@ -2129,8 +2129,8 @@ scaled_maximal_pivoting_gaussian_elimination_real ( int n,
     }
   }
 
-  free ( a );
-  free ( solution );
+  free2d ( n, a );
+  free2d ( n, solution );
   free ( row );
 
   return ( success );
@@ -2171,8 +2171,8 @@ invert_4x4_matrix ( double matrix[4][4], /**< Input matrix */
     }
   }
 
-  free ( mtmp );
-  free ( itmp );
+  free2d ( 4, mtmp );
+  free2d ( 4, itmp );
 
   return ( result ? MI_NOERROR : MI_ERROR );
 }

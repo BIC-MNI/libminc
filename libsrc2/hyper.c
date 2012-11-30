@@ -389,6 +389,9 @@ static int mirw_hyperslab_raw(int opcode,
   int dir[MI2_MAX_VAR_DIMS];  /* Direction vector in file order */
   int ndims;
   int n_different = 0;
+  misize_t buffer_size;
+  void *temp_buffer=NULL;
+  char path[MI2_MAX_PATH];
 
 
   /* Disallow write operations to anything but the highest resolution.
@@ -397,8 +400,19 @@ static int mirw_hyperslab_raw(int opcode,
     return (MI_ERROR);
   }
 
-  dset_id = volume->image_id;
+  sprintf(path, "/minc-2.0/image/%d/image", volume->selected_resolution);
+  /*printf("Using:%s\n",path);*/
+  
+  /* Open the dataset with the specified path
+  */
+  dset_id = H5Dopen1(volume->hdf_id, path);
   if (dset_id < 0) {
+    return (MI_ERROR);
+  }
+
+  fspc_id = H5Dget_space(dset_id);
+  if (fspc_id < 0) {
+    /*TODO: report can't get dataset*/
     goto cleanup;
   }
 
@@ -436,6 +450,9 @@ static int mirw_hyperslab_raw(int opcode,
     goto cleanup;
   }
 
+  miget_hyperslab_size_hdf(type_id,ndims,hdf_count,&buffer_size);
+  
+  
   if (opcode == MIRW_OP_READ) {
     result = H5Dread(dset_id, type_id, mspc_id, fspc_id, H5P_DEFAULT,buffer);
     
@@ -470,12 +487,26 @@ static int mirw_hyperslab_raw(int opcode,
 
       }
 
-      restructure_array(ndims, buffer, icount, H5Tget_size(type_id),
+      /*Use temporary array to preserve input data*/
+      temp_buffer=malloc(buffer_size);
+      if(temp_buffer==NULL)
+      {
+        /*TODO: report memory error*/
+        result=MI_ERROR;
+        goto cleanup;
+      }
+      
+      memcpy(temp_buffer,buffer,buffer_size);
+      
+      restructure_array(ndims, temp_buffer, icount, H5Tget_size(type_id),
                         imap, idir);
+      result = H5Dwrite(dset_id, type_id, mspc_id, fspc_id, H5P_DEFAULT,
+                      temp_buffer);
+    } else {
+      result = H5Dwrite(dset_id, type_id, mspc_id, fspc_id, H5P_DEFAULT,
+                        buffer);
     }
 
-    result = H5Dwrite(dset_id, type_id, mspc_id, fspc_id, H5P_DEFAULT,
-                      buffer);
   }
 
 cleanup:
@@ -488,6 +519,12 @@ cleanup:
   }
   if (fspc_id >= 0) {
     H5Sclose(fspc_id);
+  }
+  if ( dset_id >=0 ) {
+    H5Dclose(dset_id);
+  }
+  if ( temp_buffer!= NULL) {
+    free( temp_buffer );
   }
   return (result);
 }
@@ -897,14 +934,15 @@ cleanup:
     double data_offset=data_min;\
     double data_range=data_max-data_min;\
     type *_buffer_out=(type *)buffer_out;\
+    double *_buffer_in=(double *)buffer_in; \
     for(_i=0;_i<total_number_of_slices;_i++)\
       for(_j=0;_j<image_slice_length;_j++)\
       {\
-        double _temp=(type)(((*buffer_in - voxel_offset) / voxel_range)*(image_slice_max_buffer[_i]-image_slice_min_buffer[_i]) + image_slice_min_buffer[_i] );\
+        double _temp=(type)(((*_buffer_in - voxel_offset) / voxel_range)*(image_slice_max_buffer[_i]-image_slice_min_buffer[_i]) + image_slice_min_buffer[_i] );\
         _temp=(_temp-data_min)/data_range;\
         if(_temp<0.0) _temp=0.0;\
         if(_temp>1.0) _temp=1.0;\
-        buffer_in++;\
+        _buffer_in++;\
         *_buffer_out=(type)(_temp+norm_offset)*norm_range; \
         _buffer_out++;\
       }\
@@ -1046,7 +1084,7 @@ static int mirw_hyperslab_normalized(int opcode,
   miget_volume_valid_range( volume, &volume_valid_max, &volume_valid_min);
 
 #ifdef _DEBUG
-  printf("mirw_hyperslab_icv:Volume:%x valid_max:%f valid_min:%f scaling:%d\n",volume,volume_valid_max,volume_valid_min,volume->has_slice_scaling);
+  printf("mirw_hyperslab_normalized:Volume:%x valid_max:%f valid_min:%f scaling:%d\n",volume,volume_valid_max,volume_valid_min,volume->has_slice_scaling);
 #endif  
   
   if(volume->has_slice_scaling)
@@ -1134,7 +1172,7 @@ static int mirw_hyperslab_normalized(int opcode,
     total_number_of_slices=1;
     image_slice_max_buffer=malloc(sizeof(double));
     image_slice_min_buffer=malloc(sizeof(double));
-    miget_volume_range(volume,image_slice_max_buffer,image_slice_min_buffer);
+    miget_volume_range( volume,image_slice_max_buffer,image_slice_min_buffer );
     image_slice_length=1;
     /*it produces unity scaling*/
     scaling_needed=(*image_slice_max_buffer==volume_valid_max) && (*image_slice_min_buffer==volume_valid_min);
@@ -1142,15 +1180,18 @@ static int mirw_hyperslab_normalized(int opcode,
       image_slice_length *= hdf_count[i];
     }
 #ifdef _DEBUG    
-    printf("mirw_hyperslab_icv:Real max:%f min:%f\n",*image_slice_max_buffer,*image_slice_min_buffer);
+    printf("mirw_hyperslab_normalized:Real max:%f min:%f\n",*image_slice_max_buffer,*image_slice_min_buffer);
 #endif    
   }
 #ifdef _DEBUG  
-  printf("mirw_hyperslab_icv:Slice_ndim:%d total_number_of_slices:%d image_slice_length:%d\n",slice_ndims,total_number_of_slices,image_slice_length);
+  printf("mirw_hyperslab_normalized:Slice_ndim:%d total_number_of_slices:%d image_slice_length:%d\n",slice_ndims,total_number_of_slices,image_slice_length);
 #endif
 
   /*Allocate temporary Buffer*/
   temp_buffer=(double*)malloc(buffer_size);
+  memset(temp_buffer,0,buffer_size);
+  memset(buffer,0,input_buffer_size);
+  
   if (opcode == MIRW_OP_READ) 
   {
     result = H5Dread(dset_id, volume_type_id, mspc_id, fspc_id, H5P_DEFAULT, temp_buffer);

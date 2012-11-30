@@ -1452,6 +1452,8 @@ int miflush_volume(mihandle_t volume)
 */
 int miclose_volume(mihandle_t volume)
 {
+  int i;
+  
   if (volume == NULL) {
     return (MI_ERROR);
   }
@@ -1485,6 +1487,12 @@ int miclose_volume(mihandle_t volume)
     return (MI_ERROR);
   }
   if (volume->dim_handles != NULL) {
+    
+    for(i=0;i<volume->number_of_dims;i++)
+    {
+      mifree_dimension_handle(volume->dim_handles[i]);
+    }
+    
     free(volume->dim_handles);
   }
   if (volume->dim_indices != NULL) {

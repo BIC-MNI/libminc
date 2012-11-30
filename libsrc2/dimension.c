@@ -344,6 +344,10 @@ mifree_dimension_handle ( midimhandle_t dim_ptr )
   if ( dim_ptr->widths != NULL ) {
     free ( dim_ptr->widths );
   }
+  
+  if( dim_ptr->comments != NULL ) {
+    free( dim_ptr->comments );
+  }
 
   free ( dim_ptr );
 
