@@ -552,6 +552,7 @@ static int mirw_hyperslab_icv(int opcode,
   int imap[MI2_MAX_VAR_DIMS];
   double *image_slice_max_buffer=NULL;
   double *image_slice_min_buffer=NULL;
+  int scaling_needed=0;
   
   int image_slice_start[MI2_MAX_VAR_DIMS];
   int image_slice_count[MI2_MAX_VAR_DIMS];
@@ -632,7 +633,9 @@ static int mirw_hyperslab_icv(int opcode,
     hid_t image_max_fspc_id;
     hid_t image_min_fspc_id;
     hid_t scaling_mspc_id;
-    int slice_buffer_size=1;
+    total_number_of_slices=1;
+    image_slice_length=1;
+    scaling_needed=1;
 
     image_max_fspc_id=H5Dget_space(volume->imax_id);
     image_min_fspc_id=H5Dget_space(volume->imin_id);
@@ -659,10 +662,8 @@ static int mirw_hyperslab_icv(int opcode,
       image_slice_start[i] = hdf_start[i];
       
       if(hdf_count[i]>1) /*avoid zero sized dimensions?*/
-        slice_buffer_size*=hdf_count[i];
+        total_number_of_slices*=hdf_count[i];
     }
-    total_number_of_slices=slice_buffer_size;
-    image_slice_length=1;
     
     for (i = slice_ndims; i < ndims; i++ ) {
       if(hdf_count[i]>1) /*avoid zero sized dimensions?*/
@@ -671,8 +672,9 @@ static int mirw_hyperslab_icv(int opcode,
       image_slice_count[i] = 0;
       image_slice_start[i] = 0;
     }
-    image_slice_max_buffer=malloc(slice_buffer_size*sizeof(double));
-    image_slice_min_buffer=malloc(slice_buffer_size*sizeof(double));
+    
+    image_slice_max_buffer=malloc(total_number_of_slices*sizeof(double));
+    image_slice_min_buffer=malloc(total_number_of_slices*sizeof(double));
     /*TODO check for allocation failure ?*/
     
     scaling_mspc_id = H5Screate_simple(slice_ndims, image_slice_count, NULL);
@@ -713,7 +715,8 @@ static int mirw_hyperslab_icv(int opcode,
     image_slice_min_buffer=malloc(sizeof(double));
     miget_volume_range(volume,image_slice_max_buffer,image_slice_min_buffer);
     image_slice_length=1;
-    
+    /*it produces unity scaling*/
+    scaling_needed=(*image_slice_max_buffer==volume_valid_max) && (*image_slice_min_buffer==volume_valid_min);
     for (i = 0; i < ndims; i++) {
       image_slice_length *= hdf_count[i];
     }
@@ -735,14 +738,8 @@ static int mirw_hyperslab_icv(int opcode,
       goto cleanup;
     }
     
-    /* TODO: apply interslice scaling here*/
-    /* TODO: if output data type is not float or double - complain!*/
-    /* Restructure the array after reading the data in file orientation.
-    */
-    if(volume->has_slice_scaling || buffer_data_type==MI_TYPE_FLOAT || buffer_data_type==MI_TYPE_DOUBLE)
-    /*Figure out when scaling is actually needed!*/
+    if(scaling_needed)
     {
-      
       switch(buffer_data_type)
       {
         case MI_TYPE_FLOAT:
@@ -795,55 +792,61 @@ static int mirw_hyperslab_icv(int opcode,
 
       }
     }
-    /* TODO: apply interslice scaling here*/
-    /* TODO: if output data type is not float or double - complain!*/
-    /* Restructure the array after reading the data in file orientation.
-    */
     
-    if (n_different != 0 ) 
+    if(scaling_needed || n_different != 0) 
     {
-      /*TODO: don't touch the input ARRAY!*/
-      /* Restructure array before writing to file.
-      */
-      restructure_array(ndims, buffer, icount, H5Tget_size(buffer_type_id), imap, idir);
-    }
-
-    if(volume->has_slice_scaling || buffer_data_type==MI_TYPE_FLOAT || buffer_data_type==MI_TYPE_DOUBLE)
-    /*Figure out when scaling is actually needed!*/
-    {
-      switch(buffer_data_type)
+      /*create temporary copy, to be destroyed*/
+      temp_buffer=malloc(buffer_size);
+      if(!temp_buffer)
       {
-        case MI_TYPE_FLOAT:
-          APPLY_SCALING(float,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
-          break;
-        case MI_TYPE_DOUBLE:
-          APPLY_SCALING(double,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
-          break;
-        case MI_TYPE_INT:
-          APPLY_SCALING(int,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
-          break;
-        case MI_TYPE_UINT:
-          APPLY_SCALING(unsigned int,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
-          break;
-        case MI_TYPE_SHORT:
-          APPLY_SCALING(short,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
-          break;
-        case MI_TYPE_USHORT:
-          APPLY_SCALING(unsigned short,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
-          break;
-        case MI_TYPE_BYTE:
-          APPLY_SCALING(char,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
-          break;
-        case MI_TYPE_UBYTE:
-          APPLY_SCALING(unsigned char,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
-          break;
-        default:
-          /*TODO: report unsupported conversion*/
-          result=MI_ERROR;
-          goto cleanup;
+        /*TODO: report memory error*/
+        result=MI_ERROR; /*TODO: error code?*/
+        goto cleanup;
       }
+      memcpy(temp_buffer,buffer,buffer_size);
+      
+      if (n_different != 0 ) 
+        restructure_array(ndims, temp_buffer, icount, H5Tget_size(buffer_type_id), imap, idir);
+      
+      if(scaling_needed)
+      {
+        switch(buffer_data_type)
+        {
+          case MI_TYPE_FLOAT:
+            APPLY_SCALING(float,temp_buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
+            break;
+          case MI_TYPE_DOUBLE:
+            APPLY_SCALING(double,temp_buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
+            break;
+          case MI_TYPE_INT:
+            APPLY_SCALING(int,temp_buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
+            break;
+          case MI_TYPE_UINT:
+            APPLY_SCALING(unsigned int,temp_buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
+            break;
+          case MI_TYPE_SHORT:
+            APPLY_SCALING(short,temp_buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
+            break;
+          case MI_TYPE_USHORT:
+            APPLY_SCALING(unsigned short,temp_buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
+            break;
+          case MI_TYPE_BYTE:
+            APPLY_SCALING(char,temp_buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
+            break;
+          case MI_TYPE_UBYTE:
+            APPLY_SCALING(unsigned char,temp_buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
+            break;
+          default:
+            /*TODO: report unsupported conversion*/
+            result=MI_ERROR;
+            goto cleanup;
+        }
+      }
+      result = H5Dwrite(dset_id, buffer_type_id, mspc_id, fspc_id, H5P_DEFAULT, temp_buffer);
+    } else {
+      result = H5Dwrite(dset_id, buffer_type_id, mspc_id, fspc_id, H5P_DEFAULT, buffer);
     }
-    result = H5Dwrite(dset_id, buffer_type_id, mspc_id, fspc_id, H5P_DEFAULT, buffer);
+    
     if(result<0)
     {
       /*TODO: report write error somehow*/
