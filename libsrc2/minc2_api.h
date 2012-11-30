@@ -196,6 +196,14 @@ extern int miget_hyperslab_normalized(mihandle_t volume,
                                       double max, 
                                       void *buffer);
 
+extern int miset_hyperslab_normalized(mihandle_t volume, 
+                                      mitype_t buffer_data_type,
+                                      const unsigned long start[], 
+                                      const unsigned long count[],
+                                      double min, 
+                                      double max, 
+                                      void *buffer);
+
 extern int miget_hyperslab_with_icv(mihandle_t volume, 
                                     mitype_t buffer_data_type, 
                                     const unsigned long start[], 

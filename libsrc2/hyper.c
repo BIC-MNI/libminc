@@ -927,8 +927,8 @@ cleanup:
 #define APPLY_DESCALING_NORM(type,buffer_in,buffer_out,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,voxel_min,voxel_max,data_min,data_max,norm_min,norm_max) \
   { \
     int _i,_j;\
-    double voxel_range=voxel_max-voxel_min;\
     double voxel_offset=voxel_min;\
+    double voxel_range=voxel_max-voxel_min;\
     double norm_offset=norm_min;\
     double norm_range=norm_max-norm_min;\
     double data_offset=data_min;\
@@ -938,12 +938,12 @@ cleanup:
     for(_i=0;_i<total_number_of_slices;_i++)\
       for(_j=0;_j<image_slice_length;_j++)\
       {\
-        double _temp=(type)(((*_buffer_in - voxel_offset) / voxel_range)*(image_slice_max_buffer[_i]-image_slice_min_buffer[_i]) + image_slice_min_buffer[_i] );\
-        _temp=(_temp-data_min)/data_range;\
+        double _temp=(double)((( (*_buffer_in) - voxel_offset) / voxel_range)*(image_slice_max_buffer[_i]-image_slice_min_buffer[_i]) + image_slice_min_buffer[_i] );\
+        _temp=(_temp-data_offset)/data_range;\
         if(_temp<0.0) _temp=0.0;\
         if(_temp>1.0) _temp=1.0;\
+        *_buffer_out=(type)(rint((_temp+norm_offset)*norm_range)); \
         _buffer_in++;\
-        *_buffer_out=(type)(_temp+norm_offset)*norm_range; \
         _buffer_out++;\
       }\
   }
@@ -958,6 +958,7 @@ cleanup:
     double norm_range=norm_max-norm_min;\
     double data_offset=data_min;\
     double data_range=data_max-data_min;\
+    printf("APPLY_SCALING_NORM voxel_offset=%f voxel_range=%f  norm_offset=%f norm_range=%f data_offset=%f data_range=%f\n",voxel_offset,voxel_range,norm_offset,norm_range,data_offset,data_range);\
     type *_buffer_in=(type *)buffer_in;\
     for(_i=0;_i<total_number_of_slices;_i++)\
       for(_j=0;_j<image_slice_length;_j++)\
@@ -1094,7 +1095,6 @@ static int mirw_hyperslab_normalized(int opcode,
     hid_t scaling_mspc_id;
     total_number_of_slices=1;
     image_slice_length=1;
-    scaling_needed=1;
 
     image_max_fspc_id=H5Dget_space(volume->imax_id);
     image_min_fspc_id=H5Dget_space(volume->imin_id);
@@ -1174,23 +1174,20 @@ static int mirw_hyperslab_normalized(int opcode,
     image_slice_min_buffer=malloc(sizeof(double));
     miget_volume_range( volume,image_slice_max_buffer,image_slice_min_buffer );
     image_slice_length=1;
-    /*it produces unity scaling*/
-    scaling_needed=(*image_slice_max_buffer==volume_valid_max) && (*image_slice_min_buffer==volume_valid_min);
     for (i = 0; i < ndims; i++) {
       image_slice_length *= hdf_count[i];
     }
-#ifdef _DEBUG    
+#ifdef _DEBUG
     printf("mirw_hyperslab_normalized:Real max:%f min:%f\n",*image_slice_max_buffer,*image_slice_min_buffer);
-#endif    
+#endif
   }
 #ifdef _DEBUG  
   printf("mirw_hyperslab_normalized:Slice_ndim:%d total_number_of_slices:%d image_slice_length:%d\n",slice_ndims,total_number_of_slices,image_slice_length);
+  printf("mirw_hyperslab_normalized:data min:%f data max:%f buffer_data_type:%d\n",data_min,data_max,buffer_data_type);
 #endif
 
   /*Allocate temporary Buffer*/
   temp_buffer=(double*)malloc(buffer_size);
-  memset(temp_buffer,0,buffer_size);
-  memset(buffer,0,input_buffer_size);
   
   if (opcode == MIRW_OP_READ) 
   {
@@ -1203,39 +1200,36 @@ static int mirw_hyperslab_normalized(int opcode,
     }
     
     /*WARNING: floating point types will be normalized between 0.0 and 1.0*/
-    if(scaling_needed)
+    switch(buffer_data_type)
     {
-      switch(buffer_data_type)
-      {
-        case MI_TYPE_FLOAT:
-          APPLY_DESCALING_NORM(float,temp_buffer,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max,data_min,data_max,0.0,1.0);
-          break;
-        case MI_TYPE_DOUBLE:
-          APPLY_DESCALING_NORM(double,temp_buffer,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max,data_min,data_max,0.0,1.0);
-          break;
-        case MI_TYPE_INT:
-          APPLY_DESCALING_NORM(int,temp_buffer,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max,data_min,data_max,INT_MIN,INT_MAX);
-          break;
-        case MI_TYPE_UINT:
-          APPLY_DESCALING_NORM(unsigned int,temp_buffer,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max,data_min,data_max,0,UINT_MAX);
-          break;
-        case MI_TYPE_SHORT:
-          APPLY_DESCALING_NORM(short,temp_buffer,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max,data_min,data_max,SHRT_MIN,SHRT_MAX);
-          break;
-        case MI_TYPE_USHORT:
-          APPLY_DESCALING_NORM(unsigned short,temp_buffer,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max,data_min,data_max,0,USHRT_MAX);
-          break;
-        case MI_TYPE_BYTE:
-          APPLY_DESCALING_NORM(char,temp_buffer,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max,data_min,data_max,SCHAR_MIN,SCHAR_MAX);
-          break;
-        case MI_TYPE_UBYTE:
-          APPLY_DESCALING_NORM(unsigned char,temp_buffer,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max,data_min,data_max,0,UCHAR_MAX);
-          break;
-        default:
-          /*TODO: report unsupported conversion*/
-          result=MI_ERROR;
-          goto cleanup;
-      }
+      case MI_TYPE_FLOAT:
+        APPLY_DESCALING_NORM(float,temp_buffer,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max,data_min,data_max,0.0,1.0);
+        break;
+      case MI_TYPE_DOUBLE:
+        APPLY_DESCALING_NORM(double,temp_buffer,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max,data_min,data_max,0.0,1.0);
+        break;
+      case MI_TYPE_INT:
+        APPLY_DESCALING_NORM(int,temp_buffer,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max,data_min,data_max,INT_MIN,INT_MAX);
+        break;
+      case MI_TYPE_UINT:
+        APPLY_DESCALING_NORM(unsigned int,temp_buffer,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max,data_min,data_max,0,UINT_MAX);
+        break;
+      case MI_TYPE_SHORT:
+        APPLY_DESCALING_NORM(short,temp_buffer,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max,data_min,data_max,SHRT_MIN,SHRT_MAX);
+        break;
+      case MI_TYPE_USHORT:
+        APPLY_DESCALING_NORM(unsigned short,temp_buffer,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max,data_min,data_max,0,USHRT_MAX);
+        break;
+      case MI_TYPE_BYTE:
+        APPLY_DESCALING_NORM(char,temp_buffer,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max,data_min,data_max,SCHAR_MIN,SCHAR_MAX);
+        break;
+      case MI_TYPE_UBYTE:
+        APPLY_DESCALING_NORM(unsigned char,temp_buffer,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max,data_min,data_max,0,UCHAR_MAX);
+        break;
+      default:
+        /*TODO: report unsupported conversion*/
+        result=MI_ERROR;
+        goto cleanup;
     }
     
     if (n_different != 0 ) {
@@ -1271,39 +1265,36 @@ static int mirw_hyperslab_normalized(int opcode,
     if (n_different != 0 ) 
       restructure_array(ndims, temp_buffer2, icount, H5Tget_size(buffer_type_id), imap, idir);
     
-    if(scaling_needed)
+    switch(buffer_data_type)
     {
-      switch(buffer_data_type)
-      {
-        case MI_TYPE_FLOAT:
-          APPLY_SCALING_NORM(float,temp_buffer2,temp_buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max,data_min,data_max,0.0,1.0);
-          break;
-        case MI_TYPE_DOUBLE:
-          APPLY_SCALING_NORM(double,temp_buffer2,temp_buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max,data_min,data_max,0.0,1.0);
-          break;
-        case MI_TYPE_INT:
-          APPLY_SCALING_NORM(int,temp_buffer2,temp_buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max,data_min,data_max,INT_MIN,INT_MAX);
-          break;
-        case MI_TYPE_UINT:
-          APPLY_SCALING_NORM(unsigned int,temp_buffer2,temp_buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max,data_min,data_max,0,UINT_MAX);
-          break;
-        case MI_TYPE_SHORT:
-          APPLY_SCALING_NORM(short,temp_buffer2,temp_buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max,data_min,data_max,SHRT_MIN,SHRT_MAX);
-          break;
-        case MI_TYPE_USHORT:
-          APPLY_SCALING_NORM(unsigned short,temp_buffer2,temp_buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max,data_min,data_max,0,USHRT_MAX);
-          break;
-        case MI_TYPE_BYTE:
-          APPLY_SCALING_NORM(char,temp_buffer2,temp_buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max,data_min,data_max,SCHAR_MIN,SCHAR_MAX);
-          break;
-        case MI_TYPE_UBYTE:
-          APPLY_SCALING_NORM(unsigned char,temp_buffer2,temp_buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max,data_min,data_max,0,UCHAR_MAX);
-          break;
-        default:
-          /*TODO: report unsupported conversion*/
-          result=MI_ERROR;
-          goto cleanup;
-      }
+      case MI_TYPE_FLOAT:
+        APPLY_SCALING_NORM(float,temp_buffer2,temp_buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max,data_min,data_max,0.0,1.0);
+        break;
+      case MI_TYPE_DOUBLE:
+        APPLY_SCALING_NORM(double,temp_buffer2,temp_buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max,data_min,data_max,0.0,1.0);
+        break;
+      case MI_TYPE_INT:
+        APPLY_SCALING_NORM(int,temp_buffer2,temp_buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max,data_min,data_max,INT_MIN,INT_MAX);
+        break;
+      case MI_TYPE_UINT:
+        APPLY_SCALING_NORM(unsigned int,temp_buffer2,temp_buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max,data_min,data_max,0,UINT_MAX);
+        break;
+      case MI_TYPE_SHORT:
+        APPLY_SCALING_NORM(short,temp_buffer2,temp_buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max,data_min,data_max,SHRT_MIN,SHRT_MAX);
+        break;
+      case MI_TYPE_USHORT:
+        APPLY_SCALING_NORM(unsigned short,temp_buffer2,temp_buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max,data_min,data_max,0,USHRT_MAX);
+        break;
+      case MI_TYPE_BYTE:
+        APPLY_SCALING_NORM(char,temp_buffer2,temp_buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max,data_min,data_max,SCHAR_MIN,SCHAR_MAX);
+        break;
+      case MI_TYPE_UBYTE:
+        APPLY_SCALING_NORM(unsigned char,temp_buffer2,temp_buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max,data_min,data_max,0,UCHAR_MAX);
+        break;
+      default:
+        /*TODO: report unsupported conversion*/
+        result=MI_ERROR;
+        goto cleanup;
     }
     result = H5Dwrite(dset_id, volume_type_id, mspc_id, fspc_id, H5P_DEFAULT, temp_buffer);
     if(result<0)
@@ -1350,7 +1341,7 @@ cleanup:
 
 /** Reads the real values in the volume from the interval min through
  *  max, mapped to the maximum representable range for the requested
- *  data type. Float type is NOT an allowed data type.
+ *  data type. Float types is mapped to 0.0 1.0
  */
 int miget_hyperslab_normalized(mihandle_t volume,
                                mitype_t buffer_data_type,
@@ -1361,12 +1352,13 @@ int miget_hyperslab_normalized(mihandle_t volume,
                                void *buffer)
 {
 
-    return mirw_hyperslab_normalized(MIRW_OP_READ, volume, buffer_data_type, start, count, data_min, data_max, buffer);
+    return mirw_hyperslab_normalized(MIRW_OP_READ, volume, buffer_data_type, 
+                                     start, count, data_min, data_max, buffer);
 }
 
 /** Writes the real values in the volume from the interval min through
  *  max, mapped to the maximum representable range for the requested
- *  data type. Float type is NOT an allowed data type.
+ *  data type. Float types is mapped to 0.0 1.0
  */
 int miset_hyperslab_normalized(mihandle_t volume,
                                mitype_t buffer_data_type,
@@ -1376,7 +1368,8 @@ int miset_hyperslab_normalized(mihandle_t volume,
                                double data_max,
                                void *buffer)
 {
-    return mirw_hyperslab_normalized(MIRW_OP_WRITE, volume, buffer_data_type, start, count, data_min, data_max, buffer);
+    return mirw_hyperslab_normalized(MIRW_OP_WRITE, volume, buffer_data_type, 
+                                     start, count, data_min, data_max, buffer);
 }
 
 
