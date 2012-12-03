@@ -1,6 +1,6 @@
 /* ----------------------------- MNI Header -----------------------------------
 @NAME       : 
-@DESCRIPTION: 
+@DESCRIPTION: simple N-dimensional vector that supports arithmetic operations
 @COPYRIGHT  :
               Copyright 2006 Vladimir Fonov, McConnell Brain Imaging Centre, 
               Montreal Neurological Institute, McGill University.

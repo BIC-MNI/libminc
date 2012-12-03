@@ -1,3 +1,17 @@
+/* ----------------------------- MNI Header -----------------------------------
+@NAME       : 
+@DESCRIPTION: Simplified interator-based access to minc files, using minc_1_rw interface
+@COPYRIGHT  :
+              Copyright 2007 Vladimir Fonov, McConnell Brain Imaging Centre, 
+              Montreal Neurological Institute, McGill University.
+              Permission to use, copy, modify, and distribute this
+              software and its documentation for any purpose and without
+              fee is hereby granted, provided that the above copyright
+              notice appear in all copies.  The author and McGill University
+              make no representations about the suitability of this
+              software for any purpose.  It is provided "as is" without
+              express or implied warranty.
+---------------------------------------------------------------------------- */
 #ifndef __MINC_1_SIMPLE_H__
 #define __MINC_1_SIMPLE_H__
 
@@ -46,7 +60,7 @@ namespace minc
       if(_last) return false;
       _count++;
       for(size_t i=static_cast<size_t>(_rw->dim_no()-1);
-	  i>static_cast<size_t>(_rw->dim_no()-_rw->slice_dimensions()-1);i--)
+          i>static_cast<size_t>(_rw->dim_no()-_rw->slice_dimensions()-1);i--)
       {
         _cur[i]++;
         if(_cur[i]<static_cast<long>(_rw->dim(i).length))

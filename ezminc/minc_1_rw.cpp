@@ -1,8 +1,6 @@
 /* ----------------------------- MNI Header -----------------------------------
 @NAME       : 
-@DESCRIPTION: Primitive" interface to minc files, using minctoraw and rawtominc programs
-              does not require linking with minc2 library.
-              Created during the days when minc2 didn't compile on 64bit architecture
+@DESCRIPTION: Primitive C++ interface to minc files, uses MINC1 API only
 @COPYRIGHT  :
               Copyright 2007 Vladimir Fonov, McConnell Brain Imaging Centre, 
               Montreal Neurological Institute, McGill University.
