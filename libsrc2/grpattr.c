@@ -1,4 +1,5 @@
-/** \file grpattr.c
+/** 
+ * \file grpattr.c
  * \brief MINC 2.0 group/attribute functions
  * \author Bert Vincent and Leila Baghdadi
  *
@@ -28,7 +29,7 @@ struct milistdata {
 };
 
 
-/*! Start listing the objects in a group.
+/** Start listing the objects in a group.
  */
 int
 milist_start ( mihandle_t vol, const char *path, int flags,
@@ -169,7 +170,7 @@ milist_attr_op ( hid_t loc_id, const char *attr_name, void *op_data )
   return ( 1 );
 }
 
-/*! Get attributes at a given path
+/** Iterate through attributes
  */
 int
 milist_attr_next ( mihandle_t vol, milisthandle_t handle,
@@ -211,7 +212,7 @@ milist_attr_next ( mihandle_t vol, milisthandle_t handle,
   return ( MI_NOERROR );
 }
 
-/*! Finish listing attributes or groups
+/** Finish listing attributes or groups
  */
 int
 milist_finish ( milisthandle_t handle )
@@ -264,7 +265,7 @@ milist_grp_op ( hid_t loc_id, const char *name, void *op_data )
   return ( 1 );
 }
 
-/*! Get the group at given path
+/** Get the group at given path
  */
 int
 milist_grp_next ( milisthandle_t handle, char *path, int maxpath )
@@ -310,7 +311,7 @@ milist_grp_next ( milisthandle_t handle, char *path, int maxpath )
   return ( MI_NOERROR );
 }
 
-/*! Create a group at "path" using "name".
+/** Create a group at "path" using "name".
  */
 int
 micreate_group ( mihandle_t vol, const char *path, const char *name )
@@ -371,7 +372,7 @@ micreate_group ( mihandle_t vol, const char *path, const char *name )
   return ( MI_NOERROR );
 }
 
-/*! Delete the named attribute.
+/** Delete the named attribute.
  */
 int
 midelete_attr ( mihandle_t vol, const char *path, const char *name )

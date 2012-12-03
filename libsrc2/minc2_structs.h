@@ -31,11 +31,15 @@ typedef struct midimension *midimhandle_t;
 typedef struct mivolume *mihandle_t;
 
 
+/** \typedef milisthandle_t 
+ * The milisthandle_t is an opaque type that represents a handle 
+ * to iterate through various properties of MINC file object.
+ */
 typedef void *milisthandle_t;
 
 /**
  * This typedef used to represent the type of an individual voxel <b>as
- * stored</b> by MINC 2.0.  If a volume is 
+ * stored</b> by MINC 2.0. 
  */
 typedef enum {
   MI_TYPE_BYTE = 1,         /**< 8-bit signed integer */
