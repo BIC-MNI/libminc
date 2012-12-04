@@ -41,13 +41,12 @@ int miswap4(unsigned int tmp)
 }
 
 /**
-This function associates a label name with an integer value for the given
-volume. Functions which read and write voxel values will read/write 
-in integer values, and must call miget_label_name() to discover the 
-descriptive text string which corresponds to the integer value.
+ * This function associates a label name with an integer value for the given
+ * volume. Functions which read and write voxel values will read/write 
+ * in integer values, and must call miget_label_name() to discover the 
+ * descriptive text string which corresponds to the integer value.
 */
-int 
-midefine_label(mihandle_t volume, int value, const char *name)
+int  midefine_label(mihandle_t volume, int value, const char *name)
 {
     int result;
 
@@ -96,13 +95,12 @@ midefine_label(mihandle_t volume, int value, const char *name)
 }
 
 /**
-For a labelled volume, this function retrieves the text name
-associated with a given integer value.
-
-The name pointer returned must be freed by calling mifree_name().
+ * For a labelled volume, this function retrieves the text name
+ * associated with a given integer value.
+ * 
+ * The name pointer returned must be freed by calling mifree_name().
 */
-int
-miget_label_name(mihandle_t volume, int value, char **name)
+int miget_label_name(mihandle_t volume, int value, char **name)
 {
     int result;
 
@@ -132,11 +130,10 @@ miget_label_name(mihandle_t volume, int value, char **name)
 }
 
 /**
-This function is the inverse of miget_label_name(). It is called to determine
-what integer value, if any, corresponds to the given text string.
+ * This function is the inverse of miget_label_name(). It is called to determine
+ * what integer value, if any, corresponds to the given text string.
 */
-int
-miget_label_value(mihandle_t volume, const char *name, int *value_ptr)
+int miget_label_value(mihandle_t volume, const char *name, int *value_ptr)
 {
     int result;
 
@@ -163,10 +160,9 @@ miget_label_value(mihandle_t volume, const char *name, int *value_ptr)
 }
 
 /**
-This function returns the number of defined labels, if any, or zero.
+ * This function returns the number of defined labels, if any, or zero.
 */
-int
-miget_number_of_defined_labels(mihandle_t volume, int *number_of_labels)
+int miget_number_of_defined_labels(mihandle_t volume, int *number_of_labels)
 {
   int result;
  
@@ -196,10 +192,9 @@ miget_number_of_defined_labels(mihandle_t volume, int *number_of_labels)
 }
 
 /**
-This function returns the label value associated with an index (0,1,...)
+ * This function returns the label value associated with an index (0,1,...)
 */
-int
-miget_label_value_by_index(mihandle_t volume, int idx, int *value)
+int miget_label_value_by_index(mihandle_t volume, int idx, int *value)
 {
   int result;
   if (volume == NULL) {

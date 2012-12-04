@@ -13,8 +13,7 @@
 /** This method gets the name of the record dimension
  * TODO: set record name??
  */
-int 
-miget_record_name(mihandle_t volume,
+int  miget_record_name(mihandle_t volume,
                   char **name)
 {
     return (MI_NOERROR);
@@ -26,8 +25,7 @@ miget_record_name(mihandle_t volume,
  * uniform records and number of bytes for non_uniform ones) of the
  * record.
  */
-int 
-miget_record_length(mihandle_t volume,
+int miget_record_length(mihandle_t volume,
                     int *length)
 {
     if (volume == NULL || length == NULL) {
@@ -45,8 +43,7 @@ miget_record_length(mihandle_t volume,
  * for returned string is allocated on the heap and should be released using
  * mifree_name().
  */
-int
-miget_record_field_name(mihandle_t volume,
+int miget_record_field_name(mihandle_t volume,
                         int index,
                         char **name)
 {

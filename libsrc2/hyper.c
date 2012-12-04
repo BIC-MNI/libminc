@@ -254,8 +254,7 @@ restructure_array(int ndims,    /* Dimension count */
  * hyperslab specified by the \a n_dimensions and the
  * \a count parameters, using hdf type id
  */
-void 
-miget_hyperslab_size_hdf(hid_t hdf_type_id, int n_dimensions, 
+void miget_hyperslab_size_hdf(hid_t hdf_type_id, int n_dimensions, 
                                 const unsigned long count[], 
                                 misize_t *size_ptr)
 {
@@ -276,8 +275,7 @@ miget_hyperslab_size_hdf(hid_t hdf_type_id, int n_dimensions,
  * hyperslab specified by the \a n_dimensions and the
  * \a count parameters.
  */
-int
-miget_hyperslab_size(mitype_t volume_data_type,   /**< Data type of a voxel. */
+int miget_hyperslab_size(mitype_t volume_data_type,   /**< Data type of a voxel. */
                      int n_dimensions,            /**< Dimensionality */
                      const unsigned long count[], /**< Dimension lengths  */
                      misize_t *size_ptr)          /**< Returned byte count */
@@ -1373,8 +1371,8 @@ int miset_hyperslab_normalized(mihandle_t volume,
 }
 
 
-/** Get a hyperslab from the file, with the assistance of a MINC2 image
- * conversion variable (ICV).
+/** Get a hyperslab from the file, 
+ * converting voxel values into real values
  */
 int miget_hyperslab_with_icv(mihandle_t volume,           /**< A MINC 2.0 volume handle */
                              mitype_t buffer_data_type,   /**< Output datatype */
@@ -1385,8 +1383,7 @@ int miget_hyperslab_with_icv(mihandle_t volume,           /**< A MINC 2.0 volume
   return mirw_hyperslab_icv(MIRW_OP_READ, volume, buffer_data_type, start, count,buffer);
 }
 
-/** Write a hyperslab to the file, with the assistance of a MINC image
- * conversion variable (ICV).
+/** Write a hyperslab to the file, converting real values into voxel values
  */
 int miset_hyperslab_with_icv(mihandle_t volume,        /**< A MINC 2.0 volume handle */
                          mitype_t buffer_data_type,    /**< Output datatype */
@@ -1420,8 +1417,7 @@ int miget_real_value_hyperslab(mihandle_t volume,       /**< A MINC 2.0 volume h
  *  converting from the stored "voxel" data range to the desired
  * "real" (float or double) data range.
  */
-int
-miset_real_value_hyperslab(mihandle_t volume,
+int miset_real_value_hyperslab(mihandle_t volume,
                            mitype_t buffer_data_type,
                            const unsigned long start[],
                            const unsigned long count[],

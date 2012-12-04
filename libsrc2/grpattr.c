@@ -31,8 +31,7 @@ struct milistdata {
 
 /** Start listing the objects in a group.
  */
-int
-milist_start ( mihandle_t vol, const char *path, int flags,
+int milist_start ( mihandle_t vol, const char *path, int flags,
                milisthandle_t *handle )
 {
   hid_t grp_id;
@@ -172,8 +171,7 @@ milist_attr_op ( hid_t loc_id, const char *attr_name, void *op_data )
 
 /** Iterate through attributes
  */
-int
-milist_attr_next ( mihandle_t vol, milisthandle_t handle,
+int milist_attr_next ( mihandle_t vol, milisthandle_t handle,
                    char *path, int maxpath,
                    char *name, int maxname )
 {
@@ -243,8 +241,7 @@ milist_finish ( milisthandle_t handle )
   return ( MI_NOERROR );
 }
 
-static herr_t
-milist_grp_op ( hid_t loc_id, const char *name, void *op_data )
+static herr_t milist_grp_op ( hid_t loc_id, const char *name, void *op_data )
 {
   struct milistdata *data = ( struct milistdata * ) op_data;
   H5G_stat_t statbuf;
@@ -267,8 +264,7 @@ milist_grp_op ( hid_t loc_id, const char *name, void *op_data )
 
 /** Get the group at given path
  */
-int
-milist_grp_next ( milisthandle_t handle, char *path, int maxpath )
+int milist_grp_next ( milisthandle_t handle, char *path, int maxpath )
 {
   struct milistdata *data = ( struct milistdata * ) handle;
   herr_t r;
@@ -313,8 +309,7 @@ milist_grp_next ( milisthandle_t handle, char *path, int maxpath )
 
 /** Create a group at "path" using "name".
  */
-int
-micreate_group ( mihandle_t vol, const char *path, const char *name )
+int micreate_group ( mihandle_t vol, const char *path, const char *name )
 {
   hid_t hdf_file;
   hid_t hdf_grp;
@@ -374,8 +369,7 @@ micreate_group ( mihandle_t vol, const char *path, const char *name )
 
 /** Delete the named attribute.
  */
-int
-midelete_attr ( mihandle_t vol, const char *path, const char *name )
+int midelete_attr ( mihandle_t vol, const char *path, const char *name )
 {
   hid_t tmp_id;
   hid_t hdf_file;
@@ -430,8 +424,7 @@ midelete_attr ( mihandle_t vol, const char *path, const char *name )
 
 /** Delete the subgroup \a name from the group \a path
  */
-int
-midelete_group ( mihandle_t vol, const char *path, const char *name )
+int midelete_group ( mihandle_t vol, const char *path, const char *name )
 {
   hid_t hdf_file;
   hid_t hdf_grp;
@@ -484,8 +477,7 @@ midelete_group ( mihandle_t vol, const char *path, const char *name )
 
 /** Get the length of a attribute
  */
-int
-miget_attr_length ( mihandle_t vol, const char *path, const char *name,
+int miget_attr_length ( mihandle_t vol, const char *path, const char *name,
                     int *length )
 {
   hid_t tmp_id;
@@ -580,8 +572,7 @@ miget_attr_length ( mihandle_t vol, const char *path, const char *name,
 
 /** Get the type of an attribute.
  */
-int
-miget_attr_type ( mihandle_t vol, const char *path, const char *name,
+int miget_attr_type ( mihandle_t vol, const char *path, const char *name,
                   mitype_t *data_type )
 {
   hid_t tmp_id;
@@ -658,8 +649,7 @@ miget_attr_type ( mihandle_t vol, const char *path, const char *name,
 
 /** Copy all attribute given a path
  */
-int
-micopy_attr ( mihandle_t vol, const char *path, mihandle_t new_vol )
+int micopy_attr ( mihandle_t vol, const char *path, mihandle_t new_vol )
 {
   milisthandle_t hlist;
   mitype_t data_type;
@@ -707,8 +697,7 @@ micopy_attr ( mihandle_t vol, const char *path, mihandle_t new_vol )
 
 /** Get the values of an attribute.
  */
-int
-miget_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
+int miget_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
                     const char *name, int length, void *values )
 {
   hid_t tmp_id;
@@ -809,8 +798,7 @@ miget_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
 
 /** Set the values of an attribute.
  */
-int
-miset_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
+int miset_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
                     const char *name, int length, const void *values )
 {
   hid_t hdf_file;
@@ -911,8 +899,9 @@ miset_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
   return ( MI_NOERROR );
 }
 
-int
-miadd_history_attr ( mihandle_t vol, int length, const void *values )
+/** Add global history attribute
+ */
+int miadd_history_attr ( mihandle_t vol, int length, const void *values )
 {
   int result;
   hid_t hdf_file;

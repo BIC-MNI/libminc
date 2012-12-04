@@ -113,15 +113,14 @@ mirw_slice_minmax ( int opcode, mihandle_t volume,
 }
 
 /**
-This function sets \a slice_min to the minimum real value of
-voxels in the slice containing the coordinates \a start_positions.
-The \a array_length may be less than or equal to the number of dimensions
-in the volume, extra coordinates will be ignored.  Specifying too few
-coordinates will trigger an error.
-Coordinates must always be specified in raw file order.
+ * This function sets \a slice_min to the minimum real value of
+ * voxels in the slice containing the coordinates \a start_positions.
+ * The \a array_length may be less than or equal to the number of dimensions
+ * in the volume, extra coordinates will be ignored.  Specifying too few
+ * coordinates will trigger an error.
+ * Coordinates must always be specified in raw file order.
  */
-int
-miget_slice_min ( mihandle_t volume, const unsigned long start_positions[],
+int miget_slice_min ( mihandle_t volume, const unsigned long start_positions[],
                   int array_length, double *slice_min )
 {
   return ( mirw_slice_minmax ( MIRW_SCALE_MIN + MIRW_SCALE_GET,
@@ -130,15 +129,14 @@ miget_slice_min ( mihandle_t volume, const unsigned long start_positions[],
 }
 
 /**
-This function sets \a slice_max to the maximum real value of
-voxels in the slice containing the coordinates \a start_positions.
-The \a array_length may be less than or equal to the number of dimensions
-in the volume, extra coordinates will be ignored.  Specifying too few
-coordinates will trigger an error.
-Coordinates must always be specified in raw file order.
+ * This function sets \a slice_max to the maximum real value of
+ * voxels in the slice containing the coordinates \a start_positions.
+ * The \a array_length may be less than or equal to the number of dimensions
+ * in the volume, extra coordinates will be ignored.  Specifying too few
+ * coordinates will trigger an error.
+ * Coordinates must always be specified in raw file order.
  */
-int
-miget_slice_max ( mihandle_t volume, const unsigned long start_positions[],
+int miget_slice_max ( mihandle_t volume, const unsigned long start_positions[],
                   int array_length, double *slice_max )
 {
   return ( mirw_slice_minmax ( MIRW_SCALE_MAX + MIRW_SCALE_GET,
@@ -147,15 +145,14 @@ miget_slice_max ( mihandle_t volume, const unsigned long start_positions[],
 }
 
 /**
-This function sets minimum real value of
-values in the slice containing the coordinates \a start_positions.
-The \a array_length may be less than or equal to the number of dimensions
-in the volume, extra coordinates will be ignored.  Specifying too few
-coordinates will trigger an error.
-Coordinates must always be specified in raw file order.
+ * This function sets minimum real value of
+ * values in the slice containing the coordinates \a start_positions.
+ * The \a array_length may be less than or equal to the number of dimensions
+ * in the volume, extra coordinates will be ignored.  Specifying too few
+ * coordinates will trigger an error.
+ * Coordinates must always be specified in raw file order.
  */
-int
-miset_slice_min ( mihandle_t volume, const unsigned long start_positions[],
+int miset_slice_min ( mihandle_t volume, const unsigned long start_positions[],
                   int array_length, double slice_min )
 {
   return ( mirw_slice_minmax ( MIRW_SCALE_MIN + MIRW_SCALE_SET,
@@ -181,15 +178,14 @@ miset_slice_max ( mihandle_t volume, const unsigned long start_positions[],
 }
 
 /**
-This function gets both the minimum and
-maximum real value of voxels in the slice containing the coordinates
-\a start_positions.  The \a array_length may be less than or equal to
-the number of dimensions in the volume, extra coordinates will be
-ignored.  Specifying too few coordinates will trigger an error.
-Coordinates must always be specified in raw file order.
+ * This function gets both the minimum and
+ * maximum real value of voxels in the slice containing the coordinates
+ * \a start_positions.  The \a array_length may be less than or equal to
+ * the number of dimensions in the volume, extra coordinates will be
+ * ignored.  Specifying too few coordinates will trigger an error.
+ * Coordinates must always be specified in raw file order.
  */
-int
-miget_slice_range ( mihandle_t volume, const unsigned long start_positions[],
+int miget_slice_range ( mihandle_t volume, const unsigned long start_positions[],
                     int array_length, double *slice_max, double *slice_min )
 {
   int r;
@@ -213,15 +209,14 @@ miget_slice_range ( mihandle_t volume, const unsigned long start_positions[],
 }
 
 /**
-This function the minimum and maximum real value of voxels in the
-slice containing the coordinates \a start_positions.  The \a
-array_length may be less than or equal to the number of dimensions in
-the volume, extra coordinates will be ignored.  Specifying too few
-coordinates will trigger an error.  Coordinates must always be
-specified in raw file order.
+ * This function the minimum and maximum real value of voxels in the
+ * slice containing the coordinates \a start_positions.  The \a
+ * array_length may be less than or equal to the number of dimensions in
+ * the volume, extra coordinates will be ignored.  Specifying too few
+ * coordinates will trigger an error.  Coordinates must always be
+ * specified in raw file order.
  */
-int
-miset_slice_range ( mihandle_t volume, const unsigned long start_positions[],
+int miset_slice_range ( mihandle_t volume, const unsigned long start_positions[],
                     int array_length, double slice_max, double slice_min )
 {
   int r;
@@ -244,11 +239,10 @@ miset_slice_range ( mihandle_t volume, const unsigned long start_positions[],
   return ( MI_NOERROR );
 }
 
-/*! Internal function to read/write the volume global minimum or
+/** Internal function to read/write the volume global minimum or
  * maximum real range.
  */
-static int
-mirw_volume_minmax ( int opcode, mihandle_t volume, double *value )
+static int mirw_volume_minmax ( int opcode, mihandle_t volume, double *value )
 {
   hid_t dset_id;
   hid_t fspc_id;
@@ -317,60 +311,55 @@ mirw_volume_minmax ( int opcode, mihandle_t volume, double *value )
 }
 
 /**
-This function returns the minimum real value of
-voxels in the entire \a volume.  If per-slice scaling is enabled, this
-function will return an error.
+ * This function returns the minimum real value of
+ * voxels in the entire \a volume.  If per-slice scaling is enabled, this
+ * function will return an error.
  */
-int
-miget_volume_min ( mihandle_t volume, double *vol_min )
+int miget_volume_min ( mihandle_t volume, double *vol_min )
 {
   return ( mirw_volume_minmax ( MIRW_SCALE_MIN + MIRW_SCALE_GET,
                                 volume, vol_min ) );
 }
 
 /**
-This function returns the maximum real value of
-voxels in the entire \a volume.  If per-slice scaling is enabled, this
-function will return an error.
+ * This function returns the maximum real value of
+ * voxels in the entire \a volume.  If per-slice scaling is enabled, this
+ * function will return an error.
  */
-int
-miget_volume_max ( mihandle_t volume, double *vol_max )
+int miget_volume_max ( mihandle_t volume, double *vol_max )
 {
   return ( mirw_volume_minmax ( MIRW_SCALE_MAX + MIRW_SCALE_GET,
                                 volume, vol_max ) );
 }
 
 /**
-This function sets the minimum real value of
-voxels in the entire \a volume.  If per-slice scaling is enabled, this
-function will return an error.
+ * This function sets the minimum real value of
+ * voxels in the entire \a volume.  If per-slice scaling is enabled, this
+ * function will return an error.
  */
-int
-miset_volume_min ( mihandle_t volume, double vol_min )
+int miset_volume_min ( mihandle_t volume, double vol_min )
 {
   return ( mirw_volume_minmax ( MIRW_SCALE_MIN + MIRW_SCALE_SET,
                                 volume, &vol_min ) );
 }
 
 /**
-This function sets the maximum real value of
-voxels in the entire \a volume.  If per-slice scaling is enabled, this
-function will return an error.
+ * This function sets the maximum real value of
+ * voxels in the entire \a volume.  If per-slice scaling is enabled, this
+ * function will return an error.
  */
-int
-miset_volume_max ( mihandle_t volume, double vol_max )
+int miset_volume_max ( mihandle_t volume, double vol_max )
 {
   return ( mirw_volume_minmax ( MIRW_SCALE_MAX + MIRW_SCALE_SET,
                                 volume, &vol_max ) );
 }
 
 /**
-This function retrieves the maximum and minimum real values of
-voxels in the entire \a volume.  If per-slice scaling is enabled, this
-function will return an error.
+ * This function retrieves the maximum and minimum real values of
+ * voxels in the entire \a volume.  If per-slice scaling is enabled, this
+ * function will return an error.
  */
-int
-miget_volume_range ( mihandle_t volume, double *vol_max, double *vol_min )
+int miget_volume_range ( mihandle_t volume, double *vol_max, double *vol_min )
 {
   int r;
 
@@ -388,12 +377,11 @@ miget_volume_range ( mihandle_t volume, double *vol_max, double *vol_min )
 }
 
 /**
-This function sets the maximum and minimum real values of
-voxels in the entire \a volume.  If per-slice scaling is enabled, this
-function will return an error.
+ * This function sets the maximum and minimum real values of
+ * voxels in the entire \a volume.  If per-slice scaling is enabled, this
+ * function will return an error.
  */
-int
-miset_volume_range ( mihandle_t volume, double vol_max, double vol_min )
+int miset_volume_range ( mihandle_t volume, double vol_max, double vol_min )
 {
   int r;
 
@@ -410,10 +398,9 @@ miset_volume_range ( mihandle_t volume, double vol_max, double vol_min )
   return ( MI_NOERROR );
 }
 
-/*! Function to get the volume's slice-scaling flag.
+/** Function to get the volume's slice-scaling flag.
  */
-int
-miget_slice_scaling_flag ( mihandle_t volume, miboolean_t *slice_scaling_flag )
+int miget_slice_scaling_flag ( mihandle_t volume, miboolean_t *slice_scaling_flag )
 {
   if ( volume == NULL || slice_scaling_flag == NULL ) {
     return ( MI_ERROR );
@@ -422,10 +409,9 @@ miget_slice_scaling_flag ( mihandle_t volume, miboolean_t *slice_scaling_flag )
   return ( MI_NOERROR );
 }
 
-/*! Function to set the volume's slice-scaling flag.
+/** Function to set the volume's slice-scaling flag.
  */
-int
-miset_slice_scaling_flag ( mihandle_t volume, miboolean_t slice_scaling_flag )
+int miset_slice_scaling_flag ( mihandle_t volume, miboolean_t slice_scaling_flag )
 {
   if ( volume == NULL ) {
     return ( MI_ERROR );

@@ -253,11 +253,10 @@ static int _hdf_close(hid_t fd)
 }
 
 
-
 /** Create the actual image for the volume.
-    Note that the image dataset muct be created in the hierarchy
-    before the image data can be added.
-    \ingroup mi2Vol
+  * Note that the image dataset muct be created in the hierarchy
+  * before the image data can be added.
+  * \ingroup mi2Vol
 */
 int micreate_volume_image(mihandle_t volume)
 {
@@ -964,7 +963,7 @@ int micreate_volume(const char *filename, int number_of_dimensions,
 }
 
 /** Return the number of dimensions associated with this volume.
-    \ingroup mi2Vol
+  * \ingroup mi2Vol
 */
 int miget_volume_dimension_count(mihandle_t volume, midimclass_t cls,
                              midimattr_t attr, int *number_of_dimensions)
@@ -990,7 +989,7 @@ int miget_volume_dimension_count(mihandle_t volume, midimclass_t cls,
 }
 
 /** Returns the number of voxels in the volume.
-    \ingroup mi2Vol
+  * \ingroup mi2Vol
 */
 int miget_volume_voxel_count(mihandle_t volume, int *number_of_voxels)
 {
@@ -1214,8 +1213,8 @@ static int _miget_file_dimension(mihandle_t volume, const char *dimname,
 
 
 /** Opens an existing MINC volume for read-only access if mode argument is
-    MI2_OPEN_READ, or read-write access if mode argument is MI2_OPEN_RDWR.
-    \ingroup mi2Vol
+  * MI2_OPEN_READ, or read-write access if mode argument is MI2_OPEN_RDWR.
+  * \ingroup mi2Vol
 */
 int miopen_volume(const char *filename, int mode, mihandle_t *volume)
 {

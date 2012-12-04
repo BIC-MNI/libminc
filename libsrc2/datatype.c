@@ -59,6 +59,8 @@ int miget_data_type_size ( mihandle_t volume, misize_t *voxel_size )
   return ( MI_NOERROR );
 }
 
+/** Return the minc space type, name should be freed after use
+ */
 int miget_space_name ( mihandle_t volume, char **name )
 {
   int length;
@@ -102,6 +104,9 @@ int miget_space_name ( mihandle_t volume, char **name )
   return ( result );
 }
 
+/**
+ * Set minc space type
+ */
 int miset_space_name ( mihandle_t volume, const char *name )
 {
   return miset_attr_values ( volume, MI_TYPE_STRING, "/minc-2.0/info",

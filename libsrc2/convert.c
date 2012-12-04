@@ -34,8 +34,7 @@
  * \param voxel_value_ptr A pointer to the converted voxel value.
  * \ingroup mi2Cvt
  */
-int
-miconvert_real_to_voxel(mihandle_t volume,
+int miconvert_real_to_voxel(mihandle_t volume,
                         const unsigned long coords[],
                         int ncoords,
                         double real_value,
@@ -87,8 +86,7 @@ miconvert_real_to_voxel(mihandle_t volume,
  * \param real_value_ptr A pointer to the converted real value.
  * \ingroup mi2Cvt
  */
-int
-miconvert_voxel_to_real(mihandle_t volume,
+int miconvert_voxel_to_real(mihandle_t volume,
                         const unsigned long coords[],
                         int ncoords,
                         double voxel_value,
@@ -168,8 +166,7 @@ mireorder_xyz_to_voxel(mihandle_t volume,
  *
  * \ingroup mi2Cvt
  */
-int
-miconvert_voxel_to_world(mihandle_t volume,
+int miconvert_voxel_to_world(mihandle_t volume,
                          const double voxel[],
                          double world[MI2_3D])
 {
@@ -190,8 +187,7 @@ miconvert_voxel_to_world(mihandle_t volume,
  *
  * \ingroup mi2Cvt
  */
-int
-miconvert_world_to_voxel(mihandle_t volume,
+int miconvert_world_to_voxel(mihandle_t volume,
                          const double world[MI2_3D],
                          double voxel[])
 {
@@ -218,8 +214,7 @@ miconvert_world_to_voxel(mihandle_t volume,
  *
  * \ingroup mi2Cvt
  */
-int
-miget_real_value(mihandle_t volume,
+int miget_real_value(mihandle_t volume,
                  const unsigned long coords[],
                  int ndims,
                  double *value_ptr)
@@ -246,8 +241,7 @@ miget_real_value(mihandle_t volume,
  *
  * \ingroup mi2Cvt
  */
-int
-miset_real_value(mihandle_t volume,
+int miset_real_value(mihandle_t volume,
                  const unsigned long coords[],
                  int ndims,
                  double value)
@@ -410,6 +404,7 @@ convert_transform_origin_to_starts(mihandle_t hvol,
         break;
     }
 }
+
 /**
  * This function sets the world coordinates of the point (0,0,0) in voxel
  * coordinates.  This changes the constant offset of the two coordinate
@@ -417,8 +412,7 @@ convert_transform_origin_to_starts(mihandle_t hvol,
  *
  * \ingroup mi2Cvt
  */
-int
-miset_world_origin(mihandle_t volume, /**< A volume handle */
+int miset_world_origin(mihandle_t volume, /**< A volume handle */
                    double world[MI2_3D]) /**< The world coordinates of voxel origin  */
 {
     double starts[MI2_3D];
@@ -467,8 +461,7 @@ miset_spatial_frequency_origin(mihandle_t volume,
  *
  * \ingroup mi2Cvt
  */
-int
-miget_voxel_value(mihandle_t volume,
+int miget_voxel_value(mihandle_t volume,
                   const unsigned long coords[],
                   int ndims,
                   double *voxel_ptr)
@@ -491,8 +484,7 @@ miget_voxel_value(mihandle_t volume,
  *
  * \ingroup mi2Cvt
  */
-int
-miset_voxel_value(mihandle_t volume,
+int miset_voxel_value(mihandle_t volume,
                   const unsigned long coords[],
                   int ndims,
                   double voxel)
@@ -515,12 +507,7 @@ miset_voxel_value(mihandle_t volume,
 }
 
 
-/** Get the absolute minimum and maximum values of a volume.
- *
- * \ingroup mi2Cvt
- */
-int
-miget_volume_real_range(mihandle_t volume, double real_range[])
+int miget_volume_real_range(mihandle_t volume, double real_range[])
 {
     hid_t spc_id;
     int n;
