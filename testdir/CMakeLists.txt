@@ -69,6 +69,7 @@ ADD_EXECUTABLE(minc2-slice-test minc2-slice-test.c)
 ADD_EXECUTABLE(minc2-valid-test minc2-valid-test.c)
 ADD_EXECUTABLE(minc2-vector_dimension-test minc2-vector_dimension-test.c)
 ADD_EXECUTABLE(minc2-volprops-test minc2-volprops-test.c)
+ADD_EXECUTABLE(minc2-read-rgb minc2-read-rgb.c)
 
 ADD_TEST(minc2-convert-test minc2-convert-test)
 ADD_TEST(minc2-create-test-images-2 minc2-create-test-images-2)

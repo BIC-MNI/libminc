@@ -17,8 +17,8 @@ int main(int argc, char **argv)
     int r;
     mitype_t data_type;
     int length;
-    static double tstarr[TESTARRAYSIZE] = { 
-	1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8, 9.9, 10.10, 11.11
+    static double tstarr[TESTARRAYSIZE] = { 	
+      1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8, 9.9, 10.10, 11.11
     };
     double dblarr[TESTARRAYSIZE];
     float fltarr[TESTARRAYSIZE];
