@@ -65,8 +65,7 @@ int miget_record_field_name(mihandle_t volume,
  * must be of class "MI_CLASS_UNIFORM_RECORD".  The size of record
  * type will be increased if necessary to accomodate the new field.
  */
-int
-miset_record_field_name(mihandle_t volume,
+int miset_record_field_name(mihandle_t volume,
                         int index,
                         const char *name)
 {
