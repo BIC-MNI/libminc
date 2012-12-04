@@ -134,9 +134,9 @@ int miset_space_name(mihandle_t vol, const char *name);
 /** \ingroup mi2Dim DIMENSION FUNCTIONS */
 
 /**
-  Figure out whether a dimension is associated with a volume.
-  \param dimension The dimension handle.
-  \param volume    A pointer to the volume handle.
+  * Figure out whether a dimension is associated with a volume.
+  * \param dimension The dimension handle.
+  * \param volume    A pointer to the volume handle.
   *
   * This method returns the volume handle associated with a given dimension
   * or an error if the specified handle is not associated with the volume.
@@ -145,9 +145,9 @@ int miset_space_name(mihandle_t vol, const char *name);
 int miget_volume_from_dimension(midimhandle_t dimension, mihandle_t *volume);
 
 /**
-  Create a copy of a given dimension.
-  \param dim_ptr The dimension handle of the dimension to copy.
-  \param new_dim_ptr A pointer to the dimension handle of the copied dimension.
+  * Create a copy of a given dimension.
+  * \param dim_ptr The dimension handle of the dimension to copy.
+  * \param new_dim_ptr A pointer to the dimension handle of the copied dimension.
   *
   * This method creates a copy of the specified dimension and returns the handle
   * to the copied dimension or error on failure.
@@ -268,6 +268,7 @@ int miset_apparent_dimension_order_by_name(mihandle_t volume, int array_length, 
  */
 int miset_apparent_record_dimension_flag(mihandle_t volume, int record_flag);
 
+
 /**
   * Get the apparent order of voxels (i.e., the order that voxel indices increase/decrease)
   * \param dimension The dimension handle
@@ -292,6 +293,7 @@ int miget_dimension_apparent_voxel_order(midimhandle_t dimension, miflipping_t *
  */
 int miset_dimension_apparent_voxel_order(midimhandle_t dimension, miflipping_t flipping_order);
 
+
 /**
  * Get the class of a MINC dimension.
  * \param dimension The dimension handle.
@@ -306,6 +308,7 @@ int miset_dimension_apparent_voxel_order(midimhandle_t dimension, miflipping_t f
  */
 int miget_dimension_class(midimhandle_t dimension, midimclass_t *dimclass);
 
+
 /**
   * Set the class of a MINC dimension.
   * \param dimension The dimension handle.
@@ -315,6 +318,7 @@ int miget_dimension_class(midimhandle_t dimension, midimclass_t *dimclass);
   * \ingroup mi2Dim
   */
 int miset_dimension_class(midimhandle_t dimension, midimclass_t dimclass);
+
 
 /**
   * Get the direction cosine vector of a given SPATIAL dimension.
