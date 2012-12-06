@@ -39,8 +39,7 @@ miget_volume_valid_max(mihandle_t volume, /**< MINC 2.0 volume handle */
  * \retval MI_ERROR on failure
  * \retval MI_NOERROR on success
  */
-int
-miset_volume_valid_max(mihandle_t volume, /**< MINC 2.0 volume handle */
+int miset_volume_valid_max(mihandle_t volume, /**< MINC 2.0 volume handle */
                        double valid_max) /**< the new maximum value  */
 {
     if (volume == NULL) {
@@ -59,8 +58,7 @@ miset_volume_valid_max(mihandle_t volume, /**< MINC 2.0 volume handle */
  * \retval MI_ERROR on failure
  * \retval MI_NOERROR on success
  */
-int
-miget_volume_valid_min(mihandle_t volume, /**< MINC 2.0 volume handle */
+int miget_volume_valid_min(mihandle_t volume, /**< MINC 2.0 volume handle */
                        double *valid_min) /**< the output value  */
 {
     if (volume == NULL || valid_min == NULL) {
@@ -75,8 +73,7 @@ miget_volume_valid_min(mihandle_t volume, /**< MINC 2.0 volume handle */
  * \retval MI_ERROR on failure
  * \retval MI_NOERROR on success
  */
-int
-miset_volume_valid_min(mihandle_t volume,  /**< MINC 2.0 volume handle */
+int miset_volume_valid_min(mihandle_t volume,  /**< MINC 2.0 volume handle */
                        double valid_min) /**< the new minimum value  */
 {
     if (volume == NULL) {
@@ -92,8 +89,7 @@ miset_volume_valid_min(mihandle_t volume,  /**< MINC 2.0 volume handle */
  * \retval MI_ERROR on failure
  * \retval MI_NOERROR on success
  */
-int
-miget_volume_valid_range(mihandle_t volume,  /**< MINC 2.0 volume handle */
+int miget_volume_valid_range(mihandle_t volume,  /**< MINC 2.0 volume handle */
                          double *valid_max, /**< the output maximum value */
                          double *valid_min) /**< the output minimum value */
 {
@@ -110,8 +106,7 @@ miget_volume_valid_range(mihandle_t volume,  /**< MINC 2.0 volume handle */
  * \retval MI_ERROR on failure
  * \retval MI_NOERROR on success
  */
-int
-miset_volume_valid_range(mihandle_t volume, /**< MINC 2.0 volume handle */
+int miset_volume_valid_range(mihandle_t volume, /**< MINC 2.0 volume handle */
                          double valid_max, /**< the new maximum value */
                          double valid_min) /**< the output minimum value */
 {

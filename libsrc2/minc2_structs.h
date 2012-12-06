@@ -58,7 +58,7 @@ typedef enum {
   MI_TYPE_UNKNOWN  = -1     /**< when the type is a record */
 } mitype_t;
 
-/** 
+/** \typedef miclass_t
  * This typedef is used to represent the class of the MINC file.  
  *
  * The class specifies the data's interpretation rather than its 
@@ -78,7 +78,8 @@ typedef enum {
   MI_CLASS_NON_UNIFORM_RECORD = 5 /**< Aggregate datatypes consisting of multiple values of potentially differing types (not yet implemented). */
 } miclass_t;
 
-/** Dimensions be members of one of several classes.  The "MI_DIMCLASS_ANY"
+/** \typedef midimclass_t
+ * Dimensions be members of one of several classes.  The "MI_DIMCLASS_ANY"
  * value is never actually assigned to a dimension.  It is used in the 
  * programming interface to specify that an operation should apply to
  * all dimensions regardless of class.
@@ -93,7 +94,8 @@ typedef enum {
   MI_DIMCLASS_RECORD = 6      /**< Record as dimension */
 } midimclass_t;
 
-/** Dimension order refers to the idea that data can be structured in 
+/** \typedef miorder_t
+ * Dimension order refers to the idea that data can be structured in 
  * a variety of ways with respect to the dimensions.  For example, a typical
  * 3D scan could be structured as a transverse (ZYX) or sagittal (XZY) image.
  * Since it may be convenient to write code which expects a particular 
@@ -107,7 +109,8 @@ typedef enum {
   MI_DIMORDER_APPARENT  = 1
 } miorder_t;
 
-/** Voxel order can be either file (native), or apparent, as set by
+/** \typedef mivoxel_order_t
+ * Voxel order can be either file (native), or apparent, as set by
  * the function miset_dimension_apparent_voxel_order().
  */
 typedef enum {
@@ -115,7 +118,7 @@ typedef enum {
   MI_ORDER_APPARENT  = 1        /**< Apparent (user) order  */
 } mivoxel_order_t;
 
-/**
+/** \typedef miflipping_t
  * Voxel flipping can be specified to either follow the file's native
  * order, the opposite of the file's order, or it can be tied to the
  * value of the dimension's step attribute.  A value of MI_NEGATIVE
@@ -129,41 +132,55 @@ typedef enum {
   MI_NEGATIVE           = 3     /**< force step value to be negative */
 } miflipping_t;
 
-/** Compression type
+/** \typedef micompression_t
+ * Compression type
  */
 typedef enum {
   MI_COMPRESS_NONE = 0,         /**< No compression */
   MI_COMPRESS_ZLIB = 1          /**< GZIP compression */
 } micompression_t;
 
+/** \typedef miboolean_t
+ * Boolean value
+ */
 typedef int miboolean_t;
 
+/** \typedef midimattr_t
+ * Something about dimension attributes
+ */
 typedef unsigned int midimattr_t;
 
+/** \typedef misize_t
+ * size of things
+ */
 typedef unsigned long misize_t;
 
-/** 16-bit integer complex voxel.
+/**  \typedef miscomplex_t
+ * 16-bit integer complex voxel.
  */
 typedef struct {
   short real;                   /**< Real part */
   short imag;                   /**< Imaginary part */
 } miscomplex_t;
 
-/** 32-bit integer complex voxel.
+/** \typedef miicomplex_t
+ * 32-bit integer complex voxel.
  */
 typedef struct {
   int real;                     /**< Real part */
   int imag;                     /**< Imaginary part */
 } miicomplex_t;
 
-/** 32-bit floating point complex voxel.
+/** \typedef mifcomplex_t
+ * 32-bit floating point complex voxel.
  */
 typedef struct {
   float real;                   /**< Real part */
   float imag;                   /**< Imaginary part */
 } mifcomplex_t;
 
-/** 64-bit floating point complex voxel.
+/** \typedef midcomplex_t
+ * 64-bit floating point complex voxel.
  */
 typedef struct {
   double real;                  /**< Real part */

@@ -1445,9 +1445,9 @@ int miflush_volume(mihandle_t volume)
 }
 
 /** Close an existing MINC volume. If the volume was newly created,
-*  all changes will be written to disk. In all cases this function closes
-*  the open volume and frees memory associated with the volume handle.
-*  \ingroup mi2Vol
+  *  all changes will be written to disk. In all cases this function closes
+  *  the open volume and frees memory associated with the volume handle.
+  *  \ingroup mi2Vol
 */
 int miclose_volume(mihandle_t volume)
 {

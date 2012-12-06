@@ -923,8 +923,8 @@ int miset_dimension_description ( midimhandle_t dimension, const char *comments 
 /**
   * Get the identifier (name) of a MINC dimension.
   * \param dimension The dimension handle.
-  * \param name_ptr A string pointer for returning the dimension name.
-  *
+  * \param name_ptr A string pointer for returning the dimension name, should be released with free
+  * 
   * Retrieves the name of the given dimension.
   * \ingroup mi2Dim
   */
