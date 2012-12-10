@@ -16,7 +16,9 @@ double calculate_mean_f(float *array,int length)
   double avg=0.0;
   int i;
   for(i=0;i<length;i++)
+  {
     avg+=(double)(array[i]);
+  }
   
   return avg/length;
 }
@@ -190,7 +192,7 @@ int main ( int argc, char **argv )
     
     /* get the apparent dimensions and their sizes */
     r  = miget_volume_dimensions ( vol, MI_DIMCLASS_ANY,
-                                  MI_DIMATTR_ALL, MI_DIMORDER_APPARENT,/*MI_DIMORDER_FILE,*/
+                                  MI_DIMATTR_ALL, MI_DIMORDER_APPARENT,
                                   4, my_dim );
     if ( r <0 ) {
       TESTRPT("Error in miget_volume_dimensions\n" ,r );
@@ -286,8 +288,122 @@ int main ( int argc, char **argv )
     /*TODO: do something with volumes*/
     free(s_axial);free(s_coronal);free(s_sagittal);
     
-  } else  {
-    fprintf(stderr,"Sorry, currently I can only process 4D volumes\n");
+  } else if(ndim==3) {
+    /*Now we are going to work with the volume using apparent dimension order*/
+    midimhandle_t my_dim[3];
+    static char *my_dimorder[] = {MIxspace,MIyspace,MIzspace};
+    unsigned int  my_sizes[3];
+    unsigned long my_start[3];
+    unsigned long my_count[3];
+
+    float *f_coronal,*f_sagittal,*f_axial;/*floating point info*/
+    short *s_coronal,*s_sagittal,*s_axial;/*floating point info*/
+    /**/
+    
+    printf("Going to read coronal, axial and sagittal slices\n");
+    r = miset_apparent_dimension_order_by_name ( vol, 3, my_dimorder );
+    
+    if ( r <0 ) {
+      TESTRPT("Error setting apparent dimension order\n" ,r );
+    }
+    /* let's extract coronal, axial and sagittal slices*/
+    
+    /* get the apparent dimensions and their sizes */
+    r  = miget_volume_dimensions ( vol, MI_DIMCLASS_ANY,
+                                  MI_DIMATTR_ALL, MI_DIMORDER_APPARENT,/*MI_DIMORDER_FILE,*/
+                                  3, my_dim );
+    if ( r <0 ) {
+      TESTRPT("Error in miget_volume_dimensions\n" ,r );
+    }
+    r = miget_dimension_sizes ( my_dim, 3, my_sizes );
+    
+    if ( r <0 ) {
+      TESTRPT("Error in miget_dimension_sizes\n" ,r );
+    }
+    
+    /*axial, z=const slice*/
+    my_start[0]=0;my_count[0]=my_sizes[0];
+    my_start[1]=0;my_count[1]=my_sizes[1];
+    my_start[2]=0;my_count[2]=1;
+    f_axial=malloc(sizeof(float)*my_count[0]*my_count[1]*my_count[2]);
+
+    
+    printf("Reading Axial slice:%dx%dx%d float... ",my_count[0],my_count[1],my_count[2]);
+    
+    if ( (r=miget_real_value_hyperslab ( vol, MI_TYPE_FLOAT, my_start, my_count, f_axial )) < 0 ) {
+      TESTRPT ( "Could not get float axial hyperslab.\n",r );
+    }
+    printf("mean=%f\n",calculate_mean_f(f_axial,my_count[0]*my_count[1]*my_count[2]));
+    
+    /*sagittal, x=const slice*/
+    my_start[0]=my_sizes[0]/2;my_count[0]=1;
+    my_start[1]=0;my_count[1]=my_sizes[1];
+    my_start[2]=0;my_count[2]=my_sizes[2];
+    f_sagittal=malloc(sizeof(float)*my_count[0]*my_count[1]*my_count[2]);
+    
+    printf("Reading Sagittal slice:%dx%dx%d float... ",my_count[0],my_count[1],my_count[2]);
+    if ( (r=miget_real_value_hyperslab ( vol, MI_TYPE_FLOAT, my_start, my_count, f_sagittal )) < 0 ) {
+      TESTRPT ( "Could not get float sagittal hyperslab.\n",r );
+    }
+    printf("mean=%f\n",calculate_mean_f(f_sagittal,my_count[0]*my_count[1]*my_count[2]));
+    
+    /*coronal, y=const slice*/
+    my_start[0]=0;my_count[0]=my_sizes[0];
+    my_start[1]=my_sizes[1]/2;my_count[1]=1;
+    my_start[2]=0;my_count[2]=my_sizes[2];
+    f_coronal=malloc(sizeof(float)*my_count[0]*my_count[1]*my_count[2]);
+    
+    printf("Reading Coronal slice:%dx%dx%d float... ",my_count[0],my_count[1],my_count[2]);
+    if ( (r=miget_real_value_hyperslab ( vol, MI_TYPE_FLOAT, my_start, my_count, f_coronal )) < 0 ) {
+      TESTRPT ( "Could not get float coronal hyperslab.\n",r );
+    }
+    printf("mean=%f\n",calculate_mean_f(f_coronal,my_count[0]*my_count[1]*my_count[2]));
+    
+    /*TODO: do something with volumes*/
+    free(f_axial);free(f_coronal);free(f_sagittal);
+    
+    /*axial, z=const slice*/
+    my_start[0]=0;my_count[0]=my_sizes[0];
+    my_start[1]=0;my_count[1]=my_sizes[1];
+    my_start[2]=my_sizes[2]/2;my_count[2]=1;
+    s_axial=malloc(sizeof(short)*my_count[0]*my_count[1]*my_count[2]);
+    
+    printf("Reading Axial slice:%dx%dx%d short... ",my_count[0],my_count[1],my_count[2]);
+    if ( (r=miget_real_value_hyperslab ( vol, MI_TYPE_SHORT, my_start, my_count, s_axial )) < 0 ) {
+      TESTRPT ( "Could not get short axial hyperslab.\n",r );
+    }
+    printf("mean=%f\n",calculate_mean_s(s_axial,my_count[0]*my_count[1]*my_count[2]));
+    
+    /*sagittal, x=const slice*/
+    my_start[1]=my_sizes[0]/2;my_count[0]=1;
+    my_start[1]=0;my_count[1]=my_sizes[1];
+    my_start[2]=0;my_count[2]=my_sizes[2];
+    s_sagittal=malloc(sizeof(short)*my_count[0]*my_count[1]*my_count[2]);
+    
+    printf("Reading Sagittal slice:%dx%dx%d short... ",my_count[0],my_count[1],my_count[2]);
+    if ( (r=miget_real_value_hyperslab ( vol, MI_TYPE_SHORT, my_start, my_count, s_sagittal )) < 0 ) {
+      TESTRPT ( "Could not get short sagittal hyperslab.\n",r );
+    }
+    printf("mean=%f\n",calculate_mean_s(s_sagittal,my_count[0]*my_count[1]*my_count[2]));
+    
+    /*coronal, y=const slice*/
+    
+    my_start[0]=0;my_count[0]=my_sizes[0];
+    my_start[1]=my_sizes[1]/2;my_count[1]=1;
+    my_start[2]=0;my_count[2]=my_sizes[2];
+    s_coronal=malloc(sizeof(short)*my_count[0]*my_count[1]*my_count[2]);
+    
+    printf("Reading Coronal slice:%dx%dx%d short... ",my_count[0],my_count[1],my_count[2]);
+    if ( (r=miget_real_value_hyperslab ( vol, MI_TYPE_SHORT, my_start, my_count, s_coronal )) < 0 ) {
+      TESTRPT ( "Could not get short coronal hyperslab.\n",r );
+    }
+    printf("mean=%f\n",calculate_mean_s(s_coronal,my_count[0]*my_count[1]*my_count[2]));
+    
+    /*TODO: do something with volumes*/
+    free(s_axial);free(s_coronal);free(s_sagittal);
+
+  } else {
+    fprintf(stderr,"Sorry, currently I can only process 4D or 3D volumes\n");
   }
   /* close volume*/
   miclose_volume ( vol );

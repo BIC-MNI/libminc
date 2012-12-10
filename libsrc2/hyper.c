@@ -731,7 +731,7 @@ static int mirw_hyperslab_icv(int opcode,
     
     if( H5Sselect_hyperslab(image_min_fspc_id, H5S_SELECT_SET, image_slice_start, NULL, image_slice_count, NULL)>=0 )
     {
-      if(H5Dread(volume->imin_id, H5T_NATIVE_DOUBLE, scaling_mspc_id, image_min_fspc_id, H5P_DEFAULT,image_slice_max_buffer)<0)
+      if(H5Dread(volume->imin_id, H5T_NATIVE_DOUBLE, scaling_mspc_id, image_min_fspc_id, H5P_DEFAULT,image_slice_min_buffer)<0)
       {
         /*TODO: report read error somehow*/
         fprintf(stderr,"H5Dread: Fail %s:%d\n",__FILE__,__LINE__);
@@ -1152,7 +1152,7 @@ static int mirw_hyperslab_normalized(int opcode,
     
     if( H5Sselect_hyperslab(image_min_fspc_id, H5S_SELECT_SET, image_slice_start, NULL, image_slice_count, NULL)>=0 )
     {
-      if(H5Dread(volume->imin_id, H5T_NATIVE_DOUBLE, scaling_mspc_id, image_min_fspc_id, H5P_DEFAULT,image_slice_max_buffer)<0)
+      if(H5Dread(volume->imin_id, H5T_NATIVE_DOUBLE, scaling_mspc_id, image_min_fspc_id, H5P_DEFAULT,image_slice_min_buffer)<0)
       {
         /*TODO: report read error somehow*/
         fprintf(stderr,"H5Dread: Fail %s:%d\n",__FILE__,__LINE__);
@@ -1165,6 +1165,7 @@ static int mirw_hyperslab_normalized(int opcode,
     }
     H5Sclose(scaling_mspc_id);
     H5Sclose(image_max_fspc_id);
+    
   } else {
     slice_ndims=0;
     total_number_of_slices=1;
