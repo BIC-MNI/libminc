@@ -123,6 +123,8 @@ static hid_t _hdf_open(const char *path, int mode)
   } H5E_END_TRY;
   
   if (fd < 0) {
+    /*TODO: report error properly*/
+    fprintf(stderr,"Error opening file:%s at %s:%d\n",path,__FILE__,__LINE__);
     return MI_ERROR;
   }
   
@@ -209,6 +211,9 @@ static hid_t _hdf_create(const char *path, int cmode)
   } H5E_END_TRY;
   
   if (fd < 0) {
+    /*TODO: report error properly*/
+    fprintf(stderr,"Error creating file:%s at %s:%d\n",path,__FILE__,__LINE__);
+    
     return MI_ERROR;
   }
   

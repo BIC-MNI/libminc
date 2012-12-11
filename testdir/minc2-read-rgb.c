@@ -79,6 +79,8 @@ int main ( int argc, char **argv )
 
   if ( r < 0 ) {
     TESTRPT ( "failed to open image", r );
+    /*nothing else to do here*/
+    return ( error_cnt );
   }
 
   printf("Volume %s info: \n",argv[1]);
@@ -179,16 +181,18 @@ int main ( int argc, char **argv )
     unsigned long my_count[4];
 
     float *f_coronal,*f_sagittal,*f_axial;/*floating point info*/
-    short *s_coronal,*s_sagittal,*s_axial;/*floating point info*/
+    float *f_full;
+    double *d_full;
+    short *s_coronal,*s_sagittal,*s_axial;/*short info*/
+    short *s_full;
     /**/
     
-    printf("Going to read coronal, axial and sagittal slices\n");
+    printf("Going to set apparent dimension order\n");
     r = miset_apparent_dimension_order_by_name ( vol, 4, my_dimorder );
     
     if ( r <0 ) {
       TESTRPT("Error setting apparent dimension order\n" ,r );
     }
-    /* let's extract coronal, axial and sagittal slices*/
     
     /* get the apparent dimensions and their sizes */
     r  = miget_volume_dimensions ( vol, MI_DIMCLASS_ANY,
@@ -202,7 +206,26 @@ int main ( int argc, char **argv )
     if ( r <0 ) {
       TESTRPT("Error in miget_dimension_sizes\n" ,r );
     }
+
+    f_full=malloc(sizeof(float)*my_sizes[0]*my_sizes[1]*my_sizes[2]*my_sizes[3]);
     
+    my_start[0]=my_start[1]=my_start[2]=my_start[3]=0;
+    
+    my_count[0]=my_sizes[0];
+    my_count[1]=my_sizes[1];
+    my_count[2]=my_sizes[2];
+    my_count[3]=my_sizes[3];
+    printf("Reading full volume %dx%dx%dx%d float ... ",my_count[0],my_count[1],my_count[2],my_count[3]);
+    
+    if ( (r=miget_real_value_hyperslab ( vol, MI_TYPE_FLOAT, my_start, my_count, f_full )) < 0 ) {
+      TESTRPT ( "Could not get float full volume.\n",r );
+    }
+    printf("mean=%f\n",calculate_mean_f(f_full,my_count[0]*my_count[1]*my_count[2]*my_count[3]));
+    free(f_full);
+    
+    
+    /* let's extract coronal, axial and sagittal slices*/
+    printf("Going to read coronal, axial and sagittal slices\n");
     /*always extract all three vector components*/
     my_start[0]=0;
     my_count[0]=my_sizes[0];
@@ -247,6 +270,21 @@ int main ( int argc, char **argv )
     
     /*TODO: do something with volumes*/
     free(f_axial);free(f_coronal);free(f_sagittal);
+
+    
+    s_full=malloc(sizeof(short)*my_sizes[0]*my_sizes[1]*my_sizes[2]*my_sizes[3]);
+    my_start[0]=my_start[1]=my_start[2]=my_start[3]=0;
+    my_count[0]=my_sizes[0];
+    my_count[1]=my_sizes[1];
+    my_count[2]=my_sizes[2];
+    my_count[3]=my_sizes[3];
+    printf("Reading full volume %dx%dx%dx%d short ... ",my_count[0],my_count[1],my_count[2],my_count[3]);
+    
+    if ( (r=miget_real_value_hyperslab ( vol, MI_TYPE_SHORT, my_start, my_count, s_full )) < 0 ) {
+      TESTRPT ( "Could not get float full volume.\n",r );
+    }
+    printf("mean=%f\n",calculate_mean_s(s_full,my_sizes[0]*my_sizes[1]*my_sizes[2]*my_sizes[3]));
+    free(s_full);
     
     /*axial, z=const slice*/
     my_start[1]=0;my_count[1]=my_sizes[1];
@@ -288,6 +326,20 @@ int main ( int argc, char **argv )
     /*TODO: do something with volumes*/
     free(s_axial);free(s_coronal);free(s_sagittal);
     
+    d_full=malloc(sizeof(double)*my_sizes[0]*my_sizes[1]*my_sizes[2]*my_sizes[3]);
+    my_start[0]=my_start[1]=my_start[2]=my_start[3]=0;
+    my_count[0]=my_sizes[0];
+    my_count[1]=my_sizes[1];
+    my_count[2]=my_sizes[2];
+    my_count[3]=my_sizes[3];
+    printf("Reading full volume %dx%dx%dx%d double ... ",my_count[0],my_count[1],my_count[2],my_count[3]);
+    
+    if ( (r=miget_real_value_hyperslab ( vol, MI_TYPE_DOUBLE, my_start, my_count, d_full )) < 0 ) {
+      TESTRPT ( "Could not get double full volume.\n",r );
+    }
+    printf("mean=%f\n",calculate_mean_d(d_full,my_sizes[0]*my_sizes[1]*my_sizes[2]*my_sizes[3]));
+    free(d_full);
+    
   } else if(ndim==3) {
     /*Now we are going to work with the volume using apparent dimension order*/
     midimhandle_t my_dim[3];
@@ -296,8 +348,11 @@ int main ( int argc, char **argv )
     unsigned long my_start[3];
     unsigned long my_count[3];
 
-    float *f_coronal,*f_sagittal,*f_axial;/*floating point info*/
-    short *s_coronal,*s_sagittal,*s_axial;/*floating point info*/
+    float *f_coronal,*f_sagittal,*f_axial;
+    float *f_full;
+    short *s_coronal,*s_sagittal,*s_axial;
+    short *s_full;
+    double *d_full;
     /**/
     
     printf("Going to read coronal, axial and sagittal slices\n");
@@ -310,7 +365,7 @@ int main ( int argc, char **argv )
     
     /* get the apparent dimensions and their sizes */
     r  = miget_volume_dimensions ( vol, MI_DIMCLASS_ANY,
-                                  MI_DIMATTR_ALL, MI_DIMORDER_APPARENT,/*MI_DIMORDER_FILE,*/
+                                  MI_DIMATTR_ALL, MI_DIMORDER_APPARENT,
                                   3, my_dim );
     if ( r <0 ) {
       TESTRPT("Error in miget_volume_dimensions\n" ,r );
@@ -320,6 +375,20 @@ int main ( int argc, char **argv )
     if ( r <0 ) {
       TESTRPT("Error in miget_dimension_sizes\n" ,r );
     }
+
+    f_full=malloc(sizeof(float)*my_sizes[0]*my_sizes[1]*my_sizes[2]);
+    my_start[0]=my_start[1]=my_start[2]=0;
+    my_count[0]=my_sizes[0];
+    my_count[1]=my_sizes[1];
+    my_count[2]=my_sizes[2];
+    printf("Reading full volume %dx%dx%d float ... ",my_count[0],my_count[1],my_count[2]);
+    
+    if ( (r=miget_real_value_hyperslab ( vol, MI_TYPE_FLOAT, my_start, my_count, f_full )) < 0 ) {
+      TESTRPT ( "Could not get float full volume.\n",r );
+    }
+    printf("mean=%f\n",calculate_mean_f(f_full,my_sizes[0]*my_sizes[1]*my_sizes[2]));
+    free(f_full);
+    
     
     /*axial, z=const slice*/
     my_start[0]=0;my_count[0]=my_sizes[0];
@@ -366,7 +435,21 @@ int main ( int argc, char **argv )
     my_start[0]=0;my_count[0]=my_sizes[0];
     my_start[1]=0;my_count[1]=my_sizes[1];
     my_start[2]=my_sizes[2]/2;my_count[2]=1;
+    my_count[0]=my_sizes[0];
+    my_count[1]=my_sizes[1];
+    my_count[2]=my_sizes[2];
+    
     s_axial=malloc(sizeof(short)*my_count[0]*my_count[1]*my_count[2]);
+    
+    printf("Reading full volume %dx%dx%d short ... ",my_count[0],my_count[1],my_count[2]);
+    s_full=malloc(sizeof(short)*my_sizes[0]*my_sizes[1]*my_sizes[2]);
+    my_start[0]=my_start[1]=my_start[2]=0;
+    
+    if ( (r=miget_real_value_hyperslab ( vol, MI_TYPE_SHORT, my_start, my_count, s_full )) < 0 ) {
+      TESTRPT ( "Could not get float short volume.\n",r );
+    }
+    printf("mean=%f\n",calculate_mean_s(s_full,my_sizes[0]*my_sizes[1]*my_sizes[2]));
+    free(s_full);
     
     printf("Reading Axial slice:%dx%dx%d short... ",my_count[0],my_count[1],my_count[2]);
     if ( (r=miget_real_value_hyperslab ( vol, MI_TYPE_SHORT, my_start, my_count, s_axial )) < 0 ) {
@@ -402,6 +485,19 @@ int main ( int argc, char **argv )
     /*TODO: do something with volumes*/
     free(s_axial);free(s_coronal);free(s_sagittal);
 
+    d_full=malloc(sizeof(double)*my_sizes[0]*my_sizes[1]*my_sizes[2]);
+    my_start[0]=my_start[1]=my_start[2]=0;
+    my_count[0]=my_sizes[0];
+    my_count[1]=my_sizes[1];
+    my_count[2]=my_sizes[2];
+    
+    printf("Reading full volume %dx%dx%d double ... ",my_count[0],my_count[1],my_count[2]);
+    
+    if ( (r=miget_real_value_hyperslab ( vol, MI_TYPE_DOUBLE, my_start, my_count, d_full )) < 0 ) {
+      TESTRPT ( "Could not get float full volume.\n",r );
+    }
+    printf("mean=%f\n",calculate_mean_d(d_full,my_sizes[0]*my_sizes[1]*my_sizes[2]));
+    free(d_full);
   } else {
     fprintf(stderr,"Sorry, currently I can only process 4D or 3D volumes\n");
   }

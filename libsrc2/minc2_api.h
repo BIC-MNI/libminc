@@ -1043,7 +1043,7 @@ int miset_volume_range(mihandle_t volume, double slice_max,
  * \ingroup mi2Hyper
  */
 int miget_hyperslab_size(mitype_t volume_data_type, int n_dimensions, 
-                                const unsigned long count[], 
+                                const hsize_t count[], 
                                 misize_t *size_ptr);
 
 
@@ -1053,7 +1053,7 @@ int miget_hyperslab_size(mitype_t volume_data_type, int n_dimensions,
  * \ingroup mi2Hyper
  */
 void miget_hyperslab_size_hdf(hid_t hdf_type_id, int n_dimensions, 
-                                const unsigned long count[], 
+                                const hsize_t count[], 
                                 misize_t *size_ptr);
 
 

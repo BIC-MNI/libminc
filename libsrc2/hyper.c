@@ -255,7 +255,7 @@ restructure_array(int ndims,    /* Dimension count */
  * \a count parameters, using hdf type id
  */
 void miget_hyperslab_size_hdf(hid_t hdf_type_id, int n_dimensions, 
-                                const unsigned long count[], 
+                                const hsize_t count[], 
                                 misize_t *size_ptr)
 {
   int voxel_size;
@@ -277,7 +277,7 @@ void miget_hyperslab_size_hdf(hid_t hdf_type_id, int n_dimensions,
  */
 int miget_hyperslab_size(mitype_t volume_data_type,   /**< Data type of a voxel. */
                      int n_dimensions,            /**< Dimensionality */
-                     const unsigned long count[], /**< Dimension lengths  */
+                     const hsize_t count[], /**< Dimension lengths  */
                      misize_t *size_ptr)          /**< Returned byte count */
 {
   hid_t type_id;
@@ -307,7 +307,7 @@ mitranslate_hyperslab_origin(mihandle_t volume,
   int file_i;
   int ndims = volume->number_of_dims;
   int j;
-
+  
   for(j=0; j<ndims; j++) {
     hdf_count[j]=0;
     hdf_start[j]=0;
@@ -592,8 +592,8 @@ static int mirw_hyperslab_icv(int opcode,
   int scaling_needed=0;
   char path[MI2_MAX_PATH];
   
-  int image_slice_start[MI2_MAX_VAR_DIMS];
-  int image_slice_count[MI2_MAX_VAR_DIMS];
+  hsize_t image_slice_start[MI2_MAX_VAR_DIMS];
+  hsize_t image_slice_count[MI2_MAX_VAR_DIMS];
   int image_slice_length=-1;
   int total_number_of_slices=-1;
   int i;
@@ -603,6 +603,7 @@ static int mirw_hyperslab_icv(int opcode,
    */
   if (opcode == MIRW_OP_WRITE && volume->selected_resolution != 0) {
     /*TODO: report error that we are not dealing with the rihgt image here*/
+    fprintf(stderr,"mirw_hyperslab_icv trying to write to volume using thumbnail %s:%d\n",__FILE__,__LINE__);
     return (MI_ERROR);
   }
   
@@ -613,12 +614,14 @@ static int mirw_hyperslab_icv(int opcode,
   */
   dset_id = H5Dopen1(volume->hdf_id, path);
   if (dset_id < 0) {
+    fprintf(stderr,"H5Dopen1: Fail %s:%d\n",__FILE__,__LINE__);
     return (MI_ERROR);
   }
 
   fspc_id = H5Dget_space(dset_id);
   if (fspc_id < 0) {
     /*TODO: report can't get dataset*/
+    fprintf(stderr,"H5Dget_space: Fail %s:%d\n",__FILE__,__LINE__);
     goto cleanup;
   }
 
@@ -639,7 +642,7 @@ static int mirw_hyperslab_icv(int opcode,
     mspc_id = H5Screate(H5S_SCALAR);
   } else {
 
-    n_different = mitranslate_hyperslab_origin(volume,start,count, hdf_start,hdf_count,dir);
+    n_different = mitranslate_hyperslab_origin(volume, start, count, hdf_start, hdf_count, dir);
 
     mspc_id = H5Screate_simple(ndims, hdf_count, NULL);
     
@@ -649,7 +652,7 @@ static int mirw_hyperslab_icv(int opcode,
     }
   }
   
-  miget_hyperslab_size_hdf(buffer_type_id,ndims,hdf_count,&buffer_size);
+  miget_hyperslab_size_hdf(buffer_type_id, ndims, hdf_count, &buffer_size);
 
   result = H5Sselect_hyperslab(fspc_id, H5S_SELECT_SET, hdf_start, NULL,
                                hdf_count, NULL);
@@ -658,10 +661,15 @@ static int mirw_hyperslab_icv(int opcode,
     goto cleanup;
   }
 
-  miget_volume_valid_range( volume, &volume_valid_max, &volume_valid_min);
+  if((result=miget_volume_valid_range( volume, &volume_valid_max, &volume_valid_min))<0)
+  {
+    /*TODO: report read error somehow*/
+    fprintf(stderr,"miget_volume_valid_range: Fail %s:%d\n",__FILE__,__LINE__);
+    goto cleanup;
+  }
 
 #ifdef _DEBUG
-  printf("mirw_hyperslab_icv:Volume:%x valid_max:%f valid_min:%f scaling:%d \n",volume,volume_valid_max,volume_valid_min,volume->has_slice_scaling);
+  printf("mirw_hyperslab_icv:Volume:%lx valid_max:%f valid_min:%f scaling:%d n_different:%d\n",(long int)(volume),volume_valid_max,volume_valid_min,volume->has_slice_scaling,n_different);
 #endif  
   
   if(volume->has_slice_scaling)
@@ -710,14 +718,27 @@ static int mirw_hyperslab_icv(int opcode,
     }
     
     image_slice_max_buffer=malloc(total_number_of_slices*sizeof(double));
+    if(!image_slice_max_buffer)
+    {
+      result=MI_ERROR;
+      fprintf(stderr,"Memory allocation failure %s:%d\n",__FILE__,__LINE__);
+      goto cleanup;
+    }
+    
     image_slice_min_buffer=malloc(total_number_of_slices*sizeof(double));
-    /*TODO check for allocation failure ?*/
+    
+    if(!image_slice_min_buffer)
+    {
+      result=MI_ERROR;
+      fprintf(stderr,"Memory allocation failure %s:%d\n",__FILE__,__LINE__);
+      goto cleanup;
+    }
     
     scaling_mspc_id = H5Screate_simple(slice_ndims, image_slice_count, NULL);
     
-    if( H5Sselect_hyperslab(image_max_fspc_id, H5S_SELECT_SET, image_slice_start, NULL, image_slice_count, NULL)>=0 )
+    if( (result=H5Sselect_hyperslab(image_max_fspc_id, H5S_SELECT_SET, image_slice_start, NULL, image_slice_count, NULL))>=0 )
     {
-      if(H5Dread(volume->imax_id, H5T_NATIVE_DOUBLE, scaling_mspc_id, image_max_fspc_id, H5P_DEFAULT,image_slice_max_buffer)<0)
+      if((result=H5Dread(volume->imax_id, H5T_NATIVE_DOUBLE, scaling_mspc_id, image_max_fspc_id, H5P_DEFAULT,image_slice_max_buffer))<0)
       {
         /*TODO: report read error somehow*/
         fprintf(stderr,"H5Dread: Fail %s:%d\n",__FILE__,__LINE__);
@@ -729,9 +750,9 @@ static int mirw_hyperslab_icv(int opcode,
       goto cleanup;
     }
     
-    if( H5Sselect_hyperslab(image_min_fspc_id, H5S_SELECT_SET, image_slice_start, NULL, image_slice_count, NULL)>=0 )
+    if( (result=H5Sselect_hyperslab(image_min_fspc_id, H5S_SELECT_SET, image_slice_start, NULL, image_slice_count, NULL))>=0 )
     {
-      if(H5Dread(volume->imin_id, H5T_NATIVE_DOUBLE, scaling_mspc_id, image_min_fspc_id, H5P_DEFAULT,image_slice_min_buffer)<0)
+      if((result=H5Dread(volume->imin_id, H5T_NATIVE_DOUBLE, scaling_mspc_id, image_min_fspc_id, H5P_DEFAULT,image_slice_min_buffer))<0)
       {
         /*TODO: report read error somehow*/
         fprintf(stderr,"H5Dread: Fail %s:%d\n",__FILE__,__LINE__);
@@ -833,10 +854,14 @@ static int mirw_hyperslab_icv(int opcode,
     {
       /*create temporary copy, to be destroyed*/
       temp_buffer=malloc(buffer_size);
+      
       if(!temp_buffer)
       {
         /*TODO: report memory error*/
+        fprintf(stderr,"Memory allocation failure %s:%d\n",__FILE__,__LINE__);
+        
         result=MI_ERROR; /*TODO: error code?*/
+        
         goto cleanup;
       }
       memcpy(temp_buffer,buffer,buffer_size);
@@ -1008,8 +1033,8 @@ static int mirw_hyperslab_normalized(int opcode,
   int scaling_needed=0;
   char path[MI2_MAX_PATH];
   
-  int image_slice_start[MI2_MAX_VAR_DIMS];
-  int image_slice_count[MI2_MAX_VAR_DIMS];
+  hsize_t image_slice_start[MI2_MAX_VAR_DIMS];
+  hsize_t image_slice_count[MI2_MAX_VAR_DIMS];
   int image_slice_length=-1;
   int total_number_of_slices=-1;
   int i;
@@ -1136,9 +1161,9 @@ static int mirw_hyperslab_normalized(int opcode,
     
     scaling_mspc_id = H5Screate_simple(slice_ndims, image_slice_count, NULL);
     
-    if( H5Sselect_hyperslab(image_max_fspc_id, H5S_SELECT_SET, image_slice_start, NULL, image_slice_count, NULL)>=0 )
+    if( (result=H5Sselect_hyperslab(image_max_fspc_id, H5S_SELECT_SET, image_slice_start, NULL, image_slice_count, NULL))>=0 )
     {
-      if(H5Dread(volume->imax_id, H5T_NATIVE_DOUBLE, scaling_mspc_id, image_max_fspc_id, H5P_DEFAULT,image_slice_max_buffer)<0)
+      if( ( result=H5Dread(volume->imax_id, H5T_NATIVE_DOUBLE, scaling_mspc_id, image_max_fspc_id, H5P_DEFAULT,image_slice_max_buffer))<0)
       {
         /*TODO: report read error somehow*/
         fprintf(stderr,"H5Dread: Fail %s:%d\n",__FILE__,__LINE__);
@@ -1150,9 +1175,9 @@ static int mirw_hyperslab_normalized(int opcode,
       goto cleanup;
     }
     
-    if( H5Sselect_hyperslab(image_min_fspc_id, H5S_SELECT_SET, image_slice_start, NULL, image_slice_count, NULL)>=0 )
+    if( (result=H5Sselect_hyperslab(image_min_fspc_id, H5S_SELECT_SET, image_slice_start, NULL, image_slice_count, NULL))>=0 )
     {
-      if(H5Dread(volume->imin_id, H5T_NATIVE_DOUBLE, scaling_mspc_id, image_min_fspc_id, H5P_DEFAULT,image_slice_min_buffer)<0)
+      if( (result=H5Dread(volume->imin_id, H5T_NATIVE_DOUBLE, scaling_mspc_id, image_min_fspc_id, H5P_DEFAULT,image_slice_min_buffer))<0)
       {
         /*TODO: report read error somehow*/
         fprintf(stderr,"H5Dread: Fail %s:%d\n",__FILE__,__LINE__);
@@ -1187,6 +1212,12 @@ static int mirw_hyperslab_normalized(int opcode,
 
   /*Allocate temporary Buffer*/
   temp_buffer=(double*)malloc(buffer_size);
+  if(!temp_buffer)
+  {
+    fprintf(stderr,"Memory allocation failure %s:%d\n",__FILE__,__LINE__);
+    result=MI_ERROR;
+    goto cleanup;
+  }
   
   if (opcode == MIRW_OP_READ) 
   {
@@ -1256,6 +1287,7 @@ static int mirw_hyperslab_normalized(int opcode,
     if(!temp_buffer2)
     {
       /*TODO: report memory error*/
+      fprintf(stderr,"Memory allocation failure %s:%d\n",__FILE__,__LINE__);
       result=MI_ERROR; /*TODO: error code?*/
       goto cleanup;
     }
