@@ -153,7 +153,7 @@ typedef unsigned int midimattr_t;
 /** \typedef misize_t
  * size of things
  */
-typedef unsigned long misize_t;
+typedef hsize_t misize_t; /*based on HDF5 size*/
 
 /**  \typedef miscomplex_t
  * 16-bit integer complex voxel.

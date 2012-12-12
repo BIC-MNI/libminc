@@ -7,7 +7,8 @@
  ************************************************************************/
 #define _GNU_SOURCE 1
 #include <stdlib.h>
-#include <hdf5.h>
+
+/*#include <hdf5.h>*/
 #include "minc2.h"
 #include "minc2_private.h"
 
@@ -170,8 +171,8 @@ int micopy_dimension ( midimhandle_t dim_ptr, midimhandle_t *new_dim_ptr )
   * definition.
   * \ingroup mi2Dim
   */
-int micreate_dimension ( const char *name, midimclass_t class, midimattr_t attr,
-                     unsigned int length, midimhandle_t *new_dim_ptr )
+int micreate_dimension(const char *name, midimclass_t dimclass, midimattr_t attr,
+                     misize_t length, midimhandle_t *new_dim_ptr)
 {
 
   midimhandle_t handle;
@@ -192,7 +193,7 @@ int micreate_dimension ( const char *name, midimclass_t class, midimattr_t attr,
    */
   handle->comments = NULL;
 
-  switch ( class ) {
+  switch ( dimclass ) {
   case MI_DIMCLASS_SPATIAL:
     handle->dim_class  = MI_DIMCLASS_SPATIAL;
 
@@ -288,7 +289,7 @@ int micreate_dimension ( const char *name, midimclass_t class, midimattr_t attr,
 
   handle->flipping_order = MI_FILE_ORDER;
 
-  if ( class != MI_DIMCLASS_SPATIAL && class != MI_DIMCLASS_SFREQUENCY ) {
+  if ( dimclass != MI_DIMCLASS_SPATIAL && dimclass != MI_DIMCLASS_SFREQUENCY ) {
     handle->direction_cosines[MI2_X] = 1.0;
     handle->direction_cosines[MI2_Y] = 0.0;
     handle->direction_cosines[MI2_Z] = 0.0;
@@ -988,11 +989,11 @@ int miset_dimension_name ( midimhandle_t dimension, const char *name )
   * Any extra positions in the offsets[] array will be ignored.
   * \ingroup mi2Dim
   */
-int miget_dimension_offsets ( midimhandle_t dimension, unsigned long array_length,
-                          unsigned long start_position, double offsets[] )
+int miget_dimension_offsets( midimhandle_t dimension, misize_t array_length,
+                          misize_t start_position, double offsets[] )
 {
-  unsigned long end_position;
-  unsigned long i, j;
+  misize_t end_position;
+  misize_t i, j;
 
   if ( dimension == NULL || start_position > dimension->length ) {
     return ( MI_ERROR );
@@ -1031,12 +1032,12 @@ int miget_dimension_offsets ( midimhandle_t dimension, unsigned long array_lengt
   * \ingroup mi2Dim
   */
 int miset_dimension_offsets ( midimhandle_t dimension,
-                          unsigned long array_length,
-                          unsigned long start_position,
+                          misize_t array_length,
+                          misize_t start_position,
                           const double offsets[] )
 {
-  unsigned long end_position;
-  unsigned long i, j;
+  misize_t end_position;
+  misize_t i, j;
 
   /* Check to see whether the dimension is regularly sampled.
    */
@@ -1205,7 +1206,7 @@ int miset_dimension_separation ( midimhandle_t dimension, double separation )
   */
 int miget_dimension_separations ( const midimhandle_t dimensions[],
                               mivoxel_order_t voxel_order,
-                              int array_length,
+                              misize_t array_length,
                               double separations[] )
 {
   int i;
@@ -1228,10 +1229,10 @@ int miget_dimension_separations ( const midimhandle_t dimensions[],
   * \ingroup mi2Dim
   */
 int miset_dimension_separations ( const midimhandle_t dimensions[],
-                              int array_length,
+                              misize_t array_length,
                               const double separations[] )
 {
-  int i;
+  misize_t i;
 
   for ( i = 0; i < array_length; i++ ) {
     miset_dimension_separation ( dimensions[i], separations[i] );
@@ -1250,7 +1251,7 @@ int miset_dimension_separations ( const midimhandle_t dimensions[],
   * associated with an existing volume cannot be changed.
   * \ingroup mi2Dim
   */
-int miget_dimension_size ( midimhandle_t dimension, unsigned int *size_ptr )
+int miget_dimension_size ( midimhandle_t dimension, misize_t *size_ptr )
 {
   if ( dimension == NULL ) {
     return ( MI_ERROR );
@@ -1268,7 +1269,7 @@ int miget_dimension_size ( midimhandle_t dimension, unsigned int *size_ptr )
   * Refer to miget_dimension_size().
   * \ingroup mi2Dim
   */
-int miset_dimension_size ( midimhandle_t dimension, unsigned int size )
+int miset_dimension_size ( midimhandle_t dimension, misize_t size )
 {
   /* Check whether the dimension is associated with a volume.
    */
@@ -1291,8 +1292,8 @@ int miset_dimension_size ( midimhandle_t dimension, unsigned int size )
   * specifies the length of both of the arrays.
   * \ingroup mi2Dim
   */
-int miget_dimension_sizes ( const midimhandle_t dimensions[], int array_length,
-                        unsigned int sizes[] )
+int miget_dimension_sizes ( const midimhandle_t dimensions[], misize_t array_length,
+                        misize_t sizes[] )
 {
   int i;
 
@@ -1383,9 +1384,9 @@ int miset_dimension_start ( midimhandle_t dimension, double start )
   */
 int miget_dimension_starts ( const midimhandle_t dimensions[],
                          mivoxel_order_t voxel_order,
-                         int array_length, double starts[] )
+                         misize_t array_length, double starts[] )
 {
-  int i;
+  misize_t i;
 
   for ( i = 0; i < array_length; i++ ) {
     miget_dimension_start ( dimensions[i], voxel_order, &starts[i] );
@@ -1404,10 +1405,10 @@ int miget_dimension_starts ( const midimhandle_t dimensions[],
   * \ingroup mi2Dim
   */
 int miset_dimension_starts ( const midimhandle_t dimensions[],
-                         int array_length,
+                         misize_t array_length,
                          const double starts[] )
 {
-  int i;
+  misize_t i;
 
   for ( i = 0; i < array_length; i++ ) {
     miset_dimension_start ( dimensions[i], starts[i] );
@@ -1535,12 +1536,12 @@ int miset_dimension_width ( midimhandle_t dimension, double width )
   */
 int miget_dimension_widths ( midimhandle_t dimension,
                          mivoxel_order_t voxel_order,
-                         unsigned long array_length,
-                         unsigned long start_position,
+                         misize_t array_length,
+                         misize_t start_position,
                          double widths[] )
 {
   unsigned long  diff;
-  int i, j = 0;
+  misize_t i, j = 0;
 
   if ( dimension == NULL || start_position > dimension->length ) {
     return ( MI_ERROR );
@@ -1600,12 +1601,12 @@ int miget_dimension_widths ( midimhandle_t dimension,
   * \ingroup mi2Dim
   */
 int miset_dimension_widths ( midimhandle_t dimension,
-                         unsigned long array_length,
-                         unsigned long start_position,
+                         misize_t array_length,
+                         misize_t start_position,
                          const double widths[] )
 {
-  unsigned long  diff;
-  int i, j = 0;
+  misize_t  diff;
+  misize_t i, j = 0;
 
   /* Check to see whether the dimension is regularly sampled.
    */

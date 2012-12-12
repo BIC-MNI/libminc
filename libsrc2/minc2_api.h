@@ -85,7 +85,7 @@ int miset_attr_values(mihandle_t vol, mitype_t data_type,
 /** Add global history attribute
  * \ingroup mi2Group
  */
-int miadd_history_attr(mihandle_t vol, int length, const void *values);           
+int miadd_history_attr(mihandle_t vol, int length, const void *values);
 
 /** \defgroup mi2Memory FREE FUNCTIONS */
 
@@ -186,7 +186,7 @@ int micopy_dimension(midimhandle_t dim_ptr, midimhandle_t *new_dim_ptr);
   * \ingroup mi2Dim
   */
 int micreate_dimension(const char *name, midimclass_t dimclass, midimattr_t attr, 
-                              unsigned int length, midimhandle_t *new_dim_ptr);
+                              misize_t length, midimhandle_t *new_dim_ptr);
 
 /**
   * Delete the dimension definition.
@@ -410,8 +410,8 @@ int miset_dimension_name(midimhandle_t dimension, const char *name);
   * Any extra positions in the offsets[] array will be ignored.
   * \ingroup mi2Dim
   */
-int miget_dimension_offsets(midimhandle_t dimension, unsigned long array_length, 
-                                   unsigned long start_position, double offsets[]);
+int miget_dimension_offsets(midimhandle_t dimension, misize_t array_length, 
+                                   misize_t start_position, double offsets[]);
 
 /**
   * Set the absolute world coordinates of points along a MINC dimension.
@@ -423,8 +423,8 @@ int miget_dimension_offsets(midimhandle_t dimension, unsigned long array_length,
   * Refer to miget_dimension_offsets().
   * \ingroup mi2Dim
   */
-int miset_dimension_offsets(midimhandle_t dimension, unsigned long array_length, 
-                                   unsigned long start_position, const double offsets[]);
+int miset_dimension_offsets(midimhandle_t dimension, misize_t array_length, 
+                                   misize_t start_position, const double offsets[]);
 
 /**
   * Get the sampling flag for a MINC dimension.
@@ -499,7 +499,7 @@ int miset_dimension_separation(midimhandle_t dimension,
   */
 int miget_dimension_separations(const midimhandle_t dimensions[], 
                                        mivoxel_order_t voxel_order, 
-                                       int array_length, 
+                                       misize_t array_length, 
                                        double separations[]);
 
 
@@ -512,7 +512,7 @@ int miget_dimension_separations(const midimhandle_t dimensions[],
   * Refer to miget_dimension_separations().
   * \ingroup mi2Dim
   */
-int miset_dimension_separations(const midimhandle_t dimensions[], int array_length,
+int miset_dimension_separations(const midimhandle_t dimensions[], misize_t array_length,
                                        const double separations[]);
 
 /**
@@ -525,7 +525,7 @@ int miset_dimension_separations(const midimhandle_t dimensions[], int array_leng
   * associated with an existing volume cannot be changed.
   * \ingroup mi2Dim
   */
-int miget_dimension_size(midimhandle_t dimension, unsigned int *size_ptr);
+int miget_dimension_size(midimhandle_t dimension, misize_t *size_ptr);
 
 /**
   * Set the length of a MINC dimension if not associated with a volume.
@@ -535,7 +535,7 @@ int miget_dimension_size(midimhandle_t dimension, unsigned int *size_ptr);
   * Refer to miget_dimension_size().
   * \ingroup mi2Dim
   */
-int miset_dimension_size(midimhandle_t dimension, unsigned int size);
+int miset_dimension_size(midimhandle_t dimension, misize_t size);
 
 
 /**
@@ -549,8 +549,8 @@ int miset_dimension_size(midimhandle_t dimension, unsigned int size);
   * specifies the length of both of the arrays.
   * \ingroup mi2Dim
   */
-int miget_dimension_sizes(const midimhandle_t dimensions[], int array_length,
-                                 unsigned int sizes[]);
+int miget_dimension_sizes(const midimhandle_t dimensions[], misize_t array_length,
+                                misize_t sizes[]);
 
 /**
   * Get the start value of a MINC dimension.
@@ -565,8 +565,8 @@ int miget_dimension_sizes(const midimhandle_t dimensions[], int array_length,
   * \ingroup mi2Dim
   */
 int miget_dimension_start(midimhandle_t dimension, 
-                                 mivoxel_order_t voxel_order,
-                                 double *start_ptr);
+                          mivoxel_order_t voxel_order,
+                          double *start_ptr);
 
 /** 
   * Set the start of a MINC dimension.
@@ -592,7 +592,7 @@ int miset_dimension_start(midimhandle_t dimension, double start_ptr);
   * \ingroup mi2Dim
   */
 int miget_dimension_starts(const midimhandle_t dimensions[], mivoxel_order_t voxel_order,
-                                  int array_length, double starts[]);
+                                  misize_t array_length, double starts[]);
 
 /**
   * Set the start values for MINC dimensions in dimensions array.
@@ -603,7 +603,7 @@ int miget_dimension_starts(const midimhandle_t dimensions[], mivoxel_order_t vox
   * Refer to miget_dimension_starts().
   * \ingroup mi2Dim
   */
-int miset_dimension_starts(const midimhandle_t dimensions[], int array_length, 
+int miset_dimension_starts(const midimhandle_t dimensions[], misize_t array_length, 
                                   const double starts[]);
 
 /**
@@ -677,7 +677,7 @@ int miset_dimension_width(midimhandle_t dimension, double width_ptr);
   * \ingroup mi2Dim
   */
 int miget_dimension_widths(midimhandle_t dimension, mivoxel_order_t voxel_order,
-                                  unsigned long array_length, unsigned long start_position,
+                                  misize_t array_length, misize_t start_position,
                                   double widths[]);
 
 
@@ -692,8 +692,8 @@ int miget_dimension_widths(midimhandle_t dimension, mivoxel_order_t voxel_order,
   * Refer to miget_dimension_widths().
   * \ingroup mi2Dim
   */
-int miset_dimension_widths(midimhandle_t dimension, unsigned long array_length,
-                                  unsigned long start_position, const double widths[]);
+int miset_dimension_widths(midimhandle_t dimension, misize_t array_length,
+                                  misize_t start_position, const double widths[]);
 
 
 /* VOLUME FUNCTIONS */
@@ -726,7 +726,7 @@ int miget_volume_dimension_count(mihandle_t volume, midimclass_t dimclass,
 /** Returns the number of voxels in the volume.
   * \ingroup mi2Vol
 */
-int miget_volume_voxel_count(mihandle_t volume, int *number_of_voxels);
+int miget_volume_voxel_count(mihandle_t volume, misize_t *number_of_voxels);
 
 /** Opens an existing MINC volume for read-only access if mode argument is
   * MI2_OPEN_READ, or read-write access if mode argument is MI2_OPEN_RDWR.
@@ -887,7 +887,7 @@ int miget_props_blocking(mivolumeprops_t props, int *edge_count, int *edge_lengt
 /** Set properties for uniform/nonuniform record dimension
  * \ingroup mi2VPrp
  */
-int miset_props_record(mivolumeprops_t props, long record_length, char *record_name); 
+int miset_props_record(mivolumeprops_t props, misize_t record_length, char *record_name); 
 
 
 /** Set the template volume flag
@@ -906,8 +906,8 @@ int miset_props_template(mivolumeprops_t props, int template_flag);
  * \ingroup mi2Slice
  */
 int miget_slice_max(mihandle_t volume, 
-                           const unsigned long start_positions[],
-                           int array_length, double *slice_max);
+                           const misize_t start_positions[],
+                           misize_t array_length, double *slice_max);
 
 /**
  * This function sets minimum real value of
@@ -919,8 +919,8 @@ int miget_slice_max(mihandle_t volume,
  * \ingroup mi2Slice
  */
 int miset_slice_max(mihandle_t volume, 
-                           const unsigned long start_positions[],
-                           int array_length, double slice_max);
+                           const misize_t start_positions[],
+                           misize_t array_length, double slice_max);
 
 
 /**
@@ -933,8 +933,8 @@ int miset_slice_max(mihandle_t volume,
  * \ingroup mi2Slice
  */
 int miget_slice_min(mihandle_t volume, 
-                           const unsigned long start_positions[],
-                           int array_length, double *slice_min);
+                           const misize_t start_positions[],
+                           misize_t array_length, double *slice_min);
 
 
 /**
@@ -947,8 +947,8 @@ int miget_slice_min(mihandle_t volume,
  * \ingroup mi2Slice
  */
 int miset_slice_min(mihandle_t volume, 
-                           const unsigned long start_positions[],
-                           int array_length, double slice_min);
+                           const misize_t start_positions[],
+                           misize_t array_length, double slice_min);
 
 
 /**
@@ -961,8 +961,8 @@ int miset_slice_min(mihandle_t volume,
  * \ingroup mi2Slice
  */
 int miget_slice_range(mihandle_t volume,
-                             const unsigned long start_positions[],
-                             int array_length, double *slice_max,
+                             const misize_t start_positions[],
+                             misize_t array_length, double *slice_max,
                              double *slice_min);
 
 
@@ -976,8 +976,8 @@ int miget_slice_range(mihandle_t volume,
  * \ingroup mi2Slice
  */
 int miset_slice_range(mihandle_t volume, 
-                             const unsigned long start_positions[],
-                             int array_length, double slice_max, 
+                             const misize_t start_positions[],
+                             misize_t array_length, double slice_max, 
                              double slice_min);
 
 /**
@@ -1064,8 +1064,8 @@ void miget_hyperslab_size_hdf(hid_t hdf_type_id, int n_dimensions,
  */
 int miget_hyperslab_normalized(mihandle_t volume, 
                                       mitype_t buffer_data_type,
-                                      const unsigned long start[], 
-                                      const unsigned long count[],
+                                      const misize_t start[], 
+                                      const misize_t count[],
                                       double min, 
                                       double max, 
                                       void *buffer);
@@ -1077,8 +1077,8 @@ int miget_hyperslab_normalized(mihandle_t volume,
  */
 int miset_hyperslab_normalized(mihandle_t volume, 
                                       mitype_t buffer_data_type,
-                                      const unsigned long start[], 
-                                      const unsigned long count[],
+                                      const misize_t start[], 
+                                      const misize_t count[],
                                       double min, 
                                       double max, 
                                       void *buffer);
@@ -1089,8 +1089,8 @@ int miset_hyperslab_normalized(mihandle_t volume,
  */
 int miget_hyperslab_with_icv(mihandle_t volume, 
                                     mitype_t buffer_data_type, 
-                                    const unsigned long start[], 
-                                    const unsigned long count[], 
+                                    const misize_t start[], 
+                                    const misize_t count[], 
                                     void *buffer);
 
 /** Write a hyperslab to the file, converting real values into voxel values
@@ -1098,8 +1098,8 @@ int miget_hyperslab_with_icv(mihandle_t volume,
  */
 int miset_hyperslab_with_icv(mihandle_t volume,
                                     mitype_t buffer_data_type, 
-                                    const unsigned long start[],
-                                    const unsigned long count[],
+                                    const misize_t start[],
+                                    const misize_t count[],
                                     void *buffer);
 
 /** Read a hyperslab from the file into the preallocated buffer,
@@ -1109,8 +1109,8 @@ int miset_hyperslab_with_icv(mihandle_t volume,
  */
 int miget_real_value_hyperslab(mihandle_t volume,
                                       mitype_t buffer_data_type,
-                                      const unsigned long start[],
-                                      const unsigned long count[],
+                                      const misize_t start[],
+                                      const misize_t count[],
                                       void *buffer);
 
 /** Write a hyperslab to the file from the preallocated buffer,
@@ -1120,8 +1120,8 @@ int miget_real_value_hyperslab(mihandle_t volume,
  */
 int miset_real_value_hyperslab(mihandle_t volume,
                                       mitype_t buffer_data_type,
-                                      const unsigned long start[],
-                                      const unsigned long count[],
+                                      const misize_t start[],
+                                      const misize_t count[],
                                       void *buffer);
 
 /** Read a hyperslab from the file into the preallocated buffer,
@@ -1131,8 +1131,8 @@ int miset_real_value_hyperslab(mihandle_t volume,
  */
 int miget_voxel_value_hyperslab(mihandle_t volume,
                                        mitype_t buffer_data_type,
-                                       const unsigned long start[],
-                                       const unsigned long count[],
+                                       const misize_t start[],
+                                       const misize_t count[],
                                        void *buffer);
 
 /** Write a hyperslab to the file from the preallocated buffer,
@@ -1142,8 +1142,8 @@ int miget_voxel_value_hyperslab(mihandle_t volume,
  */
 int miset_voxel_value_hyperslab(mihandle_t volume,
                                        mitype_t buffer_data_type,
-                                       const unsigned long start[],
-                                       const unsigned long count[],
+                                       const misize_t start[],
+                                       const misize_t count[],
                                        void *buffer);
 
 
@@ -1167,7 +1167,7 @@ int miset_voxel_value_hyperslab(mihandle_t volume,
  * \ingroup mi2Cvt
  */
 int miconvert_real_to_voxel(mihandle_t volume,
-                                   const unsigned long coords[],
+                                   const misize_t coords[],
                                    int ncoords,
                                    double real_value,
                                    double *voxel_value_ptr);
@@ -1190,7 +1190,7 @@ int miconvert_real_to_voxel(mihandle_t volume,
  * \ingroup mi2Cvt
  */
 int miconvert_voxel_to_real(mihandle_t volume,
-                                   const unsigned long coords[],
+                                   const misize_t coords[],
                                    int ncoords,
                                    double voxel_value,
                                    double *real_value_ptr);
@@ -1235,7 +1235,7 @@ int miconvert_world_to_voxel(mihandle_t volume,
  * \ingroup mi2Cvt
  */
 int miget_real_value(mihandle_t volume,
-                            const unsigned long coords[],
+                            const misize_t coords[],
                             int ndims,
                             double *value_ptr);
 
@@ -1251,7 +1251,7 @@ int miget_real_value(mihandle_t volume,
  * \ingroup mi2Cvt
  */
 int miset_real_value(mihandle_t volume,
-                            const unsigned long coords[],
+                            const misize_t coords[],
                             int ndims,
                             double value);
 
@@ -1263,7 +1263,7 @@ int miset_real_value(mihandle_t volume,
  * \ingroup mi2Cvt
  */
 int miget_voxel_value(mihandle_t volume,
-                             const unsigned long coords[],
+                             const misize_t coords[],
                              int ndims,
                              double *voxel_ptr);
 
@@ -1275,7 +1275,7 @@ int miget_voxel_value(mihandle_t volume,
  * \ingroup mi2Cvt
  */
 int miset_voxel_value(mihandle_t volume,
-                             const unsigned long coords[],
+                             const misize_t coords[],
                              int ndims,
                              double voxel);
 

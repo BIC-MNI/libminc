@@ -996,7 +996,7 @@ int miget_volume_dimension_count(mihandle_t volume, midimclass_t cls,
 /** Returns the number of voxels in the volume.
   * \ingroup mi2Vol
 */
-int miget_volume_voxel_count(mihandle_t volume, int *number_of_voxels)
+int miget_volume_voxel_count(mihandle_t volume, misize_t *number_of_voxels)
 {
   char path[MI2_MAX_PATH];
   hid_t dset_id;
@@ -1025,7 +1025,7 @@ int miget_volume_voxel_count(mihandle_t volume, int *number_of_voxels)
   /* Determines the number of elements in the dataspace and
     cast the result to an integer.
   */
-  *number_of_voxels = (int) H5Sget_simple_extent_npoints(fspc_id);
+  *number_of_voxels = (misize_t) H5Sget_simple_extent_npoints(fspc_id);
   /* Close the dataspace */
   H5Sclose(fspc_id);
   /* Close the dataset */

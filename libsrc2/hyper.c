@@ -40,8 +40,8 @@ typedef unsigned long mioffset_t;
  */
 static mioffset_t
 index_to_offset(int ndims,
-                const unsigned long sizes[],
-                const unsigned long index[])
+                const misize_t sizes[],
+                const misize_t index[])
 {
   mioffset_t offset = index[0];
   int i;
@@ -58,9 +58,9 @@ index_to_offset(int ndims,
  */
 static void
 offset_to_index(int ndims,
-                const unsigned long sizes[],
+                const misize_t sizes[],
                 mioffset_t offset,
-                unsigned long index[])
+                misize_t index[])
 {
   int i;
 
@@ -81,14 +81,14 @@ offset_to_index(int ndims,
 MNCAPI void
 restructure_array(int ndims,    /* Dimension count */
                   unsigned char *array, /* Raw data */
-                  const unsigned long *lengths_perm, /* Permuted lengths */
+                  const misize_t *lengths_perm, /* Permuted lengths */
                   int el_size,  /* Element size, in bytes */
                   const int *map, /* Mapping array */
                   const int *dir) /* Direction array, in permuted order */
 {
-  unsigned long index[MI2_MAX_VAR_DIMS]; /* Raw indices */
-  unsigned long index_perm[MI2_MAX_VAR_DIMS]; /* Permuted indices */
-  unsigned long lengths[MI2_MAX_VAR_DIMS]; /* Raw (unpermuted) lengths */
+  misize_t index[MI2_MAX_VAR_DIMS]; /* Raw indices */
+  misize_t index_perm[MI2_MAX_VAR_DIMS]; /* Permuted indices */
+  misize_t lengths[MI2_MAX_VAR_DIMS]; /* Raw (unpermuted) lengths */
   unsigned char *temp;
   mioffset_t offset_start;
   mioffset_t offset_next;
@@ -297,11 +297,11 @@ int miget_hyperslab_size(mitype_t volume_data_type,   /**< Data type of a voxel.
  */
 int
 mitranslate_hyperslab_origin(mihandle_t volume,
-                             const unsigned long start[],
-                             const unsigned long count[],
-                             hsize_t hdf_start[],
-                             hsize_t hdf_count[],
-                             int dir[]) /* direction vector in file order */
+                             const misize_t* start,
+                             const misize_t* count,
+                             hsize_t* hdf_start,
+                             hsize_t* hdf_count,
+                             int* dir) /* direction vector in file order */
 {
   int n_different = 0;
   int file_i;
@@ -373,8 +373,8 @@ mitranslate_hyperslab_origin(mihandle_t volume,
 static int mirw_hyperslab_raw(int opcode,
                               mihandle_t volume,
                               mitype_t midatatype,
-                              const unsigned long start[],
-                              const unsigned long count[],
+                              const misize_t start[],
+                              const misize_t count[],
                               void *buffer)
 {
   hid_t dset_id = -1;
@@ -469,7 +469,7 @@ static int mirw_hyperslab_raw(int opcode,
      */
 
     if (n_different != 0) {
-      unsigned long icount[MI2_MAX_VAR_DIMS];
+      misize_t icount[MI2_MAX_VAR_DIMS];
       int idir[MI2_MAX_VAR_DIMS];
       int imap[MI2_MAX_VAR_DIMS];
       int i;
@@ -566,8 +566,8 @@ cleanup:
 static int mirw_hyperslab_icv(int opcode,
                               mihandle_t volume,
                               mitype_t buffer_data_type,
-                              const unsigned long start[],
-                              const unsigned long count[],
+                              const misize_t start[],
+                              const misize_t count[],
                               void *buffer)
 {
   hid_t dset_id = -1;
@@ -584,7 +584,7 @@ static int mirw_hyperslab_icv(int opcode,
   double volume_valid_min, volume_valid_max;
   misize_t buffer_size;
   void *temp_buffer=NULL;
-  unsigned long icount[MI2_MAX_VAR_DIMS];
+  misize_t icount[MI2_MAX_VAR_DIMS];
   int idir[MI2_MAX_VAR_DIMS];
   int imap[MI2_MAX_VAR_DIMS];
   double *image_slice_max_buffer=NULL;
@@ -1003,8 +1003,8 @@ cleanup:
 static int mirw_hyperslab_normalized(int opcode,
                               mihandle_t volume,
                               mitype_t buffer_data_type,
-                              const unsigned long start[],
-                              const unsigned long count[],
+                              const misize_t start[],
+                              const misize_t count[],
                               double data_min,
                               double data_max,
                               void *buffer)
@@ -1025,7 +1025,7 @@ static int mirw_hyperslab_normalized(int opcode,
   misize_t buffer_size;
   misize_t input_buffer_size;
   double *temp_buffer=NULL;
-  unsigned long icount[MI2_MAX_VAR_DIMS];
+  misize_t icount[MI2_MAX_VAR_DIMS];
   int idir[MI2_MAX_VAR_DIMS];
   int imap[MI2_MAX_VAR_DIMS];
   double *image_slice_max_buffer=NULL;
@@ -1376,8 +1376,8 @@ cleanup:
  */
 int miget_hyperslab_normalized(mihandle_t volume,
                                mitype_t buffer_data_type,
-                               const unsigned long start[],
-                               const unsigned long count[],
+                               const misize_t start[],
+                               const misize_t count[],
                                double data_min,
                                double data_max,
                                void *buffer)
@@ -1393,8 +1393,8 @@ int miget_hyperslab_normalized(mihandle_t volume,
  */
 int miset_hyperslab_normalized(mihandle_t volume,
                                mitype_t buffer_data_type,
-                               const unsigned long start[],
-                               const unsigned long count[],
+                               const misize_t start[],
+                               const misize_t count[],
                                double data_min,
                                double data_max,
                                void *buffer)
@@ -1409,8 +1409,8 @@ int miset_hyperslab_normalized(mihandle_t volume,
  */
 int miget_hyperslab_with_icv(mihandle_t volume,           /**< A MINC 2.0 volume handle */
                              mitype_t buffer_data_type,   /**< Output datatype */
-                             const unsigned long start[], /**< Start coordinates  */
-                             const unsigned long count[], /**< Lengths of edges  */
+                             const misize_t start[], /**< Start coordinates  */
+                             const misize_t count[], /**< Lengths of edges  */
                              void *buffer)                /**< Output memory buffer */
 {
   return mirw_hyperslab_icv(MIRW_OP_READ, volume, buffer_data_type, start, count,buffer);
@@ -1420,8 +1420,8 @@ int miget_hyperslab_with_icv(mihandle_t volume,           /**< A MINC 2.0 volume
  */
 int miset_hyperslab_with_icv(mihandle_t volume,        /**< A MINC 2.0 volume handle */
                          mitype_t buffer_data_type,    /**< Output datatype */
-                         const unsigned long start[],  /**< Start coordinates  */
-                         const unsigned long count[],  /**< Lengths of edges  */
+                         const misize_t start[],  /**< Start coordinates  */
+                         const misize_t count[],  /**< Lengths of edges  */
                          void *buffer)                 /**< Output memory buffer */
 {
   return  mirw_hyperslab_icv(MIRW_OP_WRITE,volume,buffer_data_type,start,count,buffer);
@@ -1433,8 +1433,8 @@ int miset_hyperslab_with_icv(mihandle_t volume,        /**< A MINC 2.0 volume ha
  */
 int miget_real_value_hyperslab(mihandle_t volume,       /**< A MINC 2.0 volume handle */
                            mitype_t buffer_data_type,   /**< Output datatype    */
-                           const unsigned long start[], /**< Start coordinates  */
-                           const unsigned long count[], /**< Lengths of edges   */
+                           const misize_t start[], /**< Start coordinates  */
+                           const misize_t count[], /**< Lengths of edges   */
                            void *buffer)                /**< Output memory buffer */ 
 {
 
@@ -1452,8 +1452,8 @@ int miget_real_value_hyperslab(mihandle_t volume,       /**< A MINC 2.0 volume h
  */
 int miset_real_value_hyperslab(mihandle_t volume,
                            mitype_t buffer_data_type,
-                           const unsigned long start[],
-                           const unsigned long count[],
+                           const misize_t start[],
+                           const misize_t count[],
                            void *buffer)
 {
   return mirw_hyperslab_icv(MIRW_OP_WRITE,
@@ -1470,8 +1470,8 @@ int miset_real_value_hyperslab(mihandle_t volume,
  */
 int miget_voxel_value_hyperslab(mihandle_t volume,
                             mitype_t buffer_data_type,
-                            const unsigned long start[],
-                            const unsigned long count[],
+                            const misize_t start[],
+                            const misize_t count[],
                             void *buffer)
 {
   return mirw_hyperslab_raw(MIRW_OP_READ, volume, buffer_data_type,
@@ -1484,8 +1484,8 @@ int miget_voxel_value_hyperslab(mihandle_t volume,
  */
 int miset_voxel_value_hyperslab(mihandle_t volume,
                             mitype_t buffer_data_type,
-                            const unsigned long start[],
-                            const unsigned long count[],
+                            const misize_t start[],
+                            const misize_t count[],
                             void *buffer)
 {
   return mirw_hyperslab_raw(MIRW_OP_WRITE, volume, buffer_data_type,

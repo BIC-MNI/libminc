@@ -74,7 +74,6 @@ int main ( int argc, char **argv )
     return 1;
   }
   
-
   r = miopen_volume ( argv[1], MI2_OPEN_READ, &vol );
 
   if ( r < 0 ) {

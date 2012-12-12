@@ -35,7 +35,7 @@
  * \ingroup mi2Cvt
  */
 int miconvert_real_to_voxel(mihandle_t volume,
-                        const unsigned long coords[],
+                        const misize_t coords[],
                         int ncoords,
                         double real_value,
                         double *voxel_value_ptr
@@ -87,7 +87,7 @@ int miconvert_real_to_voxel(mihandle_t volume,
  * \ingroup mi2Cvt
  */
 int miconvert_voxel_to_real(mihandle_t volume,
-                        const unsigned long coords[],
+                        const misize_t coords[],
                         int ncoords,
                         double voxel_value,
                         double *real_value_ptr)
@@ -215,7 +215,7 @@ int miconvert_world_to_voxel(mihandle_t volume,
  * \ingroup mi2Cvt
  */
 int miget_real_value(mihandle_t volume,
-                 const unsigned long coords[],
+                 const misize_t coords[],
                  int ndims,
                  double *value_ptr)
 {
@@ -242,7 +242,7 @@ int miget_real_value(mihandle_t volume,
  * \ingroup mi2Cvt
  */
 int miset_real_value(mihandle_t volume,
-                 const unsigned long coords[],
+                 const misize_t coords[],
                  int ndims,
                  double value)
 {
@@ -462,12 +462,12 @@ miset_spatial_frequency_origin(mihandle_t volume,
  * \ingroup mi2Cvt
  */
 int miget_voxel_value(mihandle_t volume,
-                  const unsigned long coords[],
+                  const misize_t coords[],
                   int ndims,
                   double *voxel_ptr)
 {
     int result;
-    unsigned long count[MI2_MAX_VAR_DIMS];
+    misize_t count[MI2_MAX_VAR_DIMS];
     int i;
 
     for (i = 0; i < volume->number_of_dims; i++) {
@@ -485,12 +485,12 @@ int miget_voxel_value(mihandle_t volume,
  * \ingroup mi2Cvt
  */
 int miset_voxel_value(mihandle_t volume,
-                  const unsigned long coords[],
+                  const misize_t coords[],
                   int ndims,
                   double voxel)
 {
     int result;
-    unsigned long count[MI2_MAX_VAR_DIMS];
+    misize_t count[MI2_MAX_VAR_DIMS];
     int i;
 
     if ((volume->mode & MI2_OPEN_RDWR) == 0) {

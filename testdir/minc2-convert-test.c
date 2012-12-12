@@ -32,8 +32,8 @@ main(int argc, char **argv)
     double voxel[NDIMS];
     double world[NDIMS];
     double new_voxel[NDIMS];
-    unsigned long coords[NDIMS];
-    unsigned long count[NDIMS] = {1,1,1};
+    misize_t coords[NDIMS];
+    misize_t count[NDIMS] = {1,1,1};
     midimhandle_t hdims[NDIMS];
     int i, j, k;
     int n;

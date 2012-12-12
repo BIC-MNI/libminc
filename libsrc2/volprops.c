@@ -456,7 +456,7 @@ int miget_props_blocking(mivolumeprops_t props, int *edge_count, int *edge_lengt
 /** Set properties for uniform/nonuniform record dimension
  * \ingroup mi2VPrp
  */
-int miset_props_record(mivolumeprops_t props, long record_length, char *record_name)
+int miset_props_record(mivolumeprops_t props, misize_t record_length, char *record_name)
 {
   if (props == NULL) {
     return (MI_ERROR);

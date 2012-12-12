@@ -1538,7 +1538,7 @@ static void miconvert_hyperslab_to_real ( mihandle_t volume, H5_START_T start[],
   double real_range, real_offset;
   int i;
   double tmp_val;
-  unsigned long pos[MI2_MAX_VAR_DIMS];
+  misize_t pos[MI2_MAX_VAR_DIMS];
   int r;
 
   total = 1;

@@ -62,7 +62,7 @@ struct mivolprops {
     int edge_count;             /*< how many chunks */
     int *edge_lengths;          /*< size of each chunk */
     int max_lengths;
-    long record_length;
+    misize_t record_length;
     char *record_name;
     int  template_flag;
 }; 
@@ -78,7 +78,7 @@ struct midimension {
   char *name;                   /*< Dimension name */
   double *offsets;              /*< Offsets (if irregular) */
   double step;                  /*< Step size */
-  unsigned int length;          /*< Length */
+  misize_t length;          /*< Length */
   double start;                 /*< Start value */
   char *units;                  /*< Units string */
   double width;                 /*< Sample width (if regular) */
@@ -144,7 +144,7 @@ extern void minormalize_vector(double vector[]);
 extern void mitransform_coord(double out_coord[],
                               mi_lin_xfm_t transform,
                               const double in_coord[]);
-extern int miinvert_transform(mi_lin_xfm_t transform, mi_lin_xfm_t inverse);
+extern int  miinvert_transform(mi_lin_xfm_t transform, mi_lin_xfm_t inverse);
 
 extern void miinit(void);
 extern void miinit_enum(hid_t);
@@ -175,11 +175,11 @@ extern int create_standard_dataset(hid_t hdf_file, const char *path);
 
 /* From hyper.c */
 extern int mitranslate_hyperslab_origin(mihandle_t volume, 
-                                        const unsigned long start[], 
-                                        const unsigned long count[],
-                                        hsize_t hdf_start[],
-                                        hsize_t hdf_count[],
-                                        int dir[]);
+                                        const misize_t* start, 
+                                        const misize_t* count,
+                                        hsize_t* hdf_start,
+                                        hsize_t* hdf_count,
+                                        int* dir);
 /* From volume.c */
 extern void misave_valid_range(mihandle_t volume);
 

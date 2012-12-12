@@ -35,17 +35,16 @@ static int mirw_volume_minmax ( int opcode, mihandle_t volume, double *value );
 
 /** Get the minimum or maximum value for the slice containing the given point.
  */
-static int 
-mirw_slice_minmax ( int opcode, mihandle_t volume,
-                    const unsigned long start_positions[],
-                    int array_length, double *value )
+static int mirw_slice_minmax ( int opcode, mihandle_t volume,
+                    const misize_t start_positions[],
+                    misize_t array_length, double *value )
 {
   hid_t dset_id;
   hid_t fspc_id;
   hid_t mspc_id;
   hsize_t hdf_start[MI2_MAX_VAR_DIMS];//VF: should it be hssize_t ?
   hsize_t hdf_count[MI2_MAX_VAR_DIMS];
-  unsigned long count[MI2_MAX_VAR_DIMS];
+  misize_t count[MI2_MAX_VAR_DIMS];
   int dir[MI2_MAX_VAR_DIMS];
   int ndims;
   int i;
@@ -120,8 +119,8 @@ mirw_slice_minmax ( int opcode, mihandle_t volume,
  * coordinates will trigger an error.
  * Coordinates must always be specified in raw file order.
  */
-int miget_slice_min ( mihandle_t volume, const unsigned long start_positions[],
-                  int array_length, double *slice_min )
+int miget_slice_min ( mihandle_t volume, const misize_t start_positions[],
+                  misize_t array_length, double *slice_min )
 {
   return ( mirw_slice_minmax ( MIRW_SCALE_MIN + MIRW_SCALE_GET,
                                volume, start_positions,
@@ -136,8 +135,8 @@ int miget_slice_min ( mihandle_t volume, const unsigned long start_positions[],
  * coordinates will trigger an error.
  * Coordinates must always be specified in raw file order.
  */
-int miget_slice_max ( mihandle_t volume, const unsigned long start_positions[],
-                  int array_length, double *slice_max )
+int miget_slice_max ( mihandle_t volume, const misize_t start_positions[],
+                  misize_t array_length, double *slice_max )
 {
   return ( mirw_slice_minmax ( MIRW_SCALE_MAX + MIRW_SCALE_GET,
                                volume, start_positions,
@@ -152,8 +151,8 @@ int miget_slice_max ( mihandle_t volume, const unsigned long start_positions[],
  * coordinates will trigger an error.
  * Coordinates must always be specified in raw file order.
  */
-int miset_slice_min ( mihandle_t volume, const unsigned long start_positions[],
-                  int array_length, double slice_min )
+int miset_slice_min ( mihandle_t volume, const misize_t start_positions[],
+                  misize_t array_length, double slice_min )
 {
   return ( mirw_slice_minmax ( MIRW_SCALE_MIN + MIRW_SCALE_SET,
                                volume, start_positions,
@@ -169,8 +168,8 @@ coordinates will trigger an error.
 Coordinates must always be specified in raw file order.
  */
 int
-miset_slice_max ( mihandle_t volume, const unsigned long start_positions[],
-                  int array_length, double slice_max )
+miset_slice_max ( mihandle_t volume, const misize_t start_positions[],
+                  misize_t array_length, double slice_max )
 {
   return ( mirw_slice_minmax ( MIRW_SCALE_MAX + MIRW_SCALE_SET,
                                volume, start_positions,
@@ -185,8 +184,8 @@ miset_slice_max ( mihandle_t volume, const unsigned long start_positions[],
  * ignored.  Specifying too few coordinates will trigger an error.
  * Coordinates must always be specified in raw file order.
  */
-int miget_slice_range ( mihandle_t volume, const unsigned long start_positions[],
-                    int array_length, double *slice_max, double *slice_min )
+int miget_slice_range ( mihandle_t volume, const misize_t start_positions[],
+                    misize_t array_length, double *slice_max, double *slice_min )
 {
   int r;
 
@@ -216,8 +215,8 @@ int miget_slice_range ( mihandle_t volume, const unsigned long start_positions[]
  * coordinates will trigger an error.  Coordinates must always be
  * specified in raw file order.
  */
-int miset_slice_range ( mihandle_t volume, const unsigned long start_positions[],
-                    int array_length, double slice_max, double slice_min )
+int miset_slice_range ( mihandle_t volume, const misize_t start_positions[],
+                    misize_t array_length, double slice_max, double slice_min )
 {
   int r;
 
