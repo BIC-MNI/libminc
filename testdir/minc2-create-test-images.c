@@ -25,8 +25,8 @@ int create_2D_image(void)
   double *offsets = (double *)malloc(CX * sizeof(double)); 
   double start_values[NDIMS-1]={-1.01, -2.02};
   miboolean_t flag=0;
-  long count[NDIMS-1];
-  long start[NDIMS-1];
+  misize_t count[NDIMS-1];
+  misize_t start[NDIMS-1];
 
   r = micreate_dimension("xspace", MI_DIMCLASS_SPATIAL, MI_DIMATTR_NOT_REGULARLY_SAMPLED, CX, &hdim[0]);
 
@@ -70,8 +70,8 @@ int create_3D_image(void)
     mihandle_t hvol;
     unsigned short *buf = ( unsigned short *) malloc(CX * CY * CZ * sizeof(unsigned short));
     int i;
-    long count[NDIMS];
-    long start[NDIMS];
+    misize_t count[NDIMS];
+    misize_t start[NDIMS];
     miboolean_t flag=1;
     
     double min = -1.0;
@@ -124,8 +124,8 @@ int create_4D_image(void)
     mihandle_t hvol;
     unsigned char *buf = (unsigned char *) malloc(CX * CU * CZ * CY * sizeof(unsigned char));
     int i,j;
-    long count[NDIMS+1];
-    long start[NDIMS+1];
+    misize_t count[NDIMS+1];
+    misize_t start[NDIMS+1];
     miboolean_t flag=1;
     
     double min = -1.0;

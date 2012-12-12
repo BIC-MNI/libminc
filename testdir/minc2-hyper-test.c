@@ -29,8 +29,8 @@ main(int argc, char **argv)
 {
     mihandle_t hvol;
     int result;
-    unsigned long start[NDIMS];
-    unsigned long count[NDIMS];
+    misize_t start[NDIMS];
+    misize_t count[NDIMS];
     double dtemp[CX][CY][CZ];
     unsigned short stmp2[CX][CY][CZ];
     unsigned short stemp[CZ][CX][CY];
@@ -235,7 +235,7 @@ main(int argc, char **argv)
     for (i = 0; (i + 3) < CZ; i += 3) {
         for (j = 0; (j + 2) < CX; j += 2) {
             for (k = 0; (k + 2) < CY; k += 2) {
-                short stmp3[3][2][2];
+                unsigned short stmp3[3][2][2];
 
                 start[0] = i;
                 start[1] = j;

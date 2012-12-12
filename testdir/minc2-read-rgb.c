@@ -11,10 +11,10 @@
 static int error_cnt = 0;
 
 
-double calculate_mean_f(float *array,int length)
+double calculate_mean_f(float *array,misize_t length)
 {
   double avg=0.0;
-  int i;
+  misize_t i;
   for(i=0;i<length;i++)
   {
     avg+=(double)(array[i]);
@@ -23,7 +23,7 @@ double calculate_mean_f(float *array,int length)
   return avg/length;
 }
 
-double calculate_mean_s(short *array,int length)
+double calculate_mean_s(short *array,misize_t length)
 {
   double avg=0.0;
   int i;
@@ -33,10 +33,10 @@ double calculate_mean_s(short *array,int length)
   return avg/length;
 }
 
-double calculate_mean_d(double *array,int length)
+double calculate_mean_d(double *array,misize_t length)
 {
   double avg=0.0;
-  int i;
+  misize_t i;
   for(i=0;i<length;i++)
     avg+=array[i];
   
@@ -51,11 +51,11 @@ int main ( int argc, char **argv )
   
   midimhandle_t *dim;
   int           ndim;
-  unsigned int  *sizes;
-  unsigned long *start;
-  unsigned long *count;
-  unsigned long *howfar;
-  unsigned long *location;
+  misize_t *sizes;
+  misize_t *start;
+  misize_t *count;
+  misize_t *howfar;
+  misize_t *location;
   double        *origin;
   double        *step;
   miclass_t      volume_class;
@@ -121,11 +121,11 @@ int main ( int argc, char **argv )
 
   /*Allocate memory buffers*/
   dim=  malloc(sizeof(midimhandle_t)*ndim);
-  sizes=malloc(sizeof(unsigned int)*ndim);
-  start=malloc(sizeof(unsigned long)*ndim);
-  count=malloc(sizeof(unsigned long)*ndim);
-  howfar=malloc(sizeof(unsigned long)*ndim);
-  location=malloc(sizeof(unsigned long)*ndim);
+  sizes=malloc(sizeof(misize_t)*ndim);
+  start=malloc(sizeof(misize_t)*ndim);
+  count=malloc(sizeof(misize_t)*ndim);
+  howfar=malloc(sizeof(misize_t)*ndim);
+  location=malloc(sizeof(misize_t)*ndim);
   origin=malloc(sizeof(double)*ndim);
   step=malloc(sizeof(double)*ndim);
   
@@ -175,9 +175,9 @@ int main ( int argc, char **argv )
     /*Now we are going to work with the volume using apparent dimension order*/
     midimhandle_t my_dim[4];
     static char *my_dimorder[] = {MIvector_dimension,MIxspace,MIyspace,MIzspace};
-    unsigned int  my_sizes[4];
-    unsigned long my_start[4];
-    unsigned long my_count[4];
+    misize_t my_sizes[4];
+    misize_t my_start[4];
+    misize_t my_count[4];
 
     float *f_coronal,*f_sagittal,*f_axial;/*floating point info*/
     float *f_full;
@@ -343,9 +343,9 @@ int main ( int argc, char **argv )
     /*Now we are going to work with the volume using apparent dimension order*/
     midimhandle_t my_dim[3];
     static char *my_dimorder[] = {MIxspace,MIyspace,MIzspace};
-    unsigned int  my_sizes[3];
-    unsigned long my_start[3];
-    unsigned long my_count[3];
+    misize_t my_sizes[3];
+    misize_t my_start[3];
+    misize_t my_count[3];
 
     float *f_coronal,*f_sagittal,*f_axial;
     float *f_full;

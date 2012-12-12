@@ -24,8 +24,8 @@ int create_real_as_int_image(void)
     mihandle_t hvol;
     int *buf = ( int *) malloc(CX * CY * CZ * sizeof(int));
     int i;
-    long count[NDIMS];
-    long start[NDIMS];
+    misize_t count[NDIMS];
+    misize_t start[NDIMS];
     miboolean_t flag=1;
     
     double min = -1.0;
@@ -78,8 +78,8 @@ int create_real_as_float_image(void)
     mihandle_t hvol;
     float *buf = (float *) malloc(CX * CY * CZ * sizeof(float));
     int i;
-    long count[NDIMS];
-    long start[NDIMS];
+    misize_t count[NDIMS];
+    misize_t start[NDIMS];
     miboolean_t flag=1;
     
     double min = -1.0;

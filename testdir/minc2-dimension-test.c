@@ -139,8 +139,8 @@ int main(int argc, char **argv)
     int r;
     midimhandle_t dim[NDIMS];
     int n;
-    unsigned long coords[NDIMS];
-    unsigned long count[NDIMS];
+    misize_t coords[NDIMS];
+    misize_t count[NDIMS];
     int i,j,k;
     double offset;
     unsigned int voxel;

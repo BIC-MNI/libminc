@@ -16,7 +16,7 @@ int test1(int do_real)
     midimhandle_t hdim[ND];
     mihandle_t hvol;
     double offsets[CX];
-    unsigned long coords[ND];
+    misize_t coords[ND];
 
     for (i = 0; i < CX; i++) {
         offsets[i] = (double) i * (double) i;
@@ -147,8 +147,8 @@ int test2()
     mihandle_t hvol;
     int r;
     int i,j,k;
-    unsigned long coords[ND];
-    unsigned long lengths[ND];
+    misize_t coords[ND];
+    misize_t lengths[ND];
     mifcomplex_t fcmpl;
 
     r = micreate_dimension("xspace", MI_DIMCLASS_SPATIAL, 

@@ -32,8 +32,8 @@ void create_test_file ( void )
   mihandle_t hvol;
   unsigned short *buf = ( unsigned short * ) malloc ( CX * CY * CZ * sizeof ( unsigned short ) );
   int i;
-  long count[NDIMS];
-  long start[NDIMS];
+  misize_t count[NDIMS];
+  misize_t start[NDIMS];
   miboolean_t flag = 1;
 
   double min = -1.0;
@@ -86,11 +86,11 @@ int main ( int argc, char **argv )
 
   midimhandle_t dim[NDIMS];
 
-  unsigned int sizes[NDIMS];
-  unsigned long start[NDIMS];
-  unsigned long count[NDIMS];
-  unsigned long howfar[NDIMS];
-  unsigned long location[NDIMS];
+  misize_t sizes[NDIMS];
+  misize_t start[NDIMS];
+  misize_t count[NDIMS];
+  misize_t howfar[NDIMS];
+  misize_t location[NDIMS];
   double *buffer, value;
   int r = 0;
 
@@ -123,7 +123,7 @@ int main ( int argc, char **argv )
   r = miget_dimension_sizes ( dim, 3, sizes );
 #endif
   if ( r == MI_NOERROR ) {
-    printf ( "Sizes: %d, %d, %d\n", sizes[0], sizes[1], sizes[2] );
+    printf ( "Sizes: %d, %d, %d\n", (int)sizes[0], (int)sizes[1], (int)sizes[2] );
   } else {
     fprintf ( stderr, "Error getting dimension sizes\n" );
   }
@@ -150,8 +150,8 @@ int main ( int argc, char **argv )
   /* Get real value hyperslab*/
   printf ( "\n" );
   printf ( "Getting a real value hyperslab \n" );
-  printf ( "Starting at %d, %d, %d \n", start[0], start[1], start[2] );
-  printf ( "Extending to %d, %d, %d \n", howfar[0], howfar[1], howfar[2] );
+  printf ( "Starting at %d, %d, %d \n",  (int)start[0],  (int)start[1],  (int)start[2] );
+  printf ( "Extending to %d, %d, %d \n", (int)howfar[0], (int)howfar[1], (int)howfar[2] );
   printf ( "\n" );
   if ( miget_real_value_hyperslab ( vol, MI_TYPE_DOUBLE, start, count, buffer ) < 0 ) {
     fprintf ( stderr, "Could not get hyperslab.\n" );
@@ -160,7 +160,7 @@ int main ( int argc, char **argv )
   /* set an arbitrary location to print values from */
   location[0] = 70; location[1] = 100; location[2] = 104;
   printf ( "Test arbitrary location %d, %d, %d \n",
-           location[0], location[1], location[2] );
+           (int)location[0], (int)location[1], (int)location[2] );
   miget_real_value ( vol, location, 3, &value );
   printf ( "Test from hyperslab: %f \n",
            * ( buffer + ( location[0] - start[0] ) *count[1]*count[2] +
@@ -174,7 +174,7 @@ int main ( int argc, char **argv )
   /* set another arbitrary location to print values from */
   location[0] = 104; location[1] = 100; location[2] = 70;
   printf ( "Test arbitrary location %d, %d, %d \n",
-           location[0], location[1], location[2] );
+           (int)location[0], (int)location[1], (int)location[2] );
   miget_real_value ( vol, location, 3, &value );
   printf ( "Test from hyperslab: %f \n", * ( buffer + ( location[0] - start[0] ) *count[1]*count[2] +
            ( location[1] - start[1] ) * count[2] + ( location[2] - start[2] ) ) );
