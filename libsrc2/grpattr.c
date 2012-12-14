@@ -659,7 +659,7 @@ int micopy_attr ( mihandle_t vol, const char *path, mihandle_t new_vol )
   float valflt;
   long  vallng;
   int r;
-  int length;
+  size_t length;
 
   r = milist_start ( vol, path, 1, &hlist );
 

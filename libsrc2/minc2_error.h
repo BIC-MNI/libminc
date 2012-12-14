@@ -97,18 +97,19 @@ typedef enum mi2msgcode {
     MI2_MSG_BADPROP,
     MI2_MSG_ICVNOTATTACHED,
     MI2_MSG_ICVCOORDS,
-    MI2_MSG_BADOP
+    MI2_MSG_BADOP,
+    MI2_MSG_HDF5,
 } mi2msgcode_t;
 
-extern int mi2log_message(mi2msgcode_t code, ...);
+int  mi2log_message(const char *file,int line, mi2msgcode_t code, ...);
+int  MI2_save_routine_name(char *name);
+int  MI2_return(void);
+int  MI2_return_error(void);
+void MI2_log_pkg_error2(int p1, char *p2);
+void MI2_log_pkg_error3(int p1, char *p2, char *p3);
+void MI2_log_sys_error1(char *p1);
+void mi2log_init(const char *name);
 
-extern int MI2_save_routine_name(char *name);
-extern int MI2_return(void);
-extern int MI2_return_error(void);
-extern void MI2_log_pkg_error2(int p1, char *p2);
-extern void MI2_log_pkg_error3(int p1, char *p2, char *p3);
-extern void MI2_log_sys_error1(char *p1);
-extern void mi2log_init(const char *name);
-
+#define MI_LOG_ERROR(code,...) mi2log_message(__FILE__,__LINE__,code , ##__VA_ARGS__ )
 
 #endif /* _MINC2_ERROR_H_ not defined */

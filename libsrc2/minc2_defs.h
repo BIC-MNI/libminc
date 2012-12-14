@@ -439,3 +439,5 @@ image dimensions */
 #endif 
 
 #endif /*__MINC2_DEFS_H__*/
+
+// kate: indent-mode cstyle; indent-width 2; replace-tabs on; 

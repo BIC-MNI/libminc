@@ -20,8 +20,8 @@ int main(int argc, char **argv)
     midimhandle_t dim[NDIMS];
     mivolumeprops_t props;
     int n;
-    unsigned long coords[NDIMS];
-    unsigned long count[NDIMS];
+    misize_t coords[NDIMS];
+    misize_t count[NDIMS];
     int i,j,k;
     unsigned int voxel;
 

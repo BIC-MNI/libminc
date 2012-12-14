@@ -20,8 +20,8 @@ main(int argc, char **argv)
     char *name;
     int result;
     midimhandle_t hdim[NDIMS];
-    unsigned long coords[NDIMS];
-    unsigned long count[NDIMS];
+    misize_t coords[NDIMS];
+    misize_t count[NDIMS];
     int i,j,k;
     struct test {
         int r;
