@@ -51,25 +51,22 @@ int  midefine_label(mihandle_t volume, int value, const char *name)
     int result;
 
     if (volume == NULL || name == NULL) {
-        return (MI_ERROR);
+        return MI_LOG_ERROR(MI2_MSG_GENERIC,"Trying to use null volume or variable");
     }
 
     if (strlen(name) > MI_LABEL_MAX) {
-        return (MI_ERROR);
+        return MI_LOG_ERROR(MI2_MSG_GENERIC,"Label name is too long");
     }
 
     if (volume->volume_class != MI_CLASS_LABEL) {
-      return (MI_ERROR);
+      return MI_LOG_ERROR(MI2_MSG_GENERIC,"Volume class is not label");
     }
 
     if (volume->ftype_id <= 0 || volume->mtype_id <= 0) {
-      return (MI_ERROR);
+      return MI_LOG_ERROR(MI2_MSG_GENERIC,"Volume not initialized");
     }
 
-    result = H5Tenum_insert(volume->mtype_id, name, &value);
-    if (result < 0) {
-      return (MI_ERROR);
-    }
+    MI_CHECK_HDF_CALL_RET(result = H5Tenum_insert(volume->mtype_id, name, &value),"H5Tenum_insert");
 
     /* We might have to swap these values before adding them to
      * the file type.
@@ -86,10 +83,7 @@ int  midefine_label(mihandle_t volume, int value, const char *name)
             break;
         }
     }
-    result = H5Tenum_insert(volume->ftype_id, name, &value);
-    if (result < 0) {
-      return (MI_ERROR);
-    }
+    MI_CHECK_HDF_CALL_RET(result = H5Tenum_insert(volume->ftype_id, name, &value),"H5Tenum_insert");
 
     return (MI_NOERROR);
 }
@@ -105,27 +99,25 @@ int miget_label_name(mihandle_t volume, int value, char **name)
     int result;
 
     if (volume == NULL || name == NULL) {
-        return (MI_ERROR);
+       return MI_LOG_ERROR(MI2_MSG_GENERIC,"Trying to use null volume or variable");
     }
 
     if (volume->volume_class != MI_CLASS_LABEL) {
-        return (MI_ERROR);
+         MI_LOG_ERROR(MI2_MSG_GENERIC,"Volume class is not label");
     }
     if (volume->mtype_id <= 0) {
-        return (MI_ERROR);
+         MI_LOG_ERROR(MI2_MSG_GENERIC,"Volume is not initialized");
     }
     *name = malloc(MI_LABEL_MAX);
     if (*name == NULL) {
-        return (MI_ERROR);
+        return MI_LOG_ERROR(MI2_MSG_OUTOFMEM,MI_LABEL_MAX);
     }
 
     H5E_BEGIN_TRY {
         result = H5Tenum_nameof(volume->mtype_id, &value, *name, MI_LABEL_MAX);
     } H5E_END_TRY;
 
-    if (result < 0) {
-      return (MI_ERROR);
-    }
+    MI_CHECK_HDF_CALL_RET(result,"H5Tenum_nameof");
     return (MI_NOERROR);
 }
 
@@ -138,24 +130,22 @@ int miget_label_value(mihandle_t volume, const char *name, int *value_ptr)
     int result;
 
     if (volume == NULL || name == NULL || value_ptr == NULL) {
-        return (MI_ERROR);
+        return MI_LOG_ERROR(MI2_MSG_GENERIC,"Trying to use null volume or variable");
     }
 
     if (volume->volume_class != MI_CLASS_LABEL) {
-        return (MI_ERROR);
+        return MI_LOG_ERROR(MI2_MSG_GENERIC,"Volume class is not label");
     }
 
     if (volume->mtype_id <= 0) {
-        return (MI_ERROR);
+        return MI_LOG_ERROR(MI2_MSG_GENERIC,"Volume is not initialized");
     }
 
     H5E_BEGIN_TRY {
         result = H5Tenum_valueof(volume->mtype_id, name, value_ptr);
     } H5E_END_TRY;
 
-    if (result < 0) {
-      return (MI_ERROR);
-    }
+    MI_CHECK_HDF_CALL_RET(result,"H5Tenum_valueof");
     return (MI_NOERROR);
 }
 
@@ -167,26 +157,23 @@ int miget_number_of_defined_labels(mihandle_t volume, int *number_of_labels)
   int result;
  
   if (volume == NULL) {
-    return (MI_ERROR);
+    return MI_LOG_ERROR(MI2_MSG_GENERIC,"Trying to use null volume");
   }
   if (volume->volume_class != MI_CLASS_LABEL) {
-    return (MI_ERROR);
+    return MI_LOG_ERROR(MI2_MSG_GENERIC,"Volume class is not label");
   }
 
   if (volume->mtype_id <= 0) {
-    return (MI_ERROR);
+    return MI_LOG_ERROR(MI2_MSG_GENERIC,"Volume is not initialized");
   }
 
   H5E_BEGIN_TRY {
     result = H5Tget_nmembers(volume->mtype_id);
   } H5E_END_TRY;
 
-  if (result < 0) {
-    return (MI_ERROR);
-  }
-  else {
-    *number_of_labels = result;
-  }
+  MI_CHECK_HDF_CALL_RET(result,"H5Tget_nmembers");
+  
+  *number_of_labels = result;
     
   return (MI_NOERROR);
 }
@@ -198,23 +185,21 @@ int miget_label_value_by_index(mihandle_t volume, int idx, int *value)
 {
   int result;
   if (volume == NULL) {
-    return (MI_ERROR);
+    return MI_LOG_ERROR(MI2_MSG_GENERIC,"Trying to use null volume");
   }
   if (volume->volume_class != MI_CLASS_LABEL) {
-    return (MI_ERROR);
+    return MI_LOG_ERROR(MI2_MSG_GENERIC,"Volume class is not label");
   }
   
   if (volume->mtype_id <= 0) {
-    return (MI_ERROR);
+    return MI_LOG_ERROR(MI2_MSG_GENERIC,"Volume is not initialized");
   }
 
   H5E_BEGIN_TRY {
     result = H5Tget_member_value(volume->mtype_id,idx,value);
   } H5E_END_TRY;
 
-  if (result < 0) {
-    return (MI_ERROR);
-  }
+  MI_CHECK_HDF_CALL_RET(result,"H5Tget_member_value");
 
   return (MI_NOERROR);
 }

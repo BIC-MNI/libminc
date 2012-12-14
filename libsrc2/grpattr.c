@@ -494,7 +494,7 @@ int miget_attr_length ( mihandle_t vol, const char *path, const char *name,
   hdf_file = vol->hdf_id;
 
   if ( hdf_file < 0 ) {
-    return ( MI_ERROR );
+    return MI_LOG_ERROR(MI2_MSG_GENERIC,"HDF file is not open");
   }
 
   strncpy ( fullpath, MI_ROOT_PATH "/" MI_INFO_NAME, sizeof ( fullpath ) );
@@ -510,26 +510,14 @@ int miget_attr_length ( mihandle_t vol, const char *path, const char *name,
   hdf_grp = midescend_path ( hdf_file, fullpath );
 
   if ( hdf_grp < 0 ) {
-    return ( MI_ERROR );
+    return MI_LOG_ERROR(MI2_MSG_GENERIC,"midescend_path fail");
   }
 
-  hdf_attr = H5Aopen_name ( hdf_grp, name );
+  MI_CHECK_HDF_CALL_RET(hdf_attr = H5Aopen_name ( hdf_grp, name ),"H5Aopen_name");
 
-  if ( hdf_attr < 0 ) {
-    return ( MI_ERROR );
-  }
+  MI_CHECK_HDF_CALL_RET(hdf_space = H5Aget_space ( hdf_attr ), "H5Aget_space");
 
-  hdf_space = H5Aget_space ( hdf_attr );
-
-  if ( hdf_space < 0 ) {
-    return ( MI_ERROR );
-  }
-
-  hdf_type = H5Aget_type ( hdf_attr );
-
-  if ( hdf_type < 0 ) {
-    return ( MI_ERROR );
-  }
+  MI_CHECK_HDF_CALL_RET(hdf_type = H5Aget_type ( hdf_attr ),"H5Aget_type");
 
   switch ( H5Sget_simple_extent_ndims ( hdf_space ) ) {
   case 0:     /* Scalar */
@@ -553,7 +541,7 @@ int miget_attr_length ( mihandle_t vol, const char *path, const char *name,
     /* For now, we allow only scalars and vectors.  No multidimensional
      * arrays for MINC 2.0 attributes.
      */
-    return ( MI_ERROR );
+    return MI_LOG_ERROR(MI2_MSG_GENERIC,"Only scalars and vectors are supported");
   }
 
   H5Tclose ( hdf_type );
@@ -587,7 +575,7 @@ int miget_attr_type ( mihandle_t vol, const char *path, const char *name,
   hdf_file = vol->hdf_id;
 
   if ( hdf_file < 0 ) {
-    return ( MI_ERROR );
+    return MI_LOG_ERROR(MI2_MSG_GENERIC,"HDF file is not open");
   }
 
   strncpy ( fullpath, MI_ROOT_PATH "/" MI_INFO_NAME, sizeof ( fullpath ) );
@@ -603,16 +591,12 @@ int miget_attr_type ( mihandle_t vol, const char *path, const char *name,
   hdf_grp = midescend_path ( hdf_file, fullpath );
 
   if ( hdf_grp < 0 ) {
-    return ( MI_ERROR );
+    return MI_LOG_ERROR(MI2_MSG_GENERIC,"midescend_path fail");
   }
 
-  hdf_attr = H5Aopen_name ( hdf_grp, name );
-
-  if ( hdf_attr < 0 ) {
-    return ( MI_ERROR );
-  }
-
-  hdf_type = H5Aget_type ( hdf_attr );
+  MI_CHECK_HDF_CALL_RET(hdf_attr = H5Aopen_name ( hdf_grp, name ),"H5Aopen_name");
+  
+  MI_CHECK_HDF_CALL_RET(hdf_type = H5Aget_type ( hdf_attr ),"H5Aget_type");
 
   switch ( H5Tget_class ( hdf_type ) ) {
   case H5T_FLOAT:
@@ -631,7 +615,7 @@ int miget_attr_type ( mihandle_t vol, const char *path, const char *name,
     *data_type = MI_TYPE_INT;
     break;
   default:
-    return ( MI_ERROR );
+    MI_LOG_ERROR(MI2_MSG_GENERIC,"Unsupported attribute type");
   }
 
   H5Tclose ( hdf_type );
@@ -683,11 +667,11 @@ int micopy_attr ( mihandle_t vol, const char *path, mihandle_t new_vol )
         miset_attr_values ( new_vol, MI_TYPE_INT, pathbuf, namebuf, 1, &vallng );
         break;
       default:
-        return ( MI_ERROR );
+        return MI_LOG_ERROR(MI2_MSG_GENERIC,"Unsupported attribute type");
       }
     }
   } else {
-    return ( MI_ERROR );
+    MI_LOG_ERROR(MI2_MSG_GENERIC,"milist_start failed");
   }
 
   milist_finish ( hlist );
@@ -713,7 +697,7 @@ int miget_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
   hdf_file = vol->hdf_id;
 
   if ( hdf_file < 0 ) {
-    return ( MI_ERROR );
+    return MI_LOG_ERROR(MI2_MSG_GENERIC,"HDF file is not open");
   }
 
   if ( strcmp ( name, "history" ) ) {
@@ -733,14 +717,10 @@ int miget_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
   hdf_grp = midescend_path ( hdf_file, fullpath );
 
   if ( hdf_grp < 0 ) {
-    return ( MI_ERROR );
+    return MI_LOG_ERROR(MI2_MSG_GENERIC,"midescend_path fail");
   }
 
-  hdf_attr = H5Aopen_name ( hdf_grp, name );
-
-  if ( hdf_attr < 0 ) {
-    return ( MI_ERROR );
-  }
+  MI_CHECK_HDF_CALL_RET(hdf_attr = H5Aopen_name ( hdf_grp, name ),"H5Aopen_name");
 
   switch ( data_type ) {
   case MI_TYPE_INT:
@@ -757,14 +737,10 @@ int miget_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
     H5Tset_size ( mtyp_id, length );
     break;
   default:
-    return ( MI_ERROR );
+    return MI_LOG_ERROR(MI2_MSG_GENERIC,"Unsupported attribute type");
   }
 
-  hdf_space = H5Aget_space ( hdf_attr );
-
-  if ( hdf_space < 0 ) {
-    return ( MI_ERROR );
-  }
+  MI_CHECK_HDF_CALL_RET(hdf_space = H5Aget_space ( hdf_attr ),"H5Aget_space");
 
   /* If we're retrieving a vector, make certain the length passed into this
    * function is sufficient.
@@ -815,7 +791,7 @@ int miset_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
   hdf_file = vol->hdf_id;
 
   if ( hdf_file < 0 ) {
-    return ( MI_ERROR );
+    return MI_LOG_ERROR(MI2_MSG_GENERIC,"HDF file is not open");
   }
 
   strncpy ( fullpath, MI_ROOT_PATH "/" MI_INFO_NAME, sizeof ( fullpath ) );
@@ -878,7 +854,7 @@ int miset_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
   hdf_grp = midescend_path ( hdf_file, fullpath );
 
   if ( hdf_grp < 0 ) {
-    return ( MI_ERROR );
+    return MI_LOG_ERROR(MI2_MSG_GENERIC,"midescend_path fail");
   }
 
   result = miset_attr_at_loc ( hdf_grp, name, data_type, length, values );
@@ -913,13 +889,13 @@ int miadd_history_attr ( mihandle_t vol, size_t length, const void *values )
   hdf_file = vol->hdf_id;
 
   if ( hdf_file < 0 ) {
-    return ( MI_ERROR );
+    return MI_LOG_ERROR(MI2_MSG_GENERIC,"HDF file is not open");
   }
 
   hdf_grp = midescend_path ( hdf_file, "/minc-2.0" );
 
   if ( hdf_grp < 0 ) {
-    return ( MI_ERROR );
+    return MI_LOG_ERROR(MI2_MSG_GENERIC,"midescend_path fail");
   }
 
   result = miset_attr_at_loc ( hdf_grp, "history", MI_TYPE_STRING, length, values );

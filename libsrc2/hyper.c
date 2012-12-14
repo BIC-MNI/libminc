@@ -123,7 +123,7 @@ void restructure_array(int ndims,    /* Dimension count */
    **/
   bitmap = calloc((total + 8 - 1) / 8, 1); /* bit array */
   if (bitmap == NULL) {
-    //TODO: report MEMORY error somehow
+    MI_LOG_ERROR(MI2_MSG_OUTOFMEM,(total + 8 - 1) / 8);
     return;
   }
 
@@ -402,7 +402,7 @@ static int mirw_hyperslab_raw(int opcode,
   
   /* Open the dataset with the specified path
   */
-  dset_id = H5Dopen1(volume->hdf_id, path);
+  MI_CHECK_HDF_CALL(dset_id = H5Dopen1(volume->hdf_id, path),"H5Dopen1");
   if (dset_id < 0) {
     return (MI_ERROR);
   }

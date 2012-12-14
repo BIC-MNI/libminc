@@ -325,27 +325,19 @@ int miset_attr_at_loc ( hid_t hdf_loc, const char *name, mitype_t data_type,
     length = 1;             /* Apparent length is one. */
     break;
   default:
-    return ( MI_ERROR );
+    return MI_LOG_ERROR(MI2_MSG_GENERIC,"Unsupported attribute type");
   }
 
   if ( length == 1 ) {
-    spc_id = H5Screate ( H5S_SCALAR );
+    MI_CHECK_HDF_CALL_RET(spc_id = H5Screate ( H5S_SCALAR ),"H5Screate");
   } else {
     hdf_len = ( hsize_t ) length;
-    spc_id = H5Screate_simple ( 1, &hdf_len, NULL );
+    MI_CHECK_HDF_CALL_RET(spc_id = H5Screate_simple ( 1, &hdf_len, NULL ),"H5Screate_simple");
   }
 
-  if ( spc_id < 0 ) {
-    return ( MI_ERROR );
-  }
+  MI_CHECK_HDF_CALL_RET(hdf_attr = H5Acreate1 ( hdf_loc, name, ftyp_id, spc_id, H5P_DEFAULT ),"H5Acreate1");
 
-  hdf_attr = H5Acreate1 ( hdf_loc, name, ftyp_id, spc_id, H5P_DEFAULT );
-
-  if ( hdf_attr < 0 ) {
-    return ( MI_ERROR );
-  }
-
-  H5Awrite ( hdf_attr, mtyp_id, values );
+  MI_CHECK_HDF_CALL_RET(H5Awrite ( hdf_attr, mtyp_id, values ),"H5Awrite");
 
   H5Aclose ( hdf_attr );
   H5Tclose ( ftyp_id );
