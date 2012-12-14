@@ -55,7 +55,7 @@ int midelete_group(mihandle_t vol, const char *path, const char *name);
  * \ingroup mi2Group
  */
 int miget_attr_length(mihandle_t vol, const char *path, 
-                             const char *name, int *length);
+                             const char *name, size_t *length);
 
 /** Get the type of an attribute.
  * \ingroup mi2Group
@@ -73,19 +73,19 @@ int micopy_attr(mihandle_t vol, const char *path, mihandle_t new_vol);
  */
 int miget_attr_values(mihandle_t vol, mitype_t data_type,
                              const char *path, const char *name, 
-                             int length, void *values);
+                             size_t length, void *values);
 
 /** Set the values of an attribute.
  * \ingroup mi2Group
  */
 int miset_attr_values(mihandle_t vol, mitype_t data_type,
-                             const char *path, const char *name, int length,
+                             const char *path, const char *name, size_t length,
                              const void *values);
 
 /** Add global history attribute
  * \ingroup mi2Group
  */
-int miadd_history_attr(mihandle_t vol, int length, const void *values);
+int miadd_history_attr(mihandle_t vol, size_t length, const void *values);
 
 /** \defgroup mi2Memory FREE FUNCTIONS */
 

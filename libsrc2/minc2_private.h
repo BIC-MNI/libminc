@@ -5,6 +5,7 @@
 #ifndef __MINC2_PRIVATE_H__
 #define __MINC2_PRIVATE_H__ 1
 
+#include <string.h>
 #include "minc2_structs.h"
 
 /** The root of all MINC 2.0 objects in the HDF5 hierarchy.
@@ -122,71 +123,80 @@ struct mivolume {
  * "semi-private" functions.
  ****************************************************************************/
 /* From m2util.c */
-extern hid_t midescend_path(hid_t file_id, const char *path);
-extern hid_t mitype_to_hdftype(mitype_t, int);
-extern int mitype_len ( mitype_t mitype );
-extern const char * mitype_sign ( mitype_t mitype );
+hid_t midescend_path(hid_t file_id, const char *path);
+hid_t mitype_to_hdftype(mitype_t, int);
+int mitype_len ( mitype_t mitype );
+const char * mitype_sign ( mitype_t mitype );
 
-extern int mitype_to_nctype(mitype_t, int *is_signed);
+int mitype_to_nctype(mitype_t, int *is_signed);
 
-extern int miget_attribute(mihandle_t volume, const char *varpath, 
+int miget_attribute(mihandle_t volume, const char *varpath, 
                            const char *attname, mitype_t data_type, 
-                           int maxvals, void *values);
-extern int miset_attr_at_loc(hid_t hdf_loc, const char *attname, 
+                           size_t maxvals, void *values);
+
+int miset_attr_at_loc(hid_t hdf_loc, const char *attname, 
                              mitype_t data_type, 
-                             int maxvals, const void *values);
-extern int miset_attribute(mihandle_t volume, const char *varpath, 
+                             size_t maxvals, const void *values);
+
+int miset_attribute(mihandle_t volume, const char *varpath, 
                            const char *attname, mitype_t data_type, 
-                           int maxvals, const void *values);
-extern void mifind_spatial_dims(int mincid, int space_to_dim[], int dim_to_space[]);
-extern void miget_voxel_to_world(mihandle_t volume, mi_lin_xfm_t voxel_to_world);
-extern void minormalize_vector(double vector[]);
-extern void mitransform_coord(double out_coord[],
+                           size_t maxvals, const void *values);
+
+/*void mifind_spatial_dims(int mincid, int space_to_dim[], int dim_to_space[]);*/
+
+void miget_voxel_to_world(mihandle_t volume, mi_lin_xfm_t voxel_to_world);
+
+void minormalize_vector(double vector[]);
+
+void mitransform_coord(double out_coord[],
                               mi_lin_xfm_t transform,
                               const double in_coord[]);
-extern int  miinvert_transform(mi_lin_xfm_t transform, mi_lin_xfm_t inverse);
 
-extern void miinit(void);
-extern void miinit_enum(hid_t);
+int  miinvert_transform(mi_lin_xfm_t transform, mi_lin_xfm_t inverse);
 
-extern int miget_scalar(hid_t loc_id, hid_t type_id, const char *path, 
+void miinit(void);
+
+void miinit_enum(hid_t);
+
+int miget_scalar(hid_t loc_id, hid_t type_id, const char *path, 
                         void *data);
 
-extern int minc_create_thumbnail(mihandle_t volume, int grp);
-extern int minc_update_thumbnail(mihandle_t volume, hid_t loc_id, int igrp, int ogrp);
-extern int minc_update_thumbnails(mihandle_t volume);
+int minc_create_thumbnail(mihandle_t volume, int grp);
 
-extern int scaled_maximal_pivoting_gaussian_elimination(int   n,
-                                                        int   row[],
-                                                        double **a,
-                                                        int   n_values,
-                                                        double **solution );
+int minc_update_thumbnail(mihandle_t volume, hid_t loc_id, int igrp, int ogrp);
 
-extern int scaled_maximal_pivoting_gaussian_elimination_real(int n,
-                                                             double **coefs,
-                                                             int n_values,
-                                                             double **values );
+int minc_update_thumbnails(mihandle_t volume);
 
-extern double *alloc1d(int);
-extern double **alloc2d(int, int);
-extern void free2d(int, double **);
-extern int create_dataset(hid_t hdf_file, const char *path);
-extern int create_standard_dataset(hid_t hdf_file, const char *path);
+int scaled_maximal_pivoting_gaussian_elimination(int   n,
+                                                  int   row[],
+                                                  double **a,
+                                                  int   n_values,
+                                                  double **solution );
+
+int scaled_maximal_pivoting_gaussian_elimination_real(int n,
+                                                      double **coefs,
+                                                      int n_values,
+                                                      double **values );
+
+double *alloc1d(int);
+double **alloc2d(int, int);
+void free2d(int, double **);
+int create_dataset(hid_t hdf_file, const char *path);
+int create_standard_dataset(hid_t hdf_file, const char *path);
 
 /* From hyper.c */
-extern int mitranslate_hyperslab_origin(mihandle_t volume, 
-                                        const misize_t* start, 
-                                        const misize_t* count,
-                                        hsize_t* hdf_start,
-                                        hsize_t* hdf_count,
-                                        int* dir);
+int mitranslate_hyperslab_origin(mihandle_t volume, 
+                                const misize_t* start, 
+                                const misize_t* count,
+                                hsize_t* hdf_start,
+                                hsize_t* hdf_count,
+                                int* dir);
 /* From volume.c */
-extern void misave_valid_range(mihandle_t volume);
+void misave_valid_range(mihandle_t volume);
 
 /* From valid.c*/
-extern void miinit_default_range(mitype_t mitype, double *valid_max, double *valid_min);
+void miinit_default_range(mitype_t mitype, double *valid_max, double *valid_min);
 
 
-#include <string.h>
 
 #endif /*__MINC2_PRIVATE_H__*/

@@ -273,8 +273,8 @@ int milist_grp_next ( milisthandle_t handle, char *path, int maxpath )
     char fullpath[256];
     char tmp[256];
 
-    strncpy ( fullpath, MI_ROOT_PATH "/" MI_INFO_NAME, sizeof ( fullpath ) );
-    strncat ( fullpath, data->frame_ptr->relpath, sizeof ( fullpath ) - strlen ( fullpath ) );
+    strncpy ( fullpath, MI_ROOT_PATH "/" MI_INFO_NAME, sizeof ( fullpath ) - 1 );
+    strncat ( fullpath, data->frame_ptr->relpath, sizeof ( fullpath ) - strlen ( fullpath ) - 1 );
     strcpy ( tmp, data->frame_ptr->relpath );
 
     H5E_BEGIN_TRY {
@@ -478,7 +478,7 @@ int midelete_group ( mihandle_t vol, const char *path, const char *name )
 /** Get the length of a attribute
  */
 int miget_attr_length ( mihandle_t vol, const char *path, const char *name,
-                    int *length )
+                    size_t *length )
 {
   hid_t tmp_id;
   hid_t hdf_file;
@@ -698,7 +698,7 @@ int micopy_attr ( mihandle_t vol, const char *path, mihandle_t new_vol )
 /** Get the values of an attribute.
  */
 int miget_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
-                    const char *name, int length, void *values )
+                    const char *name, size_t length, void *values )
 {
   hid_t tmp_id;
   hid_t hdf_file;
@@ -799,7 +799,7 @@ int miget_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
 /** Set the values of an attribute.
  */
 int miset_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
-                    const char *name, int length, const void *values )
+                    const char *name, size_t length, const void *values )
 {
   hid_t hdf_file;
   hid_t hdf_grp;
@@ -901,7 +901,7 @@ int miset_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
 
 /** Add global history attribute
  */
-int miadd_history_attr ( mihandle_t vol, int length, const void *values )
+int miadd_history_attr ( mihandle_t vol, size_t length, const void *values )
 {
   int result;
   hid_t hdf_file;

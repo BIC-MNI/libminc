@@ -292,7 +292,7 @@ hid_t midescend_path ( hid_t file_id, const char *path )
 
 
 int miset_attr_at_loc ( hid_t hdf_loc, const char *name, mitype_t data_type,
-                        int length, const void *values )
+                        size_t length, const void *values )
 {
   hid_t ftyp_id;
   hid_t mtyp_id;
@@ -356,7 +356,7 @@ int miset_attr_at_loc ( hid_t hdf_loc, const char *name, mitype_t data_type,
 
 /** Set an attribute from a minc file */
 int miset_attribute ( mihandle_t volume, const char *path, const char *name,
-                      mitype_t data_type, int length, const void *values )
+                      mitype_t data_type, size_t length, const void *values )
 {
   hid_t hdf_file;
   hid_t hdf_loc;
@@ -392,7 +392,7 @@ int miset_attribute ( mihandle_t volume, const char *path, const char *name,
 
 /** Get a double attribute from a minc file */
 int miget_attribute ( mihandle_t volume, const char *path, const char *name,
-                      mitype_t data_type, int length, void *values )
+                      mitype_t data_type, size_t length, void *values )
 {
   hid_t hdf_file;
   hid_t hdf_loc;
@@ -515,47 +515,49 @@ cleanup:
 /* Get the mapping from spatial dimension - x, y, z - to file dimensions
 * and vice-versa.
 */
-// void
-// mifind_spatial_dims(int mincid, int space_to_dim[], int dim_to_space[])
-// {
-//   int imgid;
-//   int dim[MI2_MAX_VAR_DIMS];
-//   int idim, ndims, world_index;
-//   char dimname[MI2_MAX_DIM_NAME];
-//
-//   /* Set default values */
-//   for (idim = 0; idim < 3; idim++)
-//     space_to_dim[idim] = -1;
-//
-//   for (idim = 0; idim < MI2_MAX_VAR_DIMS; idim++)
-//     dim_to_space[idim] = -1;
-//
-//   /* Get the dimension ids for the image variable
-//   */
-//   imgid = ncvarid(mincid, MIimage);
-//   ncvarinq(mincid, imgid, NULL, NULL, &ndims, dim, NULL);
-//
-//   /* Loop over them to find the spatial ones
-//   */
-//   for (idim = 0; idim < ndims; idim++) {
-//     /* Get the name and check that this is a spatial dimension
-//     */
-//     ncdiminq(mincid, dim[idim], dimname, NULL);
-//
-//     if (!strcmp(dimname, MIxspace)) {
-//       world_index = MI2_X;
-//     } else if (!strcmp(dimname, MIyspace)) {
-//       world_index = MI2_Y;
-//     } else if (!strcmp(dimname, MIzspace)) {
-//       world_index = MI2_Z;
-//     } else {
-//       continue;
-//     }
-//
-//     space_to_dim[world_index] = idim;
-//     dim_to_space[idim] = world_index;
-//   }
-// }
+/*TODO: convert to MINC2 API?*/
+#if 0
+void mifind_spatial_dims(int mincid, int space_to_dim[], int dim_to_space[])
+{
+  int imgid;
+  int dim[MI2_MAX_VAR_DIMS];
+  int idim, ndims, world_index;
+  char dimname[MI2_MAX_DIM_NAME];
+
+  /* Set default values */
+  for (idim = 0; idim < 3; idim++)
+    space_to_dim[idim] = -1;
+
+  for (idim = 0; idim < MI2_MAX_VAR_DIMS; idim++)
+    dim_to_space[idim] = -1;
+
+  /* Get the dimension ids for the image variable
+  */
+  imgid = ncvarid(mincid, MIimage);
+  ncvarinq(mincid, imgid, NULL, NULL, &ndims, dim, NULL);
+
+  /* Loop over them to find the spatial ones
+  */
+  for (idim = 0; idim < ndims; idim++) {
+    /* Get the name and check that this is a spatial dimension
+    */
+    ncdiminq(mincid, dim[idim], dimname, NULL);
+
+    if (!strcmp(dimname, MIxspace)) {
+      world_index = MI2_X;
+    } else if (!strcmp(dimname, MIyspace)) {
+      world_index = MI2_Y;
+    } else if (!strcmp(dimname, MIzspace)) {
+      world_index = MI2_Z;
+    } else {
+      continue;
+    }
+
+    space_to_dim[world_index] = idim;
+    dim_to_space[idim] = world_index;
+  }
+}
+#endif 
 
 /** Get the voxel to world transform (for column vectors) */
 void miget_voxel_to_world ( mihandle_t volume, mi_lin_xfm_t voxel_to_world )
