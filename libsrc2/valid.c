@@ -28,7 +28,7 @@ miget_volume_valid_max(mihandle_t volume, /**< MINC 2.0 volume handle */
                        double *valid_max) /**< the output value */
 {
     if (volume == NULL || valid_max == NULL) {
-        return (MI_ERROR);      /* Invalid arguments */
+        return MI_LOG_ERROR(MI2_MSG_GENERIC,"Trying to get valid range min with null volume or variable");      /* Invalid arguments */
     }
     *valid_max = volume->valid_max;
     return (MI_NOERROR);
@@ -43,7 +43,7 @@ int miset_volume_valid_max(mihandle_t volume, /**< MINC 2.0 volume handle */
                        double valid_max) /**< the new maximum value  */
 {
     if (volume == NULL) {
-        return (MI_ERROR);      /* Invalid arguments */
+        return MI_LOG_ERROR(MI2_MSG_GENERIC,"Trying to set valid range max with null volume ");      /* Invalid arguments */
     }
     /* TODO?: Should we require valid max to have some specific relationship
      * to valid_min?
@@ -62,7 +62,7 @@ int miget_volume_valid_min(mihandle_t volume, /**< MINC 2.0 volume handle */
                        double *valid_min) /**< the output value  */
 {
     if (volume == NULL || valid_min == NULL) {
-        return (MI_ERROR);      /* Invalid arguments. */
+        return MI_LOG_ERROR(MI2_MSG_GENERIC,"Trying to get valid range min with null volume or variable");      /* Invalid arguments. */
     }
     *valid_min = volume->valid_min;
     return (MI_NOERROR);
@@ -77,7 +77,7 @@ int miset_volume_valid_min(mihandle_t volume,  /**< MINC 2.0 volume handle */
                        double valid_min) /**< the new minimum value  */
 {
     if (volume == NULL) {
-        return (MI_ERROR);       /* Invalid arguments */
+        return MI_LOG_ERROR(MI2_MSG_GENERIC,"Trying to set valid range min with null volume ");       /* Invalid arguments */
     }
     volume->valid_min = valid_min;
     misave_valid_range(volume);
@@ -94,7 +94,7 @@ int miget_volume_valid_range(mihandle_t volume,  /**< MINC 2.0 volume handle */
                          double *valid_min) /**< the output minimum value */
 {
     if (volume == NULL || valid_min == NULL || valid_max == NULL) {
-        return (MI_ERROR);
+        return MI_LOG_ERROR(MI2_MSG_GENERIC,"Trying to get valid range with null volume or null variables");
     }
     *valid_min = volume->valid_min;
     *valid_max = volume->valid_max;
@@ -111,7 +111,7 @@ int miset_volume_valid_range(mihandle_t volume, /**< MINC 2.0 volume handle */
                          double valid_min) /**< the output minimum value */
 {
     if (volume == NULL) {
-        return (MI_ERROR);
+        return MI_LOG_ERROR(MI2_MSG_GENERIC,"Trying to set valid range with null volume ");
     }
     /* TODO?: Again, should we require min<max, for example?  Or should we
      * just do the right thing and swap them?  What if valid_max is greater

@@ -844,7 +844,7 @@ int micreate_volume(const char *filename, int number_of_dimensions,
   case MI_TYPE_UNKNOWN:
     break;
   default:
-    return (MI_ERROR);
+    return MI_LOG_ERROR(MI2_MSG_BADTYPE,volume_type);
   }
 
   handle->volume_type = volume_type;
@@ -887,7 +887,7 @@ int micreate_volume(const char *filename, int number_of_dimensions,
       props_handle->compression_type = MI_COMPRESS_ZLIB;
       break;
     default:
-      return (MI_ERROR);
+      return MI_LOG_ERROR(MI2_MSG_BADTYPE,create_props->compression_type);
     }
     /* Note that setting compression on (i.e., MI_COMPRESS_ZLIB)
     turns chunking on by default. Need to set the number of chunks
@@ -931,7 +931,7 @@ int miget_volume_dimension_count(mihandle_t volume, midimclass_t cls,
   int i, count=0;
   /* Validate the parameters */
   if (volume == NULL || number_of_dimensions == NULL) {
-    return (MI_ERROR);
+    return MI_LOG_ERROR(MI2_MSG_GENERIC,"Trying to get dimension count with null volume or null variable");
   }
   /* For each dimension check to make sure that dimension class and
     attribute match with the specified parameters and if yes
@@ -959,7 +959,7 @@ int miget_volume_voxel_count(mihandle_t volume, misize_t *number_of_voxels)
 
   /* Validate parameters */
   if (volume == NULL || number_of_voxels == NULL) {
-    return (MI_ERROR);
+    return MI_LOG_ERROR(MI2_MSG_GENERIC,"Trying to get voxel count with null volume or null variable");
   }
 
   /* Quickest way to do this is with the dataspace identifier of the
@@ -968,15 +968,10 @@ int miget_volume_voxel_count(mihandle_t volume, misize_t *number_of_voxels)
   sprintf(path, "/minc-2.0/image/%d/image", volume->selected_resolution);
   /* Open the dataset with the specified path
   */
-  dset_id = H5Dopen1(volume->hdf_id, path);
-  if (dset_id < 0) {
-    return (MI_ERROR);
-  }
+  MI_CHECK_HDF_CALL_RET(dset_id = H5Dopen1(volume->hdf_id, path),"H5Dopen1");
+  
   /* Get an Id to the copy of the dataspace */
-  fspc_id = H5Dget_space(dset_id);
-  if (fspc_id < 0) {
-    return (MI_ERROR);
-  }
+  MI_CHECK_HDF_CALL_RET(fspc_id = H5Dget_space(dset_id),"H5Dget_space");
   /* Determines the number of elements in the dataspace and
     cast the result to an integer.
   */
@@ -1001,10 +996,11 @@ static int _miget_file_dimension_count(hid_t file_id)
 
   if (dset_id >= 0) {
     /* Get an Id to the copy of the dataspace */
-    space_id = H5Dget_space(dset_id);
+    MI_CHECK_HDF_CALL(space_id = H5Dget_space(dset_id),"H5Dget_space");
+    
     if (space_id > 0) {
       /* Determine the dimensionality of the dataspace */
-      result = H5Sget_simple_extent_ndims(space_id);
+      MI_CHECK_HDF_CALL(result = H5Sget_simple_extent_ndims(space_id),"H5Sget_simple_extent_ndims");
       /* Close the dataspace */
       H5Sclose(space_id);
     }
@@ -1036,7 +1032,7 @@ static int _miset_volume_class(mihandle_t volume, miclass_t volume_class)
     class_ptr = "array__";
     break;
   default:
-    return (MI_ERROR);
+    return MI_LOG_ERROR(MI2_MSG_GENERIC,"Unknown volume class");
   }
   miset_attribute(volume, MI_ROOT_PATH, "class", MI_TYPE_STRING,
                   strlen(class_ptr), class_ptr);
@@ -1098,9 +1094,9 @@ static int _miget_file_dimension(mihandle_t volume, const char *dimname,
     MI2_CHAR_LENGTH, temp);
     if (r < 0) {
       /* Get the default class. */
-      if (!strcmp(dimname, "time")) {
+      if (!strcmp(dimname, MItime)) {
         hdim->dim_class = MI_DIMCLASS_TIME;
-      } else if (!strcmp(dimname, "vector_dimension")) {
+      } else if (!strcmp(dimname, MIvector_dimension)) {
         hdim->dim_class = MI_DIMCLASS_RECORD;
         hdim->step = 0.0;
       } else {
@@ -1120,28 +1116,28 @@ static int _miget_file_dimension(mihandle_t volume, const char *dimname,
       } else if (!strcmp(temp, "record_")) {
         hdim->dim_class = MI_DIMCLASS_RECORD;
       } else {
-        /* TODO: error message?? */
+        MI_LOG_ERROR(MI2_MSG_GENERIC,"Unknown dimension type");
       }
     }
     /* Get the attribute (length) from a minc file */
     r = miget_attribute(volume, path, "length", MI_TYPE_UINT, 1, &hdim->length);
     if (r < 0) {
-      fprintf(stderr, "Can't get length\n");
+      MI_LOG_ERROR(MI2_MSG_GENERIC,"Can't determine dimension length");
     }
     /* Get the attribute (start) from a minc file for NON vector_dimension only */
     if (strcmp(dimname, "vector_dimension")) {
-      r = miget_attribute(volume, path, "start", MI_TYPE_DOUBLE, 1, &hdim->start);
+      r = miget_attribute(volume, path, MIstart, MI_TYPE_DOUBLE, 1, &hdim->start);
       if (r < 0) {
         hdim->start = 0.0;
       }
       /* Get the attribute (step) from a minc file */
-      r = miget_attribute(volume, path, "step", MI_TYPE_DOUBLE, 1, &hdim->step);
+      r = miget_attribute(volume, path, MIstep, MI_TYPE_DOUBLE, 1, &hdim->step);
       if (r < 0) {
         hdim->step = 1.0;
       }
     }
     /* Get the attribute (direction_cosines) from a minc file */
-    r = miget_attribute(volume, path, "direction_cosines", MI_TYPE_DOUBLE, 3,
+    r = miget_attribute(volume, path, MIdirection_cosines, MI_TYPE_DOUBLE, 3,
                         hdim->direction_cosines);
     if (r < 0) {
       hdim->direction_cosines[MI2_X] = 0.0;
@@ -1211,7 +1207,7 @@ int miopen_volume(const char *filename, int mode, mihandle_t *volume)
   /* Allocate space for the volume handle */
   handle = mialloc_volume_handle();
   if (handle == NULL) {
-    return (MI_ERROR);
+    return MI_LOG_ERROR(MI2_MSG_OUTOFMEM,sizeof(struct mivolume));
   }
   /* Set some varibales associated with the volume handle */
   handle->hdf_id = file_id;
@@ -1229,12 +1225,16 @@ int miopen_volume(const char *filename, int mode, mihandle_t *volume)
   */
   handle->dim_handles = (midimhandle_t *)malloc(handle->number_of_dims *
                         sizeof(midimhandle_t));
+  
+  if(handle->dim_handles == NULL)
+    return MI_LOG_ERROR(MI2_MSG_OUTOFMEM, handle->number_of_dims * sizeof(midimhandle_t));
+  
   /* Get the attribute (dimorder) from the image dataset */
   r =  miget_attribute(handle, "/minc-2.0/image/0/image", "dimorder",
                        MI_TYPE_STRING, sizeof(dimorder), dimorder);
 
   if ( r < 0) {
-    return (MI_ERROR);
+    return MI_LOG_ERROR(MI2_MSG_GENERIC,"Can't determine dimension order");
   }
   p1 = dimorder;
   /* Break the ordered, comma-separated list of dimension names
@@ -1291,15 +1291,9 @@ int miopen_volume(const char *filename, int mode, mihandle_t *volume)
   miinvert_transform(handle->v2w_transform, handle->w2v_transform);
 
   /* Open the image dataset */
-  handle->image_id = H5Dopen1(file_id, "/minc-2.0/image/0/image");
-  if (handle->image_id < 0) {
-    return (MI_ERROR);
-  }
+  MI_CHECK_HDF_CALL_RET(handle->image_id = H5Dopen1(file_id, "/minc-2.0/image/0/image"),"H5Dopen1");
   /* Get the Id for the copy of the datatype for the dataset */
-  handle->ftype_id = H5Dget_type(handle->image_id);
-  if (handle->ftype_id < 0) {
-    return (MI_ERROR);
-  }
+  MI_CHECK_HDF_CALL_RET(handle->ftype_id = H5Dget_type(handle->image_id),"H5Dget_type");
 
   switch (H5Tget_class(handle->ftype_id)) {
   case H5T_INTEGER:
@@ -1366,7 +1360,7 @@ int miopen_volume(const char *filename, int mode, mihandle_t *volume)
       handle->volume_type = (is_signed ? MI_TYPE_INT : MI_TYPE_UINT);
       break;
     default:
-      return (MI_ERROR);
+      return MI_LOG_ERROR(MI2_MSG_BADTYPE,hdf_class);
     }
     break;
   case H5T_FLOAT:
@@ -1382,7 +1376,7 @@ int miopen_volume(const char *filename, int mode, mihandle_t *volume)
     /* TODO: handle this case for non-uniform records? */
     break;
   default:
-    return (MI_ERROR);
+    return MI_LOG_ERROR(MI2_MSG_BADTYPE,hdf_class);
   }
 
   /* Read the current settings for valid-range */
@@ -1414,7 +1408,7 @@ int miclose_volume(mihandle_t volume)
   int i;
   
   if (volume == NULL) {
-    return (MI_ERROR);
+    return MI_LOG_ERROR(MI2_MSG_GENERIC,"Trying to close null volume");
   }
 
   if (volume->is_dirty) {
@@ -1507,6 +1501,7 @@ void miinit_default_range(mitype_t mitype, double *valid_max, double *valid_min)
   default:
     *valid_min = 0;
     *valid_max = 1;
+    MI_LOG_ERROR(MI2_MSG_BADTYPE,mitype);
     break;
   }
 }

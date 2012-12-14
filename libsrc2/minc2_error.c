@@ -303,7 +303,8 @@ int mi2log_message ( const char *file,int line, mi2msgcode_t code, ... )
   /* For fatal messages, give up and exit.
    */
   if ( lvl == MI2_MSG_FATAL ) {
-    exit ( -1 );
+    /*exit ( -1 );  SORRRY, no exits in my programs!*/
+    return ( MI_ERROR );  /* Just for convenience */
   }
 
   return ( MI_ERROR );  /* Just for convenience */

@@ -78,8 +78,7 @@ offset_to_index(int ndims,
 
 /** The main restructuring code.
  */
-MNCAPI void
-restructure_array(int ndims,    /* Dimension count */
+void restructure_array(int ndims,    /* Dimension count */
                   unsigned char *array, /* Raw data */
                   const misize_t *lengths_perm, /* Permuted lengths */
                   int el_size,  /* Element size, in bytes */
@@ -98,7 +97,7 @@ restructure_array(int ndims,    /* Dimension count */
   int i;
 
   if ((temp = malloc(el_size)) == NULL) {
-    //TODO: report MEMORY error somehow
+    MI_LOG_ERROR(MI2_MSG_OUTOFMEM,el_size);
     return;
   }
 
@@ -395,7 +394,7 @@ static int mirw_hyperslab_raw(int opcode,
   /* Disallow write operations to anything but the highest resolution.
    */
   if (opcode == MIRW_OP_WRITE && volume->selected_resolution != 0) {
-    return (MI_ERROR);
+    return MI_LOG_ERROR(MI2_MSG_GENERIC,"Trying to write to a volume thumbnail");
   }
 
   sprintf(path, "/minc-2.0/image/%d/image", volume->selected_resolution);
@@ -408,13 +407,13 @@ static int mirw_hyperslab_raw(int opcode,
     return (MI_ERROR);
   }
 
-  fspc_id = H5Dget_space(dset_id);
+  MI_CHECK_HDF_CALL(fspc_id = H5Dget_space(dset_id),"H5Dget_space");
   if (fspc_id < 0) {
     /*TODO: report can't get dataset*/
     goto cleanup;
   }
 
-  fspc_id = H5Dget_space(dset_id);
+  MI_CHECK_HDF_CALL(fspc_id = H5Dget_space(dset_id),"H5Dget_space");
   if (fspc_id < 0) {
     goto cleanup;
   }
@@ -436,14 +435,14 @@ static int mirw_hyperslab_raw(int opcode,
 
     n_different = mitranslate_hyperslab_origin(volume, start, count, hdf_start, hdf_count, dir);
 
-    mspc_id = H5Screate_simple(ndims, hdf_count, NULL);
+    MI_CHECK_HDF_CALL(mspc_id = H5Screate_simple(ndims, hdf_count, NULL),"H5Screate_simple");
     if (mspc_id < 0) {
       goto cleanup;
     }
   }
 
-  result = H5Sselect_hyperslab(fspc_id, H5S_SELECT_SET, hdf_start, NULL,
-                               hdf_count, NULL);
+  MI_CHECK_HDF_CALL(result = H5Sselect_hyperslab(fspc_id, H5S_SELECT_SET, hdf_start, NULL,
+                               hdf_count, NULL),"H5Sselect_hyperslab");
   if (result < 0) {
     goto cleanup;
   }
@@ -452,7 +451,7 @@ static int mirw_hyperslab_raw(int opcode,
   
   
   if (opcode == MIRW_OP_READ) {
-    result = H5Dread(dset_id, type_id, mspc_id, fspc_id, H5P_DEFAULT,buffer);
+    MI_CHECK_HDF_CALL(result = H5Dread(dset_id, type_id, mspc_id, fspc_id, H5P_DEFAULT,buffer),"H5Dread");
     
     /* Restructure the array after reading the data in file orientation.
      */
@@ -498,11 +497,11 @@ static int mirw_hyperslab_raw(int opcode,
       
       restructure_array(ndims, temp_buffer, icount, H5Tget_size(type_id),
                         imap, idir);
-      result = H5Dwrite(dset_id, type_id, mspc_id, fspc_id, H5P_DEFAULT,
-                      temp_buffer);
+      MI_CHECK_HDF_CALL(result = H5Dwrite(dset_id, type_id, mspc_id, fspc_id, H5P_DEFAULT,
+                      temp_buffer),"H5Dwrite");
     } else {
-      result = H5Dwrite(dset_id, type_id, mspc_id, fspc_id, H5P_DEFAULT,
-                        buffer);
+      MI_CHECK_HDF_CALL(result = H5Dwrite(dset_id, type_id, mspc_id, fspc_id, H5P_DEFAULT,
+                        buffer),"H5Dwrite");
     }
 
   }
@@ -602,9 +601,7 @@ static int mirw_hyperslab_icv(int opcode,
   /* Disallow write operations to anything but the highest resolution.
    */
   if (opcode == MIRW_OP_WRITE && volume->selected_resolution != 0) {
-    /*TODO: report error that we are not dealing with the rihgt image here*/
-    fprintf(stderr,"mirw_hyperslab_icv trying to write to volume using thumbnail %s:%d\n",__FILE__,__LINE__);
-    return (MI_ERROR);
+    return MI_LOG_ERROR(MI2_MSG_GENERIC,"Trying to write to a volume thumbnail");
   }
   
   sprintf(path, "/minc-2.0/image/%d/image", volume->selected_resolution);
@@ -612,16 +609,13 @@ static int mirw_hyperslab_icv(int opcode,
   
   /* Open the dataset with the specified path
   */
-  dset_id = H5Dopen1(volume->hdf_id, path);
+  MI_CHECK_HDF_CALL(dset_id = H5Dopen1(volume->hdf_id, path),"H5Dopen1");
   if (dset_id < 0) {
-    fprintf(stderr,"H5Dopen1: Fail %s:%d\n",__FILE__,__LINE__);
     return (MI_ERROR);
   }
 
-  fspc_id = H5Dget_space(dset_id);
+  MI_CHECK_HDF_CALL(fspc_id = H5Dget_space(dset_id),"H5Dget_space");
   if (fspc_id < 0) {
-    /*TODO: report can't get dataset*/
-    fprintf(stderr,"H5Dget_space: Fail %s:%d\n",__FILE__,__LINE__);
     goto cleanup;
   }
 
@@ -629,7 +623,6 @@ static int mirw_hyperslab_icv(int opcode,
   buffer_type_id = mitype_to_hdftype(buffer_data_type, TRUE);
   if(buffer_type_id<0)
   {
-    fprintf(stderr,"mitype_to_hdftype: Fail %s:%d\n",__FILE__,__LINE__);
     goto cleanup;
   }
   
@@ -654,17 +647,14 @@ static int mirw_hyperslab_icv(int opcode,
   
   miget_hyperslab_size_hdf(buffer_type_id, ndims, hdf_count, &buffer_size);
 
-  result = H5Sselect_hyperslab(fspc_id, H5S_SELECT_SET, hdf_start, NULL,
-                               hdf_count, NULL);
+  MI_CHECK_HDF_CALL(result = H5Sselect_hyperslab(fspc_id, H5S_SELECT_SET, hdf_start, NULL,
+                               hdf_count, NULL),"H5Sselect_hyperslab");
   if (result < 0) {
-    fprintf(stderr,"H5Sselect_hyperslab: Fail %s:%d\n",__FILE__,__LINE__);
     goto cleanup;
   }
 
   if((result=miget_volume_valid_range( volume, &volume_valid_max, &volume_valid_min))<0)
   {
-    /*TODO: report read error somehow*/
-    fprintf(stderr,"miget_volume_valid_range: Fail %s:%d\n",__FILE__,__LINE__);
     goto cleanup;
   }
 
@@ -721,7 +711,7 @@ static int mirw_hyperslab_icv(int opcode,
     if(!image_slice_max_buffer)
     {
       result=MI_ERROR;
-      fprintf(stderr,"Memory allocation failure %s:%d\n",__FILE__,__LINE__);
+      MI_LOG_ERROR(MI2_MSG_OUTOFMEM,total_number_of_slices*sizeof(double));
       goto cleanup;
     }
     
@@ -730,7 +720,7 @@ static int mirw_hyperslab_icv(int opcode,
     if(!image_slice_min_buffer)
     {
       result=MI_ERROR;
-      fprintf(stderr,"Memory allocation failure %s:%d\n",__FILE__,__LINE__);
+      MI_LOG_ERROR(MI2_MSG_OUTOFMEM,total_number_of_slices*sizeof(double));
       goto cleanup;
     }
     
@@ -740,27 +730,24 @@ static int mirw_hyperslab_icv(int opcode,
     {
       if((result=H5Dread(volume->imax_id, H5T_NATIVE_DOUBLE, scaling_mspc_id, image_max_fspc_id, H5P_DEFAULT,image_slice_max_buffer))<0)
       {
-        /*TODO: report read error somehow*/
-        fprintf(stderr,"H5Dread: Fail %s:%d\n",__FILE__,__LINE__);
+        MI_LOG_ERROR(MI2_MSG_HDF5,"H5Dread");
         goto cleanup;
       }
     } else {
-      /*TODO: report read error somehow*/
-      fprintf(stderr,"H5Sselect_hyperslab: Fail %s:%d\n",__FILE__,__LINE__);
+      MI_LOG_ERROR(MI2_MSG_HDF5,"H5Sselect_hyperslab");
       goto cleanup;
     }
     
-    if( (result=H5Sselect_hyperslab(image_min_fspc_id, H5S_SELECT_SET, image_slice_start, NULL, image_slice_count, NULL))>=0 )
+    if((result=H5Sselect_hyperslab(image_min_fspc_id, H5S_SELECT_SET, image_slice_start, NULL, image_slice_count, NULL))>=0 )
     {
       if((result=H5Dread(volume->imin_id, H5T_NATIVE_DOUBLE, scaling_mspc_id, image_min_fspc_id, H5P_DEFAULT,image_slice_min_buffer))<0)
       {
-        /*TODO: report read error somehow*/
-        fprintf(stderr,"H5Dread: Fail %s:%d\n",__FILE__,__LINE__);
+        MI_LOG_ERROR(MI2_MSG_HDF5,"H5Dread");
         goto cleanup;
       }
     } else {
       /*TODO: report read error somehow*/
-      fprintf(stderr,"H5Sselect_hyperslab: Fail %s:%d\n",__FILE__,__LINE__);
+      MI_LOG_ERROR(MI2_MSG_HDF5,"H5Sselect_hyperslab");
       goto cleanup;
     }
     H5Sclose(scaling_mspc_id);
@@ -787,11 +774,9 @@ static int mirw_hyperslab_icv(int opcode,
 
   if (opcode == MIRW_OP_READ) 
   {
-    result = H5Dread(dset_id, buffer_type_id, mspc_id, fspc_id, H5P_DEFAULT, buffer);
+    MI_CHECK_HDF_CALL(result = H5Dread(dset_id, buffer_type_id, mspc_id, fspc_id, H5P_DEFAULT, buffer),"H5Dread");
     if(result<0)
     {
-      /*TODO: report read error somehow*/
-      fprintf(stderr,"H5Dread: Fail %s:%d\n",__FILE__,__LINE__);
       goto cleanup;
     }
     
@@ -857,8 +842,7 @@ static int mirw_hyperslab_icv(int opcode,
       
       if(!temp_buffer)
       {
-        /*TODO: report memory error*/
-        fprintf(stderr,"Memory allocation failure %s:%d\n",__FILE__,__LINE__);
+        MI_LOG_ERROR(MI2_MSG_OUTOFMEM,buffer_size);
         
         result=MI_ERROR; /*TODO: error code?*/
         
@@ -903,15 +887,13 @@ static int mirw_hyperslab_icv(int opcode,
             goto cleanup;
         }
       }
-      result = H5Dwrite(dset_id, buffer_type_id, mspc_id, fspc_id, H5P_DEFAULT, temp_buffer);
+      MI_CHECK_HDF_CALL(result = H5Dwrite(dset_id, buffer_type_id, mspc_id, fspc_id, H5P_DEFAULT, temp_buffer),"H5Dwrite");
     } else {
-      result = H5Dwrite(dset_id, buffer_type_id, mspc_id, fspc_id, H5P_DEFAULT, buffer);
+      MI_CHECK_HDF_CALL(result = H5Dwrite(dset_id, buffer_type_id, mspc_id, fspc_id, H5P_DEFAULT, buffer),"H5Dwrite");
     }
     
     if(result<0)
     {
-      /*TODO: report write error somehow*/
-      fprintf(stderr,"H5Dwrite: Fail %s:%d\n",__FILE__,__LINE__);
       goto cleanup;
     }
   }
@@ -1052,12 +1034,12 @@ static int mirw_hyperslab_normalized(int opcode,
 
   /* Open the dataset with the specified path
   */
-  dset_id = H5Dopen1(volume->hdf_id, path);
+  MI_CHECK_HDF_CALL(dset_id = H5Dopen1(volume->hdf_id, path),"H5Dopen1");
   if (dset_id < 0) {
     return (MI_ERROR);
   }
 
-  fspc_id = H5Dget_space(dset_id);
+  MI_CHECK_HDF_CALL(fspc_id = H5Dget_space(dset_id),"H5Dget_space");
   if (fspc_id < 0) {
     /*TODO: report can't get dataset*/
     goto cleanup;
@@ -1065,11 +1047,10 @@ static int mirw_hyperslab_normalized(int opcode,
   buffer_type_id = mitype_to_hdftype(buffer_data_type,TRUE);
   if(buffer_type_id<0)
   {
-    fprintf(stderr,"H5Tcopy: Fail %s:%d\n",__FILE__,__LINE__);
     goto cleanup;
   }
   
-  volume_type_id = H5Tcopy ( H5T_NATIVE_DOUBLE );
+  MI_CHECK_HDF_CALL(volume_type_id = H5Tcopy ( H5T_NATIVE_DOUBLE ),"H5Tcopy");
   if(volume_type_id<0)
   {
     fprintf(stderr,"H5Tcopy: Fail %s:%d\n",__FILE__,__LINE__);
@@ -1087,10 +1068,9 @@ static int mirw_hyperslab_normalized(int opcode,
 
     n_different = mitranslate_hyperslab_origin(volume,start,count, hdf_start,hdf_count,dir);
 
-    mspc_id = H5Screate_simple(ndims, hdf_count, NULL);
+    MI_CHECK_HDF_CALL(mspc_id = H5Screate_simple(ndims, hdf_count, NULL),"H5Screate_simple");
     
     if (mspc_id < 0) {
-      fprintf(stderr,"H5Screate_simple: Fail %s:%d\n",__FILE__,__LINE__);
       goto cleanup;
     }
   }
@@ -1098,10 +1078,9 @@ static int mirw_hyperslab_normalized(int opcode,
   miget_hyperslab_size_hdf(volume_type_id,ndims,hdf_count,&buffer_size);
   miget_hyperslab_size_hdf(buffer_type_id,ndims,hdf_count,&input_buffer_size);
 
-  result = H5Sselect_hyperslab(fspc_id, H5S_SELECT_SET, hdf_start, NULL,
-                               hdf_count, NULL);
+  MI_CHECK_HDF_CALL(result = H5Sselect_hyperslab(fspc_id, H5S_SELECT_SET, hdf_start, NULL,
+                               hdf_count, NULL),"H5Sselect_hyperslab");
   if (result < 0) {
-    fprintf(stderr,"H5Sselect_hyperslab: Fail %s:%d\n",__FILE__,__LINE__);
     goto cleanup;
   }
 
@@ -1119,19 +1098,17 @@ static int mirw_hyperslab_normalized(int opcode,
     total_number_of_slices=1;
     image_slice_length=1;
 
-    image_max_fspc_id=H5Dget_space(volume->imax_id);
-    image_min_fspc_id=H5Dget_space(volume->imin_id);
+    MI_CHECK_HDF_CALL(image_max_fspc_id=H5Dget_space(volume->imax_id),"H5Dget_space");
+    MI_CHECK_HDF_CALL(image_min_fspc_id=H5Dget_space(volume->imin_id),"H5Dget_space");
 
-    if ( image_max_fspc_id < 0 ) {
-      /*Report error that image-max is not found!*/
-      return ( MI_ERROR );
+    if ( image_max_fspc_id < 0 || image_min_fspc_id<0 ) {
+      result=MI_ERROR;
+      goto cleanup;
     }
 
-    slice_ndims = H5Sget_simple_extent_ndims ( image_max_fspc_id );
+    MI_CHECK_HDF_CALL(slice_ndims = H5Sget_simple_extent_ndims ( image_max_fspc_id ),"H5Sget_simple_extent_ndims");
     if(slice_ndims<0)
     {
-      /*TODO: report read error somehow*/
-      fprintf(stderr,"H5Sget_simple_extent_ndims: Fail %s:%d\n",__FILE__,__LINE__);
       goto cleanup;
     }
 
@@ -1159,19 +1136,17 @@ static int mirw_hyperslab_normalized(int opcode,
     image_slice_min_buffer=malloc(total_number_of_slices*sizeof(double));
     /*TODO check for allocation failure ?*/
     
-    scaling_mspc_id = H5Screate_simple(slice_ndims, image_slice_count, NULL);
+    MI_CHECK_HDF_CALL(scaling_mspc_id = H5Screate_simple(slice_ndims, image_slice_count, NULL),"H5Screate_simple");
     
     if( (result=H5Sselect_hyperslab(image_max_fspc_id, H5S_SELECT_SET, image_slice_start, NULL, image_slice_count, NULL))>=0 )
     {
       if( ( result=H5Dread(volume->imax_id, H5T_NATIVE_DOUBLE, scaling_mspc_id, image_max_fspc_id, H5P_DEFAULT,image_slice_max_buffer))<0)
       {
-        /*TODO: report read error somehow*/
-        fprintf(stderr,"H5Dread: Fail %s:%d\n",__FILE__,__LINE__);
+        MI_LOG_ERROR(MI2_MSG_HDF5,"H5Dread");
         goto cleanup;
       }
     } else {
-      /*TODO: report read error somehow*/
-      fprintf(stderr,"H5Sselect_hyperslab: Fail %s:%d\n",__FILE__,__LINE__);
+      MI_LOG_ERROR(MI2_MSG_HDF5,"H5Sselect_hyperslab");
       goto cleanup;
     }
     
@@ -1179,13 +1154,11 @@ static int mirw_hyperslab_normalized(int opcode,
     {
       if( (result=H5Dread(volume->imin_id, H5T_NATIVE_DOUBLE, scaling_mspc_id, image_min_fspc_id, H5P_DEFAULT,image_slice_min_buffer))<0)
       {
-        /*TODO: report read error somehow*/
-        fprintf(stderr,"H5Dread: Fail %s:%d\n",__FILE__,__LINE__);
+        MI_LOG_ERROR(MI2_MSG_HDF5,"H5Dread");
         goto cleanup;
       }
     } else {
-      /*TODO: report read error somehow*/
-      fprintf(stderr,"H5Sselect_hyperslab: Fail %s:%d\n",__FILE__,__LINE__);
+      MI_LOG_ERROR(MI2_MSG_HDF5,"H5Sselect_hyperslab");
       goto cleanup;
     }
     H5Sclose(scaling_mspc_id);
@@ -1214,18 +1187,16 @@ static int mirw_hyperslab_normalized(int opcode,
   temp_buffer=(double*)malloc(buffer_size);
   if(!temp_buffer)
   {
-    fprintf(stderr,"Memory allocation failure %s:%d\n",__FILE__,__LINE__);
+    MI_LOG_ERROR(MI2_MSG_OUTOFMEM,buffer_size);
     result=MI_ERROR;
     goto cleanup;
   }
   
   if (opcode == MIRW_OP_READ) 
   {
-    result = H5Dread(dset_id, volume_type_id, mspc_id, fspc_id, H5P_DEFAULT, temp_buffer);
+    MI_CHECK_HDF_CALL(result = H5Dread(dset_id, volume_type_id, mspc_id, fspc_id, H5P_DEFAULT, temp_buffer),"H5Dread");
     if(result<0)
     {
-      /*TODO: report read error somehow*/
-      fprintf(stderr,"H5Dread: Fail %s:%d\n",__FILE__,__LINE__);
       goto cleanup;
     }
     
@@ -1286,8 +1257,7 @@ static int mirw_hyperslab_normalized(int opcode,
     temp_buffer2=malloc(input_buffer_size);
     if(!temp_buffer2)
     {
-      /*TODO: report memory error*/
-      fprintf(stderr,"Memory allocation failure %s:%d\n",__FILE__,__LINE__);
+      MI_LOG_ERROR(MI2_MSG_OUTOFMEM,input_buffer_size);
       result=MI_ERROR; /*TODO: error code?*/
       goto cleanup;
     }
@@ -1327,11 +1297,9 @@ static int mirw_hyperslab_normalized(int opcode,
         result=MI_ERROR;
         goto cleanup;
     }
-    result = H5Dwrite(dset_id, volume_type_id, mspc_id, fspc_id, H5P_DEFAULT, temp_buffer);
+    MI_CHECK_HDF_CALL(result = H5Dwrite(dset_id, volume_type_id, mspc_id, fspc_id, H5P_DEFAULT, temp_buffer),"H5Dwrite");
     if(result<0)
     {
-      /*TODO: report write error somehow*/
-      fprintf(stderr,"H5Dwrite: Fail %s:%d\n",__FILE__,__LINE__);
       goto cleanup;
     }
     free(temp_buffer2);
