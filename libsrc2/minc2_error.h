@@ -111,5 +111,7 @@ void MI2_log_sys_error1(char *p1);
 void mi2log_init(const char *name);
 
 #define MI_LOG_ERROR(code,...) mi2log_message(__FILE__,__LINE__,code , ##__VA_ARGS__ )
+#define MI_CHECK_HDF_CALL(var,call) {if((var)<0) MI_LOG_ERROR(MI2_MSG_HDF5,call);}
+#define MI_CHECK_HDF_CALL_RET(var,call) {if((var)<0) return MI_LOG_ERROR(MI2_MSG_HDF5,call);}
 
 #endif /* _MINC2_ERROR_H_ not defined */

@@ -188,7 +188,7 @@ int MI2_return_error ( void )
   /* return( (((--minc_call_depth)!=0) || MI_return_error()) ? (error) : (error)) */
 
   if ( ( --minc_call_depth ) == 0 ) {
-    MI_LOG_PKG_ERROR2 ( 0, "MINC package entry point" );
+    MI2_log_pkg_error2 ( 0, "MINC package entry point" );
   }
   return ( TRUE );
 }

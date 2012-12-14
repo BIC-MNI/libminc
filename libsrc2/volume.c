@@ -39,9 +39,13 @@ static int _hdf_var_declare(hid_t fd,const char *varnm,const char *varpath, int 
 {
   hid_t dset_id,ftyp_id,mtyp_id,fspc_id;
   dset_id = H5Dopen1(fd, varpath);
+  MI_CHECK_HDF_CALL(dset_id,H5Dopen1)
   ftyp_id = H5Dget_type(dset_id);
+  MI_CHECK_HDF_CALL(ftyp_id,H5Dget_type)
   mtyp_id = H5Tget_native_type(ftyp_id, H5T_DIR_ASCEND);
+  MI_CHECK_HDF_CALL(mtyp_id,H5Tget_native_type)
   fspc_id = H5Dget_space(dset_id);
+  MI_CHECK_HDF_CALL(fspc_id,H5Dget_space)
   
   //TODO: figure out how to actually declare variable in HDF5
   return MI_NOERROR;
@@ -123,9 +127,7 @@ static hid_t _hdf_open(const char *path, int mode)
   } H5E_END_TRY;
   
   if (fd < 0) {
-    /*TODO: report error properly*/
-    fprintf(stderr,"Error opening file:%s at %s:%d\n",path,__FILE__,__LINE__);
-    return MI_ERROR;
+    return MI_LOG_ERROR(MI2_MSG_OPENFILE,path);
   }
   
   /* Open the image variables.
@@ -212,38 +214,27 @@ static hid_t _hdf_create(const char *path, int cmode)
   
   if (fd < 0) {
     /*TODO: report error properly*/
-    fprintf(stderr,"Error creating file:%s at %s:%d\n",path,__FILE__,__LINE__);
-    
-    return MI_ERROR;
+    return MI_LOG_ERROR(MI2_MSG_CREATEFILE,path);
   }
   
   /* Create the default groups.
    * Should we use a non-zero value for size_hint (parameter 3)???
    */
-  if ((grp_id = H5Gcreate1(fd, "/minc-2.0", 0)) < 0) {
-    return (MI_ERROR);
-  }
+  MI_CHECK_HDF_CALL_RET(grp_id = H5Gcreate1(fd, "/minc-2.0", 0),"H5Gcreate1")
   
-  if ((tmp_id = H5Gcreate1(grp_id, "dimensions", 0)) < 0) {
-    return (MI_ERROR);
-  }
+  MI_CHECK_HDF_CALL_RET(tmp_id = H5Gcreate1(grp_id, "dimensions", 0),"H5Gcreate1")
   H5Gclose(tmp_id);
   
-  if ((tmp_id = H5Gcreate1(grp_id, "info", 0)) < 0) {
-    return (MI_ERROR);
-  }
+  MI_CHECK_HDF_CALL_RET(tmp_id = H5Gcreate1(grp_id, "info", 0),"H5Gcreate1")
   H5Gclose(tmp_id);
   
-  if ((tmp_id = H5Gcreate1(grp_id, "image", 0)) < 0) {
-    return (MI_ERROR);
-  }
+  MI_CHECK_HDF_CALL_RET(tmp_id = H5Gcreate1(grp_id, "image", 0),"H5Gcreate1")
+  
   H5Gclose(tmp_id);
   
-  if ((tmp_id = H5Gcreate1(grp_id, "image/0", 0)) < 0) {
-    return (MI_ERROR);
-  }
-  H5Gclose(tmp_id);
+  MI_CHECK_HDF_CALL_RET(tmp_id = H5Gcreate1(grp_id, "image/0", 0),"H5Gcreate1")
   
+  H5Gclose(tmp_id);
   H5Gclose(grp_id);
   
   return fd;
