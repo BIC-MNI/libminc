@@ -1339,11 +1339,11 @@ is install the double-to-integer and integer-to-double conversion functions.
 */
 void miinit ( void )
 {
-  H5Tregister ( H5T_PERS_SOFT, "i2d", H5T_NATIVE_INT, H5T_NATIVE_DOUBLE,
-                mi2_int_to_dbl );
+  MI_CHECK_HDF_CALL(H5Tregister ( H5T_PERS_SOFT, "i2d", H5T_NATIVE_INT, H5T_NATIVE_DOUBLE,
+                mi2_int_to_dbl ),"H5Tregister")
 
-  H5Tregister ( H5T_PERS_SOFT, "d2i", H5T_NATIVE_DOUBLE, H5T_NATIVE_INT,
-                mi2_dbl_to_int );
+  MI_CHECK_HDF_CALL(H5Tregister ( H5T_PERS_SOFT, "d2i", H5T_NATIVE_DOUBLE, H5T_NATIVE_INT,
+                mi2_dbl_to_int ),"H5Tregister")
 }
 
 /** HDF5 type conversion function for converting an arbitrary integer type to

@@ -244,7 +244,7 @@ static int _hdf_close(hid_t fd)
 {
   //TODO: make sure we save all that is needed
   
-  H5Fclose(fd);
+  MI_CHECK_HDF_CALL_RET(H5Fclose(fd),"H5Fclose")
   return MI_NOERROR;
 }
 
@@ -286,13 +286,9 @@ int micreate_volume_image(mihandle_t volume)
     return MI_ERROR;
   }
 
-  dset_id = H5Dcreate1(volume->hdf_id, "/minc-2.0/image/0/image",
+  MI_CHECK_HDF_CALL_RET(dset_id = H5Dcreate1(volume->hdf_id, "/minc-2.0/image/0/image",
                        volume->ftype_id,
-                       dataspace_id, volume->plist_id);
-
-  if (dset_id < 0) {
-    return (MI_ERROR);
-  }
+                       dataspace_id, volume->plist_id),"H5Dcreate1")
 
   volume->image_id = dset_id;
 
@@ -311,10 +307,7 @@ int micreate_volume_image(mihandle_t volume)
     hid_t dcpl_id;
     double dtmp;
 
-    dcpl_id = H5Pcreate(H5P_DATASET_CREATE);
-    if (dcpl_id < 0) {
-      return (MI_ERROR);
-    }
+    MI_CHECK_HDF_CALL_RET(dcpl_id = H5Pcreate(H5P_DATASET_CREATE),"H5Pcreate")
 
     if (volume->has_slice_scaling) {
       /* TODO: Find the slowest-varying spatial dimension; that forms
@@ -322,10 +315,10 @@ int micreate_volume_image(mihandle_t volume)
       * now this is an oversimplification!
       */
       ndims = volume->number_of_dims - 2;
-      dataspace_id = H5Screate_simple(ndims, hdf_size, NULL);
+      MI_CHECK_HDF_CALL_RET(dataspace_id = H5Screate_simple(ndims, hdf_size, NULL),"H5Screate_simple")
     } else {
       ndims = 0;
-      dataspace_id = H5Screate(H5S_SCALAR);
+      MI_CHECK_HDF_CALL_RET(dataspace_id = H5Screate(H5S_SCALAR),"H5Screate")
     }
 
     if (ndims != 0) {
@@ -346,8 +339,8 @@ int micreate_volume_image(mihandle_t volume)
     dtmp = 0.0;
     H5Pset_fill_value(dcpl_id, H5T_NATIVE_DOUBLE, &dtmp);
 
-    dset_id = H5Dcreate1(volume->hdf_id, "/minc-2.0/image/0/image-min",
-                         H5T_IEEE_F64LE, dataspace_id, dcpl_id);
+    MI_CHECK_HDF_CALL_RET(dset_id = H5Dcreate1(volume->hdf_id, "/minc-2.0/image/0/image-min",
+                         H5T_IEEE_F64LE, dataspace_id, dcpl_id),H5Dcreate1)
     if (ndims != 0) {
       miset_attr_at_loc(dset_id, "dimorder", MI_TYPE_STRING,
                         strlen(dimorder), dimorder);
@@ -361,8 +354,8 @@ int micreate_volume_image(mihandle_t volume)
     dtmp = 1.0;
     H5Pset_fill_value(dcpl_id, H5T_NATIVE_DOUBLE, &dtmp);
 
-    dset_id = H5Dcreate1(volume->hdf_id, "/minc-2.0/image/0/image-max",
-                         H5T_IEEE_F64LE, dataspace_id, dcpl_id);
+    MI_CHECK_HDF_CALL_RET(dset_id = H5Dcreate1(volume->hdf_id, "/minc-2.0/image/0/image-max",
+                         H5T_IEEE_F64LE, dataspace_id, dcpl_id),"H5Dcreate1")
     if (ndims != 0) {
       miset_attr_at_loc(dset_id, "dimorder", MI_TYPE_STRING,
                         strlen(dimorder), dimorder);
@@ -469,18 +462,18 @@ int micreate_volume(const char *filename, int number_of_dimensions,
   /* Validate the parameters.
   */
   if (filename == NULL) {
-    return (MI_ERROR);
+    return MI_LOG_ERROR(MI2_MSG_CREATEFILE," (NULL) ");
   }
 
   if (dimensions == NULL && number_of_dimensions != 0) {
-    return (MI_ERROR);
+    return MI_LOG_ERROR(MI2_MSG_GENERIC," Can't create volume with undefined dimensions");
   }
 
   /* Allocate space for the volume handle
   */
   handle = mialloc_volume_handle();
   if (handle == NULL) {
-    return (MI_ERROR);
+    return MI_LOG_ERROR(MI2_MSG_OUTOFMEM,sizeof(struct mivolume));
   }
 
   /* Initialize some of the variables associated with the volume handle.
@@ -512,10 +505,7 @@ int micreate_volume(const char *filename, int number_of_dimensions,
     case MI_TYPE_BYTE:
     case MI_TYPE_SHORT:
     case MI_TYPE_INT:
-      handle->ftype_id = H5Tenum_create(hdf_type);
-      if (handle->ftype_id < 0) {
-        return (MI_ERROR);
-      }
+      MI_CHECK_HDF_CALL_RET(handle->ftype_id = H5Tenum_create(hdf_type),"H5Tenum_create")
 
       tmp_type = H5Tget_native_type(hdf_type, H5T_DIR_ASCEND);
       H5Tclose(hdf_type);
@@ -523,10 +513,8 @@ int micreate_volume(const char *filename, int number_of_dimensions,
 
       /* Create an enumerated type with the native type as it's base.
       */
-      handle->mtype_id = H5Tenum_create(hdf_type);
-      if (handle->mtype_id < 0) {
-        return (MI_ERROR);
-      }
+      MI_CHECK_HDF_CALL_RET(handle->mtype_id = H5Tenum_create(hdf_type),"H5Tenum_create")
+      
       H5Tclose(hdf_type);
 
       miinit_enum(handle->ftype_id);
@@ -547,13 +535,13 @@ int micreate_volume(const char *filename, int number_of_dimensions,
       handle->mtype_id = mitype_to_hdftype(volume_type, TRUE);
       break;
     default:
-      return (MI_ERROR);
+      return MI_LOG_ERROR(MI2_MSG_BADTYPE,volume_type);
     }
     break;
 
   case MI_CLASS_UNIFORM_RECORD:
-    handle->ftype_id = H5Tcreate(H5T_COMPOUND, H5Tget_size(hdf_type));
-    handle->mtype_id = H5Tcreate(H5T_COMPOUND, H5Tget_size(hdf_type));
+    MI_CHECK_HDF_CALL_RET(handle->ftype_id = H5Tcreate(H5T_COMPOUND, H5Tget_size(hdf_type)),"H5Tcreate")
+    MI_CHECK_HDF_CALL_RET(handle->mtype_id = H5Tcreate(H5T_COMPOUND, H5Tget_size(hdf_type)),"H5Tcreate")
     H5Tclose(hdf_type);
     break;
 
@@ -586,10 +574,7 @@ int micreate_volume(const char *filename, int number_of_dimensions,
 
   /* Create a new property list for the volume
   */
-  hdf_plist = H5Pcreate(H5P_DATASET_CREATE);
-  if (hdf_plist < 0) {
-    return (MI_ERROR);
-  }
+  MI_CHECK_HDF_CALL_RET(hdf_plist = H5Pcreate(H5P_DATASET_CREATE),"H5Pcreate")
 
   handle->plist_id = hdf_plist;
 
@@ -612,10 +597,7 @@ int micreate_volume(const char *filename, int number_of_dimensions,
       (create_props->compression_type == MI_COMPRESS_ZLIB ||
        create_props->edge_count != 0)) {
     /* Set the storage to CHUNKED */
-    stat = H5Pset_layout(hdf_plist, H5D_CHUNKED);
-    if (stat < 0) {
-      return (MI_ERROR);
-    }
+    MI_CHECK_HDF_CALL_RET(stat = H5Pset_layout(hdf_plist, H5D_CHUNKED),"H5Pset_layout")
     /* Create an array, hdf_size, containing the size of each chunk
     */
     for (i=0; i < number_of_dimensions; i++) {
@@ -630,21 +612,14 @@ int micreate_volume(const char *filename, int number_of_dimensions,
     }
 
     /* Sets the size of the chunks used to store a chunked layout dataset */
-    stat = H5Pset_chunk(hdf_plist, number_of_dimensions, hdf_size);
-    if (stat < 0) {
-      return (MI_ERROR);
-    }
+    MI_CHECK_HDF_CALL_RET(stat = H5Pset_chunk(hdf_plist, number_of_dimensions, hdf_size),"H5Pset_chunk")
+    
     /* Sets compression method and compression level */
-    stat = H5Pset_deflate(hdf_plist, create_props->zlib_level);
-    if (stat < 0) {
-      return (MI_ERROR);
-    }
+    MI_CHECK_HDF_CALL_RET(stat = H5Pset_deflate(hdf_plist, create_props->zlib_level),"H5Pset_deflate")
 
   } else { /* No COMPRESSION or CHUNKING is enabled */
-    stat = H5Pset_layout(hdf_plist, H5D_CONTIGUOUS); /*  CONTIGUOUS data */
-    if (stat < 0) {
-      return (MI_ERROR);
-    }
+    
+    MI_CHECK_HDF_CALL_RET(stat = H5Pset_layout(hdf_plist, H5D_CONTIGUOUS),"H5Pset_layout") /*  CONTIGUOUS data */
   }
 
   /* See if Multi-res is set to a level above 0 and if yes create subgroups
@@ -662,10 +637,7 @@ int micreate_volume(const char *filename, int number_of_dimensions,
 
   /* Try creating DIMENSIONS GROUP i.e. /minc-2.0/dimensions
   */
-  grp_id = H5Gopen1(file_id, MI_FULLDIMENSIONS_PATH);
-  if (grp_id < 0) {
-    return (MI_ERROR);
-  }
+  MI_CHECK_HDF_CALL_RET(grp_id = H5Gopen1(file_id, MI_FULLDIMENSIONS_PATH),"H5Gopen1")
   /* Once the DIMENSIONS GROUP is opened, create each dimension.
   */
 
@@ -676,9 +648,9 @@ int micreate_volume(const char *filename, int number_of_dimensions,
     */
     if (dimensions[i]->attr & MI_DIMATTR_NOT_REGULARLY_SAMPLED) {
       dim[0] = dimensions[i]->length;
-      dataspace_id = H5Screate_simple(1, dim, NULL);
+      MI_CHECK_HDF_CALL_RET(dataspace_id = H5Screate_simple(1, dim, NULL),"H5Screate_simple")
     } else {
-      dataspace_id = H5Screate(H5S_SCALAR);
+      MI_CHECK_HDF_CALL_RET(dataspace_id = H5Screate(H5S_SCALAR),"H5Screate")
     }
 
     if (dataspace_id < 0) {
@@ -686,8 +658,8 @@ int micreate_volume(const char *filename, int number_of_dimensions,
     }
 
     /* Create a dataset(dimension variable name) in DIMENSIONS GROUP */
-    dataset_id = H5Dcreate1(grp_id, dimensions[i]->name,
-                            H5T_IEEE_F64LE, dataspace_id, H5P_DEFAULT);
+    MI_CHECK_HDF_CALL_RET(dataset_id = H5Dcreate1(grp_id, dimensions[i]->name,
+                            H5T_IEEE_F64LE, dataspace_id, H5P_DEFAULT),"H5Dcreate1")
 
     /* Dimension variable for a regular dimension contains
       no meaningful data. Whereas, Dimension variable for
@@ -707,18 +679,14 @@ int micreate_volume(const char *filename, int number_of_dimensions,
       } else {
 
         /* If dimension is regularly sampled */
-        fspc_id = H5Dget_space(dataset_id);
-        if (fspc_id < 0) {
-          return (MI_ERROR);
-        }
+        MI_CHECK_HDF_CALL_RET(fspc_id = H5Dget_space(dataset_id),"H5Dget_space")
+        
         /* Write the raw data from buffer (dimensions[i]->offsets)
           to the dataset.
         */
-        status = H5Dwrite(dataset_id, H5T_NATIVE_DOUBLE, dataspace_id,
-                          fspc_id, H5P_DEFAULT, dimensions[i]->offsets);
-        if (status < 0) {
-          return (MI_ERROR);
-        }
+        MI_CHECK_HDF_CALL_RET(status = H5Dwrite(dataset_id, H5T_NATIVE_DOUBLE, dataspace_id,
+                          fspc_id, H5P_DEFAULT, dimensions[i]->offsets),"H5Dwrite")
+        
         /* Write the raw data from buffer (dimensions[i]->offsets)
           to the dataset.
         */
@@ -731,17 +699,13 @@ int micreate_volume(const char *filename, int number_of_dimensions,
         dataset_width = H5Dcreate1(grp_id, name, H5T_IEEE_F64LE,
                                    dataspace_id, H5P_DEFAULT);
         /* Return an Id for the dataspace of the dataset dataset_width */
-        fspc_id = H5Dget_space(dataset_width);
-        if (fspc_id < 0) {
-          return (MI_ERROR);
-        }
+        MI_CHECK_HDF_CALL_RET(fspc_id = H5Dget_space(dataset_width),"H5Dget_space")
+        
         /* Write the raw data from buffer (dimensions[i]->widths)
           to the dataset.
         */
-        status = H5Dwrite(dataset_width, H5T_NATIVE_DOUBLE, dataspace_id, fspc_id, H5P_DEFAULT, dimensions[i]->widths);
-        if (status < 0) {
-          return (MI_ERROR);
-        }
+        MI_CHECK_HDF_CALL_RET(status = H5Dwrite(dataset_width, H5T_NATIVE_DOUBLE, dataspace_id, fspc_id, H5P_DEFAULT, dimensions[i]->widths),"H5Dwrite")
+        
         /* Create new attribute "length", with appropriate
           type (to hdf5) conversion.
           miset_attr_at_loc(..) is implemented at m2utils.c
@@ -847,7 +811,7 @@ int micreate_volume(const char *filename, int number_of_dimensions,
                         sizeof(midimhandle_t));
 
   if (handle->dim_handles == NULL) {
-    return (MI_ERROR);
+    return MI_LOG_ERROR(MI2_MSG_OUTOFMEM,number_of_dimensions * sizeof(midimhandle_t));
   }
 
   /* Once the space for all dimension handles is created

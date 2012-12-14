@@ -99,6 +99,7 @@ typedef enum mi2msgcode {
     MI2_MSG_ICVCOORDS,
     MI2_MSG_BADOP,
     MI2_MSG_HDF5,
+    MI2_MSG_GENERIC
 } mi2msgcode_t;
 
 int  mi2log_message(const char *file,int line, mi2msgcode_t code, ...);

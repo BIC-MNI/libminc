@@ -158,6 +158,7 @@ static struct mierror_entry mierror_table[] = {
   { MI2_MSG_ERROR, "Invalid ICV coordinates"}, /* MI2_MSG_ICVCOORDS */
   { MI2_MSG_ERROR, "Illegal variable access operation" }, /* MI2_MSG_BADOP */
   { MI2_MSG_ERROR, "HDF5 function %s failed" } , /*MI2_MSG_HDF5*/
+  { MI2_MSG_ERROR, "Error: %s"} , /*MI2_MSG_GENERIC*/
 };
 
 int MI2_save_routine_name ( char *name )
