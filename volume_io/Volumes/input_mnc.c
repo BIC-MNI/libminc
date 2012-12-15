@@ -13,7 +13,10 @@
 ---------------------------------------------------------------------------- */
 
 #include  <internal_volume_io.h>
+
+#ifdef HAVE_MINC1
 #include  <minc_basic.h>
+
 
 #define  INVALID_AXIS   -1
 
@@ -1548,3 +1551,5 @@ VIOAPI  void  set_minc_input_user_real_range(
     options->user_real_range[0] = minimum;
     options->user_real_range[1] = maximum;
 }
+
+#endif /*HAVE_MINC1*/

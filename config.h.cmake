@@ -7,6 +7,9 @@
 #define PACKAGE_STRING "@PACKAGE_STRING@"
 #define VERSION PACKAGE_VERSION
 
+#cmakedefine HAVE_MINC1 1 
+#cmakedefine HAVE_MINC2 1 
+
 #ifndef H5Acreate_vers
 #define H5Acreate_vers 2
 #endif //H5Acreate_vers

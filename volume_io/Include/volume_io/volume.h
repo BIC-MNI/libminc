@@ -29,6 +29,7 @@
 @CREATED    : 1993            David MacDonald
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
+#ifdef HAVE_MINC1
 
 #include  <minc.h>
 #include  <volume_io/transforms.h>
@@ -451,4 +452,6 @@ typedef enum {
                TRIANGLE_FILTER,
                GAUSSIAN_FILTER } Filter_types;
 
+#endif /*HAVE_MINC1*/               
+               
 #endif

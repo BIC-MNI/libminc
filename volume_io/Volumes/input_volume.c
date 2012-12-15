@@ -14,6 +14,8 @@
 
 #include  <internal_volume_io.h>
 
+#ifdef HAVE_MINC1
+
 #include  <minc.h>
 
 #define   FREE_ENDING   "fre"
@@ -278,3 +280,5 @@ VIOAPI  Minc_file   get_volume_input_minc_file(
 {
     return( volume_input->minc_file );
 }
+
+#endif /*HAVE_MINC1*/

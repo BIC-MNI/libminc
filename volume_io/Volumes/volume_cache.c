@@ -14,6 +14,8 @@
 
 #include  <internal_volume_io.h>
 
+#ifdef HAVE_MINC1
+
 #define   HASH_FUNCTION_CONSTANT          0.6180339887498948482
 #define   HASH_TABLE_SIZE_FACTOR          3
 
@@ -1581,3 +1583,5 @@ static  void  record_cache_no_hit(
 }
 
 #endif
+
+#endif /*HAVE_MINC1*/

@@ -237,10 +237,99 @@ static struct {
   MI2_MSG_ERROR, {""}, NULL
 };
 
+/** Simple function to read a user's .mincrc file, if present.
+ */
+static int mi2read_cfg(const char *name, char *buffer, int maxlen)
+{
+    FILE *fp;
+    int result = 0;
+    char *home_ptr = getenv("HOME");
+    char path[256];
+
+    if (home_ptr != NULL) {
+      strcpy(path, home_ptr);
+    }
+    else {
+      path[0] = '\0';
+    }
+    strcat(path, "/.mincrc");
+    
+    if ((fp = fopen(path, "r")) != NULL) {
+        while (fgets(buffer, maxlen, fp)) {
+            if (buffer[0] == '#') {
+                continue;
+            }
+            if (!strncasecmp(buffer, name, strlen(name))) {
+                char *tmp = strchr(buffer, '=');
+                if (tmp != NULL) {
+                    tmp++;
+                    while (isspace(*tmp)) {
+                        tmp++;
+                    }
+                    strncpy(buffer, tmp, maxlen);
+                    result = 1;
+                    break;
+                }
+            }
+        }
+        fclose(fp);
+    }
+    return (result);
+}
+
+
+static int mi2get_cfg_bool(const char *name)
+{
+    char buffer[128];
+    char *var_ptr;
+
+    if ((var_ptr = getenv(name)) != NULL) {
+        strncpy(buffer, var_ptr, sizeof (buffer));
+    }
+    else {
+        if (!mi2read_cfg(name, buffer, sizeof (buffer))) {
+            return (0);
+        }
+    }
+    return (atoi(buffer) != 0);
+}
+
+static int mi2get_cfg_int(const char *name)
+{
+    char buffer[128];
+    char *var_ptr;
+    
+    if ((var_ptr = getenv(name)) != NULL) {
+        strncpy(buffer, var_ptr, sizeof (buffer));
+    }
+    else {
+        if (!mi2read_cfg(name, buffer, sizeof(buffer))) {
+            return (0);
+        }
+    }
+    return (atoi(buffer));
+}
+
+static char * mi2get_cfg_str(const char *name)
+{
+    char buffer[256];
+    char *var_ptr;
+
+    if ((var_ptr = getenv(name)) != NULL) {
+        strncpy(buffer, var_ptr, sizeof(buffer));
+    }
+    else {
+        if (!mi2read_cfg(name, buffer, sizeof(buffer))) {
+            return (NULL);
+        }
+    }
+    return (strdup(buffer));
+}
+
 void mi2log_init ( const char *name )
 {
-  char *fname_str = miget_cfg_str ( MICFG_LOGFILE );
-  int level = miget_cfg_int ( MICFG_LOGLEVEL );
+  char *fname_str = mi2get_cfg_str ( MICFG_LOGFILE );
+  int level = mi2get_cfg_int ( MICFG_LOGLEVEL );
 
   if ( fname_str == NULL ) {
     _MI2_log.fp = stderr;

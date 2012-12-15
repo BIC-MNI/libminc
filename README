@@ -12,36 +12,18 @@ designed for use in a medical-imaging research environment : they are
 simple and powerful and make no attempt to provide a pretty interface
 to users.
 
-Here's a list of some of the tools:
- * rawtominc, minctoraw, mincextract - format conversion
- * mincheader, mincdiff, mincinfo, minchistory - file information
- * mincedit, minc_modify_header - header manipulation
- * mincresample - arbitrary volume resampling
- * mincreshape - extraction of volume sub-cubes, image flipping,
-      dimension re-ordering, type conversion
- * mincconcat - concatenating or interleaving images from multiple
-      files
- * mincmath - perform simple math on files
- * minccalc - perform more complicated math on files through an expression
- * mincaverage - average minc files
- * mincstats - calculate statistics across voxels of a file
- * minclookup - lookup table operations for arbitrary re-mappings of
-      intensities
- * worldtovoxel, voxeltoworld - coordinate conversion
- * xfmconcat, xfminvert - generalized transformation utilities
- * mincview - simple image display using xv or ImageMagick
- * mincpik - generate picture from slice through volume
+Minc tools are hosted in https://github.com/BIC-MNI/minc-tools
 
 Additional tools are available from the Montreal Neurological
 Institute (MNI).
 
     http://packages.bic.mni.mcgill.ca/tgz
 
-MINC requires that NetCDF and HDF5 are installed.
+libMINC requires that HDF5 and optionally NetCDF to be installed.
 
-MINC development is performed on github
+libMINC development is performed on github
 
-   http://github.com/BIC-MNI/minc
+   https://github.com/BIC-MNI/libminc
 
 
 SUPPORT FOR HDF5 "MINC 2.0" FORMAT FILES

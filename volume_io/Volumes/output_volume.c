@@ -14,6 +14,8 @@
 
 #include  <internal_volume_io.h>
 
+#ifdef HAVE_MINC1
+
 /* ----------------------------- MNI Header -----------------------------------
 @NAME       : get_file_dimension_names
 @INPUT      : filename
@@ -401,3 +403,4 @@ VIOAPI  Status  output_volume(
                                     file_voxel_min, file_voxel_max,
                                     volume, NULL, history, options ) );
 }
+#endif /*HAVE_MINC1*/

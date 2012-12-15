@@ -13,6 +13,9 @@
 ---------------------------------------------------------------------------- */
 
 #include  <internal_volume_io.h>
+
+#ifdef HAVE_MINC1
+
 #include  <minc_basic.h>
 
 #define  INVALID_AXIS   -1
@@ -1814,3 +1817,5 @@ VIOAPI  void  set_minc_output_use_volume_starts_and_steps_flag(
     options->use_volume_starts_and_steps = flag;
     options->use_starts_set = TRUE;
 }
+
+#endif /*HAVE_MINC1*/

@@ -14,6 +14,8 @@
 
 #include  <internal_volume_io.h>
 
+#ifdef HAVE_MINC1
+
 VIOAPI  void  convert_voxels_to_values(
     Volume   volume,
     int      n_voxels,
@@ -1498,3 +1500,5 @@ VIOAPI  void  get_volume_voxel_hyperslab(
     }
 }
 
+
+#endif /*HAVE_MINC1*/

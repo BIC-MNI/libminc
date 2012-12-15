@@ -18,6 +18,7 @@ IF(LIBMINC_MINC1_SUPPORT)
 
   ADD_EXECUTABLE(create_grid_xfm create_grid_xfm.c)
   TARGET_LINK_LIBRARIES(create_grid_xfm ${VOLUME_IO_LIBRARY} ${LIBMINC_LIBRARIES} m)
+  
 MACRO(minc_test cmd)
   # minc 1 version
   IF(HAVE_MINC1)
