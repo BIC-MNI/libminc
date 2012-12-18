@@ -596,7 +596,7 @@ static int mirw_hyperslab_icv(int opcode,
   int image_slice_length=-1;
   int total_number_of_slices=-1;
   int i;
-  int j;
+
 
   /* Disallow write operations to anything but the highest resolution.
    */
@@ -688,7 +688,7 @@ static int mirw_hyperslab_icv(int opcode,
     }
 
     if ( slice_ndims > ndims ) { /*Can this really happen?*/
-      slice_ndims = slice_ndims;
+      slice_ndims = ndims;
     }
 
     for ( i = 0; i < slice_ndims; i++ ) {
@@ -1012,7 +1012,7 @@ static int mirw_hyperslab_normalized(int opcode,
   int imap[MI2_MAX_VAR_DIMS];
   double *image_slice_max_buffer=NULL;
   double *image_slice_min_buffer=NULL;
-  int scaling_needed=0;
+
   char path[MI2_MAX_PATH];
   
   hsize_t image_slice_start[MI2_MAX_VAR_DIMS];
@@ -1020,7 +1020,7 @@ static int mirw_hyperslab_normalized(int opcode,
   int image_slice_length=-1;
   int total_number_of_slices=-1;
   int i;
-  int j;
+
 
   /* Disallow write operations to anything but the highest resolution.
    */
@@ -1113,7 +1113,7 @@ static int mirw_hyperslab_normalized(int opcode,
     }
 
     if ( slice_ndims > ndims ) { /*Can this really happen?*/
-      slice_ndims = slice_ndims;
+      slice_ndims = ndims;
     }
 
     for ( i = 0; i < slice_ndims; i++ ) {

@@ -39,7 +39,7 @@ main(int argc, char **argv)
 
 	    miclose_volume(volume);
 
-	    printf("file: %s type %d size %ld class %d name %s\n", *argv,
+	    printf("file: %s type %d size %lld class %d name %s\n", *argv,
 		   mytype, mysize, myclass, myname);
 	}
 

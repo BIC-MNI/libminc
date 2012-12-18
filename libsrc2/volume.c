@@ -105,9 +105,9 @@ static int _generate_ident( char * id_str, size_t length )
 static hid_t _hdf_open(const char *path, int mode)
 {
   hid_t fd;
-  hid_t grp_id;
+/*  hid_t grp_id;
   hid_t dset_id;
-  int ndims;
+  int ndims;*/
   
   H5E_BEGIN_TRY {
     #if HDF5_MMAP_TEST

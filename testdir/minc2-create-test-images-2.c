@@ -30,6 +30,7 @@ int create_real_as_int_image(void)
     
     double min = -1.0;
     double max =  1.0;
+    /*TODO: add error checks in this functions*/
     r = micreate_dimension("yspace", MI_DIMCLASS_SPATIAL, 
                            MI_DIMATTR_REGULARLY_SAMPLED, CY, &hdim[0]);
 
@@ -65,9 +66,14 @@ int create_real_as_int_image(void)
       min += -0.1;
       max += 0.1;
       r = miset_slice_range(hvol,start,NDIMS , max, min);
+      if(r<0)
+      {
+        return r;
+      }
     }
     
     r = miclose_volume(hvol);
+  return r;
 }
 int create_real_as_float_image(void)
 {
