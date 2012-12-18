@@ -103,7 +103,7 @@ VIOAPI  void  set_multidim_data_type(
 VIOAPI  int  get_type_size(
     Data_types   type )
 {
-    int   size;
+    int   size = sizeof(double); /*default : double*/
 
     switch( type )
     {
@@ -125,6 +125,9 @@ VIOAPI  void  get_type_range(
     Real         *min_value,
     Real         *max_value )
 {
+    *min_value = (Real) -DBL_MAX;
+    *max_value = (Real) DBL_MAX;
+  
     switch( type )
     {
     case UNSIGNED_BYTE:

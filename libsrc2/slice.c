@@ -120,7 +120,7 @@ static int mirw_slice_minmax ( int opcode, mihandle_t volume,
  * Coordinates must always be specified in raw file order.
  */
 int miget_slice_min ( mihandle_t volume, const misize_t start_positions[],
-                  misize_t array_length, double *slice_min )
+                  size_t array_length, double *slice_min )
 {
   return ( mirw_slice_minmax ( MIRW_SCALE_MIN + MIRW_SCALE_GET,
                                volume, start_positions,
@@ -136,7 +136,7 @@ int miget_slice_min ( mihandle_t volume, const misize_t start_positions[],
  * Coordinates must always be specified in raw file order.
  */
 int miget_slice_max ( mihandle_t volume, const misize_t start_positions[],
-                  misize_t array_length, double *slice_max )
+                  size_t array_length, double *slice_max )
 {
   return ( mirw_slice_minmax ( MIRW_SCALE_MAX + MIRW_SCALE_GET,
                                volume, start_positions,
@@ -152,7 +152,7 @@ int miget_slice_max ( mihandle_t volume, const misize_t start_positions[],
  * Coordinates must always be specified in raw file order.
  */
 int miset_slice_min ( mihandle_t volume, const misize_t start_positions[],
-                  misize_t array_length, double slice_min )
+                  size_t array_length, double slice_min )
 {
   return ( mirw_slice_minmax ( MIRW_SCALE_MIN + MIRW_SCALE_SET,
                                volume, start_positions,
@@ -169,7 +169,7 @@ Coordinates must always be specified in raw file order.
  */
 int
 miset_slice_max ( mihandle_t volume, const misize_t start_positions[],
-                  misize_t array_length, double slice_max )
+                  size_t array_length, double slice_max )
 {
   return ( mirw_slice_minmax ( MIRW_SCALE_MAX + MIRW_SCALE_SET,
                                volume, start_positions,
@@ -185,7 +185,7 @@ miset_slice_max ( mihandle_t volume, const misize_t start_positions[],
  * Coordinates must always be specified in raw file order.
  */
 int miget_slice_range ( mihandle_t volume, const misize_t start_positions[],
-                    misize_t array_length, double *slice_max, double *slice_min )
+                    size_t array_length, double *slice_max, double *slice_min )
 {
   int r;
 
@@ -216,7 +216,7 @@ int miget_slice_range ( mihandle_t volume, const misize_t start_positions[],
  * specified in raw file order.
  */
 int miset_slice_range ( mihandle_t volume, const misize_t start_positions[],
-                    misize_t array_length, double slice_max, double slice_min )
+                    size_t array_length, double slice_max, double slice_min )
 {
   int r;
 

@@ -42,10 +42,10 @@ int milist_start ( mihandle_t vol, const char *path, int flags,
   strncpy ( fullpath, MI_ROOT_PATH "/" MI_INFO_NAME, sizeof ( fullpath ) );
 
   if ( *path != '/' ) {
-    strncat ( fullpath, "/", sizeof ( fullpath ) - strlen ( fullpath ) );
+    strncat ( fullpath, "/", sizeof ( fullpath ) - strlen ( fullpath ) - 1 );
   }
 
-  strncat ( fullpath, path, sizeof ( fullpath ) - strlen ( fullpath ) );
+  strncat ( fullpath, path, sizeof ( fullpath ) - strlen ( fullpath ) - 1);
 
   /*grp_id = H5Gopen1(vol->hdf_id, fullpath);
   if (grp_id < 0) {

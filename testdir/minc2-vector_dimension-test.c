@@ -103,7 +103,7 @@ int main ( int argc, char **argv )
   }
   printf ( "Dimension Size in file order : " );
   for ( i = 0; i < NDIMS; i++ ) {
-    printf ( " %d ", lengths[i] );
+    printf ( " %lld ", lengths[i] );
   }
   printf ( " \n" );
 

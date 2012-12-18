@@ -907,7 +907,7 @@ int miset_props_template(mivolumeprops_t props, int template_flag);
  */
 int miget_slice_max(mihandle_t volume, 
                            const misize_t start_positions[],
-                           misize_t array_length, double *slice_max);
+                           size_t array_length, double *slice_max);
 
 /**
  * This function sets minimum real value of
@@ -920,7 +920,7 @@ int miget_slice_max(mihandle_t volume,
  */
 int miset_slice_max(mihandle_t volume, 
                            const misize_t start_positions[],
-                           misize_t array_length, double slice_max);
+                           size_t array_length, double slice_max);
 
 
 /**
@@ -934,7 +934,7 @@ int miset_slice_max(mihandle_t volume,
  */
 int miget_slice_min(mihandle_t volume, 
                            const misize_t start_positions[],
-                           misize_t array_length, double *slice_min);
+                           size_t array_length, double *slice_min);
 
 
 /**
@@ -948,7 +948,7 @@ int miget_slice_min(mihandle_t volume,
  */
 int miset_slice_min(mihandle_t volume, 
                            const misize_t start_positions[],
-                           misize_t array_length, double slice_min);
+                           size_t array_length, double slice_min);
 
 
 /**
@@ -962,7 +962,7 @@ int miset_slice_min(mihandle_t volume,
  */
 int miget_slice_range(mihandle_t volume,
                              const misize_t start_positions[],
-                             misize_t array_length, double *slice_max,
+                             size_t array_length, double *slice_max,
                              double *slice_min);
 
 
@@ -977,7 +977,7 @@ int miget_slice_range(mihandle_t volume,
  */
 int miset_slice_range(mihandle_t volume, 
                              const misize_t start_positions[],
-                             misize_t array_length, double slice_max, 
+                             size_t array_length, double slice_max,
                              double slice_min);
 
 /**
@@ -1168,7 +1168,7 @@ int miset_voxel_value_hyperslab(mihandle_t volume,
  */
 int miconvert_real_to_voxel(mihandle_t volume,
                                    const misize_t coords[],
-                                   int ncoords,
+                                   size_t ncoords,
                                    double real_value,
                                    double *voxel_value_ptr);
 

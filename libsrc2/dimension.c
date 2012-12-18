@@ -58,7 +58,7 @@ int micopy_dimension ( midimhandle_t dim_ptr, midimhandle_t *new_dim_ptr )
    */
   handle = ( midimhandle_t ) malloc ( sizeof ( struct midimension ) );
 
-  if ( handle == NULL ) {
+  if ( handle == NULL ) { 
     return ( MI_ERROR );
   }
 
@@ -77,7 +77,8 @@ int micopy_dimension ( midimhandle_t dim_ptr, midimhandle_t *new_dim_ptr )
     handle->flipping_order = MI_COUNTER_FILE_ORDER;
     break;
   default:
-    return ( MI_ERROR );
+      free(handle);
+      return ( MI_ERROR );
   }
 
   handle->name = strdup ( dim_ptr->name );

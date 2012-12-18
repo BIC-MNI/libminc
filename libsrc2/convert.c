@@ -36,7 +36,7 @@
  */
 int miconvert_real_to_voxel(mihandle_t volume,
                         const misize_t coords[],
-                        int ncoords,
+                        size_t ncoords,
                         double real_value,
                         double *voxel_value_ptr
                         )
