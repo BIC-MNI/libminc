@@ -69,9 +69,14 @@ static int _generate_ident( char * id_str, size_t length )
   char time_str[26];
   int result;
   
+// Linking in ws2_32  for gethostname is problematic with static libraries.
+#ifdef _WIN32
+  strcpy(host_str, "unknown");
+#else
   if (gethostname(host_str, sizeof(host_str)) != 0) {
     strcpy(host_str, "unknown");
   }
+#endif
   
   temp_ptr = getenv("LOGNAME");
   if (temp_ptr != NULL) {
@@ -83,7 +88,7 @@ static int _generate_ident( char * id_str, size_t length )
   
   
   time(&now);
-#ifdef _MSC_VER
+#ifdef _WIN32
   memcpy(&tm_buf, localtime(&now), sizeof(tm_buf));
 #else
   localtime_r(&now, &tm_buf);
