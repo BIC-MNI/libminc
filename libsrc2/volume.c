@@ -225,7 +225,7 @@ static hid_t _hdf_create(const char *path, int cmode)
   /* Create the default groups.
    * Should we use a non-zero value for size_hint (parameter 3)???
    */
-  MI_CHECK_HDF_CALL_RET(grp_id = H5Gcreate1(fd, "/minc-2.0", 0),"H5Gcreate1")
+  MI_CHECK_HDF_CALL_RET(grp_id = H5Gcreate1(fd, MI_ROOT_PATH , 0),"H5Gcreate1")
   
   MI_CHECK_HDF_CALL_RET(tmp_id = H5Gcreate1(grp_id, "dimensions", 0),"H5Gcreate1")
   H5Gclose(tmp_id);
@@ -291,13 +291,13 @@ int micreate_volume_image(mihandle_t volume)
     return MI_ERROR;
   }
 
-  MI_CHECK_HDF_CALL_RET(dset_id = H5Dcreate1(volume->hdf_id, "/minc-2.0/image/0/image",
+  MI_CHECK_HDF_CALL_RET(dset_id = H5Dcreate1(volume->hdf_id, MI_ROOT_PATH "/image/0/image",
                        volume->ftype_id,
                        dataspace_id, volume->plist_id),"H5Dcreate1")
 
   volume->image_id = dset_id;
 
-  _hdf_var_declare(volume->hdf_id, "image", "/minc-2.0/image/0/image",
+  _hdf_var_declare(volume->hdf_id, "image", MI_ROOT_PATH "/image/0/image",
                   volume->number_of_dims, hdf_size);
   /* Create the dimorder attribute, ordered comma-separated
     list of dimension names.
@@ -344,14 +344,14 @@ int micreate_volume_image(mihandle_t volume)
     dtmp = 0.0;
     H5Pset_fill_value(dcpl_id, H5T_NATIVE_DOUBLE, &dtmp);
 
-    MI_CHECK_HDF_CALL_RET(dset_id = H5Dcreate1(volume->hdf_id, "/minc-2.0/image/0/image-min",
+    MI_CHECK_HDF_CALL_RET(dset_id = H5Dcreate1(volume->hdf_id, MI_ROOT_PATH "/image/0/image-min",
                          H5T_IEEE_F64LE, dataspace_id, dcpl_id),H5Dcreate1)
     if (ndims != 0) {
       miset_attr_at_loc(dset_id, "dimorder", MI_TYPE_STRING,
                         strlen(dimorder), dimorder);
     }
     volume->imin_id = dset_id;
-    _hdf_var_declare(volume->hdf_id, "image-min", "/minc-2.0/image/0/image-min", ndims, hdf_size);
+    _hdf_var_declare(volume->hdf_id, "image-min", MI_ROOT_PATH "/image/0/image-min", ndims, hdf_size);
 
 
     /* Create the image maximum dataset for FULL-RESOLUTION storage of data
@@ -359,14 +359,14 @@ int micreate_volume_image(mihandle_t volume)
     dtmp = 1.0;
     H5Pset_fill_value(dcpl_id, H5T_NATIVE_DOUBLE, &dtmp);
 
-    MI_CHECK_HDF_CALL_RET(dset_id = H5Dcreate1(volume->hdf_id, "/minc-2.0/image/0/image-max",
+    MI_CHECK_HDF_CALL_RET(dset_id = H5Dcreate1(volume->hdf_id, MI_ROOT_PATH "/image/0/image-max",
                          H5T_IEEE_F64LE, dataspace_id, dcpl_id),"H5Dcreate1")
     if (ndims != 0) {
       miset_attr_at_loc(dset_id, "dimorder", MI_TYPE_STRING,
                         strlen(dimorder), dimorder);
     }
     volume->imax_id = dset_id;
-    _hdf_var_declare(volume->hdf_id, "image-max", "/minc-2.0/image/0/image-max", ndims, hdf_size);
+    _hdf_var_declare(volume->hdf_id, "image-max", MI_ROOT_PATH "/image/0/image-max", ndims, hdf_size);
     H5Sclose(dataspace_id);
     H5Pclose(dcpl_id);
   }
@@ -970,7 +970,7 @@ int miget_volume_voxel_count(mihandle_t volume, misize_t *number_of_voxels)
   /* Quickest way to do this is with the dataspace identifier of the
   * volume. Use the volume's current resolution.
   */
-  sprintf(path, "/minc-2.0/image/%d/image", volume->selected_resolution);
+  sprintf(path, MI_ROOT_PATH "/image/%d/image", volume->selected_resolution);
   /* Open the dataset with the specified path
   */
   MI_CHECK_HDF_CALL_RET(dset_id = H5Dopen1(volume->hdf_id, path),"H5Dopen1");
@@ -996,7 +996,7 @@ static int _miget_file_dimension_count(hid_t file_id)
   int result = -1;
   /* hdf5 macro can temporarily disable the automatic error printing */
   H5E_BEGIN_TRY {
-    dset_id = midescend_path(file_id, "/minc-2.0/image/0/image");
+    dset_id = midescend_path(file_id, MI_ROOT_PATH "/image/0/image");
   } H5E_END_TRY;
 
   if (dset_id >= 0) {
@@ -1074,7 +1074,7 @@ static int _miget_file_dimension(mihandle_t volume, const char *dimname,
   midimhandle_t hdim;
 
   /* Create a path with the dimension name */
-  sprintf(path, "/minc-2.0/dimensions/%s", dimname);
+  sprintf(path, MI_ROOT_PATH "/dimensions/%s", dimname);
   /* Allocate space for the dimension handle */
   hdim = (midimhandle_t) malloc(sizeof (*hdim));
   /* Initialize everything to zero */
@@ -1225,17 +1225,22 @@ int miopen_volume(const char *filename, int mode, mihandle_t *volume)
   /* GET THE DIMENSION COUNT
   */
   handle->number_of_dims = _miget_file_dimension_count(file_id);
+  
+  if( handle->number_of_dims <= 0 ) {
+    return MI_LOG_ERROR(MI2_MSG_GENERIC,"Trying to open minc file without image variable");
+  }
 
   /* READ EACH OF THE DIMENSIONS
   */
   handle->dim_handles = (midimhandle_t *)malloc(handle->number_of_dims *
                         sizeof(midimhandle_t));
   
-  if(handle->dim_handles == NULL)
+  if(handle->dim_handles == NULL) {
     return MI_LOG_ERROR(MI2_MSG_OUTOFMEM, handle->number_of_dims * sizeof(midimhandle_t));
+  }
   
   /* Get the attribute (dimorder) from the image dataset */
-  r =  miget_attribute(handle, "/minc-2.0/image/0/image", "dimorder",
+  r =  miget_attribute(handle, MI_ROOT_PATH "/image/0/image", "dimorder",
                        MI_TYPE_STRING, sizeof(dimorder), dimorder);
 
   if ( r < 0) {
@@ -1254,7 +1259,9 @@ int miopen_volume(const char *filename, int mode, mihandle_t *volume)
     p1 = p2 + 1;
   }
 
-  miset_volume_world_indices(handle);
+  if( miset_volume_world_indices(handle) < 0 ) {
+    return MI_LOG_ERROR(MI2_MSG_GENERIC,"Can't determine world indices");
+  }
 
   /* SEE IF SLICE SCALING IS ENABLED
   */
@@ -1262,7 +1269,7 @@ int miopen_volume(const char *filename, int mode, mihandle_t *volume)
   /* hdf5 macro can temporarily disable the automatic error printing */
   H5E_BEGIN_TRY {
     /* Open the dataset image-max at the specified path*/
-    dset_id = H5Dopen1(file_id, "/minc-2.0/image/0/image-max");
+    dset_id = H5Dopen1(file_id, MI_ROOT_PATH "/image/0/image-max");
   } H5E_END_TRY;
   
   if (dset_id >= 0) {
@@ -1283,10 +1290,10 @@ int miopen_volume(const char *filename, int mode, mihandle_t *volume)
   if (!handle->has_slice_scaling) {
     /* Read the minimum scalar of the given type at the specified path */
     miget_scalar(handle->hdf_id, H5T_NATIVE_DOUBLE,
-                 "/minc-2.0/image/0/image-min", &handle->scale_min);
+                 MI_ROOT_PATH "/image/0/image-min", &handle->scale_min);
     /* Read the maximum scalar of the given type at the specified path */
     miget_scalar(handle->hdf_id, H5T_NATIVE_DOUBLE,
-                 "/minc-2.0/image/0/image-max", &handle->scale_max);
+                 MI_ROOT_PATH "/image/0/image-max", &handle->scale_max);
   }
 
   /* Read the current voxel-to-world transform */
@@ -1296,7 +1303,7 @@ int miopen_volume(const char *filename, int mode, mihandle_t *volume)
   miinvert_transform(handle->v2w_transform, handle->w2v_transform);
 
   /* Open the image dataset */
-  MI_CHECK_HDF_CALL_RET(handle->image_id = H5Dopen1(file_id, "/minc-2.0/image/0/image"),"H5Dopen1");
+  MI_CHECK_HDF_CALL_RET(handle->image_id = H5Dopen1(file_id, MI_ROOT_PATH "/image/0/image"),"H5Dopen1");
   /* Get the Id for the copy of the datatype for the dataset */
   MI_CHECK_HDF_CALL_RET(handle->ftype_id = H5Dget_type(handle->image_id),"H5Dget_type");
 
@@ -1338,8 +1345,8 @@ int miopen_volume(const char *filename, int mode, mihandle_t *volume)
   /* hdf5 macro can temporarily disable the automatic error printing */
   H5E_BEGIN_TRY {
     /* Open both image-min and image-max datasets */
-    handle->imax_id = H5Dopen1(file_id, "/minc-2.0/image/0/image-max");
-    handle->imin_id = H5Dopen1(file_id, "/minc-2.0/image/0/image-min");
+    handle->imax_id = H5Dopen1(file_id, MI_ROOT_PATH "/image/0/image-max");
+    handle->imin_id = H5Dopen1(file_id, MI_ROOT_PATH "/image/0/image-min");
   } H5E_END_TRY;
 
   /* Convert the type to a MINC type.
@@ -1519,7 +1526,7 @@ static void miread_valid_range(mihandle_t volume, double *valid_max, double *val
   double range[2];
 
   H5E_BEGIN_TRY {
-    r = miget_attribute(volume, "/minc-2.0/image/0/image", "valid_range", MI_TYPE_DOUBLE, 2, range);
+    r = miget_attribute(volume, MI_ROOT_PATH "/image/0/image", "valid_range", MI_TYPE_DOUBLE, 2, range);
   } H5E_END_TRY;
   if (r == MI_NOERROR) {
     if (range[0] < range[1]) {
@@ -1544,7 +1551,7 @@ void misave_valid_range(mihandle_t volume)
   range[0] = volume->valid_min;
   range[1] = volume->valid_max;
   
-  miset_attribute(volume, "/minc-2.0/image/0/image", "valid_range",
+  miset_attribute(volume, MI_ROOT_PATH "/image/0/image", "valid_range",
                   MI_TYPE_DOUBLE, 2, range);
 }
 

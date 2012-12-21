@@ -1395,7 +1395,7 @@ int minc_create_thumbnail ( mihandle_t volume, int grp )
     return ( MI_ERROR );
   }
 
-  sprintf ( path, "/minc-2.0/image/%d", grp );
+  sprintf ( path, MI_ROOT_PATH "/" MI_INFO_NAME "/%d", grp );
   grp_id = H5Gcreate1 ( volume->hdf_id, path, 0 );
 
   if ( grp_id < 0 ) {
@@ -1821,7 +1821,7 @@ minc_update_thumbnails ( mihandle_t volume )
   hsize_t i;
   char name[MI2_MAX_PATH];
 
-  grp_id = H5Gopen1 ( volume->hdf_id, "/minc-2.0/image" );
+  grp_id = H5Gopen1 ( volume->hdf_id, MI_ROOT_PATH "/" MI_INFO_NAME );
 
   if ( grp_id < 0 ) {
     return ( MI_ERROR );    /* Error opening group. */
@@ -1903,7 +1903,7 @@ create_dataset ( hid_t hdf_file, const char *name )
   hid_t dataspace_info;
   hid_t grp_info;
 
-  grp_info = H5Gopen1 ( hdf_file, "/minc-2.0/info" );
+  grp_info = H5Gopen1 ( hdf_file, MI_ROOT_PATH "/" MI_INFO_NAME );
 
   if ( grp_info < 0 ) {
     return ( MI_ERROR );
@@ -1940,7 +1940,7 @@ create_standard_dataset ( hid_t hdf_file, const char *name )
   hid_t grp_info;
   int result;
 
-  grp_info = H5Gopen1 ( hdf_file, "/minc-2.0/info" );
+  grp_info = H5Gopen1 ( hdf_file, MI_ROOT_PATH "/" MI_INFO_NAME );
 
   if ( grp_info < 0 ) {
     return ( MI_ERROR );

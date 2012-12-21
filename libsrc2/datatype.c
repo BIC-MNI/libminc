@@ -71,10 +71,10 @@ int miget_space_name ( mihandle_t volume, char **name )
      MINC files which associate the spacetype with individual dimensions.
   */
   static const char *path_list[] = {
-    "/minc-2.0/info",
-    "/minc-2.0/dimensions/xspace",
-    "/minc-2.0/dimensions/yspace",
-    "/minc-2.0/dimensions/zspace",
+    MI_ROOT_PATH "/" MI_INFO_NAME,
+    MI_ROOT_PATH "/dimensions/xspace",
+    MI_ROOT_PATH "/dimensions/yspace",
+    MI_ROOT_PATH "/dimensions/zspace",
     NULL
   };
 
@@ -109,7 +109,7 @@ int miget_space_name ( mihandle_t volume, char **name )
  */
 int miset_space_name ( mihandle_t volume, const char *name )
 {
-  return miset_attr_values ( volume, MI_TYPE_STRING, "/minc-2.0/info",
+  return miset_attr_values ( volume, MI_TYPE_STRING, MI_ROOT_PATH "/" MI_INFO_NAME,
                              "spacetype", strlen ( name ), name );
 
 }

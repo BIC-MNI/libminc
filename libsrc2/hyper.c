@@ -397,7 +397,7 @@ static int mirw_hyperslab_raw(int opcode,
     return MI_LOG_ERROR(MI2_MSG_GENERIC,"Trying to write to a volume thumbnail");
   }
 
-  sprintf(path, "/minc-2.0/image/%d/image", volume->selected_resolution);
+  sprintf(path, MI_ROOT_PATH "/image/%d/image", volume->selected_resolution);
   /*printf("Using:%s\n",path);*/
   
   /* Open the dataset with the specified path
@@ -604,7 +604,7 @@ static int mirw_hyperslab_icv(int opcode,
     return MI_LOG_ERROR(MI2_MSG_GENERIC,"Trying to write to a volume thumbnail");
   }
   
-  sprintf(path, "/minc-2.0/image/%d/image", volume->selected_resolution);
+  sprintf(path, MI_ROOT_PATH "/image/%d/image", volume->selected_resolution);
   /*printf("Using:%s\n",path);*/
   
   /* Open the dataset with the specified path
@@ -1029,7 +1029,7 @@ static int mirw_hyperslab_normalized(int opcode,
     return (MI_ERROR);
   }
   
-  sprintf(path, "/minc-2.0/image/%d/image", volume->selected_resolution);
+  sprintf(path, MI_ROOT_PATH "/" MI_INFO_NAME "/%d/image", volume->selected_resolution);
   
 
   /* Open the dataset with the specified path

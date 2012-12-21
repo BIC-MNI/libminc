@@ -245,7 +245,7 @@ static herr_t milist_grp_op ( hid_t loc_id, const char *name, void *op_data )
 {
   struct milistdata *data = ( struct milistdata * ) op_data;
   H5G_stat_t statbuf;
-
+  
   H5Gget_objinfo ( loc_id, name, FALSE, &statbuf );
 
   if ( statbuf.type == H5G_GROUP ) {
@@ -256,9 +256,9 @@ static herr_t milist_grp_op ( hid_t loc_id, const char *name, void *op_data )
       strcat ( data->frame_ptr->relpath, "/" );
     }
 
-    strcat ( data->frame_ptr->relpath, name );
   }
-
+  strcat ( data->frame_ptr->relpath, name );
+  
   return ( 1 );
 }
 
@@ -279,7 +279,7 @@ int milist_grp_next ( milisthandle_t handle, char *path, int maxpath )
 
     H5E_BEGIN_TRY {
       r = H5Giterate ( data->frame_ptr->grp_id, fullpath,
-      &data->frame_ptr->grp_idx, milist_grp_op, data );
+        &data->frame_ptr->grp_idx, milist_grp_op, data );
 
     } H5E_END_TRY;
 
@@ -497,8 +497,12 @@ int miget_attr_length ( mihandle_t vol, const char *path, const char *name,
     return MI_LOG_ERROR(MI2_MSG_GENERIC,"HDF file is not open");
   }
 
-  strncpy ( fullpath, MI_ROOT_PATH "/" MI_INFO_NAME, sizeof ( fullpath ) );
-
+  if ( (!strcmp ( name, "history" ) || !strcmp(name,"ident") || !strcmp(name,"minc_version")) && !strcmp(path,"/") ) {
+    strncpy ( fullpath, MI_ROOT_PATH "/" , sizeof ( fullpath ) );
+  } else {
+    strncpy ( fullpath, MI_ROOT_PATH "/" MI_INFO_NAME, sizeof ( fullpath ) );
+  }
+  
   if ( *path != '/' ) {
     strncat ( fullpath, "/", sizeof ( fullpath ) - strlen ( fullpath ) );
   }
@@ -578,8 +582,12 @@ int miget_attr_type ( mihandle_t vol, const char *path, const char *name,
     return MI_LOG_ERROR(MI2_MSG_GENERIC,"HDF file is not open");
   }
 
-  strncpy ( fullpath, MI_ROOT_PATH "/" MI_INFO_NAME, sizeof ( fullpath ) );
-
+  if ( (!strcmp ( name, "history" ) || !strcmp(name,"ident") || !strcmp(name,"minc_version")) && !strcmp(path,"/") ) {
+    strncpy ( fullpath, MI_ROOT_PATH "/" , sizeof ( fullpath ) );
+  } else {
+    strncpy ( fullpath, MI_ROOT_PATH "/" MI_INFO_NAME, sizeof ( fullpath ) );
+  }
+  
   if ( *path != '/' ) {
     strncat ( fullpath, "/", sizeof ( fullpath ) - strlen ( fullpath ) );
   }
@@ -700,10 +708,10 @@ int miget_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
     return MI_LOG_ERROR(MI2_MSG_GENERIC,"HDF file is not open");
   }
 
-  if ( strcmp ( name, "history" ) ) {
-    strncpy ( fullpath, MI_ROOT_PATH "/" MI_INFO_NAME, sizeof ( fullpath ) );
-  } else {
+  if ( (!strcmp ( name, "history" ) || !strcmp(name,"ident") || !strcmp(name,"minc_version")) && !strcmp(path,"/") ) {
     strncpy ( fullpath, MI_ROOT_PATH "/" , sizeof ( fullpath ) );
+  } else {
+    strncpy ( fullpath, MI_ROOT_PATH "/" MI_INFO_NAME, sizeof ( fullpath ) );
   }
 
   if ( *path != '/' ) {
@@ -794,8 +802,12 @@ int miset_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
     return MI_LOG_ERROR(MI2_MSG_GENERIC,"HDF file is not open");
   }
 
-  strncpy ( fullpath, MI_ROOT_PATH "/" MI_INFO_NAME, sizeof ( fullpath ) );
-
+  if ( (!strcmp ( name, "history" ) || !strcmp(name,"ident") || !strcmp(name,"minc_version")) && !strcmp(path,"/") ) {
+    strncpy ( fullpath, MI_ROOT_PATH "/" , sizeof ( fullpath ) );
+  } else {
+    strncpy ( fullpath, MI_ROOT_PATH "/" MI_INFO_NAME, sizeof ( fullpath ) );
+  }
+  
   if ( *path != '/' ) {
     strncat ( fullpath, "/", sizeof ( fullpath ) - strlen ( fullpath ) );
   }
