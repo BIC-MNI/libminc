@@ -1022,8 +1022,8 @@ int miset_volume_min(mihandle_t volume, double slice_min);
  * function will return an error.
  * \ingroup mi2Slice
  */
-int miget_volume_range(mihandle_t volume, double *slice_max, 
-                              double *slice_min);
+int miget_volume_range(mihandle_t volume, double *volume_max, 
+                              double *volume_min);
 
 /**
  * This function sets the maximum and minimum real values of
@@ -1031,8 +1031,8 @@ int miget_volume_range(mihandle_t volume, double *slice_max,
  * function will return an error.
  * \ingroup mi2Slice
  */
-int miset_volume_range(mihandle_t volume, double slice_max, 
-                              double slice_min);
+int miset_volume_range(mihandle_t volume, double volume_max, 
+                              double volume_min);
 
 
 /** \defgroup mi2Hyper HYPERSLAB FUNCTIONS */
