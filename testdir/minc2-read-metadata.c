@@ -43,6 +43,44 @@ double calculate_mean_d(double *array,misize_t length)
   return avg/length;
 }
 
+int print_metadata(mihandle_t vol, const char * path,int ident)
+{
+  milisthandle_t grplist;
+  char group_name[256];
+  milisthandle_t attlist;
+  int r=MI_NOERROR;
+  printf("Printing groups path:%s %d\n",path,ident);
+  if ( (r=milist_start(vol, path, 0, &grplist)) == MI_NOERROR )
+    {
+      while( milist_grp_next(grplist, group_name, sizeof(group_name)) == MI_NOERROR )
+      {
+        char add_path[256];
+
+        printf("%*s G:%s\n",ident,"",group_name);
+        strcpy(add_path,path);strcat(add_path,group_name);
+        
+        print_metadata(vol,add_path,ident+2);
+
+      }
+     milist_finish(grplist);
+    }
+  else return r;
+    
+  printf("Printing attributes path:%s %d\n",path,ident);
+  if((r=milist_start(vol, path, 1 , &attlist)) == MI_NOERROR)
+  {
+    char int_path[256];
+    char attribute[256];
+    
+    while( milist_attr_next(vol,attlist,int_path,sizeof(int_path),attribute,sizeof(attribute)) == MI_NOERROR )
+    {
+      printf("%*s A:%s %s\n",ident,"",int_path,attribute);
+    }
+    milist_finish(attlist);
+  } 
+  
+  return r;
+}
 
 int main ( int argc, char **argv )
 {
@@ -123,27 +161,7 @@ int main ( int argc, char **argv )
     );
 
   /* go over metadata*/
-
-  if ( milist_start(vol, "/", 0, &grplist) == MI_NOERROR )
-    {
-      printf("Iterating through root groups\n");
-      while( milist_grp_next(grplist, group_name, sizeof(group_name)) == MI_NOERROR )
-      {
-        printf("Group:%s\n",group_name);
-        char path[256];
-        char attribute[256];
-        
-         if(milist_start(vol, group_name, 1 , &attlist) == MI_NOERROR)
-         {
-           while( milist_attr_next(vol,attlist,path,sizeof(path),attribute,sizeof(attribute)) == MI_NOERROR )
-           {
-             printf("Attribute %s %s\n",path,attribute);
-           }
-           milist_finish(attlist);
-        }
-      }
-    }
-  milist_finish(grplist);
+  print_metadata(vol,"/",0);
   
   /* close volume*/
   miclose_volume ( vol );
