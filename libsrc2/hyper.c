@@ -526,34 +526,34 @@ cleanup:
   return (result);
 }
 
-#define APPLY_DESCALING(type,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,voxel_min,voxel_max) \
+#define APPLY_DESCALING(type_in,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,voxel_min,voxel_max) \
   { \
     int _i,_j;\
     double voxel_range=voxel_max-voxel_min;\
     double voxel_offset=voxel_min;\
-    type *_buffer=(type *)buffer;\
+    type_in *_buffer=(type_in *)buffer;\
     for(_i=0;_i<total_number_of_slices;_i++)\
       for(_j=0;_j<image_slice_length;_j++)\
       {\
         double _temp;\
         _temp=*_buffer;\
-        *_buffer =(type)( ((_temp - voxel_offset) / voxel_range)*(image_slice_max_buffer[_i]-image_slice_min_buffer[_i]) + image_slice_min_buffer[_i] ); \
+        *_buffer =(type_in)( ((_temp - voxel_offset) / voxel_range)*(image_slice_max_buffer[_i]-image_slice_min_buffer[_i]) + image_slice_min_buffer[_i] ); \
         _buffer++;\
       }\
   }
   
-#define APPLY_SCALING(type,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,voxel_min,voxel_max) \
+#define APPLY_SCALING(type_in,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,voxel_min,voxel_max) \
   { \
     int _i,_j;\
     double voxel_range=voxel_max-voxel_min;\
     double voxel_offset=voxel_min;\
-    type *_buffer=(type *)buffer;\
+    type_in *_buffer=(type_in *)buffer;\
     for(_i=0;_i<total_number_of_slices;_i++)\
       for(_j=0;_j<image_slice_length;_j++)\
       {\
         double _temp;\
         _temp=*_buffer;\
-        *_buffer = (type)(((_temp - image_slice_min_buffer[_i])/(image_slice_max_buffer[_i]-image_slice_min_buffer[_i]))*voxel_range + voxel_offset) ; \
+        *_buffer = (type_in)(((_temp - image_slice_min_buffer[_i])/(image_slice_max_buffer[_i]-image_slice_min_buffer[_i]))*voxel_range + voxel_offset) ; \
         _buffer++;\
       }\
   }
@@ -929,7 +929,7 @@ cleanup:
 }
 
 
-#define APPLY_DESCALING_NORM(type,buffer_in,buffer_out,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,voxel_min,voxel_max,data_min,data_max,norm_min,norm_max) \
+#define APPLY_DESCALING_NORM(type_in,buffer_in,buffer_out,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,voxel_min,voxel_max,data_min,data_max,norm_min,norm_max) \
   { \
     int _i,_j;\
     double voxel_offset=voxel_min;\
@@ -938,7 +938,7 @@ cleanup:
     double norm_range=norm_max-norm_min;\
     double data_offset=data_min;\
     double data_range=data_max-data_min;\
-    type *_buffer_out=(type *)buffer_out;\
+    type_in *_buffer_out=(type_in *)buffer_out;\
     double *_buffer_in=(double *)buffer_in; \
     for(_i=0;_i<total_number_of_slices;_i++)\
       for(_j=0;_j<image_slice_length;_j++)\
@@ -947,14 +947,14 @@ cleanup:
         _temp=(_temp-data_offset)/data_range;\
         if(_temp<0.0) _temp=0.0;\
         if(_temp>1.0) _temp=1.0;\
-        *_buffer_out=(type)(rint((_temp+norm_offset)*norm_range)); \
+        *_buffer_out=(type_in)(rint((_temp+norm_offset)*norm_range)); \
         _buffer_in++;\
         _buffer_out++;\
       }\
   }
 
 
-#define APPLY_SCALING_NORM(type,buffer_in,buffer_out,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,voxel_min,voxel_max,data_min,data_max,norm_min,norm_max) \
+#define APPLY_SCALING_NORM(type_in,buffer_in,buffer_out,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,voxel_min,voxel_max,data_min,data_max,norm_min,norm_max) \
   { \
     int _i,_j;\
     double voxel_range=voxel_max-voxel_min;\
@@ -963,8 +963,7 @@ cleanup:
     double norm_range=norm_max-norm_min;\
     double data_offset=data_min;\
     double data_range=data_max-data_min;\
-    printf("APPLY_SCALING_NORM voxel_offset=%f voxel_range=%f  norm_offset=%f norm_range=%f data_offset=%f data_range=%f\n",voxel_offset,voxel_range,norm_offset,norm_range,data_offset,data_range);\
-    type *_buffer_in=(type *)buffer_in;\
+    type_in *_buffer_in=(type_in *)buffer_in;\
     for(_i=0;_i<total_number_of_slices;_i++)\
       for(_j=0;_j<image_slice_length;_j++)\
       {\
