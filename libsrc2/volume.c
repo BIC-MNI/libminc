@@ -10,8 +10,15 @@
 
 #include <stdlib.h>
 #include <hdf5.h>
+
+#ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
+#endif //HAVE_SYS_TYPES_H
+
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#endif //HAVE_UNISTD_H
+
 #include <limits.h>
 #include <float.h>
 #include <time.h>

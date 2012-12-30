@@ -528,7 +528,7 @@ cleanup:
 
 #define APPLY_DESCALING(type_in,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,voxel_min,voxel_max) \
   { \
-    int _i,_j;\
+    hsize_t _i,_j;\
     double voxel_range=voxel_max-voxel_min;\
     double voxel_offset=voxel_min;\
     type_in *_buffer=(type_in *)buffer;\
@@ -544,7 +544,7 @@ cleanup:
   
 #define APPLY_SCALING(type_in,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,voxel_min,voxel_max) \
   { \
-    int _i,_j;\
+    hsize_t _i,_j;\
     double voxel_range=voxel_max-voxel_min;\
     double voxel_offset=voxel_min;\
     type_in *_buffer=(type_in *)buffer;\
@@ -593,9 +593,9 @@ static int mirw_hyperslab_icv(int opcode,
   
   hsize_t image_slice_start[MI2_MAX_VAR_DIMS];
   hsize_t image_slice_count[MI2_MAX_VAR_DIMS];
-  int image_slice_length=-1;
-  int total_number_of_slices=-1;
-  int i;
+  hsize_t image_slice_length=0;
+  hsize_t total_number_of_slices=0;
+  hsize_t i;
 
 
   /* Disallow write operations to anything but the highest resolution.
@@ -931,7 +931,7 @@ cleanup:
 
 #define APPLY_DESCALING_NORM(type_in,buffer_in,buffer_out,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,voxel_min,voxel_max,data_min,data_max,norm_min,norm_max) \
   { \
-    int _i,_j;\
+    hsize_t _i,_j;\
     double voxel_offset=voxel_min;\
     double voxel_range=voxel_max-voxel_min;\
     double norm_offset=norm_min;\
@@ -956,7 +956,7 @@ cleanup:
 
 #define APPLY_SCALING_NORM(type_in,buffer_in,buffer_out,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,voxel_min,voxel_max,data_min,data_max,norm_min,norm_max) \
   { \
-    int _i,_j;\
+    hsize_t _i,_j;\
     double voxel_range=voxel_max-voxel_min;\
     double voxel_offset=voxel_min;\
     double norm_offset=norm_min;\
@@ -1016,9 +1016,9 @@ static int mirw_hyperslab_normalized(int opcode,
   
   hsize_t image_slice_start[MI2_MAX_VAR_DIMS];
   hsize_t image_slice_count[MI2_MAX_VAR_DIMS];
-  int image_slice_length=-1;
-  int total_number_of_slices=-1;
-  int i;
+  hsize_t image_slice_length=0;
+  hsize_t total_number_of_slices=0;
+  hsize_t i;
 
 
   /* Disallow write operations to anything but the highest resolution.

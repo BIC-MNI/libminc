@@ -198,5 +198,12 @@ void misave_valid_range(mihandle_t volume);
 void miinit_default_range(mitype_t mitype, double *valid_max, double *valid_min);
 
 
+#ifdef _MSC_VER
+double rint(double v);
+#define snprintf _snprintf 
+#define vsnprintf _vsnprintf 
+#define strcasecmp _stricmp 
+#define strncasecmp _strnicmp 
+#endif
 
 #endif /*__MINC2_PRIVATE_H__*/

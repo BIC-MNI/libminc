@@ -30,6 +30,15 @@
 #define H5_START_T hssize_t
 #endif
 
+
+#ifdef _MSC_VER
+double rint(double v)
+{
+  return floor(v+0.5);
+}
+#endif
+
+
 /*! Convert a MINC 2 datatype into a HDF5 datatype.  Actually returns a copy
 * of the datatype, so the returned value must be explicitly freed with a
 * call to H5Tclose().
