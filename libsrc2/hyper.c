@@ -1028,8 +1028,7 @@ static int mirw_hyperslab_normalized(int opcode,
     return (MI_ERROR);
   }
   
-  sprintf(path, MI_ROOT_PATH "/" MI_INFO_NAME "/%d/image", volume->selected_resolution);
-  
+  sprintf(path, MI_ROOT_PATH "/image/%d/image", volume->selected_resolution);
 
   /* Open the dataset with the specified path
   */
