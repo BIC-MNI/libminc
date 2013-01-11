@@ -239,7 +239,8 @@ int miselect_resolution(mihandle_t volume, int depth)
   if ( volume->hdf_id < 0 || depth > MI2_MAX_RESOLUTION_GROUP || depth < 0) {
     return (MI_ERROR);
   }
-  grp_id = H5Gopen1(volume->hdf_id, "/minc-2.0/image");
+  
+  grp_id = H5Gopen1(volume->hdf_id, MI_ROOT_PATH "/image");
   if (grp_id < 0) {
     return (MI_ERROR);
   }
