@@ -92,6 +92,7 @@
 #include <ctype.h>
 
 #include "minc2.h"
+#include "minc2_private.h"
 
 struct mierror_entry {
   int level;
