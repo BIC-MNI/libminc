@@ -1902,6 +1902,7 @@ create_dataset ( hid_t hdf_file, const char *name )
   hid_t dataset_info;
   hid_t dataspace_info;
   hid_t grp_info;
+  int result;
 
   grp_info = H5Gopen1 ( hdf_file, MI_ROOT_PATH "/" MI_INFO_NAME );
 
@@ -1919,6 +1920,12 @@ create_dataset ( hid_t hdf_file, const char *name )
                               H5T_STD_I32LE, dataspace_info, H5P_DEFAULT );
 
   if ( dataset_info < 0 ) {
+    return ( MI_ERROR );
+  }
+
+  result = miset_attr_at_loc ( dataset_info, MIvartype, MI_TYPE_STRING, strlen ( MI_GROUP ), MI_GROUP );
+
+  if ( result < 0 ) {
     return ( MI_ERROR );
   }
 
