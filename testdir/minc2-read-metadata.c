@@ -11,36 +11,17 @@
 static int error_cnt = 0;
 
 
-double calculate_mean_f(float *array,misize_t length)
+const char * get_type_name(mitype_t volume_type)
 {
-  double avg=0.0;
-  misize_t i;
-  for(i=0;i<length;i++)
-  {
-    avg+=(double)(array[i]);
-  }
-  
-  return avg/length;
-}
-
-double calculate_mean_s(short *array,misize_t length)
-{
-  double avg=0.0;
-  int i;
-  for(i=0;i<length;i++)
-    avg+=(double)(array[i]);
-  
-  return avg/length;
-}
-
-double calculate_mean_d(double *array,misize_t length)
-{
-  double avg=0.0;
-  misize_t i;
-  for(i=0;i<length;i++)
-    avg+=array[i];
-  
-  return avg/length;
+  return volume_type==MI_TYPE_BYTE?"Byte":
+         volume_type==MI_TYPE_SHORT?"Short":
+         volume_type==MI_TYPE_INT?"Int":
+         volume_type==MI_TYPE_FLOAT?"Float":
+         volume_type==MI_TYPE_DOUBLE?"Double":
+         volume_type==MI_TYPE_STRING?"String":
+         volume_type==MI_TYPE_UBYTE?"Unsigned Byte":
+         volume_type==MI_TYPE_USHORT?"Unsigned Short":
+         volume_type==MI_TYPE_UINT?"Unsigned Int":"Other";
 }
 
 int print_metadata(mihandle_t vol, const char * path,int ident)
@@ -49,14 +30,14 @@ int print_metadata(mihandle_t vol, const char * path,int ident)
   char group_name[256];
   milisthandle_t attlist;
   int r=MI_NOERROR;
-  printf("Printing groups path:%s %d\n",path,ident);
+  //printf("Printing groups path:%s %d\n",path,ident);
   if ( (r=milist_start(vol, path, 0, &grplist)) == MI_NOERROR )
     {
       while( milist_grp_next(grplist, group_name, sizeof(group_name)) == MI_NOERROR )
       {
         char add_path[256];
 
-        printf("%*s G:%s\n",ident,"",group_name);
+        printf("%*s %s:\n",ident,"",group_name);
         strcpy(add_path,path);strcat(add_path,group_name);
         
         print_metadata(vol,add_path,ident+2);
@@ -66,7 +47,7 @@ int print_metadata(mihandle_t vol, const char * path,int ident)
     }
   else return r;
     
-  printf("Printing attributes path:%s %d\n",path,ident);
+  //printf("Printing attributes path:%s %d\n",path,ident);
   if((r=milist_start(vol, path, 1 , &attlist)) == MI_NOERROR)
   {
     char int_path[256];
@@ -74,7 +55,71 @@ int print_metadata(mihandle_t vol, const char * path,int ident)
     
     while( milist_attr_next(vol,attlist,int_path,sizeof(int_path),attribute,sizeof(attribute)) == MI_NOERROR )
     {
-      printf("%*s A:%s %s\n",ident,"",int_path,attribute);
+      mitype_t att_data_type;
+      size_t att_length;
+      if(miget_attr_type(vol,int_path,attribute,&att_data_type) == MI_NOERROR &&
+         miget_attr_length(vol,int_path,attribute,&att_length) == MI_NOERROR )
+      {
+        printf("%*s %s:%s type:%s length:%d\n",ident,"",int_path,attribute,get_type_name(att_data_type),(int)att_length);
+        
+        switch(att_data_type)
+        {
+          case MI_TYPE_STRING:
+          {
+            char *tmp=(char*)malloc(att_length+1);
+            if(miget_attr_values(vol,att_data_type,int_path,attribute,att_length,tmp) == MI_NOERROR )
+              printf("%*s %s\n",ident,"",tmp);
+            free(tmp);
+          }
+          break;
+          case MI_TYPE_FLOAT:
+          {
+            float *tmp=(float*)malloc(att_length*sizeof(float));
+            if(miget_attr_values(vol,att_data_type,int_path,attribute,att_length,tmp) == MI_NOERROR )
+            {
+              int i;
+              printf("%*s ",ident,"");
+              for(i=0;i<att_length;i++)
+                printf("%f ",(double)tmp[i]);
+              printf("\n");
+            }
+            free(tmp);
+          }
+          break;
+          case MI_TYPE_DOUBLE:
+          {
+            double *tmp=(double*)malloc(att_length*sizeof(double));
+            if(miget_attr_values(vol,att_data_type,int_path,attribute,att_length,tmp) == MI_NOERROR )
+            {
+              int i;
+              printf("%*s ",ident,"");
+              for(i=0;i<att_length;i++)
+                printf("%f ",tmp[i]);
+              printf("\n");
+            }
+            free(tmp);
+          }
+          break;
+          case MI_TYPE_INT:
+          {
+            int *tmp=(int*)malloc(att_length*sizeof(int));
+            if(miget_attr_values(vol,att_data_type,int_path,attribute,att_length,tmp) == MI_NOERROR )
+            {
+              int i;
+              printf("%*s ",ident,"");
+              for(i=0;i<att_length;i++)
+                printf("%d ",tmp[i]);
+              printf("\n");
+            }
+            free(tmp);
+          }
+          break;
+          default:
+            printf("%*sUnsupported type\n",ident,"");
+        }
+      } else {
+        printf("%*s A:%s %s Can't get type or length\n",ident,"",int_path,attribute);
+      }
     }
     milist_finish(attlist);
   } 
@@ -149,19 +194,11 @@ int main ( int argc, char **argv )
          volume_class==MI_CLASS_INT?"Int":
          volume_class==MI_CLASS_LABEL?"Label":
          volume_class==MI_CLASS_COMPLEX?"Complex":"Other",
-         volume_type==MI_TYPE_BYTE?"Byte":
-         volume_type==MI_TYPE_SHORT?"Short":
-         volume_type==MI_TYPE_INT?"Int":
-         volume_type==MI_TYPE_FLOAT?"Float":
-         volume_type==MI_TYPE_DOUBLE?"Double":
-         volume_type==MI_TYPE_STRING?"String":
-         volume_type==MI_TYPE_UBYTE?"Unsigned Byte":
-         volume_type==MI_TYPE_USHORT?"Unsigned Short":
-         volume_type==MI_TYPE_UINT?"Unsigned Int":"Other"
+         get_type_name(volume_type)
     );
 
   /* go over metadata*/
-  print_metadata(vol,"/",0);
+  print_metadata(vol,"",0);
   
   /* close volume*/
   miclose_volume ( vol );
