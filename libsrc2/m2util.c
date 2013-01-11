@@ -1404,7 +1404,7 @@ int minc_create_thumbnail ( mihandle_t volume, int grp )
     return ( MI_ERROR );
   }
 
-  sprintf ( path, MI_ROOT_PATH "/" MI_INFO_NAME "/%d", grp );
+  sprintf ( path, MI_ROOT_PATH "/image/%d", grp );
   grp_id = H5Gcreate1 ( volume->hdf_id, path, 0 );
 
   if ( grp_id < 0 ) {
@@ -1830,7 +1830,7 @@ minc_update_thumbnails ( mihandle_t volume )
   hsize_t i;
   char name[MI2_MAX_PATH];
 
-  grp_id = H5Gopen1 ( volume->hdf_id, MI_ROOT_PATH "/" MI_INFO_NAME );
+  grp_id = H5Gopen1 ( volume->hdf_id, MI_ROOT_PATH "/image" );
 
   if ( grp_id < 0 ) {
     return ( MI_ERROR );    /* Error opening group. */
