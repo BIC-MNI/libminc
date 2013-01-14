@@ -4,12 +4,12 @@
 *
 * Functions to create, open, and close MINC volume objects.
 ************************************************************************/
+#include <stdlib.h>
+#include <hdf5.h>
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif /*HAVE_CONFIG_H*/
-
-#include <stdlib.h>
-#include <hdf5.h>
 
 #ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
@@ -580,7 +580,7 @@ int micreate_volume(const char *filename, int number_of_dimensions,
   miset_attribute(handle, MI_ROOT_PATH, "ident", MI_TYPE_STRING,
                   strlen(ident_str), ident_str);
   miset_attribute(handle, MI_ROOT_PATH, "minc_version", MI_TYPE_STRING,
-                  strlen(VERSION), VERSION);
+                  strlen(MINC_VERSION), MINC_VERSION);
 
   _miset_volume_class(handle, handle->volume_class);
 

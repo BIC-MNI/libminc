@@ -7,6 +7,11 @@
  ************************************************************************/
 #include <stdlib.h>
 #include <hdf5.h>
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif /*HAVE_CONFIG_H*/
+
 #include "minc2.h"
 #include "minc2_private.h"
 
@@ -41,7 +46,7 @@ int milist_start ( mihandle_t vol, const char *path, int flags,
 
   strncpy ( fullpath, MI_ROOT_PATH "/" MI_INFO_NAME, sizeof ( fullpath ) );
 
-  if ( *path != '/' ) {
+  if ( *path != '/' && *path!=0 ) {
     strncat ( fullpath, "/", sizeof ( fullpath ) - strlen ( fullpath ) - 1 );
   }
 
@@ -326,7 +331,7 @@ int micreate_group ( mihandle_t vol, const char *path, const char *name )
 
   strncpy ( fullpath, MI_ROOT_PATH "/" MI_INFO_NAME, sizeof ( fullpath ) );
 
-  if ( *path != '/' ) {
+  if ( *path != '/' && *path!=0  ) {
     strncat ( fullpath, "/", sizeof ( fullpath ) - strlen ( fullpath ) );
   }
 
@@ -387,7 +392,7 @@ int midelete_attr ( mihandle_t vol, const char *path, const char *name )
 
   strncpy ( fullpath, MI_ROOT_PATH "/" MI_INFO_NAME, sizeof ( fullpath ) );
 
-  if ( *path != '/' ) {
+  if ( *path != '/' && *path!=0 ) {
     strncat ( fullpath, "/", sizeof ( fullpath ) - strlen ( fullpath ) );
   }
 
@@ -441,7 +446,7 @@ int midelete_group ( mihandle_t vol, const char *path, const char *name )
 
   strncpy ( fullpath, MI_ROOT_PATH "/" MI_INFO_NAME, sizeof ( fullpath ) );
 
-  if ( *path != '/' ) {
+  if ( *path != '/' && *path!=0 ) {
     strncat ( fullpath, "/", sizeof ( fullpath ) - strlen ( fullpath ) );
   }
 
@@ -504,7 +509,7 @@ int miget_attr_length ( mihandle_t vol, const char *path, const char *name,
     strncpy ( fullpath, MI_ROOT_PATH "/" MI_INFO_NAME, sizeof ( fullpath ) );
   }
   
-  if ( *path != '/' ) {
+  if ( *path != '/' && *path!=0 ) {
     strncat ( fullpath, "/", sizeof ( fullpath ) - strlen ( fullpath ) );
   }
 
@@ -603,7 +608,7 @@ int miget_attr_type ( mihandle_t vol, const char *path, const char *name,
     strncpy ( fullpath, MI_ROOT_PATH "/" MI_INFO_NAME, sizeof ( fullpath ) );
   }
   
-  if ( *path != '/' ) {
+  if ( *path != '/' && *path!=0 ) {
     strncat ( fullpath, "/", sizeof ( fullpath ) - strlen ( fullpath ) );
   }
 
@@ -741,7 +746,7 @@ int miget_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
     strncpy ( fullpath, MI_ROOT_PATH "/" MI_INFO_NAME, sizeof ( fullpath ) );
   }
 
-  if ( *path != '/' ) {
+  if ( *path != '/' && *path!=0 ) {
     strncat ( fullpath, "/", sizeof ( fullpath ) - strlen ( fullpath ) );
   }
 
@@ -798,7 +803,7 @@ int miget_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
   if ( H5Aread ( hdf_attr, mtyp_id, values )<0 ) 
     goto cleanup;
 
-  status = MI_ERROR;
+  status = MI_NOERROR;
   /*make sure string is zero terminated*/
   if( data_type == MI_TYPE_STRING )
     ( ( char * ) values ) [length] = '\0';
@@ -850,7 +855,7 @@ int miset_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
     strncpy ( fullpath, MI_ROOT_PATH "/" MI_INFO_NAME, sizeof ( fullpath ) );
   }
   
-  if ( *path != '/' ) {
+  if ( *path != '/' && *path!=0 ) {
     strncat ( fullpath, "/", sizeof ( fullpath ) - strlen ( fullpath ) );
   }
 

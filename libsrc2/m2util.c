@@ -3,11 +3,18 @@
 * \author Leila Baghdadi, Bert Vincent
 *
 ************************************************************************/
+#include <hdf5.h>
+
 #include <stdlib.h>
 #include <math.h>
-#include <hdf5.h>
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif /*HAVE_CONFIG_H*/
+
 #include <limits.h>
 #include <float.h>
+
 #include "minc2.h"
 #include "minc2_private.h"
 

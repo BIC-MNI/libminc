@@ -9,6 +9,11 @@
 #include <stdlib.h>
 
 /*#include <hdf5.h>*/
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif /*HAVE_CONFIG_H*/
+
 #include "minc2.h"
 #include "minc2_private.h"
 
