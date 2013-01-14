@@ -480,14 +480,15 @@ int midelete_group ( mihandle_t vol, const char *path, const char *name )
 int miget_attr_length ( mihandle_t vol, const char *path, const char *name,
                     size_t *length )
 {
-  hid_t tmp_id;
-  hid_t hdf_file;
-  hid_t hdf_grp;
-  hid_t hdf_attr;
+  hid_t tmp_id=-1;
+  hid_t hdf_file=-1;
+  hid_t hdf_grp=-1;
+  hid_t hdf_attr=-1;
   hsize_t hdf_dims[1];   /* TODO: symbolic constant for "1" here? */
-  hid_t hdf_space;
-  hid_t hdf_type;
+  hid_t hdf_space=-1;
+  hid_t hdf_type=-1;
   char fullpath[256];
+  int status = MI_ERROR;      /* Guilty until proven innocent */
 
   /* Get a handle to the actual HDF file
    */
@@ -497,7 +498,7 @@ int miget_attr_length ( mihandle_t vol, const char *path, const char *name,
     return MI_LOG_ERROR(MI2_MSG_GENERIC,"HDF file is not open");
   }
 
-  if ( (!strcmp ( name, "history" ) || !strcmp(name,"ident") || !strcmp(name,"minc_version")) && !strcmp(path,"/") ) {
+  if ( (!strcmp ( name, "history" ) || !strcmp(name,"ident") || !strcmp(name,"minc_version")) && ( *path==0 || !strcmp(path,"/")) ) {
     strncpy ( fullpath, MI_ROOT_PATH "/" , sizeof ( fullpath ) );
   } else {
     strncpy ( fullpath, MI_ROOT_PATH "/" MI_INFO_NAME, sizeof ( fullpath ) );
@@ -513,15 +514,21 @@ int miget_attr_length ( mihandle_t vol, const char *path, const char *name,
    */
   hdf_grp = midescend_path ( hdf_file, fullpath );
 
-  if ( hdf_grp < 0 ) {
-    return MI_LOG_ERROR(MI2_MSG_GENERIC,"midescend_path fail");
-  }
+  if ( hdf_grp < 0 )
+    goto cleanup;
 
-  MI_CHECK_HDF_CALL_RET(hdf_attr = H5Aopen_name ( hdf_grp, name ),"H5Aopen_name");
+  H5E_BEGIN_TRY {
+    hdf_attr = H5Aopen_name ( hdf_grp, name );
+  } H5E_END_TRY;
+  
+  if( hdf_attr<0 )
+    goto cleanup;
 
-  MI_CHECK_HDF_CALL_RET(hdf_space = H5Aget_space ( hdf_attr ), "H5Aget_space");
+  if((hdf_space = H5Aget_space ( hdf_attr ))<0)
+    goto cleanup;
 
-  MI_CHECK_HDF_CALL_RET(hdf_type = H5Aget_type ( hdf_attr ),"H5Aget_type");
+  if((hdf_type = H5Aget_type ( hdf_attr ))<0) 
+    goto cleanup;
 
   switch ( H5Sget_simple_extent_ndims ( hdf_space ) ) {
   case 0:     /* Scalar */
@@ -545,21 +552,28 @@ int miget_attr_length ( mihandle_t vol, const char *path, const char *name,
     /* For now, we allow only scalars and vectors.  No multidimensional
      * arrays for MINC 2.0 attributes.
      */
-    return MI_LOG_ERROR(MI2_MSG_GENERIC,"Only scalars and vectors are supported");
+    MI_LOG_ERROR(MI2_MSG_GENERIC,"Only scalars and vectors are supported");
+    goto cleanup;
   }
-
-  H5Tclose ( hdf_type );
-  H5Sclose ( hdf_space );
-  H5Aclose ( hdf_attr );
-  H5E_BEGIN_TRY {
-    tmp_id = H5Gclose ( hdf_grp );
-
-    if ( tmp_id < 0 ) {
-      tmp_id = H5Dclose ( hdf_grp );
+  
+  status=MI_NOERROR;
+  
+cleanup:
+  if(hdf_type >= 0 ) H5Tclose ( hdf_type );
+  if(hdf_space >= 0) H5Sclose ( hdf_space );
+  if(hdf_attr >= 0 ) H5Aclose ( hdf_attr );
+  
+  if ( hdf_grp >= 0 ) {
+    /* The hdf_loc identifier could be a group or a dataset.
+    */
+    if ( H5Iget_type ( hdf_grp ) == H5I_GROUP ) {
+      H5Gclose ( hdf_grp );
+    } else {
+      H5Dclose ( hdf_grp );
     }
-  } H5E_END_TRY;
-
-  return ( MI_NOERROR );
+  }
+  
+  return status;
 }
 
 /** Get the type of an attribute.
@@ -567,12 +581,13 @@ int miget_attr_length ( mihandle_t vol, const char *path, const char *name,
 int miget_attr_type ( mihandle_t vol, const char *path, const char *name,
                   mitype_t *data_type )
 {
-  hid_t tmp_id;
-  hid_t hdf_file;
-  hid_t hdf_grp;
-  hid_t hdf_attr;
-  hid_t hdf_type;
+  hid_t tmp_id=-1;
+  hid_t hdf_file=-1;
+  hid_t hdf_grp=-1;
+  hid_t hdf_attr=-1;
+  hid_t hdf_type=-1;
   char fullpath[256];
+  int status = MI_ERROR;      /* Guilty until proven innocent */
 
   /* Get a handle to the actual HDF file
    */
@@ -582,7 +597,7 @@ int miget_attr_type ( mihandle_t vol, const char *path, const char *name,
     return MI_LOG_ERROR(MI2_MSG_GENERIC,"HDF file is not open");
   }
 
-  if ( (!strcmp ( name, "history" ) || !strcmp(name,"ident") || !strcmp(name,"minc_version")) && !strcmp(path,"/") ) {
+  if ( (!strcmp ( name, "history" ) || !strcmp(name,"ident") || !strcmp(name,"minc_version")) && ( *path==0 || !strcmp(path,"/")) ) {
     strncpy ( fullpath, MI_ROOT_PATH "/" , sizeof ( fullpath ) );
   } else {
     strncpy ( fullpath, MI_ROOT_PATH "/" MI_INFO_NAME, sizeof ( fullpath ) );
@@ -599,12 +614,18 @@ int miget_attr_type ( mihandle_t vol, const char *path, const char *name,
   hdf_grp = midescend_path ( hdf_file, fullpath );
 
   if ( hdf_grp < 0 ) {
-    return MI_LOG_ERROR(MI2_MSG_GENERIC,"midescend_path fail");
+    goto cleanup;
   }
 
-  MI_CHECK_HDF_CALL_RET(hdf_attr = H5Aopen_name ( hdf_grp, name ),"H5Aopen_name");
+  H5E_BEGIN_TRY {
+    hdf_attr = H5Aopen_name ( hdf_grp, name );
+  } H5E_END_TRY;  
   
-  MI_CHECK_HDF_CALL_RET(hdf_type = H5Aget_type ( hdf_attr ),"H5Aget_type");
+  if( hdf_attr<0 ) 
+    goto cleanup;
+  
+  if( (hdf_type = H5Aget_type ( hdf_attr ))<0 ) 
+    goto cleanup;
 
   switch ( H5Tget_class ( hdf_type ) ) {
   case H5T_FLOAT:
@@ -623,20 +644,25 @@ int miget_attr_type ( mihandle_t vol, const char *path, const char *name,
     *data_type = MI_TYPE_INT;
     break;
   default:
-    MI_LOG_ERROR(MI2_MSG_GENERIC,"Unsupported attribute type");
+    goto cleanup;
   }
+  status = MI_NOERROR;
+  
+cleanup:
 
-  H5Tclose ( hdf_type );
-  H5Aclose ( hdf_attr );
-  H5E_BEGIN_TRY {
-    tmp_id = H5Gclose ( hdf_grp );
-
-    if ( tmp_id < 0 ) {
-      tmp_id = H5Dclose ( hdf_grp );
+  if( hdf_type >= 0 ) H5Tclose ( hdf_type );
+  if( hdf_attr >= 0 ) H5Aclose ( hdf_attr );
+  
+  if ( hdf_grp >= 0 ) {
+    /* The hdf_loc identifier could be a group or a dataset.
+    */
+    if ( H5Iget_type ( hdf_grp ) == H5I_GROUP ) {
+      H5Gclose ( hdf_grp );
+    } else {
+      H5Dclose ( hdf_grp );
     }
-  } H5E_END_TRY;
-
-  return ( MI_NOERROR );
+  }
+  return status;
 }
 
 /** Copy all attribute given a path
@@ -692,13 +718,14 @@ int micopy_attr ( mihandle_t vol, const char *path, mihandle_t new_vol )
 int miget_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
                     const char *name, size_t length, void *values )
 {
-  hid_t tmp_id;
-  hid_t hdf_file;
-  hid_t hdf_grp;
-  hid_t mtyp_id;
-  hid_t hdf_space;
-  hid_t hdf_attr;
+  hid_t tmp_id = -1;
+  hid_t hdf_file = -1;
+  hid_t hdf_grp = -1;
+  hid_t mtyp_id = -1;
+  hid_t hdf_space = -1;
+  hid_t hdf_attr = -1;
   char fullpath[256];
+  int status = MI_ERROR;      /* Guilty until proven innocent */
 
   /* Get a handle to the actual HDF file
    */
@@ -708,7 +735,7 @@ int miget_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
     return MI_LOG_ERROR(MI2_MSG_GENERIC,"HDF file is not open");
   }
 
-  if ( (!strcmp ( name, "history" ) || !strcmp(name,"ident") || !strcmp(name,"minc_version")) && !strcmp(path,"/") ) {
+  if ( (!strcmp ( name, "history" ) || !strcmp(name,"ident") || !strcmp(name,"minc_version")) && ( *path==0 || !strcmp(path,"/")) ) {
     strncpy ( fullpath, MI_ROOT_PATH "/" , sizeof ( fullpath ) );
   } else {
     strncpy ( fullpath, MI_ROOT_PATH "/" MI_INFO_NAME, sizeof ( fullpath ) );
@@ -725,10 +752,15 @@ int miget_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
   hdf_grp = midescend_path ( hdf_file, fullpath );
 
   if ( hdf_grp < 0 ) {
-    return MI_LOG_ERROR(MI2_MSG_GENERIC,"midescend_path fail");
+    goto cleanup;
   }
 
-  MI_CHECK_HDF_CALL_RET(hdf_attr = H5Aopen_name ( hdf_grp, name ),"H5Aopen_name");
+  H5E_BEGIN_TRY {
+    hdf_attr = H5Aopen_name ( hdf_grp, name );
+  } H5E_END_TRY;
+
+  if( hdf_attr<0 ) 
+    goto cleanup;
 
   switch ( data_type ) {
   case MI_TYPE_INT:
@@ -745,10 +777,10 @@ int miget_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
     H5Tset_size ( mtyp_id, length );
     break;
   default:
-    return MI_LOG_ERROR(MI2_MSG_GENERIC,"Unsupported attribute type");
+    goto cleanup;
   }
 
-  MI_CHECK_HDF_CALL_RET(hdf_space = H5Aget_space ( hdf_attr ),"H5Aget_space");
+  if( (hdf_space = H5Aget_space ( hdf_attr ))<0 ) goto cleanup;
 
   /* If we're retrieving a vector, make certain the length passed into this
    * function is sufficient.
@@ -759,25 +791,34 @@ int miget_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
     H5Sget_simple_extent_dims ( hdf_space, hdf_dims, NULL );
 
     if ( length < hdf_dims[0] ) {
-      return ( MI_ERROR );
+      goto cleanup;
     }
   }
 
+  if ( H5Aread ( hdf_attr, mtyp_id, values )<0 ) 
+    goto cleanup;
 
-  H5Aread ( hdf_attr, mtyp_id, values );
+  status = MI_ERROR;
+  /*make sure string is zero terminated*/
+  if( data_type == MI_TYPE_STRING )
+    ( ( char * ) values ) [length] = '\0';
+cleanup:
 
-  H5Aclose ( hdf_attr );
-  H5Tclose ( mtyp_id );
-  H5Sclose ( hdf_space );
-  H5E_BEGIN_TRY {
-    tmp_id = H5Gclose ( hdf_grp );
-
-    if ( tmp_id < 0 ) {
-      tmp_id = H5Dclose ( hdf_grp );
+  if( hdf_attr  >= 0  ) H5Aclose ( hdf_attr );
+  if( mtyp_id   >= 0   ) H5Tclose ( mtyp_id );
+  if( hdf_space >= 0 ) H5Sclose ( hdf_space );
+  
+  if ( hdf_grp  >= 0 ) {
+    /* The hdf_loc identifier could be a group or a dataset.
+    */
+    if ( H5Iget_type ( hdf_grp ) == H5I_GROUP ) {
+      H5Gclose ( hdf_grp );
+    } else {
+      H5Dclose ( hdf_grp );
     }
-  } H5E_END_TRY;
+  }
 
-  return ( MI_NOERROR );
+  return status;
 }
 
 /** Set the values of an attribute.
@@ -785,14 +826,15 @@ int miget_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
 int miset_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
                     const char *name, size_t length, const void *values )
 {
-  hid_t hdf_file;
-  hid_t hdf_grp;
+  hid_t hdf_file=-1;
+  hid_t hdf_grp=-1;
   int result;
   char fullpath[256];
   hid_t tmp_id;
   char *std_name;
   char *pch;
   int i, slength;
+  int status = MI_ERROR;      /* Guilty until proven innocent */
 
   /* Get a handle to the actual HDF file
    */
@@ -802,7 +844,7 @@ int miset_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
     return MI_LOG_ERROR(MI2_MSG_GENERIC,"HDF file is not open");
   }
 
-  if ( (!strcmp ( name, "history" ) || !strcmp(name,"ident") || !strcmp(name,"minc_version")) && !strcmp(path,"/") ) {
+  if ( (!strcmp ( name, "history" ) || !strcmp(name,"ident") || !strcmp(name,"minc_version")) && ( *path==0 || !strcmp(path,"/")) ) {
     strncpy ( fullpath, MI_ROOT_PATH "/" , sizeof ( fullpath ) );
   } else {
     strncpy ( fullpath, MI_ROOT_PATH "/" MI_INFO_NAME, sizeof ( fullpath ) );
@@ -866,25 +908,30 @@ int miset_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
   hdf_grp = midescend_path ( hdf_file, fullpath );
 
   if ( hdf_grp < 0 ) {
-    return MI_LOG_ERROR(MI2_MSG_GENERIC,"midescend_path fail");
+    goto cleanup;
   }
 
   result = miset_attr_at_loc ( hdf_grp, name, data_type, length, values );
 
   if ( result < 0 ) {
-    return ( MI_ERROR );
+    goto cleanup;
   }
+  
+  status=MI_NOERROR;
 
+cleanup:
+  
   /* added the following instead H5Gclose(hdf_grp) */
-  H5E_BEGIN_TRY {
-    tmp_id = H5Gclose ( hdf_grp );
-
-    if ( tmp_id < 0 ) {
-      tmp_id = H5Dclose ( hdf_grp );
+  if ( hdf_grp >= 0 ) {
+    /* The hdf_loc identifier could be a group or a dataset.
+    */
+    if ( H5Iget_type ( hdf_grp ) == H5I_GROUP ) {
+      H5Gclose ( hdf_grp );
+    } else {
+      H5Dclose ( hdf_grp );
     }
-  } H5E_END_TRY;
-
-  return ( MI_NOERROR );
+  }
+  return status;
 }
 
 /** Add global history attribute

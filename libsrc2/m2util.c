@@ -303,11 +303,12 @@ hid_t midescend_path ( hid_t file_id, const char *path )
 int miset_attr_at_loc ( hid_t hdf_loc, const char *name, mitype_t data_type,
                         size_t length, const void *values )
 {
-  hid_t ftyp_id;
-  hid_t mtyp_id;
-  hid_t spc_id;
-  hid_t hdf_attr;
+  hid_t ftyp_id=-1;
+  hid_t mtyp_id=-1;
+  hid_t spc_id=-1;
+  hid_t hdf_attr=-1;
   hsize_t hdf_len;
+  int status=MI_ERROR;
 
   H5E_BEGIN_TRY {
     /* Delete attribute if it already exists. */
@@ -338,21 +339,29 @@ int miset_attr_at_loc ( hid_t hdf_loc, const char *name, mitype_t data_type,
   }
 
   if ( length == 1 ) {
-    MI_CHECK_HDF_CALL_RET(spc_id = H5Screate ( H5S_SCALAR ),"H5Screate");
+    if( (spc_id = H5Screate ( H5S_SCALAR ))<0)
+      goto cleanup;
   } else {
     hdf_len = ( hsize_t ) length;
-    MI_CHECK_HDF_CALL_RET(spc_id = H5Screate_simple ( 1, &hdf_len, NULL ),"H5Screate_simple");
+    if( (spc_id = H5Screate_simple ( 1, &hdf_len, NULL ))<0 )
+      goto cleanup;
   }
 
-  MI_CHECK_HDF_CALL_RET(hdf_attr = H5Acreate1 ( hdf_loc, name, ftyp_id, spc_id, H5P_DEFAULT ),"H5Acreate1");
+  if((hdf_attr = H5Acreate1 ( hdf_loc, name, ftyp_id, spc_id, H5P_DEFAULT ))<0)
+    goto cleanup;
+  
+  
+  if(H5Awrite ( hdf_attr, mtyp_id, values ) < 0) 
+    goto cleanup;
+  
+  status=MI_NOERROR;
 
-  MI_CHECK_HDF_CALL_RET(H5Awrite ( hdf_attr, mtyp_id, values ),"H5Awrite");
-
-  H5Aclose ( hdf_attr );
-  H5Tclose ( ftyp_id );
-  H5Tclose ( mtyp_id );
-  H5Sclose ( spc_id );
-  return ( MI_NOERROR );
+cleanup:  
+  if(hdf_attr >=0 )  H5Aclose ( hdf_attr );
+  if(ftyp_id  >=0 )  H5Tclose ( ftyp_id );
+  if(mtyp_id  >=0 )  H5Tclose ( mtyp_id );
+  if(spc_id   >=0 )  H5Sclose ( spc_id );
+  return status;
 }
 
 /** Set an attribute from a minc file */

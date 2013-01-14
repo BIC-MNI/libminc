@@ -1055,20 +1055,25 @@ static int _miget_volume_class(mihandle_t volume, miclass_t *volume_class)
 {
   char class_buf[MI2_CHAR_LENGTH];
 
-  miget_attribute(volume, MI_ROOT_PATH, "class", MI_TYPE_STRING,
-                  MI2_CHAR_LENGTH, class_buf);
-
-  if (!strcmp(class_buf, "label__")) {
-    *volume_class = MI_CLASS_LABEL;
-  } else if (!strcmp(class_buf, "integer")) {
-    *volume_class = MI_CLASS_INT;
-  } else if (!strcmp(class_buf, "complex")) {
-    *volume_class = MI_CLASS_COMPLEX;
-  } else if (!strcmp(class_buf, "array__")) {
-    *volume_class = MI_CLASS_UNIFORM_RECORD;
+  if( miget_attribute(volume, MI_ROOT_PATH, "class", MI_TYPE_STRING,
+                  MI2_CHAR_LENGTH, class_buf) == MI_NOERROR )
+  {
+    if (!strcmp(class_buf, "label__")) {
+      *volume_class = MI_CLASS_LABEL;
+    } else if (!strcmp(class_buf, "integer")) {
+      *volume_class = MI_CLASS_INT;
+    } else if (!strcmp(class_buf, "complex")) {
+      *volume_class = MI_CLASS_COMPLEX;
+    } else if (!strcmp(class_buf, "array__")) {
+      *volume_class = MI_CLASS_UNIFORM_RECORD;
+    } else {
+      *volume_class = MI_CLASS_REAL;
+    }
   } else {
+    /*probably volume doesn't have this attribute*/
     *volume_class = MI_CLASS_REAL;
   }
+  
   return (MI_NOERROR);
 }
 
@@ -1093,17 +1098,16 @@ static int _miget_file_dimension(mihandle_t volume, const char *dimname,
   H5E_BEGIN_TRY {
     int r;
     /* Get the attribute (spacing) from a minc file */
-    r = miget_attribute(volume, path, "spacing", MI_TYPE_STRING,
-    MI2_CHAR_LENGTH, temp);
-    if (!strcmp(temp, "irregular")) {
+    r = miget_attribute(volume, path, "spacing", MI_TYPE_STRING, MI2_CHAR_LENGTH, temp);
+    
+    if (r==MI_NOERROR && !strcmp(temp, "irregular")) {
       hdim->attr |= MI_DIMATTR_NOT_REGULARLY_SAMPLED;
     } else {
       hdim->attr |= MI_DIMATTR_REGULARLY_SAMPLED;
     }
 
     /* Get the attribute (class) from a minc file */
-    r = miget_attribute(volume, path, "class", MI_TYPE_STRING,
-    MI2_CHAR_LENGTH, temp);
+    r = miget_attribute(volume, path, "class", MI_TYPE_STRING,  MI2_CHAR_LENGTH, temp);
     if (r < 0) {
       /* Get the default class. */
       if (!strcmp(dimname, MItime)) {
