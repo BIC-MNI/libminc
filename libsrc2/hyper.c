@@ -768,6 +768,13 @@ static int mirw_hyperslab_icv(int opcode,
     printf("mirw_hyperslab_icv:Real max:%f min:%f\n",*image_slice_max_buffer,*image_slice_min_buffer);
 #endif    
   }
+  
+  //A hack to disable interslice scaling when it is not needed according to MINC1 specs
+  if( volume->volume_type==MI_TYPE_FLOAT || volume->volume_type==MI_TYPE_DOUBLE || 
+      volume->volume_type==MI_TYPE_FCOMPLEX || volume->volume_type==MI_TYPE_DCOMPLEX )
+  {
+    scaling_needed=0;
+  }
 #ifdef _DEBUG  
   printf("mirw_hyperslab_icv:Slice_ndim:%d total_number_of_slices:%d image_slice_length:%d scaling_needed:%d\n",slice_ndims,total_number_of_slices,image_slice_length,scaling_needed);
 #endif
@@ -1088,7 +1095,9 @@ static int mirw_hyperslab_normalized(int opcode,
   printf("mirw_hyperslab_normalized:Volume:%x valid_max:%f valid_min:%f scaling:%d\n",volume,volume_valid_max,volume_valid_min,volume->has_slice_scaling);
 #endif  
   
-  if(volume->has_slice_scaling)
+  if(volume->has_slice_scaling && 
+    !(volume->volume_type==MI_TYPE_FLOAT || volume->volume_type==MI_TYPE_DOUBLE || 
+      volume->volume_type==MI_TYPE_FCOMPLEX || volume->volume_type==MI_TYPE_DCOMPLEX) )
   {
     hid_t image_max_fspc_id;
     hid_t image_min_fspc_id;
@@ -1176,6 +1185,7 @@ static int mirw_hyperslab_normalized(int opcode,
     printf("mirw_hyperslab_normalized:Real max:%f min:%f\n",*image_slice_max_buffer,*image_slice_min_buffer);
 #endif
   }
+
 #ifdef _DEBUG  
   printf("mirw_hyperslab_normalized:Slice_ndim:%d total_number_of_slices:%d image_slice_length:%d\n",slice_ndims,total_number_of_slices,image_slice_length);
   printf("mirw_hyperslab_normalized:data min:%f data max:%f buffer_data_type:%d\n",data_min,data_max,buffer_data_type);
