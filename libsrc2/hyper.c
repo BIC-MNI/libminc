@@ -20,7 +20,7 @@ typedef unsigned long mioffset_t;
  * Multidimensional Arrays and its Applications for Parallel Architectures"
  * IEEE Transactions on Parallel and Distributed Systems, Vol.12, No.3,
  * March 2001, pp.306-315.
- * 
+ *
  * I rewrote the algorithm in "C" an generalized it to N dimensions.
  *
  * Guaranteed to do the minimum number of memory moves, but requires
@@ -32,8 +32,8 @@ typedef unsigned long mioffset_t;
  * Map a set of array coordinates to a linear offset in the array memory.
  */
 static mioffset_t
-index_to_offset(int ndims, 
-                const unsigned long sizes[], 
+index_to_offset(int ndims,
+                const unsigned long sizes[],
                 const unsigned long index[])
 {
     mioffset_t offset = index[0];
@@ -50,9 +50,9 @@ index_to_offset(int ndims,
  * Map a linear offset to a set of coordinates in a multidimensional array.
  */
 static void
-offset_to_index(int ndims, 
-                const unsigned long sizes[], 
-                mioffset_t offset, 
+offset_to_index(int ndims,
+                const unsigned long sizes[],
+                mioffset_t offset,
                 unsigned long index[])
 {
     int i;
@@ -139,7 +139,7 @@ restructure_array(int ndims,    /* Dimension count */
             printf("%ld", offset_start);
 #endif /* DEBUG */
 
-            /** 
+            /**
              * Save the first element in this cycle.
              **/
 
@@ -164,7 +164,7 @@ restructure_array(int ndims,    /* Dimension count */
                  **/
 
                 offset_to_index(ndims, lengths_perm, offset, index_perm);
-        
+
                 /**
                  * Permute the index into the alternate arrangement.
                  **/
@@ -210,16 +210,16 @@ restructure_array(int ndims,    /* Dimension count */
 #ifdef DEBUG
                     printf(" - %ld", offset_next);
 #endif /* DEBUG */
-                    
+
                     /**
                      * Move from old to new location.
                      **/
 
-                    memcpy(array + (offset * el_size), 
-                           array + (offset_next * el_size), 
+                    memcpy(array + (offset * el_size),
+                           array + (offset_next * el_size),
                            el_size);
 
-                    /** 
+                    /**
                      * Advance offset to the next location in the cycle.
                      **/
 
@@ -245,7 +245,7 @@ restructure_array(int ndims,    /* Dimension count */
 }
 
 /** Calculates and returns the number of bytes required to store the
- * hyperslab specified by the \a n_dimensions and the 
+ * hyperslab specified by the \a n_dimensions and the
  * \a count parameters.
  */
 int
@@ -304,7 +304,7 @@ mitranslate_hyperslab_origin(mihandle_t volume,
          */
         if (volume->dim_indices != NULL) {
             /* Have to swap indices */
-            user_i = volume->dim_indices[file_i];  
+            user_i = volume->dim_indices[file_i];
             if (user_i != file_i) {
                 n_different++;
             }
@@ -327,7 +327,7 @@ mitranslate_hyperslab_origin(mihandle_t volume,
 	    hdf_start[user_i] = hdim->length - start[file_i] - count[file_i];
             dir[file_i] = -1;   /* Set direction negative */
             break;
-            
+
         case MI_POSITIVE:
             if (hdim->step > 0) { /* Positive? */
 	      //hdf_start[file_i] = start[user_i]; /* Use raw file order. */
@@ -354,12 +354,12 @@ mitranslate_hyperslab_origin(mihandle_t volume,
             }
             break;
         }
-	
+
 	//hdf_count[file_i] = count[user_i];
 	hdf_count[user_i] = count[file_i];
 
-	
-	
+
+
     }
     return (n_different);
 }
@@ -369,10 +369,10 @@ mitranslate_hyperslab_origin(mihandle_t volume,
  * mirw_hyperslab_icv()
  */
 static int
-mirw_hyperslab_raw(int opcode, 
-                   mihandle_t volume, 
-                   mitype_t midatatype, 
-                   const unsigned long start[], 
+mirw_hyperslab_raw(int opcode,
+                   mihandle_t volume,
+                   mitype_t midatatype,
+                   const unsigned long start[],
                    const unsigned long count[],
                    void *buffer)
 {
@@ -386,8 +386,8 @@ mirw_hyperslab_raw(int opcode,
     int dir[MI2_MAX_VAR_DIMS];  /* Direction vector in file order */
     int ndims;
     int n_different = 0;
-   
-   
+
+
     /* Disallow write operations to anything but the highest resolution.
      */
     if (opcode == MIRW_OP_WRITE && volume->selected_resolution != 0) {
@@ -403,7 +403,7 @@ mirw_hyperslab_raw(int opcode,
     if (fspc_id < 0) {
         goto cleanup;
     }
-    
+
     if (midatatype == MI_TYPE_UNKNOWN) {
         type_id = H5Tcopy(volume->mtype_id);
     }
@@ -414,14 +414,14 @@ mirw_hyperslab_raw(int opcode,
     ndims = volume->number_of_dims;
 
     if (ndims == 0) {
-        /* A scalar volume is possible but extremely unlikely, not to 
+        /* A scalar volume is possible but extremely unlikely, not to
          * mention useless!
          */
         mspc_id = H5Screate(H5S_SCALAR);
     }
     else {
-      
-        n_different = mitranslate_hyperslab_origin(volume, 
+
+        n_different = mitranslate_hyperslab_origin(volume,
                                                    start,
                                                    count,
                                                    hdf_start,
@@ -433,21 +433,21 @@ mirw_hyperslab_raw(int opcode,
             goto cleanup;
         }
     }
-    
-    result = H5Sselect_hyperslab(fspc_id, H5S_SELECT_SET, hdf_start, NULL, 
+
+    result = H5Sselect_hyperslab(fspc_id, H5S_SELECT_SET, hdf_start, NULL,
                                  hdf_count, NULL);
     if (result < 0) {
         goto cleanup;
     }
 
     if (opcode == MIRW_OP_READ) {
-        result = H5Dread(dset_id, type_id, mspc_id, fspc_id, H5P_DEFAULT, 
+        result = H5Dread(dset_id, type_id, mspc_id, fspc_id, H5P_DEFAULT,
                          buffer);
         /* Restructure the array after reading the data in file orientation.
          */
 
         if (n_different != 0) {
-            restructure_array(ndims, buffer, count, H5Tget_size(type_id), 
+            restructure_array(ndims, buffer, count, H5Tget_size(type_id),
                               volume->dim_indices, dir);
         }
     }
@@ -457,7 +457,7 @@ mirw_hyperslab_raw(int opcode,
 
         /* Restructure array before writing to file.
          */
-	
+
         if (n_different != 0) {
             unsigned long icount[MI2_MAX_VAR_DIMS];
             int idir[MI2_MAX_VAR_DIMS];
@@ -474,14 +474,14 @@ mirw_hyperslab_raw(int opcode,
 
 	      // this one was correct the original way
 	      imap[volume->dim_indices[i]] = i;
-	      
+
             }
 
-            restructure_array(ndims, buffer, icount, H5Tget_size(type_id), 
+            restructure_array(ndims, buffer, icount, H5Tget_size(type_id),
                               imap, idir);
         }
 
-        result = H5Dwrite(dset_id, type_id, mspc_id, fspc_id, H5P_DEFAULT, 
+        result = H5Dwrite(dset_id, type_id, mspc_id, fspc_id, H5P_DEFAULT,
                           buffer);
     }
 
@@ -503,12 +503,12 @@ mirw_hyperslab_raw(int opcode,
 /** Read/write a hyperslab of data, performing dimension remapping
  * and data rescaling as needed.
  */
-static int 
-mirw_hyperslab_icv(int opcode, 
+static int
+mirw_hyperslab_icv(int opcode,
                    mihandle_t volume,
                    int icv,
-                   const unsigned long start[], 
-                   const unsigned long count[], 
+                   const unsigned long start[],
+                   const unsigned long count[],
                    void *buffer)
 {
     int ndims;
@@ -537,7 +537,7 @@ mirw_hyperslab_icv(int opcode,
         hssize_t hdf_start[MI2_MAX_VAR_DIMS];
         hsize_t hdf_count[MI2_MAX_VAR_DIMS];
 
-        n_different = mitranslate_hyperslab_origin(volume, 
+        n_different = mitranslate_hyperslab_origin(volume,
                                                    start,
                                                    count,
                                                    hdf_start,
@@ -579,17 +579,17 @@ mirw_hyperslab_icv(int opcode,
 
 /** Reads the real values in the volume from the interval min through
  *  max, mapped to the maximum representable range for the requested
- *  data type. Float type is NOT an allowed data type.  
+ *  data type. Float type is NOT an allowed data type.
  */
 int
-miget_hyperslab_normalized(mihandle_t volume, 
+miget_hyperslab_normalized(mihandle_t volume,
                            mitype_t buffer_data_type,
-                           const unsigned long start[], 
+                           const unsigned long start[],
                            const unsigned long count[],
-                           double min, 
-                           double max, 
-                           void *buffer) 
-{ 
+                           double min,
+                           double max,
+                           void *buffer)
+{
     hid_t file_id;
     int var_id;
     int icv;
@@ -630,7 +630,7 @@ miget_hyperslab_normalized(mihandle_t volume,
 
     result = miicv_attach(icv, file_id, var_id);
     if (result == MI_NOERROR) {
-        result = mirw_hyperslab_icv(MIRW_OP_READ, volume, icv, start, count, 
+        result = mirw_hyperslab_icv(MIRW_OP_READ, volume, icv, start, count,
                                     buffer);
 	miicv_detach(icv);
     }
@@ -666,7 +666,7 @@ miget_hyperslab_with_icv(mihandle_t volume, /**< A MINC 2.0 volume handle */
 
     result = miicv_attach(icv, file_id, var_id);
     if (result == MI_NOERROR) {
-        result = mirw_hyperslab_icv(MIRW_OP_READ, volume, icv, start, count, 
+        result = mirw_hyperslab_icv(MIRW_OP_READ, volume, icv, start, count,
                                     buffer);
 	miicv_detach(icv);
     }
@@ -701,11 +701,11 @@ miset_hyperslab_with_icv(mihandle_t volume, /**< A MINC 2.0 volume handle */
 
     result = miicv_attach(icv, file_id, var_id);
     if (result == MI_NOERROR) {
-	result = mirw_hyperslab_icv(MIRW_OP_WRITE, 
+	result = mirw_hyperslab_icv(MIRW_OP_WRITE,
                                     volume,
-                                    icv, 
-                                    start, 
-                                    count, 
+                                    icv,
+                                    start,
+                                    count,
                                     (void *) buffer);
 	miicv_detach(icv);
     }
@@ -761,21 +761,21 @@ miget_real_value_hyperslab(mihandle_t volume,
           if (hdim->step < 0)
             miicv_setint(icv, MI_ICV_DO_DIM_CONV, TRUE);
           break;
-        case MI_NEGATIVE: 
+        case MI_NEGATIVE:
           if (hdim->step > 0)
             miicv_setint(icv, MI_ICV_DO_DIM_CONV, TRUE);
           break;
         default:
-          return;
+          return MI_ERROR;
         }
       }
     result = miicv_attach(icv, file_id, var_id);
     if (result == MI_NOERROR) {
       result = mirw_hyperslab_icv(MIRW_OP_READ,
                                     volume,
-                                    icv, 
-                                    start, 
-                                    count, 
+                                    icv,
+                                    start,
+                                    count,
                                     (void *) buffer);
       miicv_detach(icv);
     }
@@ -816,11 +816,11 @@ miset_real_value_hyperslab(mihandle_t volume,
 
     result = miicv_attach(icv, file_id, var_id);
     if (result == MI_NOERROR) {
-	result = mirw_hyperslab_icv(MIRW_OP_WRITE, 
+	result = mirw_hyperslab_icv(MIRW_OP_WRITE,
                                     volume,
-                                    icv, 
-                                    start, 
-                                    count, 
+                                    icv,
+                                    start,
+                                    count,
                                     (void *) buffer);
 	miicv_detach(icv);
     }
@@ -839,7 +839,7 @@ miget_voxel_value_hyperslab(mihandle_t volume,
 			     const unsigned long count[],
 			     void *buffer)
 {
-    return mirw_hyperslab_raw(MIRW_OP_READ, volume, buffer_data_type, 
+    return mirw_hyperslab_raw(MIRW_OP_READ, volume, buffer_data_type,
                               start, count, buffer);
 }
 
@@ -854,6 +854,6 @@ miset_voxel_value_hyperslab(mihandle_t volume,
 			     const unsigned long count[],
 			     void *buffer)
 {
-    return mirw_hyperslab_raw(MIRW_OP_WRITE, volume, buffer_data_type, 
+    return mirw_hyperslab_raw(MIRW_OP_WRITE, volume, buffer_data_type,
                               start, count, (void *) buffer);
 }
