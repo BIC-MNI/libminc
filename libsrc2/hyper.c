@@ -294,8 +294,7 @@ int miget_hyperslab_size(mitype_t volume_data_type,   /**< Data type of a voxel.
 
 /** "semiprivate" function for translating coordinates.
  */
-int
-mitranslate_hyperslab_origin(mihandle_t volume,
+int mitranslate_hyperslab_origin(mihandle_t volume,
                              const misize_t* start,
                              const misize_t* count,
                              hsize_t* hdf_start,
@@ -338,6 +337,7 @@ mitranslate_hyperslab_origin(mihandle_t volume,
     case MI_COUNTER_FILE_ORDER:
       hdf_start[user_i] = hdim->length - start[file_i] - count[file_i];
       dir[file_i] = -1;   /* Set direction negative */
+      n_different++;
       break;
 
     case MI_POSITIVE:
@@ -347,6 +347,7 @@ mitranslate_hyperslab_origin(mihandle_t volume,
       } else {
         hdf_start[user_i] = hdim->length - start[file_i] - count[file_i];
         dir[file_i] = -1; /* Set direction negative */
+        n_different++;
       }
       break;
 
@@ -357,6 +358,7 @@ mitranslate_hyperslab_origin(mihandle_t volume,
       } else {
         hdf_start[user_i] = hdim->length - start[file_i] - count[file_i];
         dir[file_i] = -1; /* Set direction negative */
+        n_different++;
       }
       break;
     }
