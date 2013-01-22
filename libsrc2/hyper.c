@@ -970,8 +970,6 @@ cleanup:
     double voxel_offset=voxel_min;\
     double norm_offset=norm_min;\
     double norm_range=norm_max-norm_min;\
-    double data_offset=data_min;\
-    double data_range=data_max-data_min;\
     type_in *_buffer_in=(type_in *)buffer_in;\
     for(_i=0;_i<total_number_of_slices;_i++)\
       for(_j=0;_j<image_slice_length;_j++)\

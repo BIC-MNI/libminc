@@ -132,27 +132,11 @@ int main ( int argc, char **argv )
   mihandle_t vol;
 
   
-  midimhandle_t *dim;
   int           ndim;
-  misize_t *sizes;
-  misize_t *start;
-  misize_t *count;
-  misize_t *howfar;
-  misize_t *location;
-  double        *origin;
-  double        *step;
   miclass_t      volume_class;
   mitype_t       volume_type;
-  int            vector_dimension_id=-1;
-  int            vector_size=-1;
-  milisthandle_t grplist;
-  milisthandle_t attlist;
-  char group_name[256];
-  char attr_name[256];
-  int group_id,attr_id;
   
   int r = 0;
-  int i;
   
   if(argc<2)
   {

@@ -94,8 +94,6 @@ int main ( int argc, char **argv )
   double *buffer, value;
   int r = 0;
 
-  static char *dimorder[] = {"xspace", "yspace", "zspace"};
-
   printf ( "Creating image with slice scaling!! \n" );
   create_test_file();
   printf ( "Opening hyperslab-test2.mnc! \n" );

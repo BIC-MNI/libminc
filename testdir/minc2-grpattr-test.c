@@ -136,7 +136,7 @@ int main(int argc, char **argv)
     TESTRPT("miget_attr_type failed", data_type);
   }
   if (length != 8) {
-    TESTRPT("miget_attr_length failed", length);
+    TESTRPT("miget_attr_length failed", (int)length);
   }
   
   r = midelete_group(hvol, "/test1/stuff", "goodbye");

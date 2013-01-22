@@ -52,10 +52,6 @@ int milist_start ( mihandle_t vol, const char *path, int flags,
 
   strncat ( fullpath, path, sizeof ( fullpath ) - strlen ( fullpath ) - 1);
 
-  /*grp_id = H5Gopen1(vol->hdf_id, fullpath);
-  if (grp_id < 0) {
-      return (MI_ERROR);
-  }*/
   grp_id = midescend_path ( vol->hdf_id, fullpath );
 
   if ( grp_id < 0 ) {
@@ -86,7 +82,6 @@ int milist_start ( mihandle_t vol, const char *path, int flags,
 static int
 milist_recursion ( milisthandle_t handle, char *path )
 {
-  hid_t tmp_id;
   struct milistdata *data = ( struct milistdata * ) handle;
   herr_t r;
   struct milistframe *frame;
@@ -104,14 +99,12 @@ milist_recursion ( milisthandle_t handle, char *path )
 
       /* End of this group, need to pop the frame. */
       frame = data->frame_ptr->next;
-      //H5Gclose(data->frame_ptr->grp_id);
-      H5E_BEGIN_TRY {
-        tmp_id = H5Gclose ( data->frame_ptr->grp_id );
-
-        if ( tmp_id < 0 ) {
-          tmp_id = H5Dclose ( data->frame_ptr->grp_id );
-        }
-      } H5E_END_TRY;
+      
+      if ( H5Iget_type ( data->frame_ptr->grp_id ) == H5I_GROUP ) {
+        H5Gclose ( data->frame_ptr->grp_id );
+      } else {
+        H5Dclose ( data->frame_ptr->grp_id );
+      }
 
       free ( data->frame_ptr );
       data->frame_ptr = frame;
@@ -195,21 +188,18 @@ int milist_attr_next ( mihandle_t vol, milisthandle_t handle,
     } H5E_END_TRY;
 
     if ( r > 0 ) {
-
       strncpy ( path, data->frame_ptr->relpath, maxpath );
       return ( MI_NOERROR );
-    } else
+    } else {
+      
       if ( data->flags & MILIST_RECURSE ) {
 
-        r = milist_recursion ( handle, path );
-
-        if ( r == MI_ERROR ) {
-          return ( MI_ERROR );
-        }
+        return milist_recursion ( handle, path );
 
       } else {
         return ( MI_ERROR );
       }
+    }
   }
 
   return ( MI_NOERROR );
@@ -485,7 +475,6 @@ int midelete_group ( mihandle_t vol, const char *path, const char *name )
 int miget_attr_length ( mihandle_t vol, const char *path, const char *name,
                     size_t *length )
 {
-  hid_t tmp_id=-1;
   hid_t hdf_file=-1;
   hid_t hdf_grp=-1;
   hid_t hdf_attr=-1;
@@ -586,7 +575,6 @@ cleanup:
 int miget_attr_type ( mihandle_t vol, const char *path, const char *name,
                   mitype_t *data_type )
 {
-  hid_t tmp_id=-1;
   hid_t hdf_file=-1;
   hid_t hdf_grp=-1;
   hid_t hdf_attr=-1;
@@ -723,7 +711,6 @@ int micopy_attr ( mihandle_t vol, const char *path, mihandle_t new_vol )
 int miget_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
                     const char *name, size_t length, void *values )
 {
-  hid_t tmp_id = -1;
   hid_t hdf_file = -1;
   hid_t hdf_grp = -1;
   hid_t mtyp_id = -1;
