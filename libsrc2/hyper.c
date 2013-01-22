@@ -341,7 +341,7 @@ int mitranslate_hyperslab_origin(mihandle_t volume,
       break;
 
     case MI_POSITIVE:
-      if (hdim->step > 0) { /* Positive? */
+      if (hdim->step >= 0.0) { /* Positive? */
         hdf_start[user_i] = start[file_i];
         dir[file_i] = 1; /* Set direction positive */
       } else {
@@ -352,7 +352,7 @@ int mitranslate_hyperslab_origin(mihandle_t volume,
       break;
 
     case MI_NEGATIVE:
-      if (hdim->step < 0) { /* Negative? */
+      if (hdim->step < 0.0) { /* Negative? */
         hdf_start[user_i] = start[file_i];
         dir[file_i] = 1; /* Set direction positive */
       } else {
