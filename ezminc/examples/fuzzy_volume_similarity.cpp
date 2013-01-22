@@ -182,11 +182,7 @@ int main(int argc,char **argv)
       std::cout<<"Volume 2 min="<<(int)f2.min()<<" max="<<(int)f2.max()<<" count="<<f2.count()<<std::endl;
     }
 
-    unsigned char low= std::min<double>(f1.min(), f2.min());
-    unsigned char hi = std::max<double>(f1.max(), f2.max());
-
-    int v1=0,v2=0;
-    double a=0.0,b=0.0,c=0.0,d=0.0;
+    double a=0.0,b=0.0;
     for(int i=0; i<size ; i++ )
     {
       

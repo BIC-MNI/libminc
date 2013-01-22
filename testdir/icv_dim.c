@@ -5,10 +5,14 @@
 #include <stdio.h>
 #include <minc.h>
 
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif 
+
 #define TRUE 1
 #define FALSE 0
 
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
    int icv, cdfid, img, max, min, dimvar;
    static int dim[MAX_VAR_DIMS];

@@ -19,7 +19,7 @@
 #include <getopt.h>
 #include <stdlib.h>
 #include <math.h>
-//based on http://www3.interscience.wiley.com/journal/121496529/abstract
+
 using namespace minc;
 
 void show_usage (const char * prog)
@@ -30,9 +30,6 @@ void show_usage (const char * prog)
 int main(int argc,char **argv)
 {
   int verbose=0;
-  int csv=0;
-  int kappa=0,specificity=0,sensitivity=0;
-  int jaccard=0;
   double _step=1.0;
   static struct option long_options[] = {
     {"verbose", no_argument,             &verbose, 1},

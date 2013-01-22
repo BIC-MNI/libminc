@@ -5,6 +5,10 @@
 #include <stdio.h>
 #include <minc.h>
 
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif
+
 #define TRUE 1
 #define FALSE 0
 
@@ -56,7 +60,7 @@ int main(int argc, char **argv)
             for (imax=0; imax<MAX_MAX; imax++) {
                for (ival=0; ival<MAX_VAL; ival++) {
                   printf(
-                     "in : %s, out : %s, norm : %s, imgmax : %s, valid : %s\n",
+                     "in : %s, out : %s, norm : %s, imgmax : %s, valid : %s value:%g\n",
                          typenm[intype], typenm[outtype], boolnm[inorm],
                          boolnm[imax], boolnm[ival], dvalue);
                   cdfid=micreate("test.mnc", NC_CLOBBER | cflag);

@@ -83,6 +83,7 @@ typedef  struct
          case FLOAT:  \
              SET_ONE( array, float, asterisks, subscripts, value);\
              break;  \
+         default: \
          case DOUBLE:  \
              SET_ONE( array, double, asterisks, subscripts, value);\
              break;  \
@@ -140,6 +141,7 @@ typedef  struct
 #define  SET_MULTIDIM( array, x, y, z, t, v, value )       \
          switch( (array).n_dimensions ) \
          { \
+         default: \
          case 1:  SET_MULTIDIM_1D( array, x, value );              break; \
          case 2:  SET_MULTIDIM_2D( array, x, y, value );           break; \
          case 3:  SET_MULTIDIM_3D( array, x, y, z, value );        break; \
@@ -178,6 +180,7 @@ typedef  struct
          case FLOAT:  \
              GET_ONE( value, vtype, array, float, asterisks, subscripts );\
              break;  \
+         default: \
          case DOUBLE:  \
              GET_ONE( value, vtype, array, double, asterisks, subscripts );\
              break;  \
@@ -205,6 +208,7 @@ typedef  struct
 #define  GET_MULTIDIM( value, vtype, array, x, y, z, t, v )       \
          switch( (array).n_dimensions ) \
          { \
+         defalut: \
          case 1:  GET_MULTIDIM_1D( value, vtype, array, x );              break; \
          case 2:  GET_MULTIDIM_2D( value, vtype, array, x, y );           break; \
          case 3:  GET_MULTIDIM_3D( value, vtype, array, x, y, z );        break; \

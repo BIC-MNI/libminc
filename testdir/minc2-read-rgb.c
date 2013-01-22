@@ -212,7 +212,7 @@ int main ( int argc, char **argv )
     my_count[1]=my_sizes[1];
     my_count[2]=my_sizes[2];
     my_count[3]=my_sizes[3];
-    printf("Reading full volume %dx%dx%dx%lld float ... ",my_count[0],my_count[1],my_count[2],my_count[3]);
+    printf("Reading full volume %dx%dx%dx%d float ... ",(int)my_count[0],(int)my_count[1],(int)my_count[2],(int)my_count[3]);
     
     if ( (r=miget_real_value_hyperslab ( vol, MI_TYPE_FLOAT, my_start, my_count, f_full )) < 0 ) {
       TESTRPT ( "Could not get float full volume.\n",r );
@@ -234,7 +234,7 @@ int main ( int argc, char **argv )
     f_axial=malloc(sizeof(float)*my_count[0]*my_count[1]*my_count[2]*my_count[3]);
 
     
-    printf("Reading Axial slice:%dx%dx%lld float... ",my_count[1],my_count[2],my_count[3]);
+    printf("Reading Axial slice:%dx%dx%d float... ",(int)my_count[1],(int)my_count[2],(int)my_count[3]);
     
     if ( (r=miget_real_value_hyperslab ( vol, MI_TYPE_FLOAT, my_start, my_count, f_axial )) < 0 ) {
       TESTRPT ( "Could not get float axial hyperslab.\n",r );
@@ -247,7 +247,7 @@ int main ( int argc, char **argv )
     my_start[3]=0;my_count[3]=my_sizes[3];
     f_sagittal=malloc(sizeof(float)*my_count[0]*my_count[1]*my_count[2]*my_count[3]);
     
-    printf("Reading Sagittal slice:%dx%dx%lld float... ",my_count[1],my_count[2],my_count[3]);
+    printf("Reading Sagittal slice:%dx%dx%d float... ",(int)my_count[1],(int)my_count[2],(int)my_count[3]);
     if ( (r=miget_real_value_hyperslab ( vol, MI_TYPE_FLOAT, my_start, my_count, f_sagittal )) < 0 ) {
       TESTRPT ( "Could not get float sagittal hyperslab.\n",r );
     }
@@ -259,7 +259,7 @@ int main ( int argc, char **argv )
     my_start[3]=0;my_count[3]=my_sizes[3];
     f_coronal=malloc(sizeof(float)*my_count[0]*my_count[1]*my_count[2]*my_count[3]);
     
-    printf("Reading Coronal slice:%dx%dx%lld float... ",my_count[1],my_count[2],my_count[3]);
+    printf("Reading Coronal slice:%dx%dx%d float... ",(int)my_count[1],(int)my_count[2],(int)my_count[3]);
     if ( (r=miget_real_value_hyperslab ( vol, MI_TYPE_FLOAT, my_start, my_count, f_coronal )) < 0 ) {
       TESTRPT ( "Could not get float coronal hyperslab.\n",r );
     }
@@ -275,7 +275,7 @@ int main ( int argc, char **argv )
     my_count[1]=my_sizes[1];
     my_count[2]=my_sizes[2];
     my_count[3]=my_sizes[3];
-    printf("Reading full volume %dx%dx%dx%lld short ... ",my_count[0],my_count[1],my_count[2],my_count[3]);
+    printf("Reading full volume %dx%dx%dx%d short ... ",(int)my_count[0],(int)my_count[1],(int)my_count[2],(int)my_count[3]);
     
     if ( (r=miget_real_value_hyperslab ( vol, MI_TYPE_SHORT, my_start, my_count, s_full )) < 0 ) {
       TESTRPT ( "Could not get float full volume.\n",r );
@@ -289,7 +289,7 @@ int main ( int argc, char **argv )
     my_start[3]=my_sizes[3]/2;my_count[3]=1;
     s_axial=malloc(sizeof(short)*my_count[0]*my_count[1]*my_count[2]*my_count[3]);
     
-    printf("Reading Axial slice:%dx%dx%lld short... ",my_count[1],my_count[2],my_count[3]);
+    printf("Reading Axial slice:%dx%dx%d short... ",(int)my_count[1],(int)my_count[2],(int)my_count[3]);
     if ( (r=miget_real_value_hyperslab ( vol, MI_TYPE_SHORT, my_start, my_count, s_axial )) < 0 ) {
       TESTRPT ( "Could not get short axial hyperslab.\n",r );
     }
@@ -301,7 +301,7 @@ int main ( int argc, char **argv )
     my_start[3]=0;my_count[3]=my_sizes[3];
     s_sagittal=malloc(sizeof(short)*my_count[0]*my_count[1]*my_count[2]*my_count[3]);
     
-    printf("Reading Sagittal slice:%dx%dx%lld short... ",my_count[1],my_count[2],my_count[3]);
+    printf("Reading Sagittal slice:%dx%dx%d short... ",(int)my_count[1],(int)my_count[2],(int)my_count[3]);
     if ( (r=miget_real_value_hyperslab ( vol, MI_TYPE_SHORT, my_start, my_count, s_sagittal )) < 0 ) {
       TESTRPT ( "Could not get short sagittal hyperslab.\n",r );
     }
@@ -314,7 +314,7 @@ int main ( int argc, char **argv )
     my_start[3]=0;my_count[3]=my_sizes[3];
     s_coronal=malloc(sizeof(short)*my_count[0]*my_count[1]*my_count[2]*my_count[3]);
     
-    printf("Reading Coronal slice:%dx%dx%lld short... ",my_count[1],my_count[2],my_count[3]);
+    printf("Reading Coronal slice:%dx%dx%d short... ",(int)my_count[1],(int)my_count[2],(int)my_count[3]);
     if ( (r=miget_real_value_hyperslab ( vol, MI_TYPE_SHORT, my_start, my_count, s_coronal )) < 0 ) {
       TESTRPT ( "Could not get short coronal hyperslab.\n",r );
     }
@@ -329,7 +329,7 @@ int main ( int argc, char **argv )
     my_count[1]=my_sizes[1];
     my_count[2]=my_sizes[2];
     my_count[3]=my_sizes[3];
-    printf("Reading full volume %dx%dx%dx%lld%lldble ... ",my_count[0],my_count[1],my_count[2],my_count[3]);
+    printf("Reading full volume %dx%dx%dx%d double ... ",(int)my_count[0],(int)my_count[1],(int)my_count[2],(int)my_count[3]);
     
     if ( (r=miget_real_value_hyperslab ( vol, MI_TYPE_DOUBLE, my_start, my_count, d_full )) < 0 ) {
       TESTRPT ( "Could not get double full volume.\n",r );
@@ -378,7 +378,7 @@ int main ( int argc, char **argv )
     my_count[0]=my_sizes[0];
     my_count[1]=my_sizes[1];
     my_count[2]=my_sizes[2];
-    printf("Reading full volume %dx%dx%lld float ... ",my_count[0],my_count[1],my_count[2]);
+    printf("Reading full volume %dx%dx%d float ... ",(int)my_count[0],(int)my_count[1],(int)my_count[2]);
     
     if ( (r=miget_real_value_hyperslab ( vol, MI_TYPE_FLOAT, my_start, my_count, f_full )) < 0 ) {
       TESTRPT ( "Could not get float full volume.\n",r );
@@ -394,7 +394,7 @@ int main ( int argc, char **argv )
     f_axial=malloc(sizeof(float)*my_count[0]*my_count[1]*my_count[2]);
 
     
-    printf("Reading Axial slice:%dx%dx%lld float... ",my_count[0],my_count[1],my_count[2]);
+    printf("Reading Axial slice:%dx%dx%d float... ",(int)my_count[0],(int)my_count[1],(int)my_count[2]);
     
     if ( (r=miget_real_value_hyperslab ( vol, MI_TYPE_FLOAT, my_start, my_count, f_axial )) < 0 ) {
       TESTRPT ( "Could not get float axial hyperslab.\n",r );
@@ -407,7 +407,7 @@ int main ( int argc, char **argv )
     my_start[2]=0;my_count[2]=my_sizes[2];
     f_sagittal=malloc(sizeof(float)*my_count[0]*my_count[1]*my_count[2]);
     
-    printf("Reading Sagittal slice:%dx%dx%lld float... ",my_count[0],my_count[1],my_count[2]);
+    printf("Reading Sagittal slice:%dx%dx%d float... ",(int)my_count[0],(int)my_count[1],(int)my_count[2]);
     if ( (r=miget_real_value_hyperslab ( vol, MI_TYPE_FLOAT, my_start, my_count, f_sagittal )) < 0 ) {
       TESTRPT ( "Could not get float sagittal hyperslab.\n",r );
     }
@@ -419,7 +419,7 @@ int main ( int argc, char **argv )
     my_start[2]=0;my_count[2]=my_sizes[2];
     f_coronal=malloc(sizeof(float)*my_count[0]*my_count[1]*my_count[2]);
     
-    printf("Reading Coronal slice:%dx%dx%lld float... ",my_count[0],my_count[1],my_count[2]);
+    printf("Reading Coronal slice:%dx%dx%d float... ",(int)my_count[0],(int)my_count[1],(int)my_count[2]);
     if ( (r=miget_real_value_hyperslab ( vol, MI_TYPE_FLOAT, my_start, my_count, f_coronal )) < 0 ) {
       TESTRPT ( "Could not get float coronal hyperslab.\n",r );
     }
@@ -438,7 +438,7 @@ int main ( int argc, char **argv )
     
     s_axial=malloc(sizeof(short)*my_count[0]*my_count[1]*my_count[2]);
     
-    printf("Reading full volume %dx%dx%lld short ... ",my_count[0],my_count[1],my_count[2]);
+    printf("Reading full volume %dx%dx%d short ... ",(int)my_count[0],(int)my_count[1],(int)my_count[2]);
     s_full=malloc(sizeof(short)*my_sizes[0]*my_sizes[1]*my_sizes[2]);
     my_start[0]=my_start[1]=my_start[2]=0;
     
@@ -448,7 +448,7 @@ int main ( int argc, char **argv )
     printf("mean=%f\n",calculate_mean_s(s_full,my_sizes[0]*my_sizes[1]*my_sizes[2]));
     free(s_full);
     
-    printf("Reading Axial slice:%dx%dx%lld short... ",my_count[0],my_count[1],my_count[2]);
+    printf("Reading Axial slice:%dx%dx%d short... ",(int)my_count[0],(int)my_count[1],(int)my_count[2]);
     if ( (r=miget_real_value_hyperslab ( vol, MI_TYPE_SHORT, my_start, my_count, s_axial )) < 0 ) {
       TESTRPT ( "Could not get short axial hyperslab.\n",r );
     }
@@ -460,7 +460,7 @@ int main ( int argc, char **argv )
     my_start[2]=0;my_count[2]=my_sizes[2];
     s_sagittal=malloc(sizeof(short)*my_count[0]*my_count[1]*my_count[2]);
     
-    printf("Reading Sagittal slice:%dx%dx%lld short... ",my_count[0],my_count[1],my_count[2]);
+    printf("Reading Sagittal slice:%dx%dx%d short... ",(int)my_count[0],(int)my_count[1],(int)my_count[2]);
     if ( (r=miget_real_value_hyperslab ( vol, MI_TYPE_SHORT, my_start, my_count, s_sagittal )) < 0 ) {
       TESTRPT ( "Could not get short sagittal hyperslab.\n",r );
     }
@@ -473,7 +473,7 @@ int main ( int argc, char **argv )
     my_start[2]=0;my_count[2]=my_sizes[2];
     s_coronal=malloc(sizeof(short)*my_count[0]*my_count[1]*my_count[2]);
     
-    printf("Reading Coronal slice:%dx%dx%lld short... ",my_count[0],my_count[1],my_count[2]);
+    printf("Reading Coronal slice:%dx%dx%d short... ",(int)my_count[0],(int)my_count[1],(int)my_count[2]);
     if ( (r=miget_real_value_hyperslab ( vol, MI_TYPE_SHORT, my_start, my_count, s_coronal )) < 0 ) {
       TESTRPT ( "Could not get short coronal hyperslab.\n",r );
     }
@@ -488,7 +488,7 @@ int main ( int argc, char **argv )
     my_count[1]=my_sizes[1];
     my_count[2]=my_sizes[2];
     
-    printf("Reading full volume %dx%dx%d double ... ",my_count[0],my_count[1],my_count[2]);
+    printf("Reading full volume %dx%dx%d double ... ",(int)my_count[0],(int)my_count[1],(int)my_count[2]);
     
     if ( (r=miget_real_value_hyperslab ( vol, MI_TYPE_DOUBLE, my_start, my_count, d_full )) < 0 ) {
       TESTRPT ( "Could not get float full volume.\n",r );
