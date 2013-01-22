@@ -57,7 +57,8 @@ int main( int ac, char* av[] )
 	tolerance = atof( av[3] );
 	printf( "Setting tolerance to %f.\n", tolerance );
     }
-
+    /*Set the same seed number*/
+    srand48(1);
     while (N-- > 0) {
 	Real x = 500.0 * ( drand48() - 0.5 );
 	Real y = 500.0 * ( drand48() - 0.5 );
