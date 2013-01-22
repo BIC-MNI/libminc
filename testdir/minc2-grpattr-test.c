@@ -246,26 +246,33 @@ int main(int argc, char **argv)
     TESTRPT("micreate_group failed", r);
   }
   
-  r = milist_start(hvol, "", 1, &hlist);
+  r = milist_start(hvol, "/", 1, &hlist);
   if (r == MI_NOERROR) {
     count++;
     while (milist_attr_next(hvol, hlist, pathbuf, sizeof(pathbuf),
                             namebuf, sizeof(namebuf)) == MI_NOERROR) {
       printf(" %s %s\n", pathbuf, namebuf);
     }
+  } else {
+    TESTRPT("milist_start failed", r);
   }
   milist_finish(hlist);
   
   
   printf("copy all attributes in the provided path in the new volume\n");
-  r = micopy_attr(hvol,"/OPT",hvol1);
+  
+  if((r = micopy_attr(hvol,"/OPT",hvol1))<0) 
+    TESTRPT("micopy_attr failed", r);
+     
   printf("***************** \n");
   
-  r = milist_start(hvol, "", 0, &h1list);
+  r = milist_start(hvol, "/", 1, &h1list);
   if (r == MI_NOERROR) {
     while( milist_grp_next(h1list, pathbuf1, sizeof(pathbuf1)-1) == MI_NOERROR) {
       printf("%s \n", pathbuf1);
     }
+  } else {
+    TESTRPT("milist_start failed", r);  
   }
   miclose_volume(hvol);
   

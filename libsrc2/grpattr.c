@@ -866,7 +866,7 @@ int miset_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
 
   if ( pch != NULL ) {
     slength = strlen ( path ) - ( pch - path );
-    std_name = malloc ( slength );
+    std_name = malloc ( slength + 1 );
 
     for ( i = 0; i < slength; i++ )
       std_name[i] = path[pch - path + 1 + i];
