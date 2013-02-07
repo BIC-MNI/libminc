@@ -602,7 +602,7 @@ MNCAPI int micreatex(char *path, int cmode, struct mi2opts *opts_ptr)
 
         micreate_ident(ident, sizeof(ident));
         miattputstr(fd, NC_GLOBAL, "ident", ident);
-        miattputstr(fd, NC_GLOBAL, "minc_version", VERSION);
+        miattputstr(fd, NC_GLOBAL, "minc_version", MINC_VERSION);
     }
     MI_RETURN(fd);
 }

@@ -1456,7 +1456,7 @@ PRIVATE int MI_is_in_list(char *string, char *list[])
 ---------------------------------------------------------------------------- */
 MNCAPI const char * miget_version(void)
 {
-    return (VERSION);
+    return (MINC_VERSION);
 }
 
 /* ----------------------------- MNI Header -----------------------------------
