@@ -24,7 +24,7 @@ int main(int argc,char **argv)
       for(int y=0;y<vol.dim(1);y++)
         for(int x=0;x<vol.dim(0);x++)
         {
-          vol(x,y,z)=x;
+          vol(x,y,z)=x+y+z;
         }
     minc_1_writer wrt;
     wrt.open(argv[2],rdr.info(),3,NC_FLOAT,false);
