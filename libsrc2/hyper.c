@@ -836,34 +836,62 @@ static int mirw_hyperslab_icv(int opcode,
       switch(buffer_data_type)
       {
         case MI_TYPE_FLOAT:
+#ifdef _DEBUG  
+          printf("Descaling  float\n");
+#endif
           APPLY_DESCALING(float,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
           break;
         case MI_TYPE_DOUBLE:
+#ifdef _DEBUG  
+          printf("Descaling  double\n");
+#endif
           APPLY_DESCALING(double,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
           break;
         case MI_TYPE_INT:
+#ifdef _DEBUG  
+          printf("Descaling  int\n");
+#endif
           APPLY_DESCALING_ROUND(int,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
           break;
         case MI_TYPE_UINT:
+#ifdef _DEBUG  
+          printf("Descaling  uint\n");
+#endif
           APPLY_DESCALING_ROUND(unsigned int,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
           break;
         case MI_TYPE_SHORT:
+#ifdef _DEBUG  
+          printf("Descaling  short\n");
+#endif
           APPLY_DESCALING_ROUND(short,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
           break;
         case MI_TYPE_USHORT:
+#ifdef _DEBUG  
+          printf("Descaling  ushort\n");
+#endif
           APPLY_DESCALING_ROUND(unsigned short,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
           break;
         case MI_TYPE_BYTE:
+#ifdef _DEBUG  
+          printf("Descaling  byte\n");
+#endif
           APPLY_DESCALING_ROUND(char,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
           break;
         case MI_TYPE_UBYTE:
+#ifdef _DEBUG  
+          printf("Descaling  ubyte\n");
+#endif
           APPLY_DESCALING_ROUND(unsigned char,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
           break;
         default:
           /*TODO: report unsupported conversion*/
           result=MI_ERROR;
           goto cleanup;
-      }
+      } 
+    } else {
+#ifdef _DEBUG  
+      printf("Descaling  not needed!\n");
+#endif
     }
     
     if (n_different != 0 ) {
