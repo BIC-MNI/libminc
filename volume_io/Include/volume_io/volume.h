@@ -29,11 +29,15 @@
 @CREATED    : 1993            David MacDonald
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
-#ifdef HAVE_MINC1
 
+#ifdef HAVE_MINC1
 #include  <minc.h>
+#endif /*HAVE_MINC1*/
+
 #include  <volume_io/transforms.h>
 #include  <volume_io/multidim.h>
+
+#ifdef HAVE_MINC1
 
 typedef  struct
 {
@@ -452,6 +456,9 @@ typedef enum {
                TRIANGLE_FILTER,
                GAUSSIAN_FILTER } Filter_types;
 
-#endif /*HAVE_MINC1*/               
-               
+#else  /*HAVE_MINC1*/
+/*Varios definitions to compile Volume_io without MINC1 API*/
+#define MI_ORIGINAL_TYPE 0
+
+#endif /*HAVE_MINC1*/
 #endif

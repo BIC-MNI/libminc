@@ -1,6 +1,1032 @@
 #ifndef  DEF_vol_io_prototypes
 #define  DEF_vol_io_prototypes
 
+
+/*transforms*/
+
+VIOAPI  VIO_STR  get_default_transform_file_suffix( void );
+
+VIOAPI  VIO_Status  output_transform(
+    FILE                *file,
+    VIO_STR              filename,
+    int                 *volume_count_ptr,
+    VIO_STR              comments,
+    VIO_General_transform   *transform );
+
+VIOAPI  VIO_Status  input_transform(
+    FILE                *file,
+    VIO_STR              filename,
+    VIO_General_transform   *transform );
+
+VIOAPI  VIO_Status  output_transform_file(
+    VIO_STR              filename,
+    VIO_STR              comments,
+    VIO_General_transform   *transform );
+
+VIOAPI  VIO_Status  input_transform_file(
+    VIO_STR              filename,
+    VIO_General_transform   *transform );
+
+VIOAPI  void  create_linear_transform(
+    VIO_General_transform   *transform,
+    VIO_Transform           *linear_transform );
+
+VIOAPI  void  create_thin_plate_transform_real(
+    VIO_General_transform    *transform,
+    int                  n_dimensions,
+    int                  n_points,
+    VIO_Real                 **points,
+    VIO_Real                 **displacements );
+
+VIOAPI  void  create_thin_plate_transform(
+    VIO_General_transform    *transform,
+    int                  n_dimensions,
+    int                  n_points,
+    float                **points,
+    float                **displacements );
+
+VIOAPI  void  create_user_transform(
+    VIO_General_transform         *transform,
+    void                      *user_data,
+    size_t                    size_user_data,
+    VIO_User_transform_function   transform_function,
+    VIO_User_transform_function   inverse_transform_function );
+
+VIOAPI  VIO_Transform_types  get_transform_type(
+    VIO_General_transform   *transform );
+
+VIOAPI  int  get_n_concated_transforms(
+    VIO_General_transform   *transform );
+
+VIOAPI  VIO_General_transform  *get_nth_general_transform(
+    VIO_General_transform   *transform,
+    int                 n );
+
+VIOAPI  VIO_Transform  *get_linear_transform_ptr(
+    VIO_General_transform   *transform );
+
+VIOAPI  VIO_Transform  *get_inverse_linear_transform_ptr(
+    VIO_General_transform   *transform );
+
+VIOAPI  void  general_transform_point(
+    VIO_General_transform   *transform,
+    VIO_Real                x,
+    VIO_Real                y,
+    VIO_Real                z,
+    VIO_Real                *x_transformed,
+    VIO_Real                *y_transformed,
+    VIO_Real                *z_transformed );
+
+VIOAPI  void  general_inverse_transform_point(
+    VIO_General_transform   *transform,
+    VIO_Real                x,
+    VIO_Real                y,
+    VIO_Real                z,
+    VIO_Real                *x_transformed,
+    VIO_Real                *y_transformed,
+    VIO_Real                *z_transformed );
+
+VIOAPI  void  copy_general_transform(
+    VIO_General_transform   *transform,
+    VIO_General_transform   *copy );
+
+VIOAPI  void  invert_general_transform(
+    VIO_General_transform   *transform );
+
+VIOAPI  void  create_inverse_general_transform(
+    VIO_General_transform   *transform,
+    VIO_General_transform   *inverse );
+
+VIOAPI  void  concat_general_transforms(
+    VIO_General_transform   *first,
+    VIO_General_transform   *second,
+    VIO_General_transform   *result );
+
+VIOAPI  void  delete_general_transform(
+    VIO_General_transform   *transform );
+
+VIOAPI  VIO_Status  mni_get_nonwhite_character(
+    FILE   *file,
+    char   *ch );
+
+VIOAPI  VIO_Status  mni_skip_expected_character(
+    FILE   *file,
+    char   expected_ch );
+
+VIOAPI  VIO_Status  mni_input_line(
+    FILE     *file,
+    VIO_STR   *string );
+
+VIOAPI  VIO_Status  mni_input_string(
+    FILE     *file,
+    VIO_STR   *string,
+    char     termination_char1,
+    char     termination_char2 );
+
+VIOAPI  VIO_Status  mni_input_keyword_and_equal_sign(
+    FILE         *file,
+    const char   keyword[],
+    VIO_BOOL     print_error_message );
+
+VIOAPI  VIO_Status  mni_input_real(
+    FILE    *file,
+    VIO_Real    *d );
+
+VIOAPI  VIO_Status  mni_input_reals(
+    FILE    *file,
+    int     *n,
+    VIO_Real    *reals[] );
+
+VIOAPI  VIO_Status  mni_input_int(
+    FILE    *file,
+    int     *i );
+
+VIOAPI  void  output_comments(
+    FILE     *file,
+    VIO_STR   comments );
+
+VIOAPI  VIO_STR  get_default_tag_file_suffix( void );
+
+VIOAPI  VIO_Status  initialize_tag_file_output(
+    FILE      *file,
+    VIO_STR    comments,
+    int       n_volumes );
+
+VIOAPI  VIO_Status  output_one_tag(
+    FILE      *file,
+    int       n_volumes,
+    VIO_Real      tag_volume1[],
+    VIO_Real      tag_volume2[],
+    VIO_Real      *weight,
+    int       *structure_id,
+    int       *patient_id,
+    VIO_STR    label );
+
+VIOAPI  void  terminate_tag_file_output(
+    FILE    *file );
+
+VIOAPI  VIO_Status  output_tag_points(
+    FILE      *file,
+    VIO_STR    comments,
+    int       n_volumes,
+    int       n_tag_points,
+    VIO_Real      **tags_volume1,
+    VIO_Real      **tags_volume2,
+    VIO_Real      weights[],
+    int       structure_ids[],
+    int       patient_ids[],
+    VIO_STR    *labels );
+
+VIOAPI  void  free_tag_points(
+    int       n_volumes,
+    int       n_tag_points,
+    VIO_Real      **tags_volume1,
+    VIO_Real      **tags_volume2,
+    VIO_Real      weights[],
+    int       structure_ids[],
+    int       patient_ids[],
+    char      **labels );
+
+VIOAPI  VIO_Status  initialize_tag_file_input(
+    FILE      *file,
+    int       *n_volumes_ptr );
+
+VIOAPI  VIO_Status  output_tag_file(
+    VIO_STR    filename,
+    VIO_STR    comments,
+    int       n_volumes,
+    int       n_tag_points,
+    VIO_Real      **tags_volume1,
+    VIO_Real      **tags_volume2,
+    VIO_Real      weights[],
+    int       structure_ids[],
+    int       patient_ids[],
+    VIO_STR    labels[] );
+
+VIOAPI  VIO_Status  input_tag_file(
+    VIO_STR    filename,
+    int       *n_volumes,
+    int       *n_tag_points,
+    VIO_Real      ***tags_volume1,
+    VIO_Real      ***tags_volume2,
+    VIO_Real      **weights,
+    int       **structure_ids,
+    int       **patient_ids,
+    VIO_STR    *labels[] );
+
+VIOAPI  VIO_BOOL input_one_tag(
+    FILE      *file,
+    int       n_volumes,
+    VIO_Real      tag_volume1[],
+    VIO_Real      tag_volume2[],
+    VIO_Real      *weight,
+    int       *structure_id,
+    int       *patient_id,
+    VIO_STR    *label,
+    VIO_Status    *status );
+
+VIOAPI  VIO_Status  input_tag_points(
+    FILE      *file,
+    int       *n_volumes_ptr,
+    int       *n_tag_points,
+    VIO_Real      ***tags_volume1,
+    VIO_Real      ***tags_volume2,
+    VIO_Real      **weights,
+    int       **structure_ids,
+    int       **patient_ids,
+    VIO_STR    *labels[] );
+
+VIOAPI  void  evaluate_thin_plate_spline(
+    int     n_dims,
+    int     n_values,
+    int     n_points,
+    VIO_Real    **points,
+    VIO_Real    **weights,
+    VIO_Real    pos[],
+    VIO_Real    values[],
+    VIO_Real    **derivs );
+
+VIOAPI  void  thin_plate_spline_transform(
+    int     n_dims,
+    int     n_points,
+    VIO_Real    **points,
+    VIO_Real    **weights,
+    VIO_Real    x,
+    VIO_Real    y,
+    VIO_Real    z,
+    VIO_Real    *x_transformed,
+    VIO_Real    *y_transformed,
+    VIO_Real    *z_transformed );
+
+VIOAPI  void  thin_plate_spline_inverse_transform(
+    int     n_dims,
+    int     n_points,
+    VIO_Real    **points,
+    VIO_Real    **weights,
+    VIO_Real    x,
+    VIO_Real    y,
+    VIO_Real    z,
+    VIO_Real    *x_transformed,
+    VIO_Real    *y_transformed,
+    VIO_Real    *z_transformed );
+
+VIOAPI  VIO_Real  thin_plate_spline_U(
+    VIO_Real   pos[],
+    VIO_Real   landmark[],
+    int    n_dims );
+
+VIOAPI  VIO_Colour  make_rgba_Colour(
+    int    r,
+    int    g,
+    int    b,
+    int    a );
+
+VIOAPI  int  get_Colour_r(
+    VIO_Colour   colour );
+
+VIOAPI  int  get_Colour_g(
+    VIO_Colour   colour );
+
+VIOAPI  int  get_Colour_b(
+    VIO_Colour   colour );
+
+VIOAPI  int  get_Colour_a(
+    VIO_Colour   colour );
+
+VIOAPI  VIO_Colour  make_Colour(
+    int   r,
+    int   g,
+    int   b );
+
+VIOAPI  VIO_Real  get_Colour_r_0_1(
+    VIO_Colour   colour );
+
+VIOAPI  VIO_Real  get_Colour_g_0_1(
+    VIO_Colour   colour );
+
+VIOAPI  VIO_Real  get_Colour_b_0_1(
+    VIO_Colour   colour );
+
+VIOAPI  VIO_Real  get_Colour_a_0_1(
+    VIO_Colour   colour );
+
+VIOAPI  VIO_Colour  make_Colour_0_1(
+    VIO_Real   r,
+    VIO_Real   g,
+    VIO_Real   b );
+
+VIOAPI  VIO_Colour  make_rgba_Colour_0_1(
+    VIO_Real   r,
+    VIO_Real   g,
+    VIO_Real   b,
+    VIO_Real   a );
+
+VIOAPI  VIO_BOOL solve_linear_system(
+    int   n,
+    VIO_Real  **coefs,
+    VIO_Real  values[],
+    VIO_Real  solution[] );
+
+VIOAPI  VIO_BOOL invert_square_matrix(
+    int   n,
+    VIO_Real  **matrix,
+    VIO_Real  **inverse );
+
+VIOAPI  VIO_BOOL newton_root_find(
+    int    n_dimensions,
+    void   (*function) ( void *, VIO_Real [],  VIO_Real [], VIO_Real ** ),
+    void   *function_data,
+    VIO_Real   initial_guess[],
+    VIO_Real   desired_values[],
+    VIO_Real   solution[],
+    VIO_Real   function_tolerance,
+    VIO_Real   delta_tolerance,
+    int    max_iterations );
+
+VIOAPI  void  create_orthogonal_vector(
+    VIO_Vector  *v,
+    VIO_Vector  *ortho );
+
+VIOAPI  void  create_two_orthogonal_vectors(
+    VIO_Vector   *v,
+    VIO_Vector   *v1,
+    VIO_Vector   *v2 );
+
+VIOAPI  VIO_BOOL  compute_transform_inverse(
+    VIO_Transform  *transform,
+    VIO_Transform  *inverse );
+
+VIOAPI  void  get_linear_spline_coefs(
+    VIO_Real  **coefs );
+
+VIOAPI  void  get_quadratic_spline_coefs(
+    VIO_Real  **coefs );
+
+VIOAPI  void  get_cubic_spline_coefs(
+    VIO_Real  **coefs );
+
+VIOAPI  VIO_Real  cubic_interpolate(
+    VIO_Real   u,
+    VIO_Real   v0,
+    VIO_Real   v1,
+    VIO_Real   v2,
+    VIO_Real   v3 );
+
+VIOAPI  void  evaluate_univariate_interpolating_spline(
+    VIO_Real    u,
+    int     degree,
+    VIO_Real    coefs[],
+    int     n_derivs,
+    VIO_Real    derivs[] );
+
+VIOAPI  void  evaluate_bivariate_interpolating_spline(
+    VIO_Real    u,
+    VIO_Real    v,
+    int     degree,
+    VIO_Real    coefs[],
+    int     n_derivs,
+    VIO_Real    derivs[] );
+
+VIOAPI  void  evaluate_trivariate_interpolating_spline(
+    VIO_Real    u,
+    VIO_Real    v,
+    VIO_Real    w,
+    int     degree,
+    VIO_Real    coefs[],
+    int     n_derivs,
+    VIO_Real    derivs[] );
+
+VIOAPI  void  evaluate_interpolating_spline(
+    int     n_dims,
+    VIO_Real    parameters[],
+    int     degree,
+    int     n_values,
+    VIO_Real    coefs[],
+    int     n_derivs,
+    VIO_Real    derivs[] );
+
+VIOAPI  void  spline_tensor_product(
+    int     n_dims,
+    VIO_Real    positions[],
+    int     degrees[],
+    VIO_Real    *bases[],
+    int     n_values,
+    VIO_Real    coefs[],
+    int     n_derivs[],
+    VIO_Real    results[] );
+
+VIOAPI  void  make_identity_transform( VIO_Transform   *transform );
+
+VIOAPI  VIO_BOOL close_to_identity(
+    VIO_Transform   *transform );
+
+VIOAPI  void  get_transform_origin(
+    VIO_Transform   *transform,
+    VIO_Point       *origin );
+
+VIOAPI  void  set_transform_origin(
+    VIO_Transform   *transform,
+    VIO_Point       *origin );
+
+VIOAPI  void  get_transform_origin_real(
+    VIO_Transform   *transform,
+    VIO_Real        origin[] );
+
+VIOAPI  void  get_transform_x_axis(
+    VIO_Transform   *transform,
+    VIO_Vector      *x_axis );
+
+VIOAPI  void  get_transform_x_axis_real(
+    VIO_Transform   *transform,
+    VIO_Real        x_axis[] );
+
+VIOAPI  void  set_transform_x_axis(
+    VIO_Transform   *transform,
+    VIO_Vector      *x_axis );
+
+VIOAPI  void  set_transform_x_axis_real(
+    VIO_Transform   *transform,
+    VIO_Real        x_axis[] );
+
+VIOAPI  void  get_transform_y_axis(
+    VIO_Transform   *transform,
+    VIO_Vector      *y_axis );
+
+VIOAPI  void  get_transform_y_axis_real(
+    VIO_Transform   *transform,
+    VIO_Real        y_axis[] );
+
+VIOAPI  void  set_transform_y_axis(
+    VIO_Transform   *transform,
+    VIO_Vector      *y_axis );
+
+VIOAPI  void  set_transform_y_axis_real(
+    VIO_Transform   *transform,
+    VIO_Real        y_axis[] );
+
+VIOAPI  void  get_transform_z_axis(
+    VIO_Transform   *transform,
+    VIO_Vector      *z_axis );
+
+VIOAPI  void  get_transform_z_axis_real(
+    VIO_Transform   *transform,
+    VIO_Real        z_axis[] );
+
+VIOAPI  void  set_transform_z_axis(
+    VIO_Transform   *transform,
+    VIO_Vector      *z_axis );
+
+VIOAPI  void  set_transform_z_axis_real(
+    VIO_Transform   *transform,
+    VIO_Real        z_axis[] );
+
+VIOAPI  void   make_change_to_bases_transform(
+    VIO_Point      *origin,
+    VIO_Vector     *x_axis,
+    VIO_Vector     *y_axis,
+    VIO_Vector     *z_axis,
+    VIO_Transform  *transform );
+
+VIOAPI  void   make_change_from_bases_transform(
+    VIO_Point      *origin,
+    VIO_Vector     *x_axis,
+    VIO_Vector     *y_axis,
+    VIO_Vector     *z_axis,
+    VIO_Transform  *transform );
+
+VIOAPI  void   concat_transforms(
+    VIO_Transform   *result,
+    VIO_Transform   *t1,
+    VIO_Transform   *t2 );
+
+VIOAPI  void  transform_point(
+    VIO_Transform  *transform,
+    VIO_Real       x,
+    VIO_Real       y,
+    VIO_Real       z,
+    VIO_Real       *x_trans,
+    VIO_Real       *y_trans,
+    VIO_Real       *z_trans );
+
+VIOAPI  void  transform_vector(
+    VIO_Transform  *transform,
+    VIO_Real       x,
+    VIO_Real       y,
+    VIO_Real       z,
+    VIO_Real       *x_trans,
+    VIO_Real       *y_trans,
+    VIO_Real       *z_trans );
+
+VIOAPI  void  *alloc_memory_in_bytes(
+    size_t       n_bytes
+    _ALLOC_SOURCE_LINE_ARG_DEF );
+
+VIOAPI  void  *alloc_memory_1d(
+    size_t       n_elements,
+    size_t       type_size
+    _ALLOC_SOURCE_LINE_ARG_DEF );
+
+VIOAPI  void  *alloc_memory_2d(
+    size_t       n1,
+    size_t       n2,
+    size_t       type_size
+    _ALLOC_SOURCE_LINE_ARG_DEF );
+
+VIOAPI  void  *alloc_memory_3d(
+    size_t       n1,
+    size_t       n2,
+    size_t       n3,
+    size_t       type_size
+    _ALLOC_SOURCE_LINE_ARG_DEF );
+
+VIOAPI  void  *alloc_memory_4d(
+    size_t       n1,
+    size_t       n2,
+    size_t       n3,
+    size_t       n4,
+    size_t       type_size
+    _ALLOC_SOURCE_LINE_ARG_DEF );
+
+VIOAPI  void  *alloc_memory_5d(
+    size_t       n1,
+    size_t       n2,
+    size_t       n3,
+    size_t       n4,
+    size_t       n5,
+    size_t       type_size
+    _ALLOC_SOURCE_LINE_ARG_DEF );
+
+VIOAPI  void  realloc_memory(
+    void      **ptr,
+    size_t    n_elements,
+    size_t    type_size
+    _ALLOC_SOURCE_LINE_ARG_DEF );
+
+VIOAPI  void  free_memory_1d(
+    void   **ptr
+    _ALLOC_SOURCE_LINE_ARG_DEF );
+
+VIOAPI  void  free_memory_2d(
+    void   ***ptr
+    _ALLOC_SOURCE_LINE_ARG_DEF );
+
+VIOAPI  void  free_memory_3d(
+    void   ****ptr
+    _ALLOC_SOURCE_LINE_ARG_DEF );
+
+VIOAPI  void  free_memory_4d(
+    void   *****ptr
+    _ALLOC_SOURCE_LINE_ARG_DEF );
+
+VIOAPI  void  free_memory_5d(
+    void   ******ptr
+    _ALLOC_SOURCE_LINE_ARG_DEF );
+
+VIOAPI  size_t  get_total_memory_alloced( void );
+
+VIOAPI  VIO_BOOL alloc_checking_enabled( void );
+
+VIOAPI  void  set_alloc_checking( VIO_BOOL state );
+
+VIOAPI  void  record_ptr_alloc_check(
+    void      *ptr,
+    size_t    n_bytes,
+    VIO_STR    source_file,
+    int       line_number );
+
+VIOAPI  void  change_ptr_alloc_check(
+    void      *old_ptr,
+    void      *new_ptr,
+    size_t    n_bytes,
+    VIO_STR    source_file,
+    int       line_number );
+
+VIOAPI  VIO_BOOL unrecord_ptr_alloc_check(
+    void     *ptr,
+    VIO_STR   source_file,
+    int      line_number );
+
+VIOAPI  void  output_alloc_to_file(
+    VIO_STR   filename );
+
+VIOAPI  void  print_alloc_source_line(
+    VIO_STR  filename,
+    int     line_number );
+
+VIOAPI  void  set_array_size(
+    void      **array,
+    size_t    type_size,
+    size_t    previous_n_elems,
+    size_t    new_n_elems,
+    size_t    chunk_size
+    _ALLOC_SOURCE_LINE_ARG_DEF );
+
+VIOAPI  VIO_BOOL real_is_double( void );
+
+VIOAPI  VIO_BOOL file_exists(
+    VIO_STR        filename );
+
+VIOAPI  VIO_BOOL file_directory_exists(
+    VIO_STR        filename );
+
+VIOAPI  VIO_BOOL check_clobber_file(
+    VIO_STR   filename );
+
+VIOAPI  VIO_BOOL check_clobber_file_default_suffix(
+    VIO_STR   filename,
+    VIO_STR   default_suffix );
+
+VIOAPI  VIO_Status  make_backup_file(
+    VIO_STR   filename,
+    VIO_STR   *backup_filename );
+
+VIOAPI  void  cleanup_backup_file(
+    VIO_STR   filename,
+    VIO_STR   backup_filename,
+    VIO_Status   status_of_write );
+
+VIOAPI  void  remove_file(
+    VIO_STR  filename );
+
+VIOAPI  VIO_Status  copy_file(
+    VIO_STR  src,
+    VIO_STR  dest );
+
+VIOAPI  VIO_Status  move_file(
+    VIO_STR  src,
+    VIO_STR  dest );
+
+VIOAPI  VIO_STR  expand_filename(
+    VIO_STR  filename );
+
+VIOAPI  VIO_BOOL filename_extension_matches(
+    VIO_STR   filename,
+    VIO_STR   extension );
+
+VIOAPI  VIO_STR  remove_directories_from_filename(
+    VIO_STR  filename );
+
+VIOAPI  VIO_BOOL file_exists_as_compressed(
+    VIO_STR       filename,
+    VIO_STR       *compressed_filename );
+
+VIOAPI  VIO_STR  get_temporary_filename( void );
+
+VIOAPI  VIO_Status  open_file(
+    VIO_STR            filename,
+    VIO_IO_types       io_type,
+    VIO_File_formats   file_format,
+    FILE               **file );
+
+VIOAPI  VIO_Status  open_file_with_default_suffix(
+    VIO_STR            filename,
+    VIO_STR            default_suffix,
+    VIO_IO_types       io_type,
+    VIO_File_formats   file_format,
+    FILE               **file );
+
+VIOAPI  VIO_Status  set_file_position(
+    FILE     *file,
+    long     byte_position );
+
+VIOAPI  VIO_Status  close_file(
+    FILE     *file );
+
+VIOAPI  VIO_STR  extract_directory(
+    VIO_STR    filename );
+
+VIOAPI  VIO_STR  get_absolute_filename(
+    VIO_STR    filename,
+    VIO_STR    directory );
+
+VIOAPI  VIO_Status  flush_file(
+    FILE     *file );
+
+VIOAPI  VIO_Status  input_character(
+    FILE  *file,
+    char   *ch );
+
+VIOAPI  VIO_Status  unget_character(
+    FILE  *file,
+    char  ch );
+
+VIOAPI  VIO_Status  input_nonwhite_character(
+    FILE   *file,
+    char   *ch );
+
+VIOAPI  VIO_Status  output_character(
+    FILE   *file,
+    char   ch );
+
+VIOAPI  VIO_Status   skip_input_until(
+    FILE   *file,
+    char   search_char );
+
+VIOAPI  VIO_Status  output_string(
+    FILE    *file,
+    VIO_STR  str );
+
+VIOAPI  VIO_Status  input_string(
+    FILE    *file,
+    VIO_STR  *str,
+    char    termination_char );
+
+VIOAPI  VIO_Status  input_quoted_string(
+    FILE            *file,
+    VIO_STR          *str );
+
+VIOAPI  VIO_Status  input_possibly_quoted_string(
+    FILE            *file,
+    VIO_STR          *str );
+
+VIOAPI  VIO_Status  output_quoted_string(
+    FILE            *file,
+    VIO_STR          str );
+
+VIOAPI  VIO_Status  input_binary_data(
+    FILE            *file,
+    void            *data,
+    size_t          element_size,
+    int             n );
+
+VIOAPI  VIO_Status  output_binary_data(
+    FILE            *file,
+    void            *data,
+    size_t          element_size,
+    int             n );
+
+VIOAPI  VIO_Status  input_newline(
+    FILE            *file );
+
+VIOAPI  VIO_Status  output_newline(
+    FILE            *file );
+
+VIOAPI  VIO_Status  input_line(
+    FILE    *file,
+    VIO_STR  *line );
+
+VIOAPI  VIO_Status  input_boolean(
+    FILE            *file,
+    VIO_BOOL        *b );
+
+VIOAPI  VIO_Status  output_boolean(
+    FILE            *file,
+    VIO_BOOL        b );
+
+VIOAPI  VIO_Status  input_short(
+    FILE            *file,
+    short           *s );
+
+VIOAPI  VIO_Status  output_short(
+    FILE            *file,
+    short           s );
+
+VIOAPI  VIO_Status  input_unsigned_short(
+    FILE            *file,
+    unsigned short  *s );
+
+VIOAPI  VIO_Status  output_unsigned_short(
+    FILE            *file,
+    unsigned short  s );
+
+VIOAPI  VIO_Status  input_int(
+    FILE  *file,
+    int   *i );
+
+VIOAPI  VIO_Status  output_int(
+    FILE            *file,
+    int             i );
+
+VIOAPI  VIO_Status  input_real(
+    FILE            *file,
+    VIO_Real            *r );
+
+VIOAPI  VIO_Status  output_real(
+    FILE            *file,
+    VIO_Real            r );
+
+VIOAPI  VIO_Status  input_float(
+    FILE            *file,
+    float           *f );
+
+VIOAPI  VIO_Status  output_float(
+    FILE            *file,
+    float           f );
+
+VIOAPI  VIO_Status  input_double(
+    FILE            *file,
+    double          *d );
+
+VIOAPI  VIO_Status  output_double(
+    FILE            *file,
+    double          d );
+
+VIOAPI  VIO_Status  io_binary_data(
+    FILE            *file,
+    VIO_IO_types    io_flag,
+    void            *data,
+    size_t          element_size,
+    int             n );
+
+VIOAPI  VIO_Status  io_newline(
+    FILE            *file,
+    VIO_IO_types     io_flag,
+    VIO_File_formats format );
+
+VIOAPI  VIO_Status  io_quoted_string(
+    FILE            *file,
+    VIO_IO_types     io_flag,
+    VIO_File_formats format,
+    VIO_STR          *str );
+
+VIOAPI  VIO_Status  io_boolean(
+    FILE            *file,
+    VIO_IO_types     io_flag,
+    VIO_File_formats format,
+    VIO_BOOL        *b );
+
+VIOAPI  VIO_Status  io_short(
+    FILE            *file,
+    VIO_IO_types     io_flag,
+    VIO_File_formats format,
+    short           *short_int );
+
+VIOAPI  VIO_Status  io_unsigned_short(
+    FILE            *file,
+    VIO_IO_types     io_flag,
+    VIO_File_formats format,
+    unsigned short  *unsigned_short );
+
+VIOAPI  VIO_Status  io_unsigned_char(
+    FILE            *file,
+    VIO_IO_types     io_flag,
+    VIO_File_formats format,
+    unsigned  char  *c );
+
+VIOAPI  VIO_Status  io_int(
+    FILE            *file,
+    VIO_IO_types     io_flag,
+    VIO_File_formats format,
+    int             *i );
+
+VIOAPI  VIO_Status  io_real(
+    FILE            *file,
+    VIO_IO_types     io_flag,
+    VIO_File_formats format,
+    VIO_Real         *r );
+
+VIOAPI  VIO_Status  io_float(
+    FILE            *file,
+    VIO_IO_types     io_flag,
+    VIO_File_formats format,
+    float           *f );
+
+VIOAPI  VIO_Status  io_double(
+    FILE            *file,
+    VIO_IO_types     io_flag,
+    VIO_File_formats format,
+    double          *d );
+
+VIOAPI  VIO_Status  io_ints(
+    FILE            *file,
+    VIO_IO_types     io_flag,
+    VIO_File_formats format,
+    int             n,
+    int             *ints[] );
+
+VIOAPI  VIO_Status  io_unsigned_chars(
+    FILE            *file,
+    VIO_IO_types     io_flag,
+    VIO_File_formats format,
+    int             n,
+    unsigned char   *unsigned_chars[] );
+
+VIOAPI  void  set_print_function( void  (*function) ( VIO_STR ) );
+
+VIOAPI  void  push_print_function( void );
+
+VIOAPI  void  pop_print_function( void );
+
+VIOAPI  void  print( VIO_STR format, ... );
+
+VIOAPI  void  set_print_error_function( void  (*function) ( char [] ) );
+
+VIOAPI  void  push_print_error_function( void );
+
+VIOAPI  void  pop_print_error_function( void );
+
+VIOAPI  void  print_error( char format[], ... );
+
+VIOAPI  void   handle_internal_error( char  str[] );
+
+VIOAPI  void  abort_if_allowed( void );
+
+VIOAPI  void  initialize_progress_report(
+    VIO_progress_struct *progress,
+    VIO_BOOL          one_line_only,
+    int               n_steps,
+    VIO_STR            title );
+
+VIOAPI  void  update_progress_report(
+    VIO_progress_struct   *progress,
+    int               current_step );
+
+VIOAPI  void  terminate_progress_report(
+    VIO_progress_struct   *progress );
+
+VIOAPI  VIO_STR  alloc_string(
+    int   length );
+
+VIOAPI  VIO_STR  create_string(
+    VIO_STR    initial );
+
+VIOAPI  void  delete_string(
+    VIO_STR   string );
+
+VIOAPI  VIO_STR  concat_strings(
+    VIO_STR   str1,
+    VIO_STR   str2 );
+
+VIOAPI  void  replace_string(
+    VIO_STR   *string,
+    VIO_STR   new_string );
+
+VIOAPI  void  concat_char_to_string(
+    VIO_STR   *string,
+    char     ch );
+
+VIOAPI  void  concat_to_string(
+    VIO_STR   *string,
+    VIO_STR   str2 );
+
+VIOAPI  int  string_length(
+    VIO_STR   string );
+
+VIOAPI  VIO_BOOL equal_strings(
+    VIO_STR   str1,
+    VIO_STR   str2 );
+
+VIOAPI  VIO_BOOL is_lower_case(
+    char  ch );
+
+VIOAPI  VIO_BOOL is_upper_case(
+    char  ch );
+
+VIOAPI  char  get_lower_case(
+    char   ch );
+
+VIOAPI  char  get_upper_case(
+    char   ch );
+
+VIOAPI  VIO_BOOL string_ends_in(
+    VIO_STR   string,
+    VIO_STR   ending );
+
+VIOAPI    VIO_STR   strip_outer_blanks(
+    VIO_STR  str );
+
+VIOAPI  int  find_character(
+    VIO_STR    string,
+    char      ch );
+
+VIOAPI  void  make_string_upper_case(
+    VIO_STR    string );
+
+VIOAPI  VIO_BOOL blank_string(
+    VIO_STR   string );
+
+VIOAPI  VIO_Real  current_cpu_seconds( void );
+
+VIOAPI  VIO_Real  current_realtime_seconds( void );
+
+VIOAPI  VIO_STR  format_time(
+    VIO_STR   format,
+    VIO_Real     seconds );
+
+VIOAPI  void  print_time(
+    VIO_STR   format,
+    VIO_Real     seconds );
+
+VIOAPI  VIO_STR  get_clock_time( void );
+
+VIOAPI  void  sleep_program( VIO_Real seconds );
+
+VIOAPI  VIO_STR  get_date( void );
+
+
+#ifdef HAVE_MINC1
+
+/*transformations which depend on MINC1 API*/
+VIOAPI  void  create_grid_transform(
+    VIO_General_transform    *transform,
+    VIO_Volume               displacement_volume );
+
+VIOAPI  void  create_grid_transform_no_copy(
+    VIO_General_transform    *transform,
+    VIO_Volume               displacement_volume );
+
+/*The rest of transform functions*/
+
 VIOAPI  VIO_Real  convert_voxel_to_value(
     VIO_Volume   volume,
     VIO_Real     voxel );
@@ -1063,1020 +2089,6 @@ VIOAPI  void  grid_inverse_transform_point(
     VIO_Real                *y_transformed,
     VIO_Real                *z_transformed );
 
-VIOAPI  VIO_Status  mni_get_nonwhite_character(
-    FILE   *file,
-    char   *ch );
+#endif // HAVE_MINC1
 
-VIOAPI  VIO_Status  mni_skip_expected_character(
-    FILE   *file,
-    char   expected_ch );
-
-VIOAPI  VIO_Status  mni_input_line(
-    FILE     *file,
-    VIO_STR   *string );
-
-VIOAPI  VIO_Status  mni_input_string(
-    FILE     *file,
-    VIO_STR   *string,
-    char     termination_char1,
-    char     termination_char2 );
-
-VIOAPI  VIO_Status  mni_input_keyword_and_equal_sign(
-    FILE         *file,
-    const char   keyword[],
-    VIO_BOOL     print_error_message );
-
-VIOAPI  VIO_Status  mni_input_real(
-    FILE    *file,
-    VIO_Real    *d );
-
-VIOAPI  VIO_Status  mni_input_reals(
-    FILE    *file,
-    int     *n,
-    VIO_Real    *reals[] );
-
-VIOAPI  VIO_Status  mni_input_int(
-    FILE    *file,
-    int     *i );
-
-VIOAPI  void  output_comments(
-    FILE     *file,
-    VIO_STR   comments );
-
-VIOAPI  VIO_STR  get_default_tag_file_suffix( void );
-
-VIOAPI  VIO_Status  initialize_tag_file_output(
-    FILE      *file,
-    VIO_STR    comments,
-    int       n_volumes );
-
-VIOAPI  VIO_Status  output_one_tag(
-    FILE      *file,
-    int       n_volumes,
-    VIO_Real      tag_volume1[],
-    VIO_Real      tag_volume2[],
-    VIO_Real      *weight,
-    int       *structure_id,
-    int       *patient_id,
-    VIO_STR    label );
-
-VIOAPI  void  terminate_tag_file_output(
-    FILE    *file );
-
-VIOAPI  VIO_Status  output_tag_points(
-    FILE      *file,
-    VIO_STR    comments,
-    int       n_volumes,
-    int       n_tag_points,
-    VIO_Real      **tags_volume1,
-    VIO_Real      **tags_volume2,
-    VIO_Real      weights[],
-    int       structure_ids[],
-    int       patient_ids[],
-    VIO_STR    *labels );
-
-VIOAPI  void  free_tag_points(
-    int       n_volumes,
-    int       n_tag_points,
-    VIO_Real      **tags_volume1,
-    VIO_Real      **tags_volume2,
-    VIO_Real      weights[],
-    int       structure_ids[],
-    int       patient_ids[],
-    char      **labels );
-
-VIOAPI  VIO_Status  initialize_tag_file_input(
-    FILE      *file,
-    int       *n_volumes_ptr );
-
-VIOAPI  VIO_Status  output_tag_file(
-    VIO_STR    filename,
-    VIO_STR    comments,
-    int       n_volumes,
-    int       n_tag_points,
-    VIO_Real      **tags_volume1,
-    VIO_Real      **tags_volume2,
-    VIO_Real      weights[],
-    int       structure_ids[],
-    int       patient_ids[],
-    VIO_STR    labels[] );
-
-VIOAPI  VIO_Status  input_tag_file(
-    VIO_STR    filename,
-    int       *n_volumes,
-    int       *n_tag_points,
-    VIO_Real      ***tags_volume1,
-    VIO_Real      ***tags_volume2,
-    VIO_Real      **weights,
-    int       **structure_ids,
-    int       **patient_ids,
-    VIO_STR    *labels[] );
-
-VIOAPI  VIO_BOOL input_one_tag(
-    FILE      *file,
-    int       n_volumes,
-    VIO_Real      tag_volume1[],
-    VIO_Real      tag_volume2[],
-    VIO_Real      *weight,
-    int       *structure_id,
-    int       *patient_id,
-    VIO_STR    *label,
-    VIO_Status    *status );
-
-VIOAPI  VIO_Status  input_tag_points(
-    FILE      *file,
-    int       *n_volumes_ptr,
-    int       *n_tag_points,
-    VIO_Real      ***tags_volume1,
-    VIO_Real      ***tags_volume2,
-    VIO_Real      **weights,
-    int       **structure_ids,
-    int       **patient_ids,
-    VIO_STR    *labels[] );
-
-VIOAPI  void  evaluate_thin_plate_spline(
-    int     n_dims,
-    int     n_values,
-    int     n_points,
-    VIO_Real    **points,
-    VIO_Real    **weights,
-    VIO_Real    pos[],
-    VIO_Real    values[],
-    VIO_Real    **derivs );
-
-VIOAPI  void  thin_plate_spline_transform(
-    int     n_dims,
-    int     n_points,
-    VIO_Real    **points,
-    VIO_Real    **weights,
-    VIO_Real    x,
-    VIO_Real    y,
-    VIO_Real    z,
-    VIO_Real    *x_transformed,
-    VIO_Real    *y_transformed,
-    VIO_Real    *z_transformed );
-
-VIOAPI  void  thin_plate_spline_inverse_transform(
-    int     n_dims,
-    int     n_points,
-    VIO_Real    **points,
-    VIO_Real    **weights,
-    VIO_Real    x,
-    VIO_Real    y,
-    VIO_Real    z,
-    VIO_Real    *x_transformed,
-    VIO_Real    *y_transformed,
-    VIO_Real    *z_transformed );
-
-VIOAPI  VIO_Real  thin_plate_spline_U(
-    VIO_Real   pos[],
-    VIO_Real   landmark[],
-    int    n_dims );
-
-VIOAPI  VIO_STR  get_default_transform_file_suffix( void );
-
-VIOAPI  VIO_Status  output_transform(
-    FILE                *file,
-    VIO_STR              filename,
-    int                 *volume_count_ptr,
-    VIO_STR              comments,
-    VIO_General_transform   *transform );
-
-VIOAPI  VIO_Status  input_transform(
-    FILE                *file,
-    VIO_STR              filename,
-    VIO_General_transform   *transform );
-
-VIOAPI  VIO_Status  output_transform_file(
-    VIO_STR              filename,
-    VIO_STR              comments,
-    VIO_General_transform   *transform );
-
-VIOAPI  VIO_Status  input_transform_file(
-    VIO_STR              filename,
-    VIO_General_transform   *transform );
-
-VIOAPI  void  create_linear_transform(
-    VIO_General_transform   *transform,
-    VIO_Transform           *linear_transform );
-
-VIOAPI  void  create_thin_plate_transform_real(
-    VIO_General_transform    *transform,
-    int                  n_dimensions,
-    int                  n_points,
-    VIO_Real                 **points,
-    VIO_Real                 **displacements );
-
-VIOAPI  void  create_thin_plate_transform(
-    VIO_General_transform    *transform,
-    int                  n_dimensions,
-    int                  n_points,
-    float                **points,
-    float                **displacements );
-
-VIOAPI  void  create_grid_transform(
-    VIO_General_transform    *transform,
-    VIO_Volume               displacement_volume );
-
-VIOAPI  void  create_grid_transform_no_copy(
-    VIO_General_transform    *transform,
-    VIO_Volume               displacement_volume );
-
-VIOAPI  void  create_user_transform(
-    VIO_General_transform         *transform,
-    void                      *user_data,
-    size_t                    size_user_data,
-    VIO_User_transform_function   transform_function,
-    VIO_User_transform_function   inverse_transform_function );
-
-VIOAPI  VIO_Transform_types  get_transform_type(
-    VIO_General_transform   *transform );
-
-VIOAPI  int  get_n_concated_transforms(
-    VIO_General_transform   *transform );
-
-VIOAPI  VIO_General_transform  *get_nth_general_transform(
-    VIO_General_transform   *transform,
-    int                 n );
-
-VIOAPI  VIO_Transform  *get_linear_transform_ptr(
-    VIO_General_transform   *transform );
-
-VIOAPI  VIO_Transform  *get_inverse_linear_transform_ptr(
-    VIO_General_transform   *transform );
-
-VIOAPI  void  general_transform_point(
-    VIO_General_transform   *transform,
-    VIO_Real                x,
-    VIO_Real                y,
-    VIO_Real                z,
-    VIO_Real                *x_transformed,
-    VIO_Real                *y_transformed,
-    VIO_Real                *z_transformed );
-
-VIOAPI  void  general_inverse_transform_point(
-    VIO_General_transform   *transform,
-    VIO_Real                x,
-    VIO_Real                y,
-    VIO_Real                z,
-    VIO_Real                *x_transformed,
-    VIO_Real                *y_transformed,
-    VIO_Real                *z_transformed );
-
-VIOAPI  void  copy_general_transform(
-    VIO_General_transform   *transform,
-    VIO_General_transform   *copy );
-
-VIOAPI  void  invert_general_transform(
-    VIO_General_transform   *transform );
-
-VIOAPI  void  create_inverse_general_transform(
-    VIO_General_transform   *transform,
-    VIO_General_transform   *inverse );
-
-VIOAPI  void  concat_general_transforms(
-    VIO_General_transform   *first,
-    VIO_General_transform   *second,
-    VIO_General_transform   *result );
-
-VIOAPI  void  delete_general_transform(
-    VIO_General_transform   *transform );
-
-VIOAPI  VIO_Colour  make_rgba_Colour(
-    int    r,
-    int    g,
-    int    b,
-    int    a );
-
-VIOAPI  int  get_Colour_r(
-    VIO_Colour   colour );
-
-VIOAPI  int  get_Colour_g(
-    VIO_Colour   colour );
-
-VIOAPI  int  get_Colour_b(
-    VIO_Colour   colour );
-
-VIOAPI  int  get_Colour_a(
-    VIO_Colour   colour );
-
-VIOAPI  VIO_Colour  make_Colour(
-    int   r,
-    int   g,
-    int   b );
-
-VIOAPI  VIO_Real  get_Colour_r_0_1(
-    VIO_Colour   colour );
-
-VIOAPI  VIO_Real  get_Colour_g_0_1(
-    VIO_Colour   colour );
-
-VIOAPI  VIO_Real  get_Colour_b_0_1(
-    VIO_Colour   colour );
-
-VIOAPI  VIO_Real  get_Colour_a_0_1(
-    VIO_Colour   colour );
-
-VIOAPI  VIO_Colour  make_Colour_0_1(
-    VIO_Real   r,
-    VIO_Real   g,
-    VIO_Real   b );
-
-VIOAPI  VIO_Colour  make_rgba_Colour_0_1(
-    VIO_Real   r,
-    VIO_Real   g,
-    VIO_Real   b,
-    VIO_Real   a );
-
-VIOAPI  VIO_BOOL solve_linear_system(
-    int   n,
-    VIO_Real  **coefs,
-    VIO_Real  values[],
-    VIO_Real  solution[] );
-
-VIOAPI  VIO_BOOL invert_square_matrix(
-    int   n,
-    VIO_Real  **matrix,
-    VIO_Real  **inverse );
-
-VIOAPI  VIO_BOOL newton_root_find(
-    int    n_dimensions,
-    void   (*function) ( void *, VIO_Real [],  VIO_Real [], VIO_Real ** ),
-    void   *function_data,
-    VIO_Real   initial_guess[],
-    VIO_Real   desired_values[],
-    VIO_Real   solution[],
-    VIO_Real   function_tolerance,
-    VIO_Real   delta_tolerance,
-    int    max_iterations );
-
-VIOAPI  void  create_orthogonal_vector(
-    VIO_Vector  *v,
-    VIO_Vector  *ortho );
-
-VIOAPI  void  create_two_orthogonal_vectors(
-    VIO_Vector   *v,
-    VIO_Vector   *v1,
-    VIO_Vector   *v2 );
-
-VIOAPI  VIO_BOOL  compute_transform_inverse(
-    VIO_Transform  *transform,
-    VIO_Transform  *inverse );
-
-VIOAPI  void  get_linear_spline_coefs(
-    VIO_Real  **coefs );
-
-VIOAPI  void  get_quadratic_spline_coefs(
-    VIO_Real  **coefs );
-
-VIOAPI  void  get_cubic_spline_coefs(
-    VIO_Real  **coefs );
-
-VIOAPI  VIO_Real  cubic_interpolate(
-    VIO_Real   u,
-    VIO_Real   v0,
-    VIO_Real   v1,
-    VIO_Real   v2,
-    VIO_Real   v3 );
-
-VIOAPI  void  evaluate_univariate_interpolating_spline(
-    VIO_Real    u,
-    int     degree,
-    VIO_Real    coefs[],
-    int     n_derivs,
-    VIO_Real    derivs[] );
-
-VIOAPI  void  evaluate_bivariate_interpolating_spline(
-    VIO_Real    u,
-    VIO_Real    v,
-    int     degree,
-    VIO_Real    coefs[],
-    int     n_derivs,
-    VIO_Real    derivs[] );
-
-VIOAPI  void  evaluate_trivariate_interpolating_spline(
-    VIO_Real    u,
-    VIO_Real    v,
-    VIO_Real    w,
-    int     degree,
-    VIO_Real    coefs[],
-    int     n_derivs,
-    VIO_Real    derivs[] );
-
-VIOAPI  void  evaluate_interpolating_spline(
-    int     n_dims,
-    VIO_Real    parameters[],
-    int     degree,
-    int     n_values,
-    VIO_Real    coefs[],
-    int     n_derivs,
-    VIO_Real    derivs[] );
-
-VIOAPI  void  spline_tensor_product(
-    int     n_dims,
-    VIO_Real    positions[],
-    int     degrees[],
-    VIO_Real    *bases[],
-    int     n_values,
-    VIO_Real    coefs[],
-    int     n_derivs[],
-    VIO_Real    results[] );
-
-VIOAPI  void  make_identity_transform( VIO_Transform   *transform );
-
-VIOAPI  VIO_BOOL close_to_identity(
-    VIO_Transform   *transform );
-
-VIOAPI  void  get_transform_origin(
-    VIO_Transform   *transform,
-    VIO_Point       *origin );
-
-VIOAPI  void  set_transform_origin(
-    VIO_Transform   *transform,
-    VIO_Point       *origin );
-
-VIOAPI  void  get_transform_origin_real(
-    VIO_Transform   *transform,
-    VIO_Real        origin[] );
-
-VIOAPI  void  get_transform_x_axis(
-    VIO_Transform   *transform,
-    VIO_Vector      *x_axis );
-
-VIOAPI  void  get_transform_x_axis_real(
-    VIO_Transform   *transform,
-    VIO_Real        x_axis[] );
-
-VIOAPI  void  set_transform_x_axis(
-    VIO_Transform   *transform,
-    VIO_Vector      *x_axis );
-
-VIOAPI  void  set_transform_x_axis_real(
-    VIO_Transform   *transform,
-    VIO_Real        x_axis[] );
-
-VIOAPI  void  get_transform_y_axis(
-    VIO_Transform   *transform,
-    VIO_Vector      *y_axis );
-
-VIOAPI  void  get_transform_y_axis_real(
-    VIO_Transform   *transform,
-    VIO_Real        y_axis[] );
-
-VIOAPI  void  set_transform_y_axis(
-    VIO_Transform   *transform,
-    VIO_Vector      *y_axis );
-
-VIOAPI  void  set_transform_y_axis_real(
-    VIO_Transform   *transform,
-    VIO_Real        y_axis[] );
-
-VIOAPI  void  get_transform_z_axis(
-    VIO_Transform   *transform,
-    VIO_Vector      *z_axis );
-
-VIOAPI  void  get_transform_z_axis_real(
-    VIO_Transform   *transform,
-    VIO_Real        z_axis[] );
-
-VIOAPI  void  set_transform_z_axis(
-    VIO_Transform   *transform,
-    VIO_Vector      *z_axis );
-
-VIOAPI  void  set_transform_z_axis_real(
-    VIO_Transform   *transform,
-    VIO_Real        z_axis[] );
-
-VIOAPI  void   make_change_to_bases_transform(
-    VIO_Point      *origin,
-    VIO_Vector     *x_axis,
-    VIO_Vector     *y_axis,
-    VIO_Vector     *z_axis,
-    VIO_Transform  *transform );
-
-VIOAPI  void   make_change_from_bases_transform(
-    VIO_Point      *origin,
-    VIO_Vector     *x_axis,
-    VIO_Vector     *y_axis,
-    VIO_Vector     *z_axis,
-    VIO_Transform  *transform );
-
-VIOAPI  void   concat_transforms(
-    VIO_Transform   *result,
-    VIO_Transform   *t1,
-    VIO_Transform   *t2 );
-
-VIOAPI  void  transform_point(
-    VIO_Transform  *transform,
-    VIO_Real       x,
-    VIO_Real       y,
-    VIO_Real       z,
-    VIO_Real       *x_trans,
-    VIO_Real       *y_trans,
-    VIO_Real       *z_trans );
-
-VIOAPI  void  transform_vector(
-    VIO_Transform  *transform,
-    VIO_Real       x,
-    VIO_Real       y,
-    VIO_Real       z,
-    VIO_Real       *x_trans,
-    VIO_Real       *y_trans,
-    VIO_Real       *z_trans );
-
-VIOAPI  void  *alloc_memory_in_bytes(
-    size_t       n_bytes
-    _ALLOC_SOURCE_LINE_ARG_DEF );
-
-VIOAPI  void  *alloc_memory_1d(
-    size_t       n_elements,
-    size_t       type_size
-    _ALLOC_SOURCE_LINE_ARG_DEF );
-
-VIOAPI  void  *alloc_memory_2d(
-    size_t       n1,
-    size_t       n2,
-    size_t       type_size
-    _ALLOC_SOURCE_LINE_ARG_DEF );
-
-VIOAPI  void  *alloc_memory_3d(
-    size_t       n1,
-    size_t       n2,
-    size_t       n3,
-    size_t       type_size
-    _ALLOC_SOURCE_LINE_ARG_DEF );
-
-VIOAPI  void  *alloc_memory_4d(
-    size_t       n1,
-    size_t       n2,
-    size_t       n3,
-    size_t       n4,
-    size_t       type_size
-    _ALLOC_SOURCE_LINE_ARG_DEF );
-
-VIOAPI  void  *alloc_memory_5d(
-    size_t       n1,
-    size_t       n2,
-    size_t       n3,
-    size_t       n4,
-    size_t       n5,
-    size_t       type_size
-    _ALLOC_SOURCE_LINE_ARG_DEF );
-
-VIOAPI  void  realloc_memory(
-    void      **ptr,
-    size_t    n_elements,
-    size_t    type_size
-    _ALLOC_SOURCE_LINE_ARG_DEF );
-
-VIOAPI  void  free_memory_1d(
-    void   **ptr
-    _ALLOC_SOURCE_LINE_ARG_DEF );
-
-VIOAPI  void  free_memory_2d(
-    void   ***ptr
-    _ALLOC_SOURCE_LINE_ARG_DEF );
-
-VIOAPI  void  free_memory_3d(
-    void   ****ptr
-    _ALLOC_SOURCE_LINE_ARG_DEF );
-
-VIOAPI  void  free_memory_4d(
-    void   *****ptr
-    _ALLOC_SOURCE_LINE_ARG_DEF );
-
-VIOAPI  void  free_memory_5d(
-    void   ******ptr
-    _ALLOC_SOURCE_LINE_ARG_DEF );
-
-VIOAPI  size_t  get_total_memory_alloced( void );
-
-VIOAPI  VIO_BOOL alloc_checking_enabled( void );
-
-VIOAPI  void  set_alloc_checking( VIO_BOOL state );
-
-VIOAPI  void  record_ptr_alloc_check(
-    void      *ptr,
-    size_t    n_bytes,
-    VIO_STR    source_file,
-    int       line_number );
-
-VIOAPI  void  change_ptr_alloc_check(
-    void      *old_ptr,
-    void      *new_ptr,
-    size_t    n_bytes,
-    VIO_STR    source_file,
-    int       line_number );
-
-VIOAPI  VIO_BOOL unrecord_ptr_alloc_check(
-    void     *ptr,
-    VIO_STR   source_file,
-    int      line_number );
-
-VIOAPI  void  output_alloc_to_file(
-    VIO_STR   filename );
-
-VIOAPI  void  print_alloc_source_line(
-    VIO_STR  filename,
-    int     line_number );
-
-VIOAPI  void  set_array_size(
-    void      **array,
-    size_t    type_size,
-    size_t    previous_n_elems,
-    size_t    new_n_elems,
-    size_t    chunk_size
-    _ALLOC_SOURCE_LINE_ARG_DEF );
-
-VIOAPI  VIO_BOOL real_is_double( void );
-
-VIOAPI  VIO_BOOL file_exists(
-    VIO_STR        filename );
-
-VIOAPI  VIO_BOOL file_directory_exists(
-    VIO_STR        filename );
-
-VIOAPI  VIO_BOOL check_clobber_file(
-    VIO_STR   filename );
-
-VIOAPI  VIO_BOOL check_clobber_file_default_suffix(
-    VIO_STR   filename,
-    VIO_STR   default_suffix );
-
-VIOAPI  VIO_Status  make_backup_file(
-    VIO_STR   filename,
-    VIO_STR   *backup_filename );
-
-VIOAPI  void  cleanup_backup_file(
-    VIO_STR   filename,
-    VIO_STR   backup_filename,
-    VIO_Status   status_of_write );
-
-VIOAPI  void  remove_file(
-    VIO_STR  filename );
-
-VIOAPI  VIO_Status  copy_file(
-    VIO_STR  src,
-    VIO_STR  dest );
-
-VIOAPI  VIO_Status  move_file(
-    VIO_STR  src,
-    VIO_STR  dest );
-
-VIOAPI  VIO_STR  expand_filename(
-    VIO_STR  filename );
-
-VIOAPI  VIO_BOOL filename_extension_matches(
-    VIO_STR   filename,
-    VIO_STR   extension );
-
-VIOAPI  VIO_STR  remove_directories_from_filename(
-    VIO_STR  filename );
-
-VIOAPI  VIO_BOOL file_exists_as_compressed(
-    VIO_STR       filename,
-    VIO_STR       *compressed_filename );
-
-VIOAPI  VIO_STR  get_temporary_filename( void );
-
-VIOAPI  VIO_Status  open_file(
-    VIO_STR            filename,
-    VIO_IO_types       io_type,
-    VIO_File_formats   file_format,
-    FILE               **file );
-
-VIOAPI  VIO_Status  open_file_with_default_suffix(
-    VIO_STR            filename,
-    VIO_STR            default_suffix,
-    VIO_IO_types       io_type,
-    VIO_File_formats   file_format,
-    FILE               **file );
-
-VIOAPI  VIO_Status  set_file_position(
-    FILE     *file,
-    long     byte_position );
-
-VIOAPI  VIO_Status  close_file(
-    FILE     *file );
-
-VIOAPI  VIO_STR  extract_directory(
-    VIO_STR    filename );
-
-VIOAPI  VIO_STR  get_absolute_filename(
-    VIO_STR    filename,
-    VIO_STR    directory );
-
-VIOAPI  VIO_Status  flush_file(
-    FILE     *file );
-
-VIOAPI  VIO_Status  input_character(
-    FILE  *file,
-    char   *ch );
-
-VIOAPI  VIO_Status  unget_character(
-    FILE  *file,
-    char  ch );
-
-VIOAPI  VIO_Status  input_nonwhite_character(
-    FILE   *file,
-    char   *ch );
-
-VIOAPI  VIO_Status  output_character(
-    FILE   *file,
-    char   ch );
-
-VIOAPI  VIO_Status   skip_input_until(
-    FILE   *file,
-    char   search_char );
-
-VIOAPI  VIO_Status  output_string(
-    FILE    *file,
-    VIO_STR  str );
-
-VIOAPI  VIO_Status  input_string(
-    FILE    *file,
-    VIO_STR  *str,
-    char    termination_char );
-
-VIOAPI  VIO_Status  input_quoted_string(
-    FILE            *file,
-    VIO_STR          *str );
-
-VIOAPI  VIO_Status  input_possibly_quoted_string(
-    FILE            *file,
-    VIO_STR          *str );
-
-VIOAPI  VIO_Status  output_quoted_string(
-    FILE            *file,
-    VIO_STR          str );
-
-VIOAPI  VIO_Status  input_binary_data(
-    FILE            *file,
-    void            *data,
-    size_t          element_size,
-    int             n );
-
-VIOAPI  VIO_Status  output_binary_data(
-    FILE            *file,
-    void            *data,
-    size_t          element_size,
-    int             n );
-
-VIOAPI  VIO_Status  input_newline(
-    FILE            *file );
-
-VIOAPI  VIO_Status  output_newline(
-    FILE            *file );
-
-VIOAPI  VIO_Status  input_line(
-    FILE    *file,
-    VIO_STR  *line );
-
-VIOAPI  VIO_Status  input_boolean(
-    FILE            *file,
-    VIO_BOOL        *b );
-
-VIOAPI  VIO_Status  output_boolean(
-    FILE            *file,
-    VIO_BOOL        b );
-
-VIOAPI  VIO_Status  input_short(
-    FILE            *file,
-    short           *s );
-
-VIOAPI  VIO_Status  output_short(
-    FILE            *file,
-    short           s );
-
-VIOAPI  VIO_Status  input_unsigned_short(
-    FILE            *file,
-    unsigned short  *s );
-
-VIOAPI  VIO_Status  output_unsigned_short(
-    FILE            *file,
-    unsigned short  s );
-
-VIOAPI  VIO_Status  input_int(
-    FILE  *file,
-    int   *i );
-
-VIOAPI  VIO_Status  output_int(
-    FILE            *file,
-    int             i );
-
-VIOAPI  VIO_Status  input_real(
-    FILE            *file,
-    VIO_Real            *r );
-
-VIOAPI  VIO_Status  output_real(
-    FILE            *file,
-    VIO_Real            r );
-
-VIOAPI  VIO_Status  input_float(
-    FILE            *file,
-    float           *f );
-
-VIOAPI  VIO_Status  output_float(
-    FILE            *file,
-    float           f );
-
-VIOAPI  VIO_Status  input_double(
-    FILE            *file,
-    double          *d );
-
-VIOAPI  VIO_Status  output_double(
-    FILE            *file,
-    double          d );
-
-VIOAPI  VIO_Status  io_binary_data(
-    FILE            *file,
-    VIO_IO_types    io_flag,
-    void            *data,
-    size_t          element_size,
-    int             n );
-
-VIOAPI  VIO_Status  io_newline(
-    FILE            *file,
-    VIO_IO_types     io_flag,
-    VIO_File_formats format );
-
-VIOAPI  VIO_Status  io_quoted_string(
-    FILE            *file,
-    VIO_IO_types     io_flag,
-    VIO_File_formats format,
-    VIO_STR          *str );
-
-VIOAPI  VIO_Status  io_boolean(
-    FILE            *file,
-    VIO_IO_types     io_flag,
-    VIO_File_formats format,
-    VIO_BOOL        *b );
-
-VIOAPI  VIO_Status  io_short(
-    FILE            *file,
-    VIO_IO_types     io_flag,
-    VIO_File_formats format,
-    short           *short_int );
-
-VIOAPI  VIO_Status  io_unsigned_short(
-    FILE            *file,
-    VIO_IO_types     io_flag,
-    VIO_File_formats format,
-    unsigned short  *unsigned_short );
-
-VIOAPI  VIO_Status  io_unsigned_char(
-    FILE            *file,
-    VIO_IO_types     io_flag,
-    VIO_File_formats format,
-    unsigned  char  *c );
-
-VIOAPI  VIO_Status  io_int(
-    FILE            *file,
-    VIO_IO_types     io_flag,
-    VIO_File_formats format,
-    int             *i );
-
-VIOAPI  VIO_Status  io_real(
-    FILE            *file,
-    VIO_IO_types     io_flag,
-    VIO_File_formats format,
-    VIO_Real         *r );
-
-VIOAPI  VIO_Status  io_float(
-    FILE            *file,
-    VIO_IO_types     io_flag,
-    VIO_File_formats format,
-    float           *f );
-
-VIOAPI  VIO_Status  io_double(
-    FILE            *file,
-    VIO_IO_types     io_flag,
-    VIO_File_formats format,
-    double          *d );
-
-VIOAPI  VIO_Status  io_ints(
-    FILE            *file,
-    VIO_IO_types     io_flag,
-    VIO_File_formats format,
-    int             n,
-    int             *ints[] );
-
-VIOAPI  VIO_Status  io_unsigned_chars(
-    FILE            *file,
-    VIO_IO_types     io_flag,
-    VIO_File_formats format,
-    int             n,
-    unsigned char   *unsigned_chars[] );
-
-VIOAPI  void  set_print_function( void  (*function) ( VIO_STR ) );
-
-VIOAPI  void  push_print_function( void );
-
-VIOAPI  void  pop_print_function( void );
-
-VIOAPI  void  print( VIO_STR format, ... );
-
-VIOAPI  void  set_print_error_function( void  (*function) ( char [] ) );
-
-VIOAPI  void  push_print_error_function( void );
-
-VIOAPI  void  pop_print_error_function( void );
-
-VIOAPI  void  print_error( char format[], ... );
-
-VIOAPI  void   handle_internal_error( char  str[] );
-
-VIOAPI  void  abort_if_allowed( void );
-
-VIOAPI  void  initialize_progress_report(
-    VIO_progress_struct *progress,
-    VIO_BOOL          one_line_only,
-    int               n_steps,
-    VIO_STR            title );
-
-VIOAPI  void  update_progress_report(
-    VIO_progress_struct   *progress,
-    int               current_step );
-
-VIOAPI  void  terminate_progress_report(
-    VIO_progress_struct   *progress );
-
-VIOAPI  VIO_STR  alloc_string(
-    int   length );
-
-VIOAPI  VIO_STR  create_string(
-    VIO_STR    initial );
-
-VIOAPI  void  delete_string(
-    VIO_STR   string );
-
-VIOAPI  VIO_STR  concat_strings(
-    VIO_STR   str1,
-    VIO_STR   str2 );
-
-VIOAPI  void  replace_string(
-    VIO_STR   *string,
-    VIO_STR   new_string );
-
-VIOAPI  void  concat_char_to_string(
-    VIO_STR   *string,
-    char     ch );
-
-VIOAPI  void  concat_to_string(
-    VIO_STR   *string,
-    VIO_STR   str2 );
-
-VIOAPI  int  string_length(
-    VIO_STR   string );
-
-VIOAPI  VIO_BOOL equal_strings(
-    VIO_STR   str1,
-    VIO_STR   str2 );
-
-VIOAPI  VIO_BOOL is_lower_case(
-    char  ch );
-
-VIOAPI  VIO_BOOL is_upper_case(
-    char  ch );
-
-VIOAPI  char  get_lower_case(
-    char   ch );
-
-VIOAPI  char  get_upper_case(
-    char   ch );
-
-VIOAPI  VIO_BOOL string_ends_in(
-    VIO_STR   string,
-    VIO_STR   ending );
-
-VIOAPI    VIO_STR   strip_outer_blanks(
-    VIO_STR  str );
-
-VIOAPI  int  find_character(
-    VIO_STR    string,
-    char      ch );
-
-VIOAPI  void  make_string_upper_case(
-    VIO_STR    string );
-
-VIOAPI  VIO_BOOL blank_string(
-    VIO_STR   string );
-
-VIOAPI  VIO_Real  current_cpu_seconds( void );
-
-VIOAPI  VIO_Real  current_realtime_seconds( void );
-
-VIOAPI  VIO_STR  format_time(
-    VIO_STR   format,
-    VIO_Real     seconds );
-
-VIOAPI  void  print_time(
-    VIO_STR   format,
-    VIO_Real     seconds );
-
-VIOAPI  VIO_STR  get_clock_time( void );
-
-VIOAPI  void  sleep_program( VIO_Real seconds );
-
-VIOAPI  VIO_STR  get_date( void );
 #endif

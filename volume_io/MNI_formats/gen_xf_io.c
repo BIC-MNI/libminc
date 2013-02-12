@@ -143,7 +143,8 @@ static  void  output_one_transform(
             (void) fprintf( file, "\n" );
         }
         break;
-
+        
+#ifdef HAVE_MINC1
     case GRID_TRANSFORM:
         (void) fprintf( file, "%s = %s;\n", TYPE_STRING,
                         GRID_TRANSFORM_STRING );
@@ -177,10 +178,10 @@ static  void  output_one_transform(
         (void) sprintf( volume_filename, "%s_grid_%d.mnc", prefix_filename,
                         *volume_count );
 
-	/* Increment the volume counter as a side-effect to ensure that grid
-	 * files have different names.
-	 */
-	(*volume_count)++;
+        /* Increment the volume counter as a side-effect to ensure that grid
+        * files have different names.
+        */
+        (*volume_count)++;
 
         /*--- decide where to write the volume file */
 
@@ -200,6 +201,7 @@ static  void  output_one_transform(
         delete_string( base_filename );
 
         break;
+#endif //HAVE_MINC1
 
     case USER_TRANSFORM:
         print_error( "Cannot output user transformation.\n" );
@@ -315,12 +317,16 @@ static Status input_one_transform(
     Real          **points, **displacements;
     Real          value, *points_1d;
     STRING           type_name, str, volume_filename, directory, tmp_filename;
+#ifdef HAVE_MINC1
     Volume        volume;
+#endif /*HAVE_MINC1*/
     Transform     linear_transform;
     Transform_types   type;
     BOOLEAN          inverse_flag;
     General_transform inverse;
+#ifdef HAVE_MINC1
     minc_input_options  options;
+#endif 
 
     inverse_flag = FALSE;
 
@@ -513,7 +519,8 @@ static Status input_one_transform(
         FREE2D( displacements );
 
         break;
-
+        
+#ifdef HAVE_MINC1
     case GRID_TRANSFORM:
 
         /*--- read the displacement volume filename */
@@ -576,6 +583,7 @@ static Status input_one_transform(
         create_grid_transform_no_copy( transform, volume );
 
         break;
+#endif /*HAVE_MINC1*/
     }
 
     if( inverse_flag )

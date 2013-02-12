@@ -14,6 +14,9 @@
 
 #include  <internal_volume_io.h>
 
+#ifdef HAVE_MINC1
+
+
 #define   DEGREES_CONTINUITY         2    /* -1 = Nearest; 0 = Linear; 1 = Quadratic; 2 = Cubic interpolation */
 #define   SPLINE_DEGREE         ((DEGREES_CONTINUITY) + 2)
 
@@ -568,3 +571,4 @@ static  void   evaluate_grid_volume(
         }
     }
 }
+#endif /*HAVE_MINC1*/

@@ -195,7 +195,7 @@ VIOAPI  void  create_thin_plate_transform(
 @CREATED    : Feb. 21, 1995            David MacDonald
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
-
+#ifdef HAVE_MINC1
 static  void  internal_create_grid_transform(
     General_transform    *transform,
     Volume               displacement_volume,
@@ -318,6 +318,8 @@ VIOAPI  void  create_grid_transform_no_copy(
 {
     internal_create_grid_transform( transform, displacement_volume, FALSE );
 }
+
+#endif /*HAVE_MINC1*/
 
 /* ----------------------------- MNI Header -----------------------------------
 @NAME       : create_user_transform
@@ -555,7 +557,7 @@ static  void  transform_or_invert_point(
                                          z_transformed );
         }
         break;
-
+#ifdef HAVE_MINC1
     case GRID_TRANSFORM:
         if( inverse_flag )
         {
@@ -572,7 +574,7 @@ static  void  transform_or_invert_point(
                                   z_transformed );
         }
         break;
-
+#endif /*HAVE_MINC1*/
     case USER_TRANSFORM:
         if( inverse_flag )
         {
@@ -746,6 +748,7 @@ static  void  copy_and_invert_transform(
             copy->inverse_flag = !copy->inverse_flag;
         break;
 
+#ifdef HAVE_MINC1
     case GRID_TRANSFORM:
         copy->displacement_volume = (void *) copy_volume(
                                     (Volume) transform->displacement_volume );
@@ -754,6 +757,7 @@ static  void  copy_and_invert_transform(
             copy->inverse_flag = !copy->inverse_flag;
 
         break;
+#endif /*HAVE_MINC1*/
 
     case USER_TRANSFORM:
         ALLOC( byte_ptr, copy->size_user_data );
@@ -1030,10 +1034,11 @@ VIOAPI  void  delete_general_transform(
         }
         break;
 
+#ifdef HAVE_MINC1
     case GRID_TRANSFORM:
         delete_volume( (Volume) transform->displacement_volume );
         break;
-
+#endif /*HAVE_MINC1*/
     case USER_TRANSFORM:
         if( transform->size_user_data )
             FREE( transform->user_data );
