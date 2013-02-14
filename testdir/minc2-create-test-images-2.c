@@ -68,6 +68,8 @@ int create_real_as_int_image(void)
     }
     
     r = miclose_volume(hvol);
+    return r<0?1:0;
+
 }
 int create_real_as_float_image(void)
 {
@@ -122,6 +124,8 @@ int create_real_as_float_image(void)
     }
     
     r = miclose_volume(hvol);
+    return r<0?1:0;
+    
 }
 int main(int argc, char **argv)
 {

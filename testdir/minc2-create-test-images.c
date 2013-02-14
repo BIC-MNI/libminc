@@ -59,6 +59,8 @@ int create_2D_image(void)
   r = miset_voxel_value_hyperslab(hvol, MI_TYPE_SHORT, start, count, buf);
 
   r = miclose_volume(hvol);
+  return r<0?1:0;
+  
 }
 
 int create_3D_image(void)
@@ -113,6 +115,7 @@ int create_3D_image(void)
     }
     
     r = miclose_volume(hvol);
+    return r<0?1:0;
 }
 
 int create_4D_image(void)
@@ -175,7 +178,9 @@ int create_4D_image(void)
 	}
     }
     
-    r = miclose_volume(hvol);
+  r = miclose_volume(hvol);
+  
+  return r<0?1:0;
 }
 
 int main(int argc, char **argv)
@@ -195,7 +200,6 @@ int main(int argc, char **argv)
   else {
     fprintf(stderr, "\n No errors\n");
   }
-    
   return (r);
 }
 
