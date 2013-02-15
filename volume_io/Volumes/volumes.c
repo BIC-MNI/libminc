@@ -2120,6 +2120,7 @@ VIOAPI  void  set_volume_voxel_range(
         case FLOAT:
             voxel_min = (Real) -FLT_MAX;
             voxel_max = (Real) FLT_MAX;       break;
+        default:
         case DOUBLE:
             voxel_min = (Real) -DBL_MAX;
             voxel_max = (Real) DBL_MAX;       break;

@@ -247,6 +247,7 @@ typedef  struct
          case FLOAT:  \
              GET_ONE_PTR( ptr, array, float, asterisks, subscripts );\
              break;  \
+         default: \
          case DOUBLE:  \
              GET_ONE_PTR( ptr, array, double, asterisks, subscripts );\
              break;  \
