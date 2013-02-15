@@ -60,9 +60,9 @@ int main(int argc, char **argv)
             for (imax=0; imax<MAX_MAX; imax++) {
                for (ival=0; ival<MAX_VAL; ival++) {
                   printf(
-                     "in : %s, out : %s, norm : %s, imgmax : %s, valid : %s value:%g\n",
+                     "in : %s, out : %s, norm : %s, imgmax : %s, valid : %s\n",
                          typenm[intype], typenm[outtype], boolnm[inorm],
-                         boolnm[imax], boolnm[ival], dvalue);
+                         boolnm[imax], boolnm[ival]);
                   cdfid=micreate("test.mnc", NC_CLOBBER | cflag);
                   for (i=0; i<numdims; i++) 
                      dim[i]=ncdimdef(cdfid, diminfo[i].name, diminfo[i].len);
