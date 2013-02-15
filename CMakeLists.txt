@@ -182,40 +182,47 @@ INCLUDE_DIRECTORIES(
    ${CMAKE_CURRENT_SOURCE_DIR}
    ${CMAKE_CURRENT_BINARY_DIR}
    ${CMAKE_CURRENT_SOURCE_DIR}/libsrc2
+   ${CMAKE_CURRENT_SOURCE_DIR}/libsrc
    ${HDF5_INCLUDE_DIR}
    ${CMAKE_CURRENT_SOURCE_DIR}/volume_io/Include
    )
 
-IF(LIBMINC_MINC1_SUPPORT)
-  INCLUDE_DIRECTORIES(
-    ${CMAKE_CURRENT_SOURCE_DIR}/libsrc
-  )
-ENDIF(LIBMINC_MINC1_SUPPORT)
+# IF(LIBMINC_MINC1_SUPPORT)
+#   INCLUDE_DIRECTORIES(
+#     ${CMAKE_CURRENT_SOURCE_DIR}/libsrc
+#   )
+# ENDIF(LIBMINC_MINC1_SUPPORT)
+
+SET(minc_common_SRCS
+   libsrc/time_stamp.c
+   libsrc/read_file_names.c
+   libsrc/ParseArgv.c
+)
+
+SET(minc_common_HEADERS
+  libsrc/time_stamp.h
+  libsrc/ParseArgv.h 
+)
 
 # some variables
 SET(minc1_LIB_SRCS
-   libsrc/ParseArgv.c
    libsrc/dim_conversion.c
    libsrc/image_conversion.c
    libsrc/minc_convenience.c
    libsrc/minc_error.c
    libsrc/nd_loop.c
    libsrc/netcdf_convenience.c
-   libsrc/time_stamp.c
    libsrc/value_conversion.c
    libsrc/voxel_loop.c
    libsrc/hdf_convenience.c
    libsrc/minc_compat.c
    libsrc/minc_simple.c
-   libsrc/read_file_names.c
    )
 
 SET(minc1_HEADERS
   libsrc/minc.h 
-  libsrc/ParseArgv.h 
   libsrc/voxel_loop.h 
   libsrc/nd_loop.h
-  libsrc/time_stamp.h
   libsrc/minc_compat.h
   volume_io/Include/volume_io.h
   libsrc/minc_simple.h
@@ -312,8 +319,8 @@ IF(UNIX)
  SET(LIBMINC_LIBRARIES ${LIBMINC_LIBRARIES}  m )
 ENDIF(UNIX)
 
-SET(minc_LIB_SRCS ${minc2_LIB_SRCS})
-SET(minc_HEADERS ${minc2_HEADERS})
+SET(minc_LIB_SRCS ${minc2_LIB_SRCS} ${minc_common_SRCS})
+SET(minc_HEADERS  ${minc2_HEADERS} ${minc_common_HEADERS})
 
 IF(LIBMINC_MINC1_SUPPORT)
   SET(minc_HEADERS  ${minc_HEADERS} ${minc1_HEADERS} ${volume_io_HEADERS})
@@ -331,7 +338,6 @@ SET_TARGET_PROPERTIES(${LIBMINC_LIBRARY}
  PROPERTIES 
   VERSION ${PACKAGE_VERSION} 
   SOVERSION ${LIBMINC_PACKAGE_VERSION_MAJOR})
-
 
 IF(LIBMINC_MINC1_SUPPORT)
   SET(LIBMINC_LIBRARIES ${LIBMINC_LIBRARIES} ${NETCDF_LIBRARY} )

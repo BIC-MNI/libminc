@@ -51,13 +51,11 @@
               express or implied warranty.
 ---------------------------------------------------------------------------- */
 
-#include "minc.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
 
-MNCAPI char *time_stamp(int argc, char *argv[]);
+char *time_stamp(int argc, char *argv[]);
 
 #ifdef __cplusplus
 }

@@ -11,7 +11,6 @@ IF(LIBMINC_MINC1_SUPPORT)
   ADD_EXECUTABLE(icv_range icv_range.c)
   ADD_EXECUTABLE(mincapi mincapi.c)
   ADD_EXECUTABLE(minc_types minc_types.c)
-  ADD_EXECUTABLE(test_arg_parse test_arg_parse.c)
   ADD_EXECUTABLE(test_mconv test_mconv.c)
 
   #ADD_EXECUTABLE(test_speed test_speed.c)
@@ -43,7 +42,6 @@ ENDMACRO(minc_test)
   ADD_TEST(minc minc_tst)
 
   ADD_TEST(mincapi mincapi)
-  ADD_TEST(test_arg_parse test_arg_parse)
   ADD_TEST(test_mconv test_mconv)
 
   # TODO port these test to cmake
@@ -58,7 +56,12 @@ ENDMACRO(minc_test)
 ENDIF(LIBMINC_MINC1_SUPPORT)
 
 #IF(LIBMINC_BUILD_V2)
+#common tests
+ADD_EXECUTABLE(test_arg_parse test_arg_parse.c)
+ADD_TEST(test_arg_parse test_arg_parse)
 
+
+#MINC2 tests
 ADD_EXECUTABLE(minc2-convert-test minc2-convert-test.c)
 ADD_EXECUTABLE(minc2-create-test-images-2 minc2-create-test-images-2.c)
 ADD_EXECUTABLE(minc2-create-test-images minc2-create-test-images.c)

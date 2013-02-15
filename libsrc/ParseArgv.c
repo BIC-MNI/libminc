@@ -464,8 +464,13 @@ static void PrintVersion(ArgvInfo *argTable)
         }
     }
     printf("program: %s\n", versionStr);
-    printf("libminc: %s\n", miget_version());
-    printf("netcdf : %s\n", nc_inq_libvers());
+#if MINC1
+    {
+      printf("libminc: %s\n", miget_version());
+      printf("netcdf : %s\n", nc_inq_libvers());
+    }
+#endif
+    
 #if MINC2
     {
         unsigned int major, minor, release;

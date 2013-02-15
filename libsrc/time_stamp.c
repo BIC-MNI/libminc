@@ -58,8 +58,14 @@
               software for any purpose.  It is provided "as is" without
               express or implied warranty.
 ---------------------------------------------------------------------------- */
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif /*HAVE_CONFIG_H*/
 
-#include "minc_private.h"
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif
+
 #include <time.h>
 #include <time_stamp.h>
 
@@ -78,6 +84,8 @@
 @CREATED    : February 1, 1993 (Peter Neelin)
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
+#include <stdlib.h>
+
 char *time_stamp(int argc, char *argv[])
 {
    char *str, *the_time;
