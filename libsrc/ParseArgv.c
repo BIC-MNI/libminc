@@ -19,14 +19,34 @@
  *
  * Modifications by Peter Neelin (November 27, 1992)
  */
+#ifdef HAVE_CONFIG_H
 #include "config.h"
-#include "minc_private.h"
+#endif
+
 #include <stdio.h>
+
+#ifdef HAVE_STDLIB_H
 #include <stdlib.h>
+#endif
+
+#ifdef HAVE_STRING_H
 #include <string.h>
+#endif
+
+#ifdef HAVE_INTTYPES_H
 #include <inttypes.h>
+#endif 
+
 #include <math.h>
 #include <ParseArgv.h>
+
+#ifndef FALSE
+#define FALSE 0
+#endif
+
+#ifndef TRUE
+#define TRUE 1
+#endif
 
 /*
  * Default table of argument descriptors.  These are normally available

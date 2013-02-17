@@ -18,7 +18,11 @@
  * $Header: /private-cvsroot/minc/libsrc/ParseArgv.h,v 6.6 2004-10-15 13:44:52 bert Exp $ SPRITE (Berkeley)
  */
 
+#ifdef HAVE_MINC1
 #include "minc.h"
+#else
+#define MNCAPI
+#endif
 /*
  * Definitions that allow this header file to be used either with or
  * without ANSI C features like function prototypes.
@@ -84,8 +88,8 @@ typedef struct {
 #if defined(__cplusplus)
 extern "C" {
 #endif
-
-MNCAPI int ParseArgv _ANSI_ARGS_((int *argcPtr, char **argv,
+  
+int MNCAPI ParseArgv _ANSI_ARGS_((int *argcPtr, char **argv,
                                   ArgvInfo *argTable, int flags));
 
 #if defined(__cplusplus)
