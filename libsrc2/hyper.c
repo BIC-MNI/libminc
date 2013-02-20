@@ -546,62 +546,25 @@ cleanup:
       }\
     }\
   }
-  
-#define APPLY_SCALING(type_in,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,voxel_min,voxel_max) \
-  { \
-    hsize_t _i,_j;\
-    double voxel_range=voxel_max-voxel_min;\
-    double voxel_offset=voxel_min;\
-    type_in *_buffer=(type_in *)buffer;\
-    for(_i=0;_i<total_number_of_slices;_i++)\
-      for(_j=0;_j<image_slice_length;_j++)\
-      {\
-        double _temp;\
-        _temp=*_buffer;\
-        _temp = ((_temp - image_slice_min_buffer[_i])/(image_slice_max_buffer[_i]-image_slice_min_buffer[_i]))*voxel_range + voxel_offset ; \
-        *_buffer = (type_in)(_temp); \
-        _buffer++;\
-      }\
-  }
 
-#define APPLY_DESCALING_ROUND(type_in,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,voxel_min,voxel_max) \
+#define APPLY_SCALING(type_in,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,voxel_min,voxel_max) \
   { \
     hsize_t _i,_j;\
     type_in *_buffer=(type_in *)buffer;\
     for(_i=0;_i<total_number_of_slices;_i++)\
     {\
-      double _scale=(image_slice_max_buffer[_i]-image_slice_min_buffer[_i])/(voxel_max-voxel_min); \
-      double _offset=image_slice_min_buffer[_i]-voxel_min*_scale; \
+      double _scale= (voxel_max-voxel_min)/(image_slice_max_buffer[_i]-image_slice_min_buffer[_i]); \
+      double _offset= image_slice_min_buffer[_i]*_scale-voxel_min; \
       for(_j=0;_j<image_slice_length;_j++)\
       {\
         double _temp;\
-        _temp=*_buffer;\
-        _temp= _temp*_scale  + _offset ; \
-        *_buffer = (type_in)(_temp+(_temp>=0 ? 0.5 : (-0.5) )); \
+        _temp=(double)(*_buffer);\
+        _temp= rint(_temp *_scale - _offset); \
+        *_buffer = (type_in)(_temp); \
         _buffer++;\
       }\
     }\
   }
-  
-#define APPLY_SCALING_ROUND(type_in,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,voxel_min,voxel_max) \
-  { \
-    hsize_t _i,_j;\
-    double voxel_range=voxel_max-voxel_min;\
-    double voxel_offset=voxel_min;\
-    type_in *_buffer=(type_in *)buffer;\
-    for(_i=0;_i<total_number_of_slices;_i++)\
-      for(_j=0;_j<image_slice_length;_j++)\
-      {\
-        double _temp;\
-        _temp=*_buffer;\
-        _temp = ((_temp - image_slice_min_buffer[_i])/(image_slice_max_buffer[_i]-image_slice_min_buffer[_i]))*voxel_range + voxel_offset ; \
-        *_buffer = (type_in)(_temp+(_temp>=0 ? 0.5 : (-0.5) )); \
-        _buffer++;\
-      }\
-  }
-  
-  
-  
 
 /** Read/write a hyperslab of data, performing dimension remapping
  * and data rescaling as needed.
@@ -814,11 +777,11 @@ static int mirw_hyperslab_icv(int opcode,
   }
   
   //A hack to disable interslice scaling when it is not needed according to MINC1 specs
-  if( volume->volume_type==MI_TYPE_FLOAT || volume->volume_type==MI_TYPE_DOUBLE || 
+  if( volume->volume_type==MI_TYPE_FLOAT    || volume->volume_type==MI_TYPE_DOUBLE || 
       volume->volume_type==MI_TYPE_FCOMPLEX || volume->volume_type==MI_TYPE_DCOMPLEX )
   {
     scaling_needed=0;
-  }
+  } 
 #ifdef _DEBUG  
   printf("mirw_hyperslab_icv:Slice_ndim:%d total_number_of_slices:%d image_slice_length:%d scaling_needed:%d\n",slice_ndims,total_number_of_slices,image_slice_length,scaling_needed);
 #endif
@@ -851,37 +814,37 @@ static int mirw_hyperslab_icv(int opcode,
 #ifdef _DEBUG  
           printf("Descaling  int\n");
 #endif
-          APPLY_DESCALING_ROUND(int,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
+          APPLY_DESCALING(int,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
           break;
         case MI_TYPE_UINT:
 #ifdef _DEBUG  
           printf("Descaling  uint\n");
 #endif
-          APPLY_DESCALING_ROUND(unsigned int,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
+          APPLY_DESCALING(unsigned int,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
           break;
         case MI_TYPE_SHORT:
 #ifdef _DEBUG  
           printf("Descaling  short\n");
 #endif
-          APPLY_DESCALING_ROUND(short,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
+          APPLY_DESCALING(short,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
           break;
         case MI_TYPE_USHORT:
 #ifdef _DEBUG  
           printf("Descaling  ushort\n");
 #endif
-          APPLY_DESCALING_ROUND(unsigned short,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
+          APPLY_DESCALING(unsigned short,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
           break;
         case MI_TYPE_BYTE:
 #ifdef _DEBUG  
           printf("Descaling  byte\n");
 #endif
-          APPLY_DESCALING_ROUND(char,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
+          APPLY_DESCALING(char,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
           break;
         case MI_TYPE_UBYTE:
 #ifdef _DEBUG  
           printf("Descaling  ubyte\n");
 #endif
-          APPLY_DESCALING_ROUND(unsigned char,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
+          APPLY_DESCALING(unsigned char,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
           break;
         default:
           /*TODO: report unsupported conversion*/
@@ -913,52 +876,72 @@ static int mirw_hyperslab_icv(int opcode,
 
       }
     }
-    
     if(scaling_needed || n_different != 0) 
     {
       /*create temporary copy, to be destroyed*/
       temp_buffer=malloc(buffer_size);
-      
       if(!temp_buffer)
       {
         MI_LOG_ERROR(MI2_MSG_OUTOFMEM,buffer_size);
-        
         result=MI_ERROR; /*TODO: error code?*/
-        
         goto cleanup;
       }
       memcpy(temp_buffer,buffer,buffer_size);
-      
-      if (n_different != 0 ) 
+
+      if (n_different != 0 )
         restructure_array(ndims, temp_buffer, icount, H5Tget_size(buffer_type_id), imap, idir);
-      
+
       if(scaling_needed)
       {
         switch(buffer_data_type)
         {
           case MI_TYPE_FLOAT:
+#ifdef _DEBUG  
+            printf("scaling  float\n");
+#endif
             APPLY_SCALING(float,temp_buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
             break;
           case MI_TYPE_DOUBLE:
+#ifdef _DEBUG  
+            printf("scaling  double\n");
+#endif
             APPLY_SCALING(double,temp_buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
             break;
           case MI_TYPE_INT:
-            APPLY_SCALING_ROUND(int,temp_buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
+#ifdef _DEBUG  
+            printf("scaling  int\n");
+#endif
+            APPLY_SCALING(int,temp_buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
             break;
           case MI_TYPE_UINT:
-            APPLY_SCALING_ROUND(unsigned int,temp_buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
+#ifdef _DEBUG  
+            printf("scaling  unsigned int\n");
+#endif
+            APPLY_SCALING(unsigned int,temp_buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
             break;
           case MI_TYPE_SHORT:
-            APPLY_SCALING_ROUND(short,temp_buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
+#ifdef _DEBUG  
+            printf("scaling  short\n");
+#endif
+            APPLY_SCALING(short,temp_buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
             break;
           case MI_TYPE_USHORT:
-            APPLY_SCALING_ROUND(unsigned short,temp_buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
+#ifdef _DEBUG  
+            printf("scaling  unsigned short\n");
+#endif
+            APPLY_SCALING(unsigned short,temp_buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
             break;
           case MI_TYPE_BYTE:
-            APPLY_SCALING_ROUND(char,temp_buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
+#ifdef _DEBUG
+            printf("scaling  char\n");
+#endif
+            APPLY_SCALING(char,temp_buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
             break;
           case MI_TYPE_UBYTE:
-            APPLY_SCALING_ROUND(unsigned char,temp_buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
+#ifdef _DEBUG
+            printf("scaling  unsigned char\n");
+#endif
+            APPLY_SCALING(unsigned char,temp_buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max);
             break;
           default:
             /*TODO: report unsupported conversion*/
