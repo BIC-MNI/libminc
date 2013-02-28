@@ -20,15 +20,13 @@ static const STRING      TRANSFORM_FILE_HEADER = "MNI Transform File";
 static const STRING      TYPE_STRING = "Transform_Type";
 static const STRING      LINEAR_TRANSFORM_STRING = "Linear_Transform";
 static const STRING      LINEAR_TYPE = "Linear";
-static const STRING      THIN_PLATE_SPLINE_STRING =
-                                              "Thin_Plate_Spline_Transform";
+static const STRING      THIN_PLATE_SPLINE_STRING ="Thin_Plate_Spline_Transform";
 static const STRING      INVERT_FLAG_STRING = "Invert_Flag";
 static const STRING      TRUE_STRING = "True";
 static const STRING      FALSE_STRING = "False";
 static const STRING      N_DIMENSIONS_STRING = "Number_Dimensions";
 static const STRING      POINTS_STRING = "Points";
 static const STRING      DISPLACEMENTS_STRING = "Displacements";
-
 static const STRING      GRID_TRANSFORM_STRING = "Grid_Transform";
 static const STRING      DISPLACEMENT_VOLUME = "Displacement_Volume";
 
@@ -144,7 +142,6 @@ static  void  output_one_transform(
         }
         break;
         
-#ifdef HAVE_MINC1
     case GRID_TRANSFORM:
         (void) fprintf( file, "%s = %s;\n", TYPE_STRING,
                         GRID_TRANSFORM_STRING );
@@ -191,17 +188,18 @@ static  void  output_one_transform(
 
         /*--- write the volume file */
 
+#ifdef HAVE_MINC1
         (void) output_volume( volume_filename, 
                               MI_ORIGINAL_TYPE, FALSE, 0.0, 0.0,
                               (Volume) transform->displacement_volume,
                               NULL, NULL );
+#endif //HAVE_MINC1
 
         delete_string( prefix_filename );
         delete_string( volume_filename );
         delete_string( base_filename );
 
         break;
-#endif //HAVE_MINC1
 
     case USER_TRANSFORM:
         print_error( "Cannot output user transformation.\n" );
@@ -520,7 +518,6 @@ static Status input_one_transform(
 
         break;
         
-#ifdef HAVE_MINC1
     case GRID_TRANSFORM:
 
         /*--- read the displacement volume filename */
@@ -565,6 +562,8 @@ static Status input_one_transform(
 
         /*--- input the displacement volume */
 
+#ifdef HAVE_MINC1
+        /*TODO: initialize strings*/
         set_default_minc_input_options( &options );
         set_minc_input_vector_to_scalar_flag( &options, FALSE );
 
@@ -581,9 +580,9 @@ static Status input_one_transform(
         /*--- create the transform */
 
         create_grid_transform_no_copy( transform, volume );
+#endif /*HAVE_MINC1*/
 
         break;
-#endif /*HAVE_MINC1*/
     }
 
     if( inverse_flag )

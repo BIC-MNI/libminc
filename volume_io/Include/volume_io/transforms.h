@@ -31,9 +31,12 @@
 
 /* --- the list of supported transform types */
 
-typedef enum { LINEAR, THIN_PLATE_SPLINE, USER_TRANSFORM,
-               CONCATENATED_TRANSFORM, GRID_TRANSFORM }
-              VIO_Transform_types;
+typedef enum { LINEAR, 
+               THIN_PLATE_SPLINE, 
+               USER_TRANSFORM,
+               CONCATENATED_TRANSFORM, 
+               GRID_TRANSFORM 
+             } VIO_Transform_types;
 
 /* --- the user transformation function */
 
