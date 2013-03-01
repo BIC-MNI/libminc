@@ -14,7 +14,6 @@
 
 #include  <internal_volume_io.h>
 
-#ifdef HAVE_MINC1
 
 /* ----------------------------- MNI Header -----------------------------------
 @NAME       : get_file_dimension_names
@@ -31,6 +30,7 @@
 @CREATED    : 1993            David MacDonald
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
+#ifdef HAVE_MINC1
 
 VIOAPI  Status   get_file_dimension_names(
     STRING   filename,

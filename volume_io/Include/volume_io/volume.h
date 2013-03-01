@@ -37,8 +37,6 @@
 #include  <volume_io/transforms.h>
 #include  <volume_io/multidim.h>
 
-#ifdef HAVE_MINC1
-
 typedef  struct
 {
     VIO_Real global_image_range[2];
@@ -57,6 +55,31 @@ extern  VIO_STR   File_order_dimension_names[];
 #define  ANY_SPATIAL_DIMENSION   "any_spatial_dimension"
 
 #define MI_UNKNOWN_SPACE    "unknown___"
+
+#ifndef HAVE_MINC1
+/*Varios definitions to compile Volume_io without MINC1 API*/
+#define MI_ORIGINAL_TYPE 0
+typedef int nc_type;
+#define MAX_VAR_DIMS       100
+#define MIxspace           "xspace"
+#define MIyspace           "yspace"
+#define MIzspace           "zspace"
+#define MItime             "time"
+#define MItfrequency       "tfrequency"
+#define MIxfrequency       "xfrequency"
+#define MIyfrequency       "yfrequency"
+#define MIzfrequency       "zfrequency"
+#define MIvector_dimension "vector_dimension"
+
+/*TODO: use minc2 definitions here?*/
+#define NC_BYTE   1
+#define NC_SHORT  2
+#define NC_INT    3
+#define NC_FLOAT  4
+#define NC_DOUBLE 5
+
+#endif /*HAVE_MINC1*/
+
 
 typedef  struct
 {
@@ -456,9 +479,4 @@ typedef enum {
                TRIANGLE_FILTER,
                GAUSSIAN_FILTER } Filter_types;
 
-#else  /*HAVE_MINC1*/
-/*Varios definitions to compile Volume_io without MINC1 API*/
-#define MI_ORIGINAL_TYPE 0
-
-#endif /*HAVE_MINC1*/
 #endif

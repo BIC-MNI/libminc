@@ -16,8 +16,6 @@
 #include  <limits.h>
 #include  <float.h>
 
-#ifdef HAVE_MINC1
-
 STRING   XYZ_dimension_names[] = { MIxspace, MIyspace, MIzspace };
 STRING   File_order_dimension_names[] = { "", "", "", "", "" };
 
@@ -2635,4 +2633,3 @@ nonspatial_world_to_voxel(Volume volume, int idim, VIO_Real world)
     return (voxel);
 }
 
-#endif /*HAVE_MINC1*/

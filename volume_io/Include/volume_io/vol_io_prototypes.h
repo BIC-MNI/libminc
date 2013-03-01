@@ -1014,7 +1014,7 @@ VIOAPI  void  sleep_program( VIO_Real seconds );
 VIOAPI  VIO_STR  get_date( void );
 
 
-#ifdef HAVE_MINC1
+/*#ifdef HAVE_MINC1*/
 
 /*transformations which depend on MINC1 API*/
 VIOAPI  void  create_grid_transform(
@@ -2089,6 +2089,6 @@ VIOAPI  void  grid_inverse_transform_point(
     VIO_Real                *y_transformed,
     VIO_Real                *z_transformed );
 
-#endif // HAVE_MINC1
+/*/#endif // HAVE_MINC1*/
 
 #endif

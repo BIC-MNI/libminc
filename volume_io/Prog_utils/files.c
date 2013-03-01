@@ -822,7 +822,80 @@ VIOAPI  BOOLEAN  file_exists_as_compressed(
 
 VIOAPI  STRING  get_temporary_filename( void )
 {
-    return micreate_tempfile();
+  int tmp_fd;
+  char *tmpfile_ptr;
+
+#if defined (HAVE_MKSTEMP)
+  /* Best-case scenario (so far...)
+   * mkstemp() creates a file immediately, minimizing the race
+   * conditions that exist when using the other functions.  These race
+   * conditions can lead to small security holes (and large, annoying
+   * GNU linker messages).
+   *
+   * The only catch is that mkstemp() does not automatically put the 
+   * file in the TMPDIR directory (or some other appropriate place).
+   * So I more-or-less emulate that behavior here.
+   */
+  const char pat_str[] = "/minc-XXXXXX";
+  char *tmpdir_ptr;
+
+  if ((tmpdir_ptr = getenv("TMPDIR")) == NULL) {
+    tmpdir_ptr = P_tmpdir;
+  }
+  tmpfile_ptr = malloc(strlen(tmpdir_ptr) + sizeof (pat_str));
+  if (tmpfile_ptr == NULL) {
+    return (NULL);
+  }
+  strcpy(tmpfile_ptr, tmpdir_ptr);
+  strcat(tmpfile_ptr, pat_str);
+  tmp_fd = mkstemp(tmpfile_ptr); /* Creates the file if possible. */
+
+#elif defined (HAVE_TEMPNAM)
+
+  /* Second-best case.  While not completely avoiding the race condition,
+   * this approach should at least have the nice property of putting the
+   * tempfile in the right directory (on IRIX and Linux, at least - on
+   * some systems tempnam() may not consult the TMPDIR environment variable).
+   */
+  tmpfile_ptr = tempnam(NULL, "minc-");
+  if (tmpfile_ptr == NULL) {
+    return (NULL);
+  }
+  tmp_fd = open(tmpfile_ptr, O_CREAT | O_EXCL | O_RDWR, S_IWRITE | S_IREAD);
+
+#elif defined (HAVE_TMPNAM)
+  /* Worst case.  tmpnam() is apparently the worst of all possible worlds
+   * here.  It doesn't allow any way to force a particular directory,
+   * and it doesn't avoid the race condition.  But volume_io used it for
+   * years, so I see no reason to disallow this case for systems that 
+   * might not define the above two functions (whether any such systems
+   * exist is unclear to me).
+   */
+  tmpfile_ptr = malloc(L_tmpnam + 1);
+  if (tmpfile_ptr == NULL) {
+    return (NULL);
+  }
+  if (tmpnam(tmpfile_ptr) == NULL) {
+    free(tmpfile_ptr);
+    return (NULL);
+  }
+  tmp_fd = open(tmpfile_ptr, O_CREAT | O_EXCL | O_RDWR, S_IWRITE | S_IREAD);
+
+#else
+#error "System defines neither mkstemp(), tempnam(), nor tmpnam()"
+#endif /* Neither HAVE_MKSTEMP, HAVE_TEMPNAM, or HAVE_TMPNAM defined. */
+
+  /* If we get here, tmp_fd should have been opened and the file
+   * created.  Now go ahead and close the file.
+   */
+  if (tmp_fd >= 0) {
+    close(tmp_fd);
+  }
+  else {
+    free(tmpfile_ptr);
+    tmpfile_ptr = NULL;
+  }
+  return (tmpfile_ptr);
 }
 
 /* ----------------------------- MNI Header -----------------------------------

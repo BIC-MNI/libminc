@@ -197,12 +197,12 @@ VIOAPI  void  create_thin_plate_transform(
 ---------------------------------------------------------------------------- */
 static  void  internal_create_grid_transform(
     General_transform    *transform,
-    Volume               displacement_volume,
+    VIO_Volume               displacement_volume,
     BOOLEAN              copy_flag )
 {
     int       dim, sizes[MAX_DIMENSIONS], vector_dim;
     STRING    *dim_names;
-    Volume    copy;
+    VIO_Volume    copy;
     BOOLEAN   volume_ok, dim_found[N_DIMENSIONS];
 
     volume_ok = TRUE;

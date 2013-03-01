@@ -32,6 +32,10 @@
 
 #include  <volume_io/multidim.h>
 
+#ifndef HAVE_MINC1
+typedef int nc_type;
+#endif /*HAVE_MINC1*/
+
 typedef  enum  { SLICE_ACCESS, RANDOM_VOLUME_ACCESS }
                VIO_Cache_block_size_hints;
 
