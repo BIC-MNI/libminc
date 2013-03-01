@@ -408,7 +408,9 @@ VIOAPI  Minc_file  initialize_minc_output(
         equal_strings( volume_to_attach->cache.output_filename, file->filename))
     {
         file->ignoring_because_cached = TRUE;
+#ifdef HAVE_MINC1
         flush_volume_cache( volume_to_attach );
+#endif /*HAVE_MINC1*/        
         return( file );
     }
 
@@ -1173,6 +1175,7 @@ static  void  output_slab(
             volume_start[ind] = 0;
     }
 
+#ifdef HAVE_MINC1    
     if( volume->is_cached_volume )
     {
         /*--- must make a temporary hyperslab array to contain the volume */
@@ -1248,17 +1251,25 @@ static  void  output_slab(
     }
     else
     {
+#endif /8HAVE_MINC1*/
         GET_MULTIDIM_PTR( array_data_ptr, volume->array,
                           volume_start[0], volume_start[1], volume_start[2],
                           volume_start[3], volume_start[4] );
         get_volume_sizes( volume, volume_sizes );
 
+#ifdef HAVE_MINC1        
         (void) output_minc_hyperslab( file, get_volume_data_type(volume),
                                       get_volume_n_dimensions(volume),
                                       volume_sizes, array_data_ptr,
                                       to_volume,
                                       int_file_start, int_file_count );
+#else /*HAVE_MINC1*/        
+        /*TODO: implement MINC2 api based reader*/
+#endif /*HAVE_MINC1*/        
+#ifdef HAVE_MINC1    
     }
+#endif /*HAVE_MINC1*/
+  
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -1654,6 +1665,9 @@ VIOAPI  Status  close_minc_output(
 
     return( OK );
 }
+#endif /*HAVE_MINC1*/
+
+
 
 /* ----------------------------- MNI Header -----------------------------------
 @NAME       : set_default_minc_output_options
@@ -1818,4 +1832,3 @@ VIOAPI  void  set_minc_output_use_volume_starts_and_steps_flag(
     options->use_starts_set = TRUE;
 }
 
-#endif /*HAVE_MINC1*/

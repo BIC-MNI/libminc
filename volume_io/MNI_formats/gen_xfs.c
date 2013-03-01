@@ -197,7 +197,7 @@ VIOAPI  void  create_thin_plate_transform(
 ---------------------------------------------------------------------------- */
 static  void  internal_create_grid_transform(
     General_transform    *transform,
-    VIO_Volume               displacement_volume,
+    VIO_Volume           displacement_volume,
     BOOLEAN              copy_flag )
 {
     int       dim, sizes[MAX_DIMENSIONS], vector_dim;
@@ -207,7 +207,7 @@ static  void  internal_create_grid_transform(
 
     volume_ok = TRUE;
     /*TODO: initialize strings?*/
-#ifdef HAVE_MINC1
+//#ifdef HAVE_MINC1
     if( get_volume_n_dimensions(displacement_volume) != 4 )
     {
         volume_ok = FALSE;
@@ -265,7 +265,10 @@ static  void  internal_create_grid_transform(
         copy = copy_volume( displacement_volume );
     else
         copy = displacement_volume;
-    
+#if 0  /*HAVE_MINC1*/
+    printf("internal_create_grid_transform:displacement_volume=%p\n",displacement_volume);
+    create_linear_transform( transform, NULL );  /*--- make identity */
+    return;
 #endif /*HAVE_MINC1*/
 
     transform->type = GRID_TRANSFORM;
@@ -1040,7 +1043,7 @@ VIOAPI  void  delete_general_transform(
 
     case GRID_TRANSFORM:
 #ifdef HAVE_MINC1
-        delete_volume( (Volume) transform->displacement_volume );
+        delete_volume( (VIO_Volume) transform->displacement_volume );
 #endif /*HAVE_MINC1*/
         /*TODO: free string*/
         break;

@@ -14,7 +14,6 @@
 
 #include  <internal_volume_io.h>
 
-#ifdef HAVE_MINC1
 
 /* ----------------------------- MNI Header -----------------------------------
 @NAME       : convert_voxel_to_value
@@ -1186,4 +1185,5 @@ VIOAPI  void   evaluate_volume_in_world(
         FREE3D( second_deriv );
     }
 }
+#ifdef HAVE_MINC1
 #endif /*HAVE_MINC1*/

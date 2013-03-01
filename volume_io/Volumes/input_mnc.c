@@ -1316,6 +1316,10 @@ static  BOOLEAN  match_dimension_names(
     return( n_matches == n_volume_dims );
 }
 
+
+#endif /*HAVE_MINC1*/
+
+
 /* ----------------------------- MNI Header -----------------------------------
 @NAME       : get_minc_file_id
 @INPUT      : file
@@ -1552,4 +1556,3 @@ VIOAPI  void  set_minc_input_user_real_range(
     options->user_real_range[1] = maximum;
 }
 
-#endif /*HAVE_MINC1*/

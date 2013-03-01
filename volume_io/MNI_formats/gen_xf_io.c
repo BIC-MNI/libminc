@@ -311,20 +311,16 @@ static Status input_one_transform(
     General_transform   *transform )
 {
     Status        status;
-    int               i, j, n_points, n_dimensions;
+    int           i, j, n_points, n_dimensions;
     Real          **points, **displacements;
     Real          value, *points_1d;
-    STRING           type_name, str, volume_filename, directory, tmp_filename;
-#ifdef HAVE_MINC1
-    Volume        volume;
-#endif /*HAVE_MINC1*/
+    STRING        type_name, str, volume_filename, directory, tmp_filename;
+    VIO_Volume    volume;
     Transform     linear_transform;
     Transform_types   type;
-    BOOLEAN          inverse_flag;
+    BOOLEAN       inverse_flag;
     General_transform inverse;
-#ifdef HAVE_MINC1
     minc_input_options  options;
-#endif 
 
     inverse_flag = FALSE;
 
@@ -562,11 +558,11 @@ static Status input_one_transform(
 
         /*--- input the displacement volume */
 
-#ifdef HAVE_MINC1
         /*TODO: initialize strings*/
         set_default_minc_input_options( &options );
         set_minc_input_vector_to_scalar_flag( &options, FALSE );
 
+#ifdef HAVE_MINC1
         if( input_volume( volume_filename, 4, NULL, 
                           MI_ORIGINAL_TYPE, FALSE, 0.0, 0.0, 
                           TRUE, &volume, &options ) != OK )
@@ -574,13 +570,16 @@ static Status input_one_transform(
             delete_string( volume_filename );
             return( ERROR );
         }
+#else
+        /*TODO: read volume with minc2 here?*/
+        volume=NULL;
+#endif /*HAVE_MINC1*/
 
         delete_string( volume_filename );
 
         /*--- create the transform */
 
         create_grid_transform_no_copy( transform, volume );
-#endif /*HAVE_MINC1*/
 
         break;
     }

@@ -15,8 +15,6 @@ IF(LIBMINC_MINC1_SUPPORT)
 
   #ADD_EXECUTABLE(test_speed test_speed.c)
 
-  ADD_EXECUTABLE(test_xfm   vio_xfm_test/test-xfm.c)
-  TARGET_LINK_LIBRARIES(test_xfm ${VOLUME_IO_LIBRARY} ${LIBMINC_LIBRARIES} m)
 
   ADD_EXECUTABLE(create_grid_xfm create_grid_xfm.c)
   TARGET_LINK_LIBRARIES(create_grid_xfm ${VOLUME_IO_LIBRARY} ${LIBMINC_LIBRARIES} m)
@@ -44,16 +42,22 @@ ENDMACRO(minc_test)
   ADD_TEST(mincapi mincapi)
   ADD_TEST(test_mconv test_mconv)
 
-  # TODO port these test to cmake
-  #ADD_TEST(create_grid_xfm create_grid_xfm)
-  #ADD_TEST(test_speed test_speed)
-  #ADD_TEST(test_xfm test_xfm)
-
-  ADD_TEST(test_xfm_1 test_xfm 10000 ${CMAKE_CURRENT_SOURCE_DIR}/vio_xfm_test/t1.xfm)
-  ADD_TEST(test_xfm_2 test_xfm 10000 ${CMAKE_CURRENT_SOURCE_DIR}/vio_xfm_test/t2.xfm)
-  ADD_TEST(test_xfm_3 test_xfm 10000 ${CMAKE_CURRENT_SOURCE_DIR}/vio_xfm_test/t3.xfm 0.9)
 
 ENDIF(LIBMINC_MINC1_SUPPORT)
+
+
+# Volume IO tests
+ADD_EXECUTABLE(test_xfm   vio_xfm_test/test-xfm.c)
+TARGET_LINK_LIBRARIES(test_xfm ${VOLUME_IO_LIBRARY} ${LIBMINC_LIBRARIES} m)
+# TODO port these test to cmake
+#ADD_TEST(create_grid_xfm create_grid_xfm)
+#ADD_TEST(test_speed test_speed)
+#ADD_TEST(test_xfm test_xfm)
+
+ADD_TEST(test_xfm_1 test_xfm 10000 ${CMAKE_CURRENT_SOURCE_DIR}/vio_xfm_test/t1.xfm)
+ADD_TEST(test_xfm_2 test_xfm 10000 ${CMAKE_CURRENT_SOURCE_DIR}/vio_xfm_test/t2.xfm)
+ADD_TEST(test_xfm_3 test_xfm 10000 ${CMAKE_CURRENT_SOURCE_DIR}/vio_xfm_test/t3.xfm 0.9)
+
 
 #IF(LIBMINC_BUILD_V2)
 #common tests

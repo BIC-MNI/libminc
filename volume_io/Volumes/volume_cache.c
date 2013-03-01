@@ -482,12 +482,14 @@ static  void  write_cache_block(
     GET_MULTIDIM_PTR( array_data_ptr, block->array, 0, 0, 0, 0, 0 );
     n_dims = cache->n_dimensions;
 
+#ifdef HAVE_MINC1
     (void) output_minc_hyperslab( (Minc_file) cache->minc_file,
                                   get_multidim_data_type(&block->array),
                                   n_dims, cache->block_sizes, array_data_ptr,
                                   minc_file->to_volume_index,
                                   file_start, file_count );
-
+#else /*TODO: Write out minc file using MINC2 api*/
+#endif     
     cache->must_read_blocks_before_use = TRUE;
 }
 
@@ -647,12 +649,15 @@ VIOAPI  void  delete_volume_cache(
 
     if( cache->minc_file != NULL )
     {
-        if( cache->output_file_is_open )
-        {
+
+      /*TODO: replace to MINC2 API*/
+#ifdef HAVE_MINC1
+      if( cache->output_file_is_open )
+      {
             (void) close_minc_output( (Minc_file) cache->minc_file );
-        }
-        else
+      } else
             (void) close_minc_input( (Minc_file) cache->minc_file );
+#endif       
     }
 }
 
@@ -829,7 +834,9 @@ VIOAPI  void  open_cache_volume_input_file(
 {
     cache->input_filename = create_string( filename );
 
+#ifdef HAVE_MINC1
     cache->minc_file = initialize_minc_input( filename, volume, options );
+#endif     
 
     cache->must_read_blocks_before_use = TRUE;
 }
@@ -892,10 +899,11 @@ static  Status  open_cache_volume_output_file(
         cache->writing_to_temp_file = FALSE;
         output_filename = create_string( cache->output_filename );
 
+#ifdef HAVE_MINC1
         out_dim_names = create_output_dim_names( volume,
                                                  cache->original_filename, 
                                                  &cache->options, out_sizes );
-
+#endif 
         if( out_dim_names == NULL )
             return( ERROR );
     }
@@ -906,6 +914,7 @@ static  Status  open_cache_volume_output_file(
 
     /*--- open the file for writing */
 
+#ifdef HAVE_MINC1
     out_minc_file = initialize_minc_output( output_filename,
                                         n_dims, out_dim_names, out_sizes,
                                         cache->file_nc_data_type,
@@ -914,14 +923,17 @@ static  Status  open_cache_volume_output_file(
                                         cache->file_voxel_max,
                                         get_voxel_to_world_transform(volume),
                                         volume, &cache->options );
-
+#endif 
     if( out_minc_file == NULL )
         return( ERROR );
 
+#ifdef HAVE_MINC1
     status = copy_volume_auxiliary_and_history( out_minc_file, output_filename,
                                                 cache->original_filename,
                                                 cache->history );
 
+#endif 
+    
     if( status != OK )
         return( status );
 
@@ -932,7 +944,9 @@ static  Status  open_cache_volume_output_file(
     if( string_length( cache->output_filename ) == 0 )
         remove_file( output_filename );
 
+#ifdef HAVE_MINC1
     status = set_minc_output_random_order( out_minc_file );
+#endif 
 
     if( status != OK )
         return( status );
@@ -942,9 +956,11 @@ static  Status  open_cache_volume_output_file(
 
     if( cache->minc_file != NULL )
     {
+#ifdef HAVE_MINC1
         (void) output_minc_volume( out_minc_file );
 
         (void) close_minc_input( (Minc_file) cache->minc_file );
+#endif 
 
         cache->must_read_blocks_before_use = TRUE;
     }
@@ -1062,11 +1078,13 @@ static  void  read_cache_block(
     n_dims = cache->n_dimensions;
     GET_MULTIDIM_PTR( array_data_ptr, block->array, 0, 0, 0, 0, 0 );
 
+#ifdef HAVE_MINC1
     (void) input_minc_hyperslab( (Minc_file) cache->minc_file,
                                  get_multidim_data_type(&block->array),
                                  n_dims, cache->block_sizes, array_data_ptr,
                                  minc_file->to_volume_index,
                                  file_start, file_count );
+#endif 
 }
 
 /* ----------------------------- MNI Header -----------------------------------
