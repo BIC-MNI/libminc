@@ -14,9 +14,6 @@
 
 #include  <internal_volume_io.h>
 
-#ifdef HAVE_MINC1
-
-
 #define   DEGREES_CONTINUITY         2    /* -1 = Nearest; 0 = Linear; 1 = Quadratic; 2 = Cubic interpolation */
 #define   SPLINE_DEGREE         ((DEGREES_CONTINUITY) + 2)
 
@@ -30,7 +27,7 @@
 #define   MAX_INVERSE_ITERATIONS         20
 
 static void   evaluate_grid_volume(
-    Volume         volume,
+    VIO_Volume         volume,
     Real           x,
     Real           y,
     Real           z,
@@ -59,7 +56,7 @@ static void   evaluate_grid_volume(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  grid_transform_point(
-    General_transform   *transform,
+    VIO_General_transform   *transform,
     Real                x,
     Real                y,
     Real                z,
@@ -68,13 +65,13 @@ VIOAPI  void  grid_transform_point(
     Real                *z_transformed )
 {
     Real    displacements[N_COMPONENTS];
-    Volume  volume;
+    VIO_Volume  volume;
 
     /* --- the volume that defines the transform is an offset vector,
            so evaluate the volume at the given position and add the
            resulting offset to the given position */
 
-    volume = (Volume) transform->displacement_volume;
+    volume = (VIO_Volume) transform->displacement_volume;
 
     evaluate_grid_volume( volume, x, y, z, DEGREES_CONTINUITY, displacements,
                           NULL, NULL, NULL );
@@ -110,16 +107,16 @@ private  void  forward_function(
     Real   **derivatives )
 {
     int                c;
-    General_transform  *transform;
+    VIO_General_transform  *transform;
     Real               deriv_x[N_COMPONENTS], deriv_y[N_COMPONENTS];
     Real               deriv_z[N_COMPONENTS];
-    Volume             volume;
+    VIO_Volume             volume;
 
-    transform = (General_transform *) function_data;
+    transform = (VIO_General_transform *) function_data;
 
     /* --- store the offset vector in values[0-2] */
 
-    volume = transform->displacement_volume;
+    volume = (VIO_Volume) transform->displacement_volume;
 
     evaluate_grid_volume( volume, parameters[X], parameters[Y], parameters[Z],
                           DEGREES_CONTINUITY, values,
@@ -172,7 +169,7 @@ it matches the code he uses in minctracc to generate the grid transforms.
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  grid_inverse_transform_point(
-    General_transform   *transform,
+    VIO_General_transform   *transform,
     Real                x,
     Real                y,
     Real                z,
@@ -239,7 +236,7 @@ VIOAPI  void  grid_inverse_transform_point(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  grid_inverse_transform_point(
-    General_transform   *transform,
+    VIO_General_transform   *transform,
     Real                x,
     Real                y,
     Real                z,
@@ -285,7 +282,7 @@ VIOAPI  void  grid_inverse_transform_point(
 
     int    sizes[MAX_DIMENSIONS];
     Real   steps[MAX_DIMENSIONS];
-    Volume volume = (Volume) transform->displacement_volume;
+    VIO_Volume volume = (VIO_Volume) transform->displacement_volume;
     get_volume_sizes( volume, sizes );
     get_volume_separations( volume, steps );
 
@@ -351,7 +348,7 @@ VIOAPI  void  grid_inverse_transform_point(
 ---------------------------------------------------------------------------- */
 
 static  void   evaluate_grid_volume(
-    Volume         volume,
+    VIO_Volume         volume,
     Real           x,
     Real           y,
     Real           z,
@@ -571,4 +568,3 @@ static  void   evaluate_grid_volume(
         }
     }
 }
-#endif /*HAVE_MINC1*/

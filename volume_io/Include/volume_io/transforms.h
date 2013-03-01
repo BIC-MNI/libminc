@@ -60,7 +60,7 @@ typedef struct VIO_General_transform
     VIO_Transform               *linear_transform;
     VIO_Transform               *inverse_linear_transform;
 
-    /* --- non-linear transform */
+    /* --- thin-plate spline transform */
 
     int                         n_points;
     int                         n_dimensions;
@@ -71,6 +71,7 @@ typedef struct VIO_General_transform
     /* --- grid transform */
 
     void                        *displacement_volume;
+    VIO_STR                     displacement_volume_file;
 
     /* --- user_defined */
 

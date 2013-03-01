@@ -1,5 +1,5 @@
-#ifndef  DEF_vol_io_prototypes
-#define  DEF_vol_io_prototypes
+#ifndef  __VOL_IO_PROTOTYPES_H__
+#define  __VOL_IO_PROTOTYPES_H__
 
 
 /*transforms*/
@@ -44,6 +44,18 @@ VIOAPI  void  create_thin_plate_transform(
     int                  n_points,
     float                **points,
     float                **displacements );
+
+VIOAPI  void  create_grid_transform(
+    VIO_General_transform    *transform,
+    VIO_Volume               displacement_volume,
+    VIO_STR                  displacement_volume_file
+                                   );
+
+VIOAPI  void  create_grid_transform_no_copy(
+    VIO_General_transform    *transform,
+    VIO_Volume               displacement_volume,
+    VIO_STR                  displacement_volume_file
+                                           );
 
 VIOAPI  void  create_user_transform(
     VIO_General_transform         *transform,
@@ -1012,18 +1024,6 @@ VIOAPI  VIO_STR  get_clock_time( void );
 VIOAPI  void  sleep_program( VIO_Real seconds );
 
 VIOAPI  VIO_STR  get_date( void );
-
-
-/*#ifdef HAVE_MINC1*/
-
-/*transformations which depend on MINC1 API*/
-VIOAPI  void  create_grid_transform(
-    VIO_General_transform    *transform,
-    VIO_Volume               displacement_volume );
-
-VIOAPI  void  create_grid_transform_no_copy(
-    VIO_General_transform    *transform,
-    VIO_Volume               displacement_volume );
 
 /*The rest of transform functions*/
 
@@ -2089,6 +2089,4 @@ VIOAPI  void  grid_inverse_transform_point(
     VIO_Real                *y_transformed,
     VIO_Real                *z_transformed );
 
-/*/#endif // HAVE_MINC1*/
-
-#endif
+#endif /*__VOL_IO_PROTOTYPES_H__*/

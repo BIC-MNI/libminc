@@ -28,7 +28,7 @@
 ---------------------------------------------------------------------------- */
 
 static  void  alloc_linear_transform(
-    General_transform   *transform )
+    VIO_General_transform   *transform )
 {
     transform->type = LINEAR;
     transform->inverse_flag = FALSE;
@@ -53,7 +53,7 @@ static  void  alloc_linear_transform(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  create_linear_transform(
-    General_transform   *transform,
+    VIO_General_transform   *transform,
     Transform           *linear_transform )
 {
     alloc_linear_transform( transform );
@@ -78,7 +78,7 @@ VIOAPI  void  create_linear_transform(
               n_points
 @OUTPUT     : 
 @RETURNS    : 
-@DESCRIPTION: Initializes a General_transform structure for thin plate
+@DESCRIPTION: Initializes a VIO_General_transform structure for thin plate
               transforms.
 @METHOD     : 
 @GLOBALS    : 
@@ -88,7 +88,7 @@ VIOAPI  void  create_linear_transform(
 ---------------------------------------------------------------------------- */
 
 static  void  initialize_thin_plate_transform(
-    General_transform    *transform,
+    VIO_General_transform    *transform,
     int                  n_dimensions,
     int                  n_points )
 {
@@ -120,7 +120,7 @@ static  void  initialize_thin_plate_transform(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  create_thin_plate_transform_real(
-    General_transform    *transform,
+    VIO_General_transform    *transform,
     int                  n_dimensions,
     int                  n_points,
     Real                 **points,
@@ -160,7 +160,7 @@ VIOAPI  void  create_thin_plate_transform_real(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  create_thin_plate_transform(
-    General_transform    *transform,
+    VIO_General_transform    *transform,
     int                  n_dimensions,
     int                  n_points,
     float                **points,
@@ -196,9 +196,11 @@ VIOAPI  void  create_thin_plate_transform(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 static  void  internal_create_grid_transform(
-    General_transform    *transform,
+    VIO_General_transform    *transform,
     VIO_Volume           displacement_volume,
-    BOOLEAN              copy_flag )
+    BOOLEAN              copy_flag,
+    VIO_STR              displacement_volume_file
+                                            )
 {
     int       dim, sizes[MAX_DIMENSIONS], vector_dim;
     STRING    *dim_names;
@@ -207,80 +209,87 @@ static  void  internal_create_grid_transform(
 
     volume_ok = TRUE;
     /*TODO: initialize strings?*/
-//#ifdef HAVE_MINC1
-    if( get_volume_n_dimensions(displacement_volume) != 4 )
+    
+    if( displacement_volume )
     {
-        volume_ok = FALSE;
-        print_error( "Grid transform must be 4 dimensional.\n" );
-    }
-    else
-    {
-        dim_names = get_volume_dimension_names( displacement_volume );
-        get_volume_sizes( displacement_volume, sizes );
+      if( get_volume_n_dimensions(displacement_volume) != 4 )
+      {
+          volume_ok = FALSE;
+          print_error( "Grid transform must be 4 dimensional.\n" );
+      }
+      else
+      {
+          dim_names = get_volume_dimension_names( displacement_volume );
+          get_volume_sizes( displacement_volume, sizes );
 
-        dim_found[X] = FALSE;
-        dim_found[Y] = FALSE;
-        dim_found[Z] = FALSE;
-        vector_dim = -1;
+          dim_found[X] = FALSE;
+          dim_found[Y] = FALSE;
+          dim_found[Z] = FALSE;
+          vector_dim = -1;
 
-        for_less( dim, 0, 4 )
-        {
-            if( equal_strings( dim_names[dim], MIxspace ) )
-                dim_found[X] = TRUE;
-            else if( equal_strings( dim_names[dim], MIyspace ) )
-                dim_found[Y] = TRUE;
-            else if( equal_strings( dim_names[dim], MIzspace ) )
-                dim_found[Z] = TRUE;
-            else
-            {
-                if( sizes[dim] != 3 )
-                {
-                    print_error(
-                            "displacement_volume must have 3 components on " );
-                    print_error( "the non-spatial axis.\n" );
-                    volume_ok = FALSE;
-                }
+          for_less( dim, 0, 4 )
+          {
+              if( equal_strings( dim_names[dim], MIxspace ) )
+                  dim_found[X] = TRUE;
+              else if( equal_strings( dim_names[dim], MIyspace ) )
+                  dim_found[Y] = TRUE;
+              else if( equal_strings( dim_names[dim], MIzspace ) )
+                  dim_found[Z] = TRUE;
+              else
+              {
+                  if( sizes[dim] != 3 )
+                  {
+                      print_error(
+                              "displacement_volume must have 3 components on " );
+                      print_error( "the non-spatial axis.\n" );
+                      volume_ok = FALSE;
+                  }
 
-                vector_dim = dim;
-            }
-        }
+                  vector_dim = dim;
+              }
+          }
 
-        if( !dim_found[X] || !dim_found[Y] || !dim_found[Z] )
-        {
-            print_error(
-              "Must have an x, y, and z dimension in displacement volume.\n" );
-            volume_ok = FALSE;
-        }
+          if( !dim_found[X] || !dim_found[Y] || !dim_found[Z] )
+          {
+              print_error(
+                "Must have an x, y, and z dimension in displacement volume.\n" );
+              volume_ok = FALSE;
+          }
 
-        delete_dimension_names( displacement_volume, dim_names );
-    }
+          delete_dimension_names( displacement_volume, dim_names );
+      }
 
-    if( !volume_ok )
-    {
-        create_linear_transform( transform, NULL );  /*--- make identity */
-        return;
+      if( !volume_ok )
+      {
+          create_linear_transform( transform, NULL );  /*--- make identity */
+          return;
+      }
+      
+      if( copy_flag )
+          copy = copy_volume( displacement_volume );
+      else
+          copy = displacement_volume;
+
+      transform->type = GRID_TRANSFORM;
+      transform->inverse_flag = FALSE;
+
+
+      /* --- force 4th dimension to be vector dimension */
+
+      replace_string( &copy->dimension_names[vector_dim],
+                      create_string(MIvector_dimension) );
+
+      transform->displacement_volume = (void *) copy;
+    } else {
+      /*we are probably dealing with a case when only a placeholder is needed*/
+      transform->displacement_volume = NULL;
     }
     
-    if( copy_flag )
-        copy = copy_volume( displacement_volume );
+    /*Will be initialized on save*/
+    if(displacement_volume_file)
+      transform->displacement_volume_file = create_string( displacement_volume_file );
     else
-        copy = displacement_volume;
-#if 0  /*HAVE_MINC1*/
-    printf("internal_create_grid_transform:displacement_volume=%p\n",displacement_volume);
-    create_linear_transform( transform, NULL );  /*--- make identity */
-    return;
-#endif /*HAVE_MINC1*/
-
-    transform->type = GRID_TRANSFORM;
-    transform->inverse_flag = FALSE;
-
-
-    /* --- force 4th dimension to be vector dimension */
-
-    replace_string( &copy->dimension_names[vector_dim],
-                    create_string(MIvector_dimension) );
-
-    transform->displacement_volume = (void *) copy;
+      transform->displacement_volume_file = NULL; 
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -288,8 +297,8 @@ static  void  internal_create_grid_transform(
 @INPUT      : displacement_volume
 @OUTPUT     : transform
 @RETURNS    : 
-@DESCRIPTION: Creates a grid transform General_transform.  Makes a copy of
-              the displacement volume and puts it in the General_transform.
+@DESCRIPTION: Creates a grid transform VIO_General_transform.  Makes a copy of
+              the displacement volume and puts it in the VIO_General_transform.
 @METHOD     : 
 @GLOBALS    : 
 @CALLS      : 
@@ -298,10 +307,11 @@ static  void  internal_create_grid_transform(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  create_grid_transform(
-    General_transform    *transform,
-    Volume               displacement_volume )
+    VIO_General_transform    *transform,
+    Volume                   displacement_volume,
+    VIO_STR                  displacement_volume_file)
 {
-    internal_create_grid_transform( transform, displacement_volume, TRUE );
+    internal_create_grid_transform( transform, displacement_volume, TRUE, displacement_volume_file );
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -309,8 +319,8 @@ VIOAPI  void  create_grid_transform(
 @INPUT      : displacement_volume
 @OUTPUT     : transform
 @RETURNS    : 
-@DESCRIPTION: Creates a grid transform General_transform.  Places the
-              displacement volume into the General_transform; therefore the
+@DESCRIPTION: Creates a grid transform VIO_General_transform.  Places the
+              displacement volume into the VIO_General_transform; therefore the
               calling program should not delete the volume.
 @METHOD     : 
 @GLOBALS    : 
@@ -320,10 +330,11 @@ VIOAPI  void  create_grid_transform(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  create_grid_transform_no_copy(
-    General_transform    *transform,
-    Volume               displacement_volume )
+    VIO_General_transform    *transform,
+    Volume               displacement_volume,
+    VIO_STR                  displacement_volume_file )
 {
-    internal_create_grid_transform( transform, displacement_volume, FALSE );
+    internal_create_grid_transform( transform, displacement_volume, FALSE,displacement_volume_file );
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -343,7 +354,7 @@ VIOAPI  void  create_grid_transform_no_copy(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  create_user_transform(
-    General_transform         *transform,
+    VIO_General_transform         *transform,
     void                      *user_data,
     size_t                    size_user_data,
     User_transform_function   transform_function,
@@ -376,7 +387,7 @@ VIOAPI  void  create_user_transform(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  Transform_types  get_transform_type(
-    General_transform   *transform )
+    VIO_General_transform   *transform )
 {
     return( transform->type );
 }
@@ -396,7 +407,7 @@ VIOAPI  Transform_types  get_transform_type(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  int  get_n_concated_transforms(
-    General_transform   *transform )
+    VIO_General_transform   *transform )
 {
     if( transform->type == CONCATENATED_TRANSFORM )
         return( transform->n_transforms );
@@ -418,14 +429,14 @@ VIOAPI  int  get_n_concated_transforms(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  General_transform  *get_nth_general_transform(
-    General_transform   *transform,
+VIOAPI  VIO_General_transform  *get_nth_general_transform(
+    VIO_General_transform   *transform,
     int                 n )
 {
     if( n < 0 || n >= get_n_concated_transforms( transform ) )
     {
         handle_internal_error( "get_nth_general_transform" );
-        return( (General_transform *) NULL );
+        return( (VIO_General_transform *) NULL );
     }
     else if( transform->type == CONCATENATED_TRANSFORM )
         return( &transform->transforms[n] );
@@ -448,7 +459,7 @@ VIOAPI  General_transform  *get_nth_general_transform(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  Transform  *get_linear_transform_ptr(
-    General_transform   *transform )
+    VIO_General_transform   *transform )
 {
     if( transform->type == LINEAR )
     {
@@ -479,7 +490,7 @@ VIOAPI  Transform  *get_linear_transform_ptr(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  Transform  *get_inverse_linear_transform_ptr(
-    General_transform   *transform )
+    VIO_General_transform   *transform )
 {
     if( transform->type == LINEAR )
     {
@@ -516,7 +527,7 @@ VIOAPI  Transform  *get_inverse_linear_transform_ptr(
 ---------------------------------------------------------------------------- */
 
 static  void  transform_or_invert_point(
-    General_transform   *transform,
+    VIO_General_transform   *transform,
     BOOLEAN             inverse_flag,
     Real                x,
     Real                y,
@@ -563,23 +574,23 @@ static  void  transform_or_invert_point(
         }
         break;
     case GRID_TRANSFORM:
+        if( !transform->displacement_volume ) {
+          handle_internal_error( "Not initialized grid transform, make sure you have MINC1" );
+          break;
+        }
         if( inverse_flag )
         {
-#ifdef HAVE_MINC1
             grid_inverse_transform_point( transform,
                                           x, y, z,
                                           x_transformed, y_transformed,
                                           z_transformed );
-#endif /*HAVE_MINC1*/
         }
         else
         {
-#ifdef HAVE_MINC1
             grid_transform_point( transform,
                                   x, y, z,
                                   x_transformed, y_transformed,
                                   z_transformed );
-#endif /*HAVE_MINC1*/
         }
         break;
     case USER_TRANSFORM:
@@ -647,7 +658,7 @@ static  void  transform_or_invert_point(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  general_transform_point(
-    General_transform   *transform,
+    VIO_General_transform   *transform,
     Real                x,
     Real                y,
     Real                z,
@@ -679,7 +690,7 @@ VIOAPI  void  general_transform_point(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  general_inverse_transform_point(
-    General_transform   *transform,
+    VIO_General_transform   *transform,
     Real                x,
     Real                y,
     Real                z,
@@ -708,9 +719,9 @@ VIOAPI  void  general_inverse_transform_point(
 ---------------------------------------------------------------------------- */
 
 static  void  copy_and_invert_transform(
-    General_transform   *transform,
+    VIO_General_transform   *transform,
     BOOLEAN             invert_it,
-    General_transform   *copy )
+    VIO_General_transform   *copy )
 {
     unsigned char  *byte_ptr;
     Transform      *swap;
@@ -757,12 +768,16 @@ static  void  copy_and_invert_transform(
 
     case GRID_TRANSFORM:
 #ifdef HAVE_MINC1
-        copy->displacement_volume = (void *) copy_volume(
-                                    (Volume) transform->displacement_volume );
+        if( transform->displacement_volume )
+          copy->displacement_volume = (void *) copy_volume(
+                                      (Volume) transform->displacement_volume );
+#endif /*HAVE_MINC1*/
+        if( transform->displacement_volume_file )
+          copy->displacement_volume_file = 
+            create_string( transform->displacement_volume_file );
 
         if( invert_it )
             copy->inverse_flag = !copy->inverse_flag;
-#endif /*HAVE_MINC1*/
 
         break;
 
@@ -806,8 +821,8 @@ static  void  copy_and_invert_transform(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  copy_general_transform(
-    General_transform   *transform,
-    General_transform   *copy )
+    VIO_General_transform   *transform,
+    VIO_General_transform   *copy )
 {
     copy_and_invert_transform( transform, FALSE, copy );
 }
@@ -826,7 +841,7 @@ VIOAPI  void  copy_general_transform(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  invert_general_transform(
-    General_transform   *transform )
+    VIO_General_transform   *transform )
 {
     transform->inverse_flag = !transform->inverse_flag;
 }
@@ -845,8 +860,8 @@ VIOAPI  void  invert_general_transform(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  create_inverse_general_transform(
-    General_transform   *transform,
-    General_transform   *inverse )
+    VIO_General_transform   *transform,
+    VIO_General_transform   *inverse )
 {
     copy_and_invert_transform( transform, TRUE, inverse );
 }
@@ -868,9 +883,9 @@ VIOAPI  void  create_inverse_general_transform(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  concat_general_transforms(
-    General_transform   *first,
-    General_transform   *second,
-    General_transform   *result )
+    VIO_General_transform   *first,
+    VIO_General_transform   *second,
+    VIO_General_transform   *result )
 {
     int                  first_start, first_end, first_step;
     int                  second_start, second_end, second_step;
@@ -879,8 +894,8 @@ VIOAPI  void  concat_general_transforms(
     BOOLEAN              first_inverted_concat, second_inverted_concat;
     Transform            *first_transform, *first_inverse;
     Transform            *second_transform, *second_inverse;
-    General_transform    result_tmp, *result_ptr;
-    General_transform    *transform;
+    VIO_General_transform    result_tmp, *result_ptr;
+    VIO_General_transform    *transform;
 
     if( result == first || result == second )
         result_ptr = &result_tmp;
@@ -1022,7 +1037,7 @@ VIOAPI  void  concat_general_transforms(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  delete_general_transform(
-    General_transform   *transform )
+    VIO_General_transform   *transform )
 {
     int   trans;
 
@@ -1043,9 +1058,14 @@ VIOAPI  void  delete_general_transform(
 
     case GRID_TRANSFORM:
 #ifdef HAVE_MINC1
-        delete_volume( (VIO_Volume) transform->displacement_volume );
+        if( transform->displacement_volume ) 
+          delete_volume( (VIO_Volume) transform->displacement_volume );
 #endif /*HAVE_MINC1*/
-        /*TODO: free string*/
+        if( transform->displacement_volume_file )
+          delete_string(transform->displacement_volume_file);
+        
+        transform->displacement_volume_file=NULL;
+        
         break;
     case USER_TRANSFORM:
         if( transform->size_user_data )

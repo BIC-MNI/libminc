@@ -71,7 +71,7 @@ static  void  output_one_transform(
     STRING              filename,
     int                 *volume_count,
     BOOLEAN             invert,
-    General_transform   *transform )
+    VIO_General_transform   *transform )
 {
     int        i, c, trans;
     Transform  *lin_transform;
@@ -259,7 +259,7 @@ VIOAPI  Status  output_transform(
     STRING              filename,
     int                 *volume_count_ptr,
     STRING              comments,
-    General_transform   *transform )
+    VIO_General_transform   *transform )
 {
     int    volume_count;
 
@@ -308,7 +308,7 @@ VIOAPI  Status  output_transform(
 static Status input_one_transform(
     FILE                *file,
     STRING              filename,
-    General_transform   *transform )
+    VIO_General_transform   *transform )
 {
     Status        status;
     int           i, j, n_points, n_dimensions;
@@ -319,7 +319,7 @@ static Status input_one_transform(
     Transform     linear_transform;
     Transform_types   type;
     BOOLEAN       inverse_flag;
-    General_transform inverse;
+    VIO_General_transform inverse;
     minc_input_options  options;
 
     inverse_flag = FALSE;
@@ -574,12 +574,11 @@ static Status input_one_transform(
         /*TODO: read volume with minc2 here?*/
         volume=NULL;
 #endif /*HAVE_MINC1*/
-
+        create_grid_transform_no_copy( transform, volume, volume_filename );
         delete_string( volume_filename );
 
         /*--- create the transform */
 
-        create_grid_transform_no_copy( transform, volume );
 
         break;
     }
@@ -611,12 +610,12 @@ static Status input_one_transform(
 VIOAPI  Status  input_transform(
     FILE                *file,
     STRING              filename,
-    General_transform   *transform )
+    VIO_General_transform   *transform )
 {
     Status              status;
     int                 n_transforms;
     STRING              line;
-    General_transform   next, concated;
+    VIO_General_transform   next, concated;
 
     /* parameter checking */
 
@@ -691,7 +690,7 @@ VIOAPI  Status  input_transform(
 VIOAPI  Status  output_transform_file(
     STRING              filename,
     STRING              comments,
-    General_transform   *transform )
+    VIO_General_transform   *transform )
 {
     Status  status;
     FILE    *file;
@@ -728,7 +727,7 @@ VIOAPI  Status  output_transform_file(
 
 VIOAPI  Status  input_transform_file(
     STRING              filename,
-    General_transform   *transform )
+    VIO_General_transform   *transform )
 {
     Status  status;
     FILE    *file;
