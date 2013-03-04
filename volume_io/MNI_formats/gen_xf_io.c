@@ -169,12 +169,16 @@ static  void  output_one_transform(
         }
 
         /*--- write out the volume filename to the transform file */
-
-        volume_filename = alloc_string( string_length(prefix_filename) +
+        if( ! transform->displacement_volume_file )
+        {
+          volume_filename = alloc_string( string_length(prefix_filename) +
                                         100 );
-        (void) sprintf( volume_filename, "%s_grid_%d.mnc", prefix_filename,
+          sprintf( volume_filename, "%s_grid_%d.mnc", prefix_filename,
                         *volume_count );
+          
+          transform->displacement_volume_file = volume_filename;
 
+        }
         /* Increment the volume counter as a side-effect to ensure that grid
         * files have different names.
         */
@@ -182,21 +186,22 @@ static  void  output_one_transform(
 
         /*--- decide where to write the volume file */
 
-        base_filename = remove_directories_from_filename( volume_filename );
+        base_filename = remove_directories_from_filename( transform->displacement_volume_file );
 
-        (void) fprintf( file, "%s = %s;\n", DISPLACEMENT_VOLUME, base_filename);
+        fprintf( file, "%s = %s;\n", DISPLACEMENT_VOLUME, base_filename);
 
         /*--- write the volume file */
 
 #ifdef HAVE_MINC1
-        (void) output_volume( volume_filename, 
+        if( transform->displacement_volume )
+          output_volume( transform->displacement_volume_file, 
                               MI_ORIGINAL_TYPE, FALSE, 0.0, 0.0,
                               (VIO_Volume) transform->displacement_volume,
                               NULL, NULL );
 #endif //HAVE_MINC1
 
         delete_string( prefix_filename );
-        delete_string( volume_filename );
+        /*delete_string( volume_filename );*/
         delete_string( base_filename );
 
         break;
@@ -254,7 +259,7 @@ static  void  output_one_transform(
 @MODIFIED   : Feb. 21, 1995   D. MacDonald
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  output_transform(
+VIOAPI  VIO_Status  output_transform(
     FILE                *file,
     STRING              filename,
     int                 *volume_count_ptr,
@@ -687,7 +692,7 @@ VIOAPI  Status  input_transform(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  output_transform_file(
+VIOAPI  VIO_Status  output_transform_file(
     STRING              filename,
     STRING              comments,
     VIO_General_transform   *transform )
