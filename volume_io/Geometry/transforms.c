@@ -599,7 +599,7 @@ VIOAPI  void   concat_transforms(
 @OUTPUT     : x_trans
               y_trans
               z_trans
-@RETURNS    : 
+@RETURNS    : Status
 @DESCRIPTION: Transforms the point (x,y,z,w) by the homogenous transform
               matrix, resulting in (x_trans,y_trans,z_trans).
 @METHOD     : 
@@ -609,7 +609,7 @@ VIOAPI  void   concat_transforms(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-static  void  homogenous_transform_point(
+static  VIO_Status  homogenous_transform_point(
     Transform  *transform,
     Real       x,
     Real       y,
@@ -647,6 +647,7 @@ static  void  homogenous_transform_point(
         *y_trans /= w_trans;
         *z_trans /= w_trans;
     }
+    return OK;
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -658,7 +659,7 @@ static  void  homogenous_transform_point(
 @OUTPUT     : x_trans
               y_trans
               z_trans
-@RETURNS    : 
+@RETURNS    : Status
 @DESCRIPTION: Transforms the point (x,y,z) by the transform matrix, resulting
               in (x_trans,y_trans,z_trans).
 @METHOD     : 
@@ -668,7 +669,7 @@ static  void  homogenous_transform_point(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  void  transform_point(
+VIOAPI  VIO_Status  transform_point(
     Transform  *transform,
     Real       x,
     Real       y,
@@ -677,7 +678,7 @@ VIOAPI  void  transform_point(
     Real       *y_trans,
     Real       *z_trans )
 {
-    homogenous_transform_point( transform, x, y, z, 1.0,
+    return homogenous_transform_point( transform, x, y, z, 1.0,
                                 x_trans, y_trans, z_trans );
 }
 
@@ -699,7 +700,7 @@ VIOAPI  void  transform_point(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  void  transform_vector(
+VIOAPI  VIO_Status  transform_vector(
     Transform  *transform,
     Real       x,
     Real       y,
@@ -708,6 +709,6 @@ VIOAPI  void  transform_vector(
     Real       *y_trans,
     Real       *z_trans )
 {
-    homogenous_transform_point( transform, x, y, z, 0.0,
+    return homogenous_transform_point( transform, x, y, z, 0.0,
                                 x_trans, y_trans, z_trans );
 }

@@ -43,48 +43,66 @@ int main( int ac, char* av[] )
 
 
     if ( ac != 3 && ac != 4 ) {
-	fprintf( stderr, "usage: %s N transform.xfm [tolerance]\n", av[0] );
-	return 1;
+      fprintf( stderr, "usage: %s N transform.xfm [tolerance]\n", av[0] );
+      return 1;
     }
 
     N = atoi( av[1] );
     if ( input_transform_file( av[2], &xfm ) != OK ) {
-	fprintf( stderr, "Failed to load transform '%s'\n", av[2] );
-	return 2;
+      fprintf( stderr, "Failed to load transform '%s'\n", av[2] );
+      return 2;
     }
 
     if ( ac == 4 ) {
-	tolerance = atof( av[3] );
-	printf( "Setting tolerance to %f.\n", tolerance );
+      tolerance = atof( av[3] );
+      printf( "Setting tolerance to %f.\n", tolerance );
     }
     /*Set the same seed number*/
     srand48(1);
     while (N-- > 0) {
-	Real x = 500.0 * ( drand48() - 0.5 );
-	Real y = 500.0 * ( drand48() - 0.5 );
-	Real z = 500.0 * ( drand48() - 0.5 );
+      Real x = 500.0 * ( drand48() - 0.5 );
+      Real y = 500.0 * ( drand48() - 0.5 );
+      Real z = 500.0 * ( drand48() - 0.5 );
 
-	Real tx,ty,tz;
-	Real a,b,c;
+      Real tx,ty,tz;
+      Real a,b,c;
 
-	general_transform_point( &xfm,  x,y,z,  &tx,&ty,&tz );
+      if(general_transform_point( &xfm,  x,y,z,  &tx,&ty,&tz )!=OK)
+      {
+        fprintf( stderr, "Failed to transform point %f,%f,%f \n", x,y,z );
+        return 3;
+      }
 
-	/* Check that general_inverse_transform_point() and
-	   invert_general_transform() behave sensibly.
-	*/
-	general_inverse_transform_point( &xfm,  tx,ty,tz,  &a,&b,&c );
-	assert_equal_point( x,y,z, a,b,c,
-			    "general_inverse_transform_point()" );
+      /* Check that general_inverse_transform_point() and
+        invert_general_transform() behave sensibly.
+      */
+      if(general_inverse_transform_point( &xfm,  tx,ty,tz,  &a,&b,&c )!=OK)
+      {
+        fprintf( stderr, "Failed to invert transform point %f,%f,%f \n", tx,ty,tz );
+        return 3;
+      }
+      assert_equal_point( x,y,z, a,b,c,
+              "general_inverse_transform_point()" );
 
-	invert_general_transform( &xfm );
+      invert_general_transform( &xfm );
 
-	general_transform_point( &xfm, tx,ty,tz,  &a,&b,&c );
-	assert_equal_point( x,y,z, a,b,c,
-			    "general_transform_point() / inverted xfm" );
+      if(general_transform_point( &xfm, tx,ty,tz,  &a,&b,&c )!=OK)
+      {
+        fprintf( stderr, "Failed to transform point %f,%f,%f \n", x,y,z );
+        return 3;
+      }
+        
+      assert_equal_point( x,y,z, a,b,c,
+              "general_transform_point() / inverted xfm" );
 
-	general_inverse_transform_point( &xfm,  x,y,z,  &a,&b,&c );
-	assert_equal_point( tx,ty,tz, a,b,c,
-			    "general_inverse_transform_point() / inverted xfm" );
+      if(general_inverse_transform_point( &xfm,  x,y,z,  &a,&b,&c )!=OK)
+      {
+        fprintf( stderr, "Failed to invert transform point %f,%f,%f \n", x,y,z );
+        return 3;
+      }
+        
+      assert_equal_point( tx,ty,tz, a,b,c,
+              "general_inverse_transform_point() / inverted xfm" );
     }
 
     return 0;

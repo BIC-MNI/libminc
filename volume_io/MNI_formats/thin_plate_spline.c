@@ -194,7 +194,7 @@ VIOAPI  void  evaluate_thin_plate_spline(
                     reorganized to call evaluate_thin_plane_spline()
 ---------------------------------------------------------------------------- */
 
-VIOAPI  void  thin_plate_spline_transform(
+VIOAPI  VIO_Status  thin_plate_spline_transform(
     int     n_dims,
     int     n_points,
     Real    **points,
@@ -223,6 +223,8 @@ VIOAPI  void  thin_plate_spline_transform(
 
     if( n_dims >= 3 )
         *z_transformed = output_point[2];
+    
+    return OK;
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -252,7 +254,7 @@ VIOAPI  void  thin_plate_spline_transform(
                     reorganized to call evaluate_thin_plane_spline()
 ---------------------------------------------------------------------------- */
 
-VIOAPI  void  thin_plate_spline_inverse_transform(
+VIOAPI  VIO_Status  thin_plate_spline_inverse_transform(
     int     n_dims,
     int     n_points,
     Real    **points,
@@ -295,13 +297,16 @@ VIOAPI  void  thin_plate_spline_inverse_transform(
         *x_transformed = solution[0];
         *y_transformed = solution[1];
         *z_transformed = solution[2];
+        return OK;
     }
     else
     {
         *x_transformed = x_in[0];
         *y_transformed = x_in[1];
         *z_transformed = x_in[2];
+        return ERROR;
     }
+    return ERROR;
 }
 
 /* ----------------------------- MNI Header -----------------------------------

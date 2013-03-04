@@ -55,7 +55,7 @@ static void   evaluate_grid_volume(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  void  grid_transform_point(
+VIOAPI  VIO_Status  grid_transform_point(
     VIO_General_transform   *transform,
     Real                x,
     Real                y,
@@ -71,6 +71,9 @@ VIOAPI  void  grid_transform_point(
            so evaluate the volume at the given position and add the
            resulting offset to the given position */
 
+    if(!transform->displacement_volume) 
+      return ERROR;
+    
     volume = (VIO_Volume) transform->displacement_volume;
 
     evaluate_grid_volume( volume, x, y, z, DEGREES_CONTINUITY, displacements,
@@ -79,6 +82,8 @@ VIOAPI  void  grid_transform_point(
     *x_transformed = x + displacements[X];
     *y_transformed = y + displacements[Y];
     *z_transformed = z + displacements[Z];
+    
+    return OK;
 }
 
 #ifdef USE_NEWTONS_METHOD
@@ -146,7 +151,7 @@ private  void  forward_function(
 @OUTPUT     : x_transformed
               y_transformed
               z_transformed
-@RETURNS    : 
+@RETURNS    : Status
 @DESCRIPTION: Applies the inverse grid transform to the point.  This is done
               by using newton-rhapson steps to find the point which maps to
               the parameters (x,y,z).
@@ -168,7 +173,7 @@ it matches the code he uses in minctracc to generate the grid transforms.
 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  void  grid_inverse_transform_point(
+VIOAPI  VIO_Status  grid_inverse_transform_point(
     VIO_General_transform   *transform,
     Real                x,
     Real                y,
@@ -204,13 +209,16 @@ VIOAPI  void  grid_inverse_transform_point(
         *x_transformed = solution[X];
         *y_transformed = solution[Y];
         *z_transformed = solution[Z];
+        return OK;
     }
     else  /* --- if no solution found, not sure what is reasonable to return */
     {
         *x_transformed = x;
         *y_transformed = y;
         *z_transformed = z;
+        return ERROR;
     }
+    return ERROR;
 }
 #endif
 
@@ -235,7 +243,7 @@ VIOAPI  void  grid_inverse_transform_point(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  void  grid_inverse_transform_point(
+VIOAPI  VIO_Status  grid_inverse_transform_point(
     VIO_General_transform   *transform,
     Real                x,
     Real                y,
@@ -251,13 +259,16 @@ VIOAPI  void  grid_inverse_transform_point(
     Real   gx, gy, gz;
     Real   error_x, error_y, error_z, error, smallest_e;
     Real   ftol;
+    VIO_Status status=ERROR;
 
-    grid_transform_point( transform, x, y, z, &tx, &ty, &tz );
+    if((status=grid_transform_point( transform, x, y, z, &tx, &ty, &tz ))!=OK)
+      return status;
     tx = x - (tx - x);
     ty = y - (ty - y);
     tz = z - (tz - z);
 
-    grid_transform_point( transform, tx, ty, tz, &gx, &gy, &gz );
+    if((status=grid_transform_point( transform, tx, ty, tz, &gx, &gy, &gz ))!=OK)
+    return status;
 
     error_x = x - gx;
     error_y = y - gy;
@@ -310,7 +321,8 @@ VIOAPI  void  grid_inverse_transform_point(
         ty += 0.95 * error_y;
         tz += 0.95 * error_z;
 
-        grid_transform_point( transform, tx, ty, tz, &gx, &gy, &gz );
+        if((status=grid_transform_point( transform, tx, ty, tz, &gx, &gy, &gz ))!=OK)
+          return status;
 
         error_x = x - gx;
         error_y = y - gy;
@@ -329,6 +341,7 @@ VIOAPI  void  grid_inverse_transform_point(
     *x_transformed = best_x;
     *y_transformed = best_y;
     *z_transformed = best_z;
+    return OK;
 }
 
 /* ----------------------------- MNI Header -----------------------------------

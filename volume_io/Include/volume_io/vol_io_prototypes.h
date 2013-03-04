@@ -1,6 +1,7 @@
 #ifndef  __VOL_IO_PROTOTYPES_H__
 #define  __VOL_IO_PROTOTYPES_H__
 
+#include "basic.h"
 
 /*transforms*/
 
@@ -80,7 +81,7 @@ VIOAPI  VIO_Transform  *get_linear_transform_ptr(
 VIOAPI  VIO_Transform  *get_inverse_linear_transform_ptr(
     VIO_General_transform   *transform );
 
-VIOAPI  void  general_transform_point(
+VIOAPI  VIO_Status  general_transform_point(
     VIO_General_transform   *transform,
     VIO_Real                x,
     VIO_Real                y,
@@ -89,7 +90,7 @@ VIOAPI  void  general_transform_point(
     VIO_Real                *y_transformed,
     VIO_Real                *z_transformed );
 
-VIOAPI  void  general_inverse_transform_point(
+VIOAPI  VIO_Status  general_inverse_transform_point(
     VIO_General_transform   *transform,
     VIO_Real                x,
     VIO_Real                y,
@@ -258,7 +259,7 @@ VIOAPI  void  evaluate_thin_plate_spline(
     VIO_Real    values[],
     VIO_Real    **derivs );
 
-VIOAPI  void  thin_plate_spline_transform(
+VIOAPI  VIO_Status  thin_plate_spline_transform(
     int     n_dims,
     int     n_points,
     VIO_Real    **points,
@@ -270,7 +271,7 @@ VIOAPI  void  thin_plate_spline_transform(
     VIO_Real    *y_transformed,
     VIO_Real    *z_transformed );
 
-VIOAPI  void  thin_plate_spline_inverse_transform(
+VIOAPI  VIO_Status  thin_plate_spline_inverse_transform(
     int     n_dims,
     int     n_points,
     VIO_Real    **points,
@@ -511,7 +512,7 @@ VIOAPI  void   concat_transforms(
     VIO_Transform   *t1,
     VIO_Transform   *t2 );
 
-VIOAPI  void  transform_point(
+VIOAPI  VIO_Status  transform_point(
     VIO_Transform  *transform,
     VIO_Real       x,
     VIO_Real       y,
@@ -520,7 +521,7 @@ VIOAPI  void  transform_point(
     VIO_Real       *y_trans,
     VIO_Real       *z_trans );
 
-VIOAPI  void  transform_vector(
+VIOAPI  VIO_Status  transform_vector(
     VIO_Transform  *transform,
     VIO_Real       x,
     VIO_Real       y,
@@ -2071,7 +2072,7 @@ VIOAPI  VIO_Volume   copy_volume_definition(
 VIOAPI  VIO_Volume  copy_volume(
     VIO_Volume   volume );
 
-VIOAPI  void  grid_transform_point(
+VIOAPI  VIO_Status  grid_transform_point(
     VIO_General_transform   *transform,
     VIO_Real                x,
     VIO_Real                y,
@@ -2080,7 +2081,7 @@ VIOAPI  void  grid_transform_point(
     VIO_Real                *y_transformed,
     VIO_Real                *z_transformed );
 
-VIOAPI  void  grid_inverse_transform_point(
+VIOAPI  VIO_Status  grid_inverse_transform_point(
     VIO_General_transform   *transform,
     VIO_Real                x,
     VIO_Real                y,

@@ -282,6 +282,8 @@ static  void  internal_create_grid_transform(
       transform->displacement_volume = (void *) copy;
     } else {
       /*we are probably dealing with a case when only a placeholder is needed*/
+      transform->type = GRID_TRANSFORM;
+      transform->inverse_flag = FALSE;
       transform->displacement_volume = NULL;
     }
     
@@ -526,7 +528,7 @@ VIOAPI  Transform  *get_inverse_linear_transform_ptr(
 @MODIFIED   : Feb. 27, 1995   D. MacDonald  - added grid transforms
 ---------------------------------------------------------------------------- */
 
-static  void  transform_or_invert_point(
+static  VIO_Status  transform_or_invert_point(
     VIO_General_transform   *transform,
     BOOLEAN             inverse_flag,
     Real                x,
@@ -537,16 +539,17 @@ static  void  transform_or_invert_point(
     Real                *z_transformed )
 {
     int      trans;
+    VIO_Status status=ERROR;
 
     switch( transform->type )
     {
     case LINEAR:
         if( inverse_flag )
-            transform_point( transform->inverse_linear_transform,
+            return transform_point( transform->inverse_linear_transform,
                              x, y, z,
                              x_transformed, y_transformed, z_transformed );
         else
-            transform_point( transform->linear_transform,
+            return transform_point( transform->linear_transform,
                              x, y, z,
                              x_transformed, y_transformed, z_transformed );
         break;
@@ -554,7 +557,7 @@ static  void  transform_or_invert_point(
     case THIN_PLATE_SPLINE:
         if( inverse_flag )
         {
-            thin_plate_spline_inverse_transform( transform->n_dimensions,
+            return thin_plate_spline_inverse_transform( transform->n_dimensions,
                                                  transform->n_points,
                                                  transform->points,
                                                  transform->displacements,
@@ -564,7 +567,7 @@ static  void  transform_or_invert_point(
         }
         else
         {
-            thin_plate_spline_transform( transform->n_dimensions,
+            return thin_plate_spline_transform( transform->n_dimensions,
                                          transform->n_points,
                                          transform->points,
                                          transform->displacements,
@@ -576,18 +579,19 @@ static  void  transform_or_invert_point(
     case GRID_TRANSFORM:
         if( !transform->displacement_volume ) {
           handle_internal_error( "Not initialized grid transform, make sure you have MINC1" );
+          return ERROR;
           break;
         }
         if( inverse_flag )
         {
-            grid_inverse_transform_point( transform,
+            return grid_inverse_transform_point( transform,
                                           x, y, z,
                                           x_transformed, y_transformed,
                                           z_transformed );
         }
         else
         {
-            grid_transform_point( transform,
+            return grid_transform_point( transform,
                                   x, y, z,
                                   x_transformed, y_transformed,
                                   z_transformed );
@@ -599,13 +603,16 @@ static  void  transform_or_invert_point(
             transform->user_inverse_transform_function(
                            transform->user_data, x, y, z,
                            x_transformed, y_transformed, z_transformed );
+            /*TODO: add error handling?*/
         }
         else
         {
             transform->user_transform_function(
                            transform->user_data, x, y, z,
                            x_transformed, y_transformed, z_transformed );
+            /*TODO: add error handling?*/
         }
+        return OK;
         break;
 
     case CONCATENATED_TRANSFORM:
@@ -617,26 +624,30 @@ static  void  transform_or_invert_point(
         {
             for( trans = transform->n_transforms-1;  trans >= 0;  --trans )
             {
-                general_inverse_transform_point( &transform->transforms[trans],
+                if( (status=general_inverse_transform_point( &transform->transforms[trans],
                              *x_transformed, *y_transformed, *z_transformed,
-                             x_transformed, y_transformed, z_transformed );
+                             x_transformed, y_transformed, z_transformed )) != OK)
+                  return status;
             }
         }
         else
         {
             for_less( trans, 0, transform->n_transforms )
             {
-                general_transform_point( &transform->transforms[trans],
+                if((status=general_transform_point( &transform->transforms[trans],
                              *x_transformed, *y_transformed, *z_transformed,
-                             x_transformed, y_transformed, z_transformed );
+                             x_transformed, y_transformed, z_transformed )) != OK)
+                  return status;
             }
         }
         break;
 
     default:
         handle_internal_error( "transform_or_invert_point" );
+        return ERROR;
         break;
     }
+    return status;
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -657,7 +668,7 @@ static  void  transform_or_invert_point(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  void  general_transform_point(
+VIOAPI  VIO_Status  general_transform_point(
     VIO_General_transform   *transform,
     Real                x,
     Real                y,
@@ -667,7 +678,7 @@ VIOAPI  void  general_transform_point(
     Real                *z_transformed )
 {
 
-    transform_or_invert_point( transform, transform->inverse_flag, x, y, z,
+    return transform_or_invert_point( transform, transform->inverse_flag, x, y, z,
                                x_transformed, y_transformed, z_transformed );
 }
 
@@ -689,7 +700,7 @@ VIOAPI  void  general_transform_point(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  void  general_inverse_transform_point(
+VIOAPI  VIO_Status  general_inverse_transform_point(
     VIO_General_transform   *transform,
     Real                x,
     Real                y,
@@ -699,7 +710,7 @@ VIOAPI  void  general_inverse_transform_point(
     Real                *z_transformed )
 {
 
-    transform_or_invert_point( transform, !transform->inverse_flag, x, y, z,
+    return transform_or_invert_point( transform, !transform->inverse_flag, x, y, z,
                                x_transformed, y_transformed, z_transformed );
 }
 
@@ -770,7 +781,7 @@ static  void  copy_and_invert_transform(
 #ifdef HAVE_MINC1
         if( transform->displacement_volume )
           copy->displacement_volume = (void *) copy_volume(
-                                      (Volume) transform->displacement_volume );
+                                      (VIO_Volume) transform->displacement_volume );
 #endif /*HAVE_MINC1*/
         if( transform->displacement_volume_file )
           copy->displacement_volume_file = 

@@ -191,7 +191,7 @@ static  void  output_one_transform(
 #ifdef HAVE_MINC1
         (void) output_volume( volume_filename, 
                               MI_ORIGINAL_TYPE, FALSE, 0.0, 0.0,
-                              (Volume) transform->displacement_volume,
+                              (VIO_Volume) transform->displacement_volume,
                               NULL, NULL );
 #endif //HAVE_MINC1
 
