@@ -1,6 +1,9 @@
 /* various defines */
 
+#ifndef MINC2
 #define MINC2 @MINC2@
+#endif
+
 #define MINC_PACKAGE_NAME "@PACKAGE_NAME@"
 #define MINC_PACKAGE_BUGREPORT "@PACKAGE_BUGREPORT@"
 #define MINC_PACKAGE_VERSION "@PACKAGE_VERSION@"
