@@ -62,7 +62,7 @@ namespace minc
   {
     close();
   }
-  
+
   void minc_1_base::close(void)
   {
     if(_icvid!=MI_ERROR)
@@ -73,8 +73,7 @@ namespace minc
     if(_mincid!=MI_ERROR) miclose(_mincid);
     _mincid=MI_ERROR;
   }
-  
-  
+
   std::string minc_1_base::history(void) const
   {
     nc_type datatype;
@@ -113,7 +112,45 @@ namespace minc
     if(ncvarinq(_mincid, no, name, NULL, NULL, NULL, NULL)!=MI_ERROR)
       return name;
   }
-  
+
+  std::vector<double> minc_1_base::var_value_double(int varid) const
+  {
+    nc_type var_type;
+    int vardims;
+    int dims[MAX_VAR_DIMS];
+    long start[MAX_VAR_DIMS];
+    long count[MAX_VAR_DIMS];
+    
+    if(ncvarinq(_mincid, varid, NULL, &var_type, &vardims, dims, NULL)!=MI_ERROR &&
+      var_type==NC_DOUBLE )
+    {
+      int _var_length=1;
+      for(int i=0;i<vardims;i++)
+      {
+        _var_length*=dims[i];
+        start[i]=0;
+        count[i]=dims[i];
+      }
+      std::vector<double> r(_var_length);
+      
+      if(ncvarget(_mincid, varid, start,count,&r[0])!=MI_ERROR)
+        return r;
+      else
+        return std::vector<double>(0);
+    } else {
+      return std::vector<double>(0);
+    }
+  }
+
+  std::vector<double> minc_1_base::var_value_double(const char *var_name) const
+  {
+    int varid=var_id(var_name);
+    if(varid!=MI_ERROR)
+      return var_value_double(varid);
+    else
+      return std::vector<double>(0);
+  }
+
   int minc_1_base::att_number(const char *var_name) const
   {
     int varid;

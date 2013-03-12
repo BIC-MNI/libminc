@@ -257,6 +257,12 @@ namespace minc
     //! get the variable name number no
     std::string var_name(int no) const;
     
+    //! get the variable contents, given it's id
+    std::vector<double> var_value_double(int varid) const;
+    
+    //! get the variable contents, given it's name
+    std::vector<double> var_value_double(const char *var_name) const;
+    
     //! get the number of attributes associated with variable
     int att_number(const char *var_name) const;
     
