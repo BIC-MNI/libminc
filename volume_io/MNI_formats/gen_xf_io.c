@@ -12,6 +12,10 @@
               express or implied warranty.
 ---------------------------------------------------------------------------- */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif /*HAVE_CONFIG_H*/
+
 #include  <internal_volume_io.h>
 
 /*--------------------- file format keywords ------------------------------ */
