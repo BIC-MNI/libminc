@@ -171,10 +171,16 @@ static  void  output_one_transform(
             if( i >= 0 && prefix_filename[i] == '.' )
                 prefix_filename[i] = END_OF_STRING;
         }
-
-        /*--- write out the volume filename to the transform file */
-        if( ! transform->displacement_volume_file )
+        
+        if( transform->displacement_volume_file )
         {
+          delete_string( transform->displacement_volume_file );
+          transform->displacement_volume_file = NULL;
+        }
+        
+        /*--- write out the volume filename to the transform file */
+/*        if( ! transform->displacement_volume_file )
+        {*/
           volume_filename = alloc_string( string_length(prefix_filename) +
                                         100 );
           sprintf( volume_filename, "%s_grid_%d.mnc", prefix_filename,
@@ -182,7 +188,7 @@ static  void  output_one_transform(
           
           transform->displacement_volume_file = volume_filename;
 
-        }
+/*        }*/
         /* Increment the volume counter as a side-effect to ensure that grid
         * files have different names.
         */
