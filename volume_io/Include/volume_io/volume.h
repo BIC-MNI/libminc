@@ -1,5 +1,5 @@
-#ifndef  DEF_VOLUME
-#define  DEF_VOLUME
+#ifndef  __VOLUME_H__
+#define  __VOLUME_H__
 
 /* ----------------------------------------------------------------------------
 @COPYRIGHT  :
@@ -479,4 +479,4 @@ typedef enum {
                TRIANGLE_FILTER,
                GAUSSIAN_FILTER } Filter_types;
 
-#endif
+#endif /* __VOLUME_H__ */

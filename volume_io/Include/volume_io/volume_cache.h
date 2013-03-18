@@ -1,6 +1,8 @@
 #ifndef  DEF_VOLUME_CACHE
 #define  DEF_VOLUME_CACHE
 
+#include "volume.h"
+
 /* ----------------------------------------------------------------------------
 @COPYRIGHT  :
               Copyright 1993,1994,1995 David MacDonald,
