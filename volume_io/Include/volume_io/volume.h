@@ -45,8 +45,6 @@ typedef  struct
     VIO_BOOL use_volume_starts_and_steps;
 } minc_output_options;
 
-#include  <volume_io/volume_cache.h>
-
 extern  VIO_STR   XYZ_dimension_names[];
 extern  VIO_STR   File_order_dimension_names[];
 
@@ -79,6 +77,8 @@ typedef int nc_type;
 #define NC_DOUBLE 5
 
 #endif /*HAVE_MINC1*/
+
+#include  <volume_io/volume_cache.h>
 
 
 typedef  struct

@@ -1,5 +1,5 @@
-#ifndef  DEF_VOLUME_CACHE
-#define  DEF_VOLUME_CACHE
+#ifndef  __VOLUME_CACHE_H__
+#define  __VOLUME_CACHE_H__
 
 #include "volume.h"
 
@@ -105,4 +105,4 @@ typedef VIO_cache_lookup_struct cache_lookup_struct;
 typedef VIO_volume_cache_struct volume_cache_struct;
 #endif /* !VIO_PREFIX_NAMES */
 
-#endif
+#endif /* __VOLUME_CACHE_H__ */
