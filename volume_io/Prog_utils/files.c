@@ -20,6 +20,9 @@
 #if HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif /* HAVE_SYS_TYPES_H */
+#if HAVE_SYS_STAT_H
+#include <sys/stat.h>
+#endif /* HAVE_SYS_STAT_H */
 #if HAVE_PWD_H
 #include  <pwd.h>
 #endif /* HAVE_PWD_H */
@@ -27,8 +30,31 @@
 #if HAVE_UNISTD_H
 #include  <unistd.h>
 #endif /* HAVE_UNISTD_H */
+#if HAVE_FCNTL_H
+#include <fcntl.h>
+#endif /* HAVE_FCNTL_H */
 
 #include  <errno.h>
+
+/* hack for compiling on Windows*/
+#if !defined(S_IREAD) && defined(_S_IREAD)
+#define S_IREAD _S_IREAD
+#endif
+#if !defined(S_IWRITE) && defined(_S_IWRITE)
+#define S_IWRITE _S_IWRITE
+#endif
+
+#if !defined(O_CREAT) && defined(_O_CREAT)
+#define O_CREAT _O_CREAT
+#endif
+
+#if !defined(O_EXCL) && defined(_O_EXCL)
+#define O_EXCL _O_EXCL
+#endif
+
+#if !defined(O_RDWR) && defined(_O_RDWR)
+#define O_RDWR _O_RDWR
+#endif
 
 
 static  BOOLEAN  has_no_extension( STRING );

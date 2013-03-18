@@ -31,14 +31,14 @@
 
 static void   evaluate_grid_volume(
     VIO_Volume         volume,
-    Real           x,
-    Real           y,
-    Real           z,
+    VIO_Real           x,
+    VIO_Real           y,
+    VIO_Real           z,
     int            degrees_continuity,
-    Real           values[],
-    Real           deriv_x[],
-    Real           deriv_y[],
-    Real           deriv_z[] );
+    VIO_Real           values[],
+    VIO_Real           deriv_x[],
+    VIO_Real           deriv_y[],
+    VIO_Real           deriv_z[] );
 
 /* ----------------------------- MNI Header -----------------------------------
 @NAME       : grid_transform_point
@@ -60,14 +60,14 @@ static void   evaluate_grid_volume(
 
 VIOAPI  VIO_Status  grid_transform_point(
     VIO_General_transform   *transform,
-    Real                x,
-    Real                y,
-    Real                z,
-    Real                *x_transformed,
-    Real                *y_transformed,
-    Real                *z_transformed )
+    VIO_Real                x,
+    VIO_Real                y,
+    VIO_Real                z,
+    VIO_Real                *x_transformed,
+    VIO_Real                *y_transformed,
+    VIO_Real                *z_transformed )
 {
-    Real    displacements[N_COMPONENTS];
+    VIO_Real    displacements[N_COMPONENTS];
     VIO_Volume  volume;
 
     /* --- the volume that defines the transform is an offset vector,
@@ -110,14 +110,14 @@ VIOAPI  VIO_Status  grid_transform_point(
 
 private  void  forward_function(
     void   *function_data,
-    Real   parameters[],
-    Real   values[],
-    Real   **derivatives )
+    VIO_Real   parameters[],
+    VIO_Real   values[],
+    VIO_Real   **derivatives )
 {
     int                c;
     VIO_General_transform  *transform;
-    Real               deriv_x[N_COMPONENTS], deriv_y[N_COMPONENTS];
-    Real               deriv_z[N_COMPONENTS];
+    VIO_Real               deriv_x[N_COMPONENTS], deriv_y[N_COMPONENTS];
+    VIO_Real               deriv_z[N_COMPONENTS];
     VIO_Volume             volume;
 
     transform = (VIO_General_transform *) function_data;
@@ -178,16 +178,16 @@ it matches the code he uses in minctracc to generate the grid transforms.
 
 VIOAPI  VIO_Status  grid_inverse_transform_point(
     VIO_General_transform   *transform,
-    Real                x,
-    Real                y,
-    Real                z,
-    Real                *x_transformed,
-    Real                *y_transformed,
-    Real                *z_transformed )
+    VIO_Real                x,
+    VIO_Real                y,
+    VIO_Real                z,
+    VIO_Real                *x_transformed,
+    VIO_Real                *y_transformed,
+    VIO_Real                *z_transformed )
 {
-    Real   solution[N_DIMENSIONS];
-    Real   initial_guess[N_DIMENSIONS];
-    Real   desired_values[N_DIMENSIONS];
+    VIO_Real   solution[N_DIMENSIONS];
+    VIO_Real   initial_guess[N_DIMENSIONS];
+    VIO_Real   desired_values[N_DIMENSIONS];
 
     /* --- fill in the initial guess */
 
@@ -248,20 +248,20 @@ VIOAPI  VIO_Status  grid_inverse_transform_point(
 
 VIOAPI  VIO_Status  grid_inverse_transform_point(
     VIO_General_transform   *transform,
-    Real                x,
-    Real                y,
-    Real                z,
-    Real                *x_transformed,
-    Real                *y_transformed,
-    Real                *z_transformed )
+    VIO_Real                x,
+    VIO_Real                y,
+    VIO_Real                z,
+    VIO_Real                *x_transformed,
+    VIO_Real                *y_transformed,
+    VIO_Real                *z_transformed )
 {
 #define  NUMBER_TRIES  10
     int    tries;
-    Real   best_x, best_y, best_z;
-    Real   tx, ty, tz;
-    Real   gx, gy, gz;
-    Real   error_x, error_y, error_z, error, smallest_e;
-    Real   ftol;
+    VIO_Real   best_x, best_y, best_z;
+    VIO_Real   tx, ty, tz;
+    VIO_Real   gx, gy, gz;
+    VIO_Real   error_x, error_y, error_z, error, smallest_e;
+    VIO_Real   ftol;
     VIO_Status status=ERROR;
 
     if((status=grid_transform_point( transform, x, y, z, &tx, &ty, &tz ))!=OK)
@@ -295,7 +295,7 @@ VIOAPI  VIO_Status  grid_inverse_transform_point(
     // ftol = 0.05 * smallest_e + 0.0001;
 
     int    sizes[MAX_DIMENSIONS];
-    Real   steps[MAX_DIMENSIONS];
+    VIO_Real   steps[MAX_DIMENSIONS];
     VIO_Volume volume = (VIO_Volume) transform->displacement_volume;
     get_volume_sizes( volume, sizes );
     get_volume_separations( volume, steps );
@@ -365,16 +365,16 @@ VIOAPI  VIO_Status  grid_inverse_transform_point(
 
 static  void   evaluate_grid_volume(
     VIO_Volume         volume,
-    Real           x,
-    Real           y,
-    Real           z,
+    VIO_Real           x,
+    VIO_Real           y,
+    VIO_Real           z,
     int            degrees_continuity,
-    Real           values[],
-    Real           deriv_x[],
-    Real           deriv_y[],
-    Real           deriv_z[] )
+    VIO_Real           values[],
+    VIO_Real           deriv_x[],
+    VIO_Real           deriv_y[],
+    VIO_Real           deriv_z[] )
 {
-    Real     voxel[MAX_DIMENSIONS], voxel_vector[MAX_DIMENSIONS];
+    VIO_Real     voxel[MAX_DIMENSIONS], voxel_vector[MAX_DIMENSIONS];
     int      inc0, inc1, inc2, inc3, inc[MAX_DIMENSIONS], derivs_per_value;
     int      ind0, vector_dim;
     int      start0, start1, start2, start3, inc_so_far;
@@ -383,9 +383,10 @@ static  void   evaluate_grid_volume(
     int      v, d, id, sizes[MAX_DIMENSIONS];
     int      start[MAX_DIMENSIONS];
     int      end[MAX_DIMENSIONS];
-    Real     fraction[MAX_DIMENSIONS], bound, pos;
-    Real     coefs[SPLINE_DEGREE*SPLINE_DEGREE*SPLINE_DEGREE*N_COMPONENTS];
-    Real     values_derivs[N_COMPONENTS + N_COMPONENTS * N_DIMENSIONS];
+    VIO_Real     fraction[MAX_DIMENSIONS], bound, pos;
+    VIO_Real     coefs[SPLINE_DEGREE*SPLINE_DEGREE*SPLINE_DEGREE*N_COMPONENTS];
+    VIO_Real     values_derivs[N_COMPONENTS + N_COMPONENTS * N_DIMENSIONS];
+    int is_2dslice = -1;
 
 
     convert_world_to_voxel( volume, x, y, z, voxel );
@@ -408,7 +409,6 @@ static  void   evaluate_grid_volume(
 
     /*--- if a 2-d slice, do best interpolation in the plane */
 
-    int is_2dslice = -1;
     for_less( d, 0, FOUR_DIMS ) {
       if( d == vector_dim ) continue;
       if( sizes[d] == 1 ) {
@@ -416,7 +416,7 @@ static  void   evaluate_grid_volume(
       }
     }
 
-    bound = (Real) degrees_continuity / 2.0;
+    bound = (VIO_Real) degrees_continuity / 2.0;
 
     /*--- if near the edges, reduce the degrees of continuity.
           This is very important. Doing cubic (with a shifted
@@ -429,12 +429,12 @@ static  void   evaluate_grid_volume(
       if( d == vector_dim ) continue;
       while( degrees_continuity >= -1 &&
              (voxel[d] < bound  ||
-              voxel[d] > (Real) sizes[d] - 1.0 - bound ||
-              bound == (Real) sizes[d] - 1.0 - bound ) ) {
+              voxel[d] > (VIO_Real) sizes[d] - 1.0 - bound ||
+              bound == (VIO_Real) sizes[d] - 1.0 - bound ) ) {
         --degrees_continuity;
         if( degrees_continuity == 1 )
           degrees_continuity = 0;
-        bound = (Real) degrees_continuity / 2.0;
+        bound = (VIO_Real) degrees_continuity / 2.0;
       }
     }
 
@@ -524,7 +524,7 @@ static  void   evaluate_grid_volume(
         for_less( v1, start1, end1 ) {
             for_less( v2, start2, end2 ) {
                 for_less( v3, start3, end3 ) {
-                    GET_VALUE_4D_TYPED( coefs[ind0], (Real), volume,
+                    GET_VALUE_4D_TYPED( coefs[ind0], (VIO_Real), volume,
                                         v0, v1, v2, v3 );
                     ind0 += inc3;
                 }
