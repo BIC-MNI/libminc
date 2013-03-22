@@ -4,8 +4,24 @@
 
 #include <volume_io.h>
 
-
+ 
 Real tolerance = 1e-8;
+
+/*Windows compatibility hack*/
+#ifndef HAVE_SRAND48
+void srand48(long seed)
+{
+  srand((unsigned int)seed);
+}
+#endif /*HAVE_SRAND48*/
+
+#ifndef HAVE_DRAND48
+double drand48(void)
+{
+  return (double)rand() / (RAND_MAX + 1);
+}
+#endif /*HAVE_DRAND48*/
+
 
 
 int is_equal_real( Real e, Real a )
@@ -29,7 +45,7 @@ void assert_equal_point( Real ex, Real ey, Real ez,
     printf( "%s failure.\n"
 	    "Expected: %f %f %f\n"
 	    "  Actual: %f %f %f\n", 
-	    msg, ex,ey,ez,  ax,ay,az );
+	    msg, ex,ey,ez,  ax,ay,az ); 
 
     exit(3);
 }

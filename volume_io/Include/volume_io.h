@@ -48,11 +48,10 @@ extern "C" {
 #include  <volume_io/transforms.h>
 
 #ifndef  VIOAPI
-
 #if defined(_MSC_VER)
-#define       VIOAPI   __declspec(dllimport)
+#define       VIOAPI   /*__declspec(dllimport)*/
 #else
-#define       VIOAPI   extern
+#define       VIOAPI   /*extern*/
 #endif /* _MSC_VER not defined */
 #endif /* VIOAPI not defined */
 

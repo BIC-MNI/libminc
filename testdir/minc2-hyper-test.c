@@ -9,6 +9,11 @@
 #define CY 12
 #define CZ 9
 
+
+#ifdef _MSC_VER
+double rint(double v); /*hack: defined in m2util.c*/
+#endif
+
 #define TESTRPT(msg, val) (error_cnt++, printf(\
                                   "Error reported on line #%d, %s: %d\n", \
                                   __LINE__, msg, val))
@@ -323,6 +328,7 @@ main(int argc, char **argv)
                     else {
                         r = ((r - REAL_MIN) / (REAL_MAX - REAL_MIN)) * 255;
                     }
+
 
                     if (btemp[i][j][k] != (unsigned char)rint(r)) {
                         printf("%d != %d: @ %d,%d,%d ", (int)btemp[i][j][k], (int)rint(r), i,j,k);

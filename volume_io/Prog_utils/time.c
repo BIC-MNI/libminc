@@ -38,6 +38,15 @@
 #define CLK_TCK CLOCKS_PER_SEC
 #endif
 
+#if !defined(HAVE_SLEEP)
+
+void sleep(unsigned milliseconds)
+{
+  fprintf(stderr,"Unfortunately sleep is not implemented!\n");
+}
+
+#endif /*HAVE_SLEEP*/
+
 /* ----------------------------- MNI Header -----------------------------------
 @NAME       : get_clock_ticks_per_second
 @INPUT      : 

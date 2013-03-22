@@ -20,7 +20,7 @@
 
 #ifndef  VIOAPI
 #if defined(_MSC_VER)
-#define  VIOAPI __declspec(dllexport)
+#define  VIOAPI /*__declspec(dllexport)*/
 #else
 #define  VIOAPI
 #endif /* _MSC_VER not defined */

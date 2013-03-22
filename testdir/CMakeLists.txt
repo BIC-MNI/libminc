@@ -48,7 +48,9 @@ ENDIF(LIBMINC_MINC1_SUPPORT)
 
 # Volume IO tests
 ADD_EXECUTABLE(test_xfm   vio_xfm_test/test-xfm.c)
-TARGET_LINK_LIBRARIES(test_xfm ${VOLUME_IO_LIBRARY} ${LIBMINC_LIBRARIES} m)
+TARGET_LINK_LIBRARIES(test_xfm ${VOLUME_IO_LIBRARY} ${LIBMINC_LIBRARIES})
+
+
 # TODO port these test to cmake
 #ADD_TEST(create_grid_xfm create_grid_xfm)
 #ADD_TEST(test_speed test_speed)

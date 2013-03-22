@@ -263,6 +263,10 @@ VIOAPI  VIO_Status  grid_inverse_transform_point(
     VIO_Real   error_x, error_y, error_z, error, smallest_e;
     VIO_Real   ftol;
     VIO_Status status=ERROR;
+    int    sizes[MAX_DIMENSIONS];
+    VIO_Real   steps[MAX_DIMENSIONS];
+    VIO_Volume volume;
+    short d, vector_dim = -1;
 
     if((status=grid_transform_point( transform, x, y, z, &tx, &ty, &tz ))!=OK)
       return status;
@@ -294,14 +298,13 @@ VIOAPI  VIO_Status  grid_inverse_transform_point(
     // Make the error a fraction of the initial residual.
     // ftol = 0.05 * smallest_e + 0.0001;
 
-    int    sizes[MAX_DIMENSIONS];
-    VIO_Real   steps[MAX_DIMENSIONS];
-    VIO_Volume volume = (VIO_Volume) transform->displacement_volume;
+
+    volume = (VIO_Volume) transform->displacement_volume;
     get_volume_sizes( volume, sizes );
     get_volume_separations( volume, steps );
 
     /*--- find which of 4 dimensions is the vector dimension */
-    short d, vector_dim = -1;
+    
     for_less( vector_dim, 0, FOUR_DIMS ) {
       for_less( d, 0, N_DIMENSIONS ) {
         if( volume->spatial_axes[d] == vector_dim ) break;
