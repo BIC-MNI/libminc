@@ -48,21 +48,21 @@
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  BOOLEAN  newton_root_find(
+VIOAPI  VIO_BOOL  newton_root_find(
     int    n_dimensions,
-    void   (*function) ( void *, Real [],  Real [], Real ** ),
+    void   (*function) ( void *, VIO_Real [],  VIO_Real [], VIO_Real ** ),
     void   *function_data,
-    Real   initial_guess[],
-    Real   desired_values[],
-    Real   solution[],
-    Real   function_tolerance,
-    Real   delta_tolerance,
+    VIO_Real   initial_guess[],
+    VIO_Real   desired_values[],
+    VIO_Real   solution[],
+    VIO_Real   function_tolerance,
+    VIO_Real   delta_tolerance,
     int    max_iterations )
 {
     int       iter, dim;
-    Real      *values, **derivatives, *delta, error, best_error, *position;
-    Real      step_size;
-    BOOLEAN   success;
+    VIO_Real      *values, **derivatives, *delta, error, best_error, *position;
+    VIO_Real      step_size;
+    VIO_BOOL   success;
 
     ALLOC( position, n_dimensions );
     ALLOC( values, n_dimensions );

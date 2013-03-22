@@ -35,7 +35,7 @@ static   const char      *TAG_POINTS_STRING = "Points";
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  STRING  get_default_tag_file_suffix( void )
+VIOAPI  VIO_STR  get_default_tag_file_suffix( void )
 {
     return( "tag" );
 }
@@ -55,12 +55,12 @@ VIOAPI  STRING  get_default_tag_file_suffix( void )
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  initialize_tag_file_output(
+VIOAPI  VIO_Status  initialize_tag_file_output(
     FILE      *file,
-    STRING    comments,
+    VIO_STR    comments,
     int       n_volumes )
 {
-    Status   status;
+    VIO_Status   status;
 
     /* parameter checking */
 
@@ -115,18 +115,18 @@ VIOAPI  Status  initialize_tag_file_output(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  output_one_tag(
+VIOAPI  VIO_Status  output_one_tag(
     FILE      *file,
     int       n_volumes,
-    Real      tag_volume1[],
-    Real      tag_volume2[],
-    Real      *weight,
+    VIO_Real      tag_volume1[],
+    VIO_Real      tag_volume2[],
+    VIO_Real      *weight,
     int       *structure_id,
     int       *patient_id,
-    STRING    label )
+    VIO_STR    label )
 {
-    Status   status;
-    BOOLEAN  aux_present;
+    VIO_Status   status;
+    VIO_BOOL  aux_present;
 
     /* parameter checking */
 
@@ -153,7 +153,7 @@ VIOAPI  Status  output_one_tag(
 
     if( aux_present )
     {
-        if( weight != (Real *) NULL )
+        if( weight != (VIO_Real *) NULL )
             (void) fprintf( file, " %.15g", *weight );
         else
             (void) fprintf( file, " %.15g", 0.0 );
@@ -220,19 +220,19 @@ VIOAPI  void  terminate_tag_file_output(
                               tags_volume2 with n_volumes==1
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  output_tag_points(
+VIOAPI  VIO_Status  output_tag_points(
     FILE      *file,
-    STRING    comments,
+    VIO_STR    comments,
     int       n_volumes,
     int       n_tag_points,
-    Real      **tags_volume1,
-    Real      **tags_volume2,
-    Real      weights[],
+    VIO_Real      **tags_volume1,
+    VIO_Real      **tags_volume2,
+    VIO_Real      weights[],
     int       structure_ids[],
     int       patient_ids[],
-    STRING    *labels )
+    VIO_STR    *labels )
 {
-    Status   status;
+    VIO_Status   status;
     int      i;
 
     status = initialize_tag_file_output( file, comments, n_volumes );
@@ -275,7 +275,7 @@ VIOAPI  Status  output_tag_points(
 ---------------------------------------------------------------------------- */
 
 static void free_tags(
-    Real    **tags,
+    VIO_Real    **tags,
     int     n_tag_points )
 {
     int   i;
@@ -310,9 +310,9 @@ static void free_tags(
 VIOAPI  void  free_tag_points(
     int       n_volumes,
     int       n_tag_points,
-    Real      **tags_volume1,
-    Real      **tags_volume2,
-    Real      weights[],
+    VIO_Real      **tags_volume1,
+    VIO_Real      **tags_volume2,
+    VIO_Real      weights[],
     int       structure_ids[],
     int       patient_ids[],
     char      **labels )
@@ -326,7 +326,7 @@ VIOAPI  void  free_tag_points(
         if( n_volumes == 2 )
             free_tags( tags_volume2, n_tag_points );
 
-        if( weights != (Real *) NULL )
+        if( weights != (VIO_Real *) NULL )
             FREE( weights );
 
         if( structure_ids != (int *) NULL )
@@ -360,12 +360,12 @@ VIOAPI  void  free_tag_points(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-static STRING extract_label(
-    STRING     str )
+static VIO_STR extract_label(
+    VIO_STR     str )
 {
-    BOOLEAN  quoted;
+    VIO_BOOL  quoted;
     int      i;
-    STRING   label;
+    VIO_STR   label;
 
     i = 0;
 
@@ -387,7 +387,7 @@ static STRING extract_label(
 
     label = create_string( NULL );
 
-    while( str[i] != END_OF_STRING &&
+    while( str[i] != VIO_END_OF_STRING &&
            (quoted && str[i] != '"' ||
             !quoted && str[i] != ' ' && str[i] != '\t') )
     {
@@ -411,11 +411,11 @@ static STRING extract_label(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  initialize_tag_file_input(
+VIOAPI  VIO_Status  initialize_tag_file_input(
     FILE      *file,
     int       *n_volumes_ptr )
 {
-    STRING  line;
+    VIO_STR  line;
     int     n_volumes;
 
     /* parameter checking */
@@ -429,7 +429,7 @@ VIOAPI  Status  initialize_tag_file_input(
     /* okay read the header */
 
     if( mni_input_string( file, &line, (char) 0, (char) 0 ) != VIO_OK ||
-        !equal_strings( line, (STRING) TAG_FILE_HEADER ) )
+        !equal_strings( line, (VIO_STR) TAG_FILE_HEADER ) )
     {
         print_error( "input_tag_points(): invalid header in file.\n");
         delete_string( line );
@@ -492,24 +492,24 @@ VIOAPI  Status  initialize_tag_file_input(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-static Status read_one_tag(
+static VIO_Status read_one_tag(
     FILE      *file,
     int       n_volumes,
-    Real      tags_volume1_ptr[],
-    Real      tags_volume2_ptr[],
-    Real      *weight_ptr,
+    VIO_Real      tags_volume1_ptr[],
+    VIO_Real      tags_volume2_ptr[],
+    VIO_Real      *weight_ptr,
     int       *structure_id_ptr,
     int       *patient_id_ptr,
-    STRING    *label_ptr )
+    VIO_STR    *label_ptr )
 {
-    Status  status;
-    STRING  line;
-    BOOLEAN last_was_blank, in_quotes;
+    VIO_Status  status;
+    VIO_STR  line;
+    VIO_BOOL last_was_blank, in_quotes;
     int     n_strings, pos, i;
-    Real    x1, y1, z1, x2, y2, z2;
+    VIO_Real    x1, y1, z1, x2, y2, z2;
     int     structure_id, patient_id;
-    Real    weight;
-    STRING  label;
+    VIO_Real    weight;
+    VIO_STR  label;
 
     /* parameter checking */
 
@@ -536,16 +536,16 @@ static Status read_one_tag(
 
         if( tags_volume1_ptr != NULL )
         {
-            tags_volume1_ptr[X] = x1;
-            tags_volume1_ptr[Y] = y1;
-            tags_volume1_ptr[Z] = z1;
+            tags_volume1_ptr[VIO_X] = x1;
+            tags_volume1_ptr[VIO_Y] = y1;
+            tags_volume1_ptr[VIO_Z] = z1;
         }
 
         if( n_volumes == 2 && tags_volume2_ptr != NULL )
         {
-            tags_volume2_ptr[X] = x2;
-            tags_volume2_ptr[Y] = y2;
-            tags_volume2_ptr[Z] = z2;
+            tags_volume2_ptr[VIO_X] = x2;
+            tags_volume2_ptr[VIO_Y] = y2;
+            tags_volume2_ptr[VIO_Z] = z2;
         }
 
         label = NULL;
@@ -559,7 +559,7 @@ static Status read_one_tag(
             i = 0;
             last_was_blank = TRUE;
             in_quotes = FALSE;
-            while( line[i] != END_OF_STRING )
+            while( line[i] != VIO_END_OF_STRING )
             {
                 if( line[i] == ' ' || line[i] == '\t' )
                 {
@@ -580,13 +580,13 @@ static Status read_one_tag(
 
             while( i > 0 &&
                    (line[i] == ' ' || line[i] == '\t' ||
-                    line[i] == END_OF_STRING) )
+                    line[i] == VIO_END_OF_STRING) )
                 --i;
 
             if( line[i] == ';' )
             {
                 (void) unget_character( file, (char) ';' );
-                line[i] = END_OF_STRING;
+                line[i] = VIO_END_OF_STRING;
             }
         }
 
@@ -659,19 +659,19 @@ static Status read_one_tag(
 @MODIFIED   : Oct. 19, 1995   D. MacDonald    - now calls the 1 at a time funcs
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  output_tag_file(
-    STRING    filename,
-    STRING    comments,
+VIOAPI  VIO_Status  output_tag_file(
+    VIO_STR    filename,
+    VIO_STR    comments,
     int       n_volumes,
     int       n_tag_points,
-    Real      **tags_volume1,
-    Real      **tags_volume2,
-    Real      weights[],
+    VIO_Real      **tags_volume1,
+    VIO_Real      **tags_volume2,
+    VIO_Real      weights[],
     int       structure_ids[],
     int       patient_ids[],
-    STRING    labels[] )
+    VIO_STR    labels[] )
 {
-    Status  status;
+    VIO_Status  status;
     FILE    *file;
 
     status = open_file_with_default_suffix( filename,
@@ -709,18 +709,18 @@ VIOAPI  Status  output_tag_file(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  input_tag_file(
-    STRING    filename,
+VIOAPI  VIO_Status  input_tag_file(
+    VIO_STR    filename,
     int       *n_volumes,
     int       *n_tag_points,
-    Real      ***tags_volume1,
-    Real      ***tags_volume2,
-    Real      **weights,
+    VIO_Real      ***tags_volume1,
+    VIO_Real      ***tags_volume2,
+    VIO_Real      **weights,
     int       **structure_ids,
     int       **patient_ids,
-    STRING    *labels[] )
+    VIO_STR    *labels[] )
 {
-    Status  status;
+    VIO_Status  status;
     FILE    *file;
 
     status = open_file_with_default_suffix( filename,
@@ -758,19 +758,19 @@ VIOAPI  Status  input_tag_file(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  BOOLEAN  input_one_tag(
+VIOAPI  VIO_BOOL  input_one_tag(
     FILE      *file,
     int       n_volumes,
-    Real      tag_volume1[],
-    Real      tag_volume2[],
-    Real      *weight,
+    VIO_Real      tag_volume1[],
+    VIO_Real      tag_volume2[],
+    VIO_Real      *weight,
     int       *structure_id,
     int       *patient_id,
-    STRING    *label,
-    Status    *status )
+    VIO_STR    *label,
+    VIO_Status    *status )
 {
-    BOOLEAN  read_one;
-    Status   read_status;
+    VIO_BOOL  read_one;
+    VIO_Status   read_status;
 
     read_status = read_one_tag( file, n_volumes,
                                 tag_volume1, tag_volume2, weight,
@@ -807,23 +807,23 @@ VIOAPI  BOOLEAN  input_one_tag(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  input_tag_points(
+VIOAPI  VIO_Status  input_tag_points(
     FILE      *file,
     int       *n_volumes_ptr,
     int       *n_tag_points,
-    Real      ***tags_volume1,
-    Real      ***tags_volume2,
-    Real      **weights,
+    VIO_Real      ***tags_volume1,
+    VIO_Real      ***tags_volume2,
+    VIO_Real      **weights,
     int       **structure_ids,
     int       **patient_ids,
-    STRING    *labels[] )
+    VIO_STR    *labels[] )
 {
-    Status   status;
-    Real     tags1[N_DIMENSIONS];
-    Real     tags2[N_DIMENSIONS];
-    Real     weight;
+    VIO_Status   status;
+    VIO_Real     tags1[VIO_N_DIMENSIONS];
+    VIO_Real     tags2[VIO_N_DIMENSIONS];
+    VIO_Real     weight;
     int      structure_id, patient_id, n_volumes;
-    STRING   label;
+    VIO_STR   label;
 
     status = initialize_tag_file_input( file, &n_volumes );
 
@@ -842,9 +842,9 @@ VIOAPI  Status  input_tag_points(
             SET_ARRAY_SIZE( *tags_volume1, *n_tag_points, *n_tag_points+1,
                             DEFAULT_CHUNK_SIZE );
             ALLOC( (*tags_volume1)[*n_tag_points], 3 );
-            (*tags_volume1)[*n_tag_points][X] = tags1[X];
-            (*tags_volume1)[*n_tag_points][Y] = tags1[Y];
-            (*tags_volume1)[*n_tag_points][Z] = tags1[Z];
+            (*tags_volume1)[*n_tag_points][VIO_X] = tags1[VIO_X];
+            (*tags_volume1)[*n_tag_points][VIO_Y] = tags1[VIO_Y];
+            (*tags_volume1)[*n_tag_points][VIO_Z] = tags1[VIO_Z];
         }
 
         if( n_volumes == 2 && tags_volume2 != NULL )
@@ -852,9 +852,9 @@ VIOAPI  Status  input_tag_points(
             SET_ARRAY_SIZE( *tags_volume2, *n_tag_points, *n_tag_points+1,
                             DEFAULT_CHUNK_SIZE );
             ALLOC( (*tags_volume2)[*n_tag_points], 3 );
-            (*tags_volume2)[*n_tag_points][X] = tags2[X];
-            (*tags_volume2)[*n_tag_points][Y] = tags2[Y];
-            (*tags_volume2)[*n_tag_points][Z] = tags2[Z];
+            (*tags_volume2)[*n_tag_points][VIO_X] = tags2[VIO_X];
+            (*tags_volume2)[*n_tag_points][VIO_Y] = tags2[VIO_Y];
+            (*tags_volume2)[*n_tag_points][VIO_Z] = tags2[VIO_Z];
         }
 
         if( weights != NULL )

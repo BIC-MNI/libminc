@@ -27,16 +27,16 @@
 #define   DEFAULT_CACHE_THRESHOLD         -1
 #define   DEFAULT_MAX_BYTES_IN_CACHE      100000000
 
-static  BOOLEAN  n_bytes_cache_threshold_set = FALSE;
+static  VIO_BOOL  n_bytes_cache_threshold_set = FALSE;
 static  int      n_bytes_cache_threshold = DEFAULT_CACHE_THRESHOLD;
 
-static  BOOLEAN  default_cache_size_set = FALSE;
+static  VIO_BOOL  default_cache_size_set = FALSE;
 static  int      default_cache_size = DEFAULT_MAX_BYTES_IN_CACHE;
 
 
-static  Cache_block_size_hints   block_size_hint = RANDOM_VOLUME_ACCESS;
-static  BOOLEAN  default_block_sizes_set = FALSE;
-static  int      default_block_sizes[MAX_DIMENSIONS] = {
+static  VIO_Cache_block_size_hints   block_size_hint = RANDOM_VOLUME_ACCESS;
+static  VIO_BOOL  default_block_sizes_set = FALSE;
+static  int      default_block_sizes[VIO_MAX_DIMENSIONS] = {
                                                      DEFAULT_BLOCK_SIZE,
                                                      DEFAULT_BLOCK_SIZE,
                                                      DEFAULT_BLOCK_SIZE,
@@ -44,21 +44,21 @@ static  int      default_block_sizes[MAX_DIMENSIONS] = {
                                                      DEFAULT_BLOCK_SIZE };
 
 static  void  alloc_volume_cache(
-    volume_cache_struct   *cache,
-    Volume                volume );
+    VIO_volume_cache_struct   *cache,
+    VIO_Volume                volume );
 
 #ifdef  CACHE_DEBUGGING
 static  void  initialize_cache_debug(
-    volume_cache_struct  *cache );
+    VIO_volume_cache_struct  *cache );
 
 static  void  record_cache_hit(
-    volume_cache_struct  *cache );
+    VIO_volume_cache_struct  *cache );
 
 static  void  record_cache_prev_hit(
-    volume_cache_struct  *cache );
+    VIO_volume_cache_struct  *cache );
 
 static  void  record_cache_no_hit(
-    volume_cache_struct  *cache );
+    VIO_volume_cache_struct  *cache );
 #endif
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -188,7 +188,7 @@ VIOAPI  void  set_default_cache_block_sizes(
 {
     int   dim;
 
-    for_less( dim, 0, MAX_DIMENSIONS )
+    for_less( dim, 0, VIO_MAX_DIMENSIONS )
         default_block_sizes[dim] = block_sizes[dim];
 
     default_block_sizes_set = TRUE;
@@ -210,7 +210,7 @@ VIOAPI  void  set_default_cache_block_sizes(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  set_cache_block_sizes_hint(
-    Cache_block_size_hints  hint )
+    VIO_Cache_block_size_hints  hint )
 {
     block_size_hint = hint;
     default_block_sizes_set = FALSE;
@@ -245,7 +245,7 @@ static  void  get_default_cache_block_sizes(
 
         /*--- set the last two dimensions to be entire size of dimension */
 
-        for_less( dim, MAX( 0, n_dims - 2), MAX_DIMENSIONS )
+        for_less( dim, MAX( 0, n_dims - 2), VIO_MAX_DIMENSIONS )
             block_sizes[dim] = -1;
     }
     else if( !default_block_sizes_set &&
@@ -258,18 +258,18 @@ static  void  get_default_cache_block_sizes(
             block_size = DEFAULT_BLOCK_SIZE;
         }
 
-        for_less( dim, 0, MAX_DIMENSIONS )
+        for_less( dim, 0, VIO_MAX_DIMENSIONS )
             block_sizes[dim] = block_size;
     }
     else
     {
-        for_less( dim, 0, MAX_DIMENSIONS )
+        for_less( dim, 0, VIO_MAX_DIMENSIONS )
             block_sizes[dim] = default_block_sizes[dim];
     }
 
     /*--- now change any non-positive values to the correct volume size */
 
-    for_less( dim, 0, MAX_DIMENSIONS )
+    for_less( dim, 0, VIO_MAX_DIMENSIONS )
     {
         if( block_sizes[dim] <= 0 || block_sizes[dim] > volume_sizes[dim] )
             block_sizes[dim] = volume_sizes[dim];
@@ -291,16 +291,16 @@ static  void  get_default_cache_block_sizes(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  initialize_volume_cache(
-    volume_cache_struct   *cache,
-    Volume                volume )
+    VIO_volume_cache_struct   *cache,
+    VIO_Volume                volume )
 {
-    int    dim, n_dims, sizes[MAX_DIMENSIONS];
+    int    dim, n_dims, sizes[VIO_MAX_DIMENSIONS];
 
     n_dims = get_volume_n_dimensions( volume );
     cache->n_dimensions = n_dims;
     cache->writing_to_temp_file = FALSE;
 
-    for_less( dim, 0, MAX_DIMENSIONS )
+    for_less( dim, 0, VIO_MAX_DIMENSIONS )
         cache->file_offset[dim] = 0;
 
     cache->minc_file = NULL;
@@ -341,10 +341,10 @@ VIOAPI  void  initialize_volume_cache(
 ---------------------------------------------------------------------------- */
 
 static  void  alloc_volume_cache(
-    volume_cache_struct   *cache,
-    Volume                volume )
+    VIO_volume_cache_struct   *cache,
+    VIO_Volume                volume )
 {
-    int    dim, n_dims, sizes[MAX_DIMENSIONS], block, block_size;
+    int    dim, n_dims, sizes[VIO_MAX_DIMENSIONS], block, block_size;
     int    x, block_stride, remainder, block_index;
 
     get_volume_sizes( volume, sizes );
@@ -398,8 +398,8 @@ static  void  alloc_volume_cache(
     cache->n_blocks = 0;
 }
 
-VIOAPI  BOOLEAN  volume_cache_is_alloced(
-    volume_cache_struct   *cache )
+VIOAPI  VIO_BOOL  volume_cache_is_alloced(
+    VIO_volume_cache_struct   *cache )
 {
     return( cache->hash_table != NULL );
 }
@@ -419,7 +419,7 @@ VIOAPI  BOOLEAN  volume_cache_is_alloced(
 ---------------------------------------------------------------------------- */
 
 static  void  get_block_start(
-    volume_cache_struct  *cache,
+    VIO_volume_cache_struct  *cache,
     int                  block_index,
     int                  block_start[] )
 {
@@ -450,16 +450,16 @@ static  void  get_block_start(
 ---------------------------------------------------------------------------- */
 
 static  void  write_cache_block(
-    volume_cache_struct  *cache,
-    Volume               volume,
-    cache_block_struct   *block )
+    VIO_volume_cache_struct  *cache,
+    VIO_Volume               volume,
+    VIO_cache_block_struct   *block )
 {
     Minc_file        minc_file;
     int              dim, ind, n_dims;
-    int              file_start[MAX_DIMENSIONS];
-    int              file_count[MAX_DIMENSIONS];
-    int              volume_sizes[MAX_DIMENSIONS];
-    int              block_start[MAX_DIMENSIONS];
+    int              file_start[VIO_MAX_DIMENSIONS];
+    int              file_count[VIO_MAX_DIMENSIONS];
+    int              volume_sizes[VIO_MAX_DIMENSIONS];
+    int              block_start[VIO_MAX_DIMENSIONS];
     void             *array_data_ptr;
 
     minc_file = (Minc_file) cache->minc_file;
@@ -515,11 +515,11 @@ static  void  write_cache_block(
 ---------------------------------------------------------------------------- */
 
 static  void  flush_cache_blocks(
-    volume_cache_struct   *cache,
-    Volume                volume,
-    BOOLEAN               deleting_volume_flag )
+    VIO_volume_cache_struct   *cache,
+    VIO_Volume                volume,
+    VIO_BOOL               deleting_volume_flag )
 {
-    cache_block_struct  *block;
+    VIO_cache_block_struct  *block;
 
     /*--- don't bother flushing if deleting volume and just writing to temp */
 
@@ -555,7 +555,7 @@ static  void  flush_cache_blocks(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  flush_volume_cache(
-    Volume                volume )
+    VIO_Volume                volume )
 {
     flush_cache_blocks( &volume->cache, volume, FALSE );
 }
@@ -577,12 +577,12 @@ VIOAPI  void  flush_volume_cache(
 ---------------------------------------------------------------------------- */
 
 static  void  delete_cache_blocks(
-    volume_cache_struct   *cache,
-    Volume                volume,
-    BOOLEAN               deleting_volume_flag )
+    VIO_volume_cache_struct   *cache,
+    VIO_Volume                volume,
+    VIO_BOOL               deleting_volume_flag )
 {
     int                 block;
-    cache_block_struct  *current, *next;
+    VIO_cache_block_struct  *current, *next;
 
     /*--- if required, write out cache blocks */
 
@@ -627,8 +627,8 @@ static  void  delete_cache_blocks(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  delete_volume_cache(
-    volume_cache_struct   *cache,
-    Volume                volume )
+    VIO_volume_cache_struct   *cache,
+    VIO_Volume                volume )
 {
     int   dim, n_dims;
 
@@ -683,12 +683,12 @@ VIOAPI  void  delete_volume_cache(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  set_volume_cache_block_sizes(
-    Volume    volume,
+    VIO_Volume    volume,
     int       block_sizes[] )
 {
-    volume_cache_struct   *cache;
-    int                   d, dim, sizes[N_DIMENSIONS];
-    BOOLEAN               changed;
+    VIO_volume_cache_struct   *cache;
+    int                   d, dim, sizes[VIO_N_DIMENSIONS];
+    VIO_BOOL               changed;
 
     if( !volume->is_cached_volume )
         return;
@@ -745,11 +745,11 @@ VIOAPI  void  set_volume_cache_block_sizes(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  set_volume_cache_size(
-    Volume    volume,
+    VIO_Volume    volume,
     int       max_memory_bytes )
 {
     int                   dim;
-    volume_cache_struct   *cache;
+    VIO_volume_cache_struct   *cache;
 
     if( !volume->is_cached_volume )
         return;
@@ -794,14 +794,14 @@ VIOAPI  void  set_volume_cache_size(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  set_cache_output_volume_parameters(
-    Volume                      volume,
-    STRING                      filename,
+    VIO_Volume                      volume,
+    VIO_STR                      filename,
     nc_type                     file_nc_data_type,
-    BOOLEAN                     file_signed_flag,
-    Real                        file_voxel_min,
-    Real                        file_voxel_max,
-    STRING                      original_filename,
-    STRING                      history,
+    VIO_BOOL                     file_signed_flag,
+    VIO_Real                        file_voxel_min,
+    VIO_Real                        file_voxel_max,
+    VIO_STR                      original_filename,
+    VIO_STR                      history,
     minc_output_options         *options )
 
 {
@@ -832,9 +832,9 @@ VIOAPI  void  set_cache_output_volume_parameters(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  open_cache_volume_input_file(
-    volume_cache_struct   *cache,
-    Volume                volume,
-    STRING                filename,
+    VIO_volume_cache_struct   *cache,
+    VIO_Volume                volume,
+    VIO_STR                filename,
     minc_input_options    *options )
 {
     cache->input_filename = create_string( filename );
@@ -860,17 +860,17 @@ VIOAPI  void  open_cache_volume_input_file(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-static  Status  open_cache_volume_output_file(
-    volume_cache_struct   *cache,
-    Volume                volume )
+static  VIO_Status  open_cache_volume_output_file(
+    VIO_volume_cache_struct   *cache,
+    VIO_Volume                volume )
 {
-    Status     status;
+    VIO_Status     status;
     int        dim, n_dims;
-    int        out_sizes[MAX_DIMENSIONS], vol_sizes[MAX_DIMENSIONS];
-    Real       min_value, max_value;
+    int        out_sizes[VIO_MAX_DIMENSIONS], vol_sizes[VIO_MAX_DIMENSIONS];
+    VIO_Real       min_value, max_value;
     Minc_file  out_minc_file;
-    STRING     *vol_dim_names;
-    STRING     *out_dim_names, output_filename;
+    VIO_STR     *vol_dim_names;
+    VIO_STR     *out_dim_names, output_filename;
 
     n_dims = get_volume_n_dimensions( volume );
 
@@ -980,7 +980,7 @@ static  Status  open_cache_volume_output_file(
 }
 
 VIOAPI  void  cache_volume_range_has_changed(
-    Volume   volume )
+    VIO_Volume   volume )
 {
     if( !volume->is_cached_volume )
         return;
@@ -1010,16 +1010,16 @@ VIOAPI  void  cache_volume_range_has_changed(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  set_cache_volume_file_offset(
-    volume_cache_struct   *cache,
-    Volume                volume,
+    VIO_volume_cache_struct   *cache,
+    VIO_Volume                volume,
     long                  file_offset[] )
 {
-    BOOLEAN  changed;
+    VIO_BOOL  changed;
     int      dim;
 
     changed = FALSE;
 
-    for_less( dim, 0, MAX_DIMENSIONS )
+    for_less( dim, 0, VIO_MAX_DIMENSIONS )
     {
         if( cache->file_offset[dim] != (int) file_offset[dim] )
             changed = TRUE;
@@ -1048,16 +1048,16 @@ VIOAPI  void  set_cache_volume_file_offset(
 ---------------------------------------------------------------------------- */
 
 static  void  read_cache_block(
-    volume_cache_struct  *cache,
-    Volume               volume,
-    cache_block_struct   *block,
+    VIO_volume_cache_struct  *cache,
+    VIO_Volume               volume,
+    VIO_cache_block_struct   *block,
     int                  block_start[] )
 {
     Minc_file        minc_file;
     int              dim, ind, n_dims;
-    int              sizes[MAX_DIMENSIONS];
-    int              file_start[MAX_DIMENSIONS];
-    int              file_count[MAX_DIMENSIONS];
+    int              sizes[VIO_MAX_DIMENSIONS];
+    int              file_start[VIO_MAX_DIMENSIONS];
+    int              file_count[VIO_MAX_DIMENSIONS];
     void             *array_data_ptr;
 
     minc_file = (Minc_file) cache->minc_file;
@@ -1107,11 +1107,11 @@ static  void  read_cache_block(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-static  cache_block_struct  *appropriate_a_cache_block(
-    volume_cache_struct  *cache,
-    Volume               volume )
+static  VIO_cache_block_struct  *appropriate_a_cache_block(
+    VIO_volume_cache_struct  *cache,
+    VIO_Volume               volume )
 {
-    cache_block_struct  *block;
+    VIO_cache_block_struct  *block;
 
     /*--- if can allocate more blocks, do so */
 
@@ -1175,11 +1175,11 @@ static  int  hash_block_index(
     int  table_size )
 {
     int    index;
-    Real   v;
+    VIO_Real   v;
 
-    v = (Real) key * HASH_FUNCTION_CONSTANT;
+    v = (VIO_Real) key * HASH_FUNCTION_CONSTANT;
     
-    index = (int) (( v - (Real) ((int) v)) * (Real) table_size);
+    index = (int) (( v - (VIO_Real) ((int) v)) * (VIO_Real) table_size);
 
     return( index );
 }
@@ -1206,8 +1206,8 @@ static  int  hash_block_index(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-static  cache_block_struct  *get_cache_block_for_voxel(
-    Volume   volume,
+static  VIO_cache_block_struct  *get_cache_block_for_voxel(
+    VIO_Volume   volume,
     int      x,
     int      y,
     int      z,
@@ -1215,12 +1215,12 @@ static  cache_block_struct  *get_cache_block_for_voxel(
     int      v,
     int      *offset )
 {
-    cache_block_struct   *block;
-    cache_lookup_struct  *lookup0, *lookup1, *lookup2, *lookup3, *lookup4;
+    VIO_cache_block_struct   *block;
+    VIO_cache_lookup_struct  *lookup0, *lookup1, *lookup2, *lookup3, *lookup4;
     int                  block_index;
-    int                  block_start[MAX_DIMENSIONS];
+    int                  block_start[VIO_MAX_DIMENSIONS];
     int                  n_dims, hash_index;
-    volume_cache_struct  *cache;
+    VIO_volume_cache_struct  *cache;
 
     cache = &volume->cache;
     n_dims = cache->n_dimensions;
@@ -1420,8 +1420,8 @@ static  cache_block_struct  *get_cache_block_for_voxel(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Real  get_cached_volume_voxel(
-    Volume   volume,
+VIOAPI  VIO_Real  get_cached_volume_voxel(
+    VIO_Volume   volume,
     int      x,
     int      y,
     int      z,
@@ -1429,15 +1429,15 @@ VIOAPI  Real  get_cached_volume_voxel(
     int      v )
 {
     int                  offset;
-    Real                 value;
-    cache_block_struct   *block;
+    VIO_Real                 value;
+    VIO_cache_block_struct   *block;
 
     if( volume->cache.minc_file == NULL )
         return( get_volume_voxel_min( volume ) );
 
     block = get_cache_block_for_voxel( volume, x, y, z, t, v, &offset );
 
-    GET_MULTIDIM_1D( value, (Real), block->array, offset );
+    GET_MULTIDIM_1D( value, (VIO_Real), block->array, offset );
 
     return( value );
 }
@@ -1462,16 +1462,16 @@ VIOAPI  Real  get_cached_volume_voxel(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  set_cached_volume_voxel(
-    Volume   volume,
+    VIO_Volume   volume,
     int      x,
     int      y,
     int      z,
     int      t,
     int      v,
-    Real     value )
+    VIO_Real     value )
 {
     int                  offset;
-    cache_block_struct   *block;
+    VIO_cache_block_struct   *block;
 
     if( !volume->cache.output_file_is_open )
     {
@@ -1499,14 +1499,14 @@ VIOAPI  void  set_cached_volume_voxel(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  BOOLEAN  cached_volume_has_been_modified(
-    volume_cache_struct  *cache )
+VIOAPI  VIO_BOOL  cached_volume_has_been_modified(
+    VIO_volume_cache_struct  *cache )
 {
     return( cache->minc_file != NULL );
 }
 
-VIOAPI  BOOLEAN  volume_is_cached(
-    Volume  volume )
+VIOAPI  VIO_BOOL  volume_is_cached(
+    VIO_Volume  volume )
 {
     return( volume->is_cached_volume );
 }
@@ -1516,7 +1516,7 @@ VIOAPI  BOOLEAN  volume_is_cached(
 #endif
 
 VIOAPI  void   set_volume_cache_debugging(
-    Volume   volume,
+    VIO_Volume   volume,
     int      output_every )
 {
 #ifdef  CACHE_DEBUGGING
@@ -1535,10 +1535,10 @@ VIOAPI  void   set_volume_cache_debugging(
 #ifdef  CACHE_DEBUGGING
 
 static  void  initialize_cache_debug(
-    volume_cache_struct  *cache )
+    VIO_volume_cache_struct  *cache )
 {
     int      output_every;
-    STRING   debug;
+    VIO_STR   debug;
 
     debug = getenv( "VOLUME_CACHE_DEBUG" );
 
@@ -1557,17 +1557,17 @@ static  void  initialize_cache_debug(
 }
 
 static  void  increment_n_accesses(
-    volume_cache_struct  *cache )
+    VIO_volume_cache_struct  *cache )
 {
     ++cache->n_accesses;
 
     if( cache->n_accesses >= cache->output_every )
     {
-        print( "Volume cache:  Hit ratio: %g   Prev ratio: %g\n",
-               (Real) (cache->n_hits + cache->n_prev_hits) /
-               (Real) cache->n_accesses,
-               (Real) cache->n_prev_hits /
-               (Real) cache->n_accesses );
+        print( "VIO_Volume cache:  Hit ratio: %g   Prev ratio: %g\n",
+               (VIO_Real) (cache->n_hits + cache->n_prev_hits) /
+               (VIO_Real) cache->n_accesses,
+               (VIO_Real) cache->n_prev_hits /
+               (VIO_Real) cache->n_accesses );
 
         cache->n_accesses = 0;
         cache->n_hits = 0;
@@ -1576,7 +1576,7 @@ static  void  increment_n_accesses(
 }
 
 static  void  record_cache_hit(
-    volume_cache_struct  *cache )
+    VIO_volume_cache_struct  *cache )
 {
     if( cache->debugging_on )
     {
@@ -1586,7 +1586,7 @@ static  void  record_cache_hit(
 }
 
 static  void  record_cache_prev_hit(
-    volume_cache_struct  *cache )
+    VIO_volume_cache_struct  *cache )
 {
     if( cache->debugging_on )
     {
@@ -1596,7 +1596,7 @@ static  void  record_cache_prev_hit(
 }
 
 static  void  record_cache_no_hit(
-    volume_cache_struct  *cache )
+    VIO_volume_cache_struct  *cache )
 {
     if( cache->debugging_on )
     {

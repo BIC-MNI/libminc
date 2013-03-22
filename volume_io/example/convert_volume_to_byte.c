@@ -5,11 +5,11 @@ int  main(
     char  *argv[] )
 {
     Volume     volume;
-    Status     status;
+    VIO_Status     status;
     int        x, y, z, sizes[N_DIMENSIONS];
     char       *input_filename, *output_filename, *history;
     double     min_value, max_value, value, new_value, new_voxel;
-    BOOLEAN    thresholding;
+    VIO_BOOL    thresholding;
 
     if( argc < 3 )
     {

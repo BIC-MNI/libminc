@@ -33,16 +33,16 @@
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  create_orthogonal_vector(
-    Vector  *v,
-    Vector  *ortho )
+    VIO_Vector  *v,
+    VIO_Vector  *ortho )
 {
-    Real   x, y, z;
+    VIO_Real   x, y, z;
 
-    x = (Real) Vector_x(*v);
-    y = (Real) Vector_y(*v);
-    z = (Real) Vector_z(*v);
+    x = (VIO_Real) Vector_x(*v);
+    y = (VIO_Real) Vector_y(*v);
+    z = (VIO_Real) Vector_z(*v);
 
-    fill_Vector( *ortho, y+z, -x-z, y-x );
+    fill_VIO_Vector( *ortho, y+z, -x-z, y-x );
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -61,9 +61,9 @@ VIOAPI  void  create_orthogonal_vector(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  create_two_orthogonal_vectors(
-    Vector   *v,
-    Vector   *v1,
-    Vector   *v2 )
+    VIO_Vector   *v,
+    VIO_Vector   *v1,
+    VIO_Vector   *v2 )
 {
     create_orthogonal_vector( v, v1 );
 

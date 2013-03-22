@@ -57,8 +57,8 @@
 #endif
 
 
-static  BOOLEAN  has_no_extension( STRING );
-static  STRING   compressed_endings[] = { ".z", ".Z", ".gz" };
+static  VIO_BOOL  has_no_extension( VIO_STR );
+static  VIO_STR   compressed_endings[] = { ".z", ".Z", ".gz" };
 
 #if !HAVE_STRERROR
 static char *strerror(int errnum)
@@ -111,10 +111,10 @@ static  void  print_system_error( void )
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  BOOLEAN  real_is_double( void )
+VIOAPI  VIO_BOOL  real_is_double( void )
 {
     static  const  size_t  constant_8 = sizeof(double);
-    return( sizeof(Real) == constant_8 );
+    return( sizeof(VIO_Real) == constant_8 );
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -130,12 +130,12 @@ VIOAPI  BOOLEAN  real_is_double( void )
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  BOOLEAN  file_exists(
-    STRING        filename )
+VIOAPI  VIO_BOOL  file_exists(
+    VIO_STR        filename )
 {
-    BOOLEAN  exists;
+    VIO_BOOL  exists;
     FILE     *file;
-    STRING   expanded;
+    VIO_STR   expanded;
 
     expanded = expand_filename( filename );
 
@@ -167,11 +167,11 @@ VIOAPI  BOOLEAN  file_exists(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  BOOLEAN  file_directory_exists(
-    STRING        filename )
+VIOAPI  VIO_BOOL  file_directory_exists(
+    VIO_STR        filename )
 {
-    BOOLEAN  exists;
-    STRING   dir;
+    VIO_BOOL  exists;
+    VIO_STR   dir;
 
     dir = extract_directory( filename );
 
@@ -199,12 +199,12 @@ VIOAPI  BOOLEAN  file_directory_exists(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  BOOLEAN  check_clobber_file(
-    STRING   filename )
+VIOAPI  VIO_BOOL  check_clobber_file(
+    VIO_STR   filename )
 {
     char     ch;
-    BOOLEAN  okay;
-    STRING   expanded;
+    VIO_BOOL  okay;
+    VIO_STR   expanded;
 
     okay = TRUE;
 
@@ -248,12 +248,12 @@ VIOAPI  BOOLEAN  check_clobber_file(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  BOOLEAN  check_clobber_file_default_suffix(
-    STRING   filename,
-    STRING   default_suffix )
+VIOAPI  VIO_BOOL  check_clobber_file_default_suffix(
+    VIO_STR   filename,
+    VIO_STR   default_suffix )
 {
-    STRING   expanded;
-    BOOLEAN  can_write;
+    VIO_STR   expanded;
+    VIO_BOOL  can_write;
 
     expanded = expand_filename( filename );
 
@@ -274,7 +274,7 @@ VIOAPI  BOOLEAN  check_clobber_file_default_suffix(
 @NAME       : create_backup_filename
 @INPUT      : filename
 @OUTPUT     : 
-@RETURNS    : STRING - a backup filename
+@RETURNS    : VIO_STR - a backup filename
 @DESCRIPTION: Creates a backup filename that is filename.{date}.bkp
               If this already exists (not very likely), then it tries
               appending _1, _2, ...
@@ -285,11 +285,11 @@ VIOAPI  BOOLEAN  check_clobber_file_default_suffix(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-static  STRING  create_backup_filename(
-    STRING   filename )
+static  VIO_STR  create_backup_filename(
+    VIO_STR   filename )
 {
     int      i, len, count;
-    STRING   expanded, backup_filename, date;
+    VIO_STR   expanded, backup_filename, date;
 
 
     expanded = expand_filename( filename );
@@ -361,11 +361,11 @@ static  STRING  create_backup_filename(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  make_backup_file(
-    STRING   filename,
-    STRING   *backup_filename )
+VIOAPI  VIO_Status  make_backup_file(
+    VIO_STR   filename,
+    VIO_STR   *backup_filename )
 {
-    Status   status;
+    VIO_Status   status;
 
     status = VIO_OK;
 
@@ -405,11 +405,11 @@ VIOAPI  Status  make_backup_file(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  cleanup_backup_file(
-    STRING   filename,
-    STRING   backup_filename,
-    Status   status_of_write )
+    VIO_STR   filename,
+    VIO_STR   backup_filename,
+    VIO_Status   status_of_write )
 {
-    BOOLEAN  can_remove;
+    VIO_BOOL  can_remove;
 
     if( backup_filename != NULL )
     {
@@ -446,9 +446,9 @@ VIOAPI  void  cleanup_backup_file(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  remove_file(
-    STRING  filename )
+    VIO_STR  filename )
 {
-    STRING   expanded;
+    VIO_STR   expanded;
 
     expanded = expand_filename( filename );
 
@@ -475,12 +475,12 @@ VIOAPI  void  remove_file(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  copy_file(
-    STRING  src,
-    STRING  dest )
+VIOAPI  VIO_Status  copy_file(
+    VIO_STR  src,
+    VIO_STR  dest )
 {
-    Status   status;
-    STRING   src_expanded, dest_expanded, command;
+    VIO_Status   status;
+    VIO_STR   src_expanded, dest_expanded, command;
 
     src_expanded = expand_filename( src );
     dest_expanded = expand_filename( dest );
@@ -520,12 +520,12 @@ VIOAPI  Status  copy_file(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  move_file(
-    STRING  src,
-    STRING  dest )
+VIOAPI  VIO_Status  move_file(
+    VIO_STR  src,
+    VIO_STR  dest )
 {
-    Status   status;
-    STRING   src_expanded, dest_expanded, command;
+    VIO_Status   status;
+    VIO_STR   src_expanded, dest_expanded, command;
 
     src_expanded = expand_filename( src );
     dest_expanded = expand_filename( dest );
@@ -564,8 +564,8 @@ VIOAPI  Status  move_file(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-static  STRING  get_user_home_directory(
-    STRING   user_name )
+static  VIO_STR  get_user_home_directory(
+    VIO_STR   user_name )
 {
 #if HAVE_GETPWNAM 
     struct passwd  *p;
@@ -600,14 +600,14 @@ static  STRING  get_user_home_directory(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  STRING  expand_filename(
-    STRING  filename )
+VIOAPI  VIO_STR  expand_filename(
+    VIO_STR  filename )
 {
     int      i, new_i, dest, len, env_index;
-    BOOLEAN  tilde_found, prev_was_backslash;
+    VIO_BOOL  tilde_found, prev_was_backslash;
     char     *expand_value;
     int      n_alloced, n_env_alloced;
-    STRING   env, expanded;
+    VIO_STR   env, expanded;
 
     /* --- copy from filename to expanded_filename, changing environment
            variables and home directories */
@@ -642,7 +642,7 @@ VIOAPI  STRING  expand_filename(
             env_index = 0;
             while( filename[new_i] != '/' &&
                    filename[new_i] != '.' &&
-                   filename[new_i] != END_OF_STRING )
+                   filename[new_i] != VIO_END_OF_STRING )
             {
                 ADD_ELEMENT_TO_ARRAY_WITH_SIZE( env, n_env_alloced, env_index,
                                                 filename[new_i],
@@ -651,7 +651,7 @@ VIOAPI  STRING  expand_filename(
             }
 
             ADD_ELEMENT_TO_ARRAY_WITH_SIZE( env, n_env_alloced, env_index,
-                                            END_OF_STRING, DEFAULT_CHUNK_SIZE );
+                                            VIO_END_OF_STRING, DEFAULT_CHUNK_SIZE );
 
             /* --- if expanding a '~', find the corresponding home directory */
 
@@ -731,13 +731,13 @@ VIOAPI  STRING  expand_filename(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  BOOLEAN  filename_extension_matches(
-    STRING   filename,
-    STRING   extension )
+VIOAPI  VIO_BOOL  filename_extension_matches(
+    VIO_STR   filename,
+    VIO_STR   extension )
 {
     int       len, i;
-    STRING    filename_no_z, ending;
-    BOOLEAN   matches;
+    VIO_STR    filename_no_z, ending;
+    VIO_BOOL   matches;
 
     filename_no_z = expand_filename( filename );
 
@@ -748,7 +748,7 @@ VIOAPI  BOOLEAN  filename_extension_matches(
         if( string_ends_in( filename_no_z, compressed_endings[i] ) )
         {
             filename_no_z[len-string_length(compressed_endings[i])] =
-                                   END_OF_STRING;
+                                   VIO_END_OF_STRING;
         }
     }
 
@@ -777,10 +777,10 @@ VIOAPI  BOOLEAN  filename_extension_matches(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  STRING  remove_directories_from_filename(
-    STRING  filename )
+VIOAPI  VIO_STR  remove_directories_from_filename(
+    VIO_STR  filename )
 {
-    STRING   expanded, no_directories;
+    VIO_STR   expanded, no_directories;
     int      i;
 
     expanded = expand_filename( filename );
@@ -813,13 +813,13 @@ VIOAPI  STRING  remove_directories_from_filename(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  BOOLEAN  file_exists_as_compressed(
-    STRING       filename,
-    STRING       *compressed_filename )
+VIOAPI  VIO_BOOL  file_exists_as_compressed(
+    VIO_STR       filename,
+    VIO_STR       *compressed_filename )
 {
     int      i;
-    STRING   compressed, expanded;
-    BOOLEAN  gzipped;
+    VIO_STR   compressed, expanded;
+    VIO_BOOL  gzipped;
 
     gzipped = FALSE;
 
@@ -849,7 +849,7 @@ VIOAPI  BOOLEAN  file_exists_as_compressed(
     return( gzipped );
 }
 
-VIOAPI  STRING  get_temporary_filename( void )
+VIOAPI  VIO_STR  get_temporary_filename( void )
 {
   int tmp_fd;
   char *tmpfile_ptr;
@@ -942,18 +942,18 @@ VIOAPI  STRING  get_temporary_filename( void )
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  open_file(
-    STRING             filename,
-    IO_types           io_type,
-    File_formats       file_format,
+VIOAPI  VIO_Status  open_file(
+    VIO_STR            filename,
+    VIO_IO_types           io_type,
+    VIO_File_formats   file_format,
     FILE               **file )
 {
-    Status   status;
+    VIO_Status   status;
     int      i;
     char     *tmp_name;
-    char     command[EXTREMELY_LARGE_STRING_SIZE];
-    STRING   access_str, expanded;
-    BOOLEAN  gzipped;
+    char     command[VIO_EXTREMELY_LARGE_STRING_SIZE];
+    VIO_STR   access_str, expanded;
+    VIO_BOOL  gzipped;
     int      command_status;
 
     /* --- determine what mode of file access */
@@ -1078,16 +1078,16 @@ VIOAPI  Status  open_file(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  open_file_with_default_suffix(
-    STRING             filename,
-    STRING             default_suffix,
-    IO_types           io_type,
-    File_formats       file_format,
+VIOAPI  VIO_Status  open_file_with_default_suffix(
+    VIO_STR             filename,
+    VIO_STR             default_suffix,
+    VIO_IO_types           io_type,
+    VIO_File_formats       file_format,
     FILE               **file )
 {
-    Status   status;
-    BOOLEAN  suffix_added;
-    STRING   used_filename, expanded;
+    VIO_Status   status;
+    VIO_BOOL  suffix_added;
+    VIO_STR   used_filename, expanded;
 
     expanded = expand_filename( filename );
 
@@ -1139,11 +1139,11 @@ VIOAPI  Status  open_file_with_default_suffix(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-static  BOOLEAN  has_no_extension(
-    STRING   filename )
+static  VIO_BOOL  has_no_extension(
+    VIO_STR   filename )
 {
-    STRING   base_name;
-    BOOLEAN  dot_found;
+    VIO_STR   base_name;
+    VIO_BOOL  dot_found;
 
     base_name = remove_directories_from_filename( filename );
 
@@ -1168,11 +1168,11 @@ static  BOOLEAN  has_no_extension(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  set_file_position(
+VIOAPI  VIO_Status  set_file_position(
     FILE     *file,
     long     byte_position )
 {
-    Status   status;
+    VIO_Status   status;
 
     if( fseek( file, byte_position, 0 ) == 0 )
     {
@@ -1201,7 +1201,7 @@ VIOAPI  Status  set_file_position(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  close_file(
+VIOAPI  VIO_Status  close_file(
     FILE     *file )
 {
     if( file != NULL )
@@ -1227,11 +1227,11 @@ VIOAPI  Status  close_file(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  STRING  extract_directory(
-    STRING    filename )
+VIOAPI  VIO_STR  extract_directory(
+    VIO_STR    filename )
 {
     int     i, slash_index;
-    STRING  expanded, directory;
+    VIO_STR  expanded, directory;
 
     expanded = expand_filename( filename );
 
@@ -1251,7 +1251,7 @@ VIOAPI  STRING  extract_directory(
         for_less( i, 0, slash_index )
             directory[i] = expanded[i];
 
-        directory[slash_index] = END_OF_STRING;
+        directory[slash_index] = VIO_END_OF_STRING;
     }
 
     delete_string( expanded );
@@ -1275,11 +1275,11 @@ VIOAPI  STRING  extract_directory(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  STRING  get_absolute_filename(
-    STRING    filename,
-    STRING    directory )
+VIOAPI  VIO_STR  get_absolute_filename(
+    VIO_STR    filename,
+    VIO_STR    directory )
 {
-    STRING  abs_filename, expanded;
+    VIO_STR  abs_filename, expanded;
 
     /* if the directory is non-null and the filename is not already
        absolute (begins with '/'), then prefix the directory to the filename */
@@ -1318,10 +1318,10 @@ VIOAPI  STRING  get_absolute_filename(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  flush_file(
+VIOAPI  VIO_Status  flush_file(
     FILE     *file )
 {
-    Status   status;
+    VIO_Status   status;
 
     if( fflush( file ) == 0 )
     {
@@ -1341,7 +1341,7 @@ VIOAPI  Status  flush_file(
 @NAME       : input_character
 @INPUT      : file
 @OUTPUT     : ch
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Inputs one character from the file, returning VIO_ERROR if eof.
 @METHOD     : 
 @GLOBALS    : 
@@ -1350,11 +1350,11 @@ VIOAPI  Status  flush_file(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  input_character(
+VIOAPI  VIO_Status  input_character(
     FILE  *file,
     char   *ch )
 {
-    Status   status;
+    VIO_Status   status;
     int      c;
 
     c = fgetc( file );
@@ -1376,7 +1376,7 @@ VIOAPI  Status  input_character(
 @NAME       : unget_character
 @INPUT      : file
 @OUTPUT     : ch
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Ungets one character back to the file, returning status.
 @METHOD     : 
 @GLOBALS    : 
@@ -1385,11 +1385,11 @@ VIOAPI  Status  input_character(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  unget_character(
+VIOAPI  VIO_Status  unget_character(
     FILE  *file,
     char  ch )
 {
-    Status   status;
+    VIO_Status   status;
     int      c;
 
     c = ungetc( (int) ch, file );
@@ -1406,7 +1406,7 @@ VIOAPI  Status  unget_character(
 @NAME       : input_nonwhite_character
 @INPUT      : file
 @OUTPUT     : ch
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Inputs the next nonwhite (tab, space, newline) character.
 @METHOD     : 
 @GLOBALS    : 
@@ -1415,11 +1415,11 @@ VIOAPI  Status  unget_character(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  input_nonwhite_character(
+VIOAPI  VIO_Status  input_nonwhite_character(
     FILE   *file,
     char   *ch )
 {
-    Status   status;
+    VIO_Status   status;
 
     do
     {
@@ -1435,7 +1435,7 @@ VIOAPI  Status  input_nonwhite_character(
 @INPUT      : file
             : ch
 @OUTPUT     : 
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Outputs the character to the file, returning the status.
 @METHOD     : 
 @GLOBALS    : 
@@ -1444,11 +1444,11 @@ VIOAPI  Status  input_nonwhite_character(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  output_character(
+VIOAPI  VIO_Status  output_character(
     FILE   *file,
     char   ch )
 {
-    Status   status;
+    VIO_Status   status;
 
     if( fputc( (int) ch, file ) != ch )
     {
@@ -1467,7 +1467,7 @@ VIOAPI  Status  output_character(
 @INPUT      : file
             : search_char
 @OUTPUT     : 
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Skips characters in the file, up to and including the first match
             : of the search_char;
 @METHOD     : 
@@ -1477,11 +1477,11 @@ VIOAPI  Status  output_character(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status   skip_input_until(
+VIOAPI  VIO_Status   skip_input_until(
     FILE   *file,
     char   search_char )
 {
-    Status   status;
+    VIO_Status   status;
     char     ch;
 
     status = VIO_OK;
@@ -1500,7 +1500,7 @@ VIOAPI  Status   skip_input_until(
 @INPUT      : file
             : str
 @OUTPUT     : 
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Outputs the string to the file.
 @METHOD     : 
 @GLOBALS    : 
@@ -1509,11 +1509,11 @@ VIOAPI  Status   skip_input_until(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  output_string(
+VIOAPI  VIO_Status  output_string(
     FILE    *file,
-    STRING  str )
+    VIO_STR  str )
 {
-    Status   status;
+    VIO_Status   status;
 
     if( fprintf( file, "%s", str ) == string_length(str) )
         status = VIO_OK;
@@ -1532,7 +1532,7 @@ VIOAPI  Status  output_string(
 @INPUT      : file
             : termination_char
 @OUTPUT     : str 
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Inputs a string from the file.  First it skips white space, then
             : inputs all characters until the termination_char is found.
 @METHOD     : 
@@ -1542,13 +1542,13 @@ VIOAPI  Status  output_string(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  input_string(
+VIOAPI  VIO_Status  input_string(
     FILE    *file,
-    STRING  *str,
+    VIO_STR  *str,
     char    termination_char )
 {
     char    ch;
-    Status  status;
+    VIO_Status  status;
 
     status = input_nonwhite_character( file, &ch );
 
@@ -1577,7 +1577,7 @@ VIOAPI  Status  input_string(
 @NAME       : input_quoted_string
 @INPUT      : file
 @OUTPUT     : str
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Skips to the next nonwhitespace character, checks if it is a
             : quotation mark ( ", ', or ` ), then reads characters into the
             : string until the : next quotation mark.
@@ -1588,12 +1588,12 @@ VIOAPI  Status  input_string(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  input_quoted_string(
+VIOAPI  VIO_Status  input_quoted_string(
     FILE            *file,
-    STRING          *str )
+    VIO_STR          *str )
 {
     char     ch, quote;
-    Status   status;
+    VIO_Status   status;
 
     status = input_nonwhite_character( file, &quote );
 
@@ -1627,7 +1627,7 @@ VIOAPI  Status  input_quoted_string(
             : str
             : str_length    - size of string storage
 @OUTPUT     : 
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Skips to the next nonwhitespace character, checks if it is a
             : quotation mark, then reads characters into the string until the
             : next quotation mark.  If it is not a quotation mark, reads to
@@ -1639,13 +1639,13 @@ VIOAPI  Status  input_quoted_string(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  input_possibly_quoted_string(
+VIOAPI  VIO_Status  input_possibly_quoted_string(
     FILE            *file,
-    STRING          *str )
+    VIO_STR          *str )
 {
-    BOOLEAN  quoted;
+    VIO_BOOL  quoted;
     char     ch, quote;
-    Status   status;
+    VIO_Status   status;
 
     status = input_nonwhite_character( file, &quote );
 
@@ -1691,7 +1691,7 @@ VIOAPI  Status  input_possibly_quoted_string(
 @INPUT      : file
             : str
 @OUTPUT     : 
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Outputs the given string, with quotation marks around it.
 @METHOD     : 
 @GLOBALS    : 
@@ -1700,11 +1700,11 @@ VIOAPI  Status  input_possibly_quoted_string(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  output_quoted_string(
+VIOAPI  VIO_Status  output_quoted_string(
     FILE            *file,
-    STRING          str )
+    VIO_STR          str )
 {
-    Status   status;
+    VIO_Status   status;
 
     if( fprintf( file, " \"%s\"", str ) > 0 )
         status = VIO_OK;
@@ -1720,7 +1720,7 @@ VIOAPI  Status  output_quoted_string(
             : element_size       size of each element
             : n                  number of elements
 @OUTPUT     : data               array of elements to input
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Inputs the data in binary format.
 @METHOD     : 
 @GLOBALS    : 
@@ -1729,13 +1729,13 @@ VIOAPI  Status  output_quoted_string(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  input_binary_data(
+VIOAPI  VIO_Status  input_binary_data(
     FILE            *file,
     void            *data,
     size_t          element_size,
     int             n )
 {
-    Status   status;
+    VIO_Status   status;
     int      n_done;
 
     status = VIO_OK;
@@ -1760,7 +1760,7 @@ VIOAPI  Status  input_binary_data(
             : element_size       size of each element
             : n                  number of elements
 @OUTPUT     : 
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Outputs the data in binary format.
 @METHOD     : 
 @GLOBALS    : 
@@ -1769,13 +1769,13 @@ VIOAPI  Status  input_binary_data(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  output_binary_data(
+VIOAPI  VIO_Status  output_binary_data(
     FILE            *file,
     void            *data,
     size_t          element_size,
     int             n )
 {
-    Status   status;
+    VIO_Status   status;
     int      n_done;
 
     status = VIO_OK;
@@ -1797,7 +1797,7 @@ VIOAPI  Status  output_binary_data(
 @NAME       : input_newline
 @INPUT      : file
 @OUTPUT     : 
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Skips to after the next newline in the file.
 @METHOD     : 
 @GLOBALS    : 
@@ -1806,10 +1806,10 @@ VIOAPI  Status  output_binary_data(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  input_newline(
+VIOAPI  VIO_Status  input_newline(
     FILE            *file )
 {
-    Status   status;
+    VIO_Status   status;
 
     status = skip_input_until( file, '\n' );
 
@@ -1827,7 +1827,7 @@ VIOAPI  Status  input_newline(
 @NAME       : output_newline
 @INPUT      : file
 @OUTPUT     : 
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Outputs a newline to the file.
 @METHOD     : 
 @GLOBALS    : 
@@ -1836,10 +1836,10 @@ VIOAPI  Status  input_newline(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  output_newline(
+VIOAPI  VIO_Status  output_newline(
     FILE            *file )
 {
-    Status   status;
+    VIO_Status   status;
 
     if( fprintf( file, "\n" ) > 0 )
         status = VIO_OK;
@@ -1858,7 +1858,7 @@ VIOAPI  Status  output_newline(
 @INPUT      : line         - string to input to
             : str_length   - storage allocated to the string
 @OUTPUT     : 
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Inputs all characters upto the next newline.
 @METHOD     : 
 @GLOBALS    : 
@@ -1867,11 +1867,11 @@ VIOAPI  Status  output_newline(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  input_line(
+VIOAPI  VIO_Status  input_line(
     FILE    *file,
-    STRING  *line )
+    VIO_STR  *line )
 {
-    Status   status;
+    VIO_Status   status;
     char     ch;
 
     *line = create_string( NULL );
@@ -1898,8 +1898,8 @@ VIOAPI  Status  input_line(
 @NAME       : input_boolean
 @INPUT      : file
 @OUTPUT     : b
-@RETURNS    : Status
-@DESCRIPTION: Inputs a BOOLEAN value from a file, by looking for an 'f' or 't'.
+@RETURNS    : VIO_Status
+@DESCRIPTION: Inputs a VIO_BOOL value from a file, by looking for an 'f' or 't'.
 @METHOD     : 
 @GLOBALS    : 
 @CALLS      : 
@@ -1907,11 +1907,11 @@ VIOAPI  Status  input_line(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  input_boolean(
+VIOAPI  VIO_Status  input_boolean(
     FILE            *file,
-    BOOLEAN         *b )
+    VIO_BOOL         *b )
 {
-    Status   status;
+    VIO_Status   status;
     char     ch;
 
     status = input_nonwhite_character( file, &ch );
@@ -1934,7 +1934,7 @@ VIOAPI  Status  input_boolean(
 @INPUT      : file
             : b
 @OUTPUT     : 
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Outputs a T or F to the file.
 @METHOD     : 
 @GLOBALS    : 
@@ -1943,12 +1943,12 @@ VIOAPI  Status  input_boolean(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  output_boolean(
+VIOAPI  VIO_Status  output_boolean(
     FILE            *file,
-    BOOLEAN         b )
+    VIO_BOOL         b )
 {
-    Status   status;
-    STRING   str;
+    VIO_Status   status;
+    VIO_STR   str;
 
     status = VIO_OK;
 
@@ -1959,7 +1959,7 @@ VIOAPI  Status  output_boolean(
 
     if( fprintf( file, " %s", str ) <= 0 )
     {
-        print_error( "Error outputting BOOLEAN.  " );
+        print_error( "Error outputting VIO_BOOL.  " );
         print_system_error();
         status = VIO_ERROR;
     }
@@ -1971,7 +1971,7 @@ VIOAPI  Status  output_boolean(
 @NAME       : input_short
 @INPUT      : file
 @OUTPUT     : s
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Inputs an ascii short.
 @METHOD     : 
 @GLOBALS    : 
@@ -1980,11 +1980,11 @@ VIOAPI  Status  output_boolean(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  input_short(
+VIOAPI  VIO_Status  input_short(
     FILE            *file,
     short           *s )
 {
-    Status   status;
+    VIO_Status   status;
 
     if( fscanf( file, "%hd", s ) == 1 )
         status = VIO_OK;
@@ -1999,7 +1999,7 @@ VIOAPI  Status  input_short(
 @INPUT      : file
             : s
 @OUTPUT     :
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Outputs an ascii short.
 @METHOD     : 
 @GLOBALS    : 
@@ -2008,11 +2008,11 @@ VIOAPI  Status  input_short(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  output_short(
+VIOAPI  VIO_Status  output_short(
     FILE            *file,
     short           s )
 {
-    Status   status;
+    VIO_Status   status;
 
     if( fprintf( file, " %d", s ) > 0 )
         status = VIO_OK;
@@ -2030,7 +2030,7 @@ VIOAPI  Status  output_short(
 @NAME       : input_unsigned_short
 @INPUT      : file
 @OUTPUT     : s
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Inputs an ascii unsigned short.
 @METHOD     : 
 @GLOBALS    : 
@@ -2039,12 +2039,12 @@ VIOAPI  Status  output_short(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  input_unsigned_short(
+VIOAPI  VIO_Status  input_unsigned_short(
     FILE            *file,
     unsigned short  *s )
 {
     int      i;
-    Status   status;
+    VIO_Status   status;
 
     if( fscanf( file, "%d", &i ) == 1 )
     {
@@ -2062,7 +2062,7 @@ VIOAPI  Status  input_unsigned_short(
 @INPUT      : file
             : s
 @OUTPUT     :
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Outputs an ascii unsigned short.
 @METHOD     : 
 @GLOBALS    : 
@@ -2071,11 +2071,11 @@ VIOAPI  Status  input_unsigned_short(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  output_unsigned_short(
+VIOAPI  VIO_Status  output_unsigned_short(
     FILE            *file,
     unsigned short  s )
 {
-    Status   status;
+    VIO_Status   status;
 
     if( fprintf( file, " %d", (int) s ) > 0 )
         status = VIO_OK;
@@ -2093,7 +2093,7 @@ VIOAPI  Status  output_unsigned_short(
 @NAME       : input_int
 @INPUT      : file
 @OUTPUT     : i
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Inputs an ascii integer.
 @METHOD     : 
 @GLOBALS    : 
@@ -2102,11 +2102,11 @@ VIOAPI  Status  output_unsigned_short(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  input_int(
+VIOAPI  VIO_Status  input_int(
     FILE  *file,
     int   *i )
 {
-    Status   status;
+    VIO_Status   status;
 
     if( fscanf( file, "%d", i ) == 1 )
         status = VIO_OK;
@@ -2121,7 +2121,7 @@ VIOAPI  Status  input_int(
 @INPUT      : file
             : i
 @OUTPUT     :
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Outputs an ascii integer.
 @METHOD     : 
 @GLOBALS    : 
@@ -2130,11 +2130,11 @@ VIOAPI  Status  input_int(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  output_int(
+VIOAPI  VIO_Status  output_int(
     FILE            *file,
     int             i )
 {
-    Status   status;
+    VIO_Status   status;
 
     if( fprintf( file, " %d", i ) > 0 )
         status = VIO_OK;
@@ -2152,7 +2152,7 @@ VIOAPI  Status  output_int(
 @NAME       : input_real
 @INPUT      : file
 @OUTPUT     : r
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Inputs an ascii real value.
 @METHOD     : 
 @GLOBALS    : 
@@ -2161,11 +2161,11 @@ VIOAPI  Status  output_int(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  input_real(
+VIOAPI  VIO_Status  input_real(
     FILE            *file,
-    Real            *r )
+    VIO_Real            *r )
 {
-    Status   status;
+    VIO_Status   status;
 
     if( real_is_double() )
     {
@@ -2184,7 +2184,7 @@ VIOAPI  Status  input_real(
 @INPUT      : file
             : i
 @OUTPUT     :
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Outputs an ascii real value.
 @METHOD     : 
 @GLOBALS    : 
@@ -2193,11 +2193,11 @@ VIOAPI  Status  input_real(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  output_real(
+VIOAPI  VIO_Status  output_real(
     FILE            *file,
-    Real            r )
+    VIO_Real            r )
 {
-    Status   status;
+    VIO_Status   status;
 
     if( real_is_double() )
     {
@@ -2215,7 +2215,7 @@ VIOAPI  Status  output_real(
 @NAME       : input_float
 @INPUT      : file
 @OUTPUT     : f
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Inputs an ascii float.
 @METHOD     : 
 @GLOBALS    : 
@@ -2224,11 +2224,11 @@ VIOAPI  Status  output_real(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  input_float(
+VIOAPI  VIO_Status  input_float(
     FILE            *file,
     float           *f )
 {
-    Status   status;
+    VIO_Status   status;
 
     if( fscanf( file, "%f", f ) == 1 )
         status = VIO_OK;
@@ -2245,7 +2245,7 @@ VIOAPI  Status  input_float(
 @INPUT      : file
             : f
 @OUTPUT     :
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Outputs an ascii float value.
 @METHOD     : 
 @GLOBALS    : 
@@ -2254,11 +2254,11 @@ VIOAPI  Status  input_float(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  output_float(
+VIOAPI  VIO_Status  output_float(
     FILE            *file,
     float           f )
 {
-    Status   status;
+    VIO_Status   status;
 
     if( fprintf( file, " %g", f ) > 0 )
         status = VIO_OK;
@@ -2276,7 +2276,7 @@ VIOAPI  Status  output_float(
 @NAME       : input_double
 @INPUT      : file
 @OUTPUT     : d
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Inputs an ascii double.
 @METHOD     : 
 @GLOBALS    : 
@@ -2285,11 +2285,11 @@ VIOAPI  Status  output_float(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  input_double(
+VIOAPI  VIO_Status  input_double(
     FILE            *file,
     double          *d )
 {
-    Status   status;
+    VIO_Status   status;
 
     if( fscanf( file, "%lf", d ) == 1 )
         status = VIO_OK;
@@ -2306,7 +2306,7 @@ VIOAPI  Status  input_double(
 @INPUT      : file
             : d
 @OUTPUT     :
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Outputs an ascii double value.
 @METHOD     : 
 @GLOBALS    : 
@@ -2315,11 +2315,11 @@ VIOAPI  Status  input_double(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  output_double(
+VIOAPI  VIO_Status  output_double(
     FILE            *file,
     double          d )
 {
-    Status   status;
+    VIO_Status   status;
 
     if( fprintf( file, " %g", d ) > 0 )
         status = VIO_OK;
@@ -2341,7 +2341,7 @@ VIOAPI  Status  output_double(
             : element_size
             : n
 @OUTPUT     :
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Inputs or outputs binary data, depending on io_flag.
 @METHOD     : 
 @GLOBALS    : 
@@ -2350,14 +2350,14 @@ VIOAPI  Status  output_double(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  io_binary_data(
+VIOAPI  VIO_Status  io_binary_data(
     FILE            *file,
-    IO_types        io_flag,
+    VIO_IO_types        io_flag,
     void            *data,
     size_t          element_size,
     int             n )
 {
-    Status   status;
+    VIO_Status   status;
 
     if( io_flag == READ_FILE )
         status = input_binary_data( file, data, element_size, n );
@@ -2373,7 +2373,7 @@ VIOAPI  Status  io_binary_data(
             : io_flag
             : data
 @OUTPUT     :
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Inputs or outputs an ascii or binary newline char, as appropriate.
 @METHOD     : 
 @GLOBALS    : 
@@ -2382,12 +2382,12 @@ VIOAPI  Status  io_binary_data(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  io_newline(
+VIOAPI  VIO_Status  io_newline(
     FILE            *file,
-    IO_types        io_flag,
-    File_formats    format )
+    VIO_IO_types        io_flag,
+    VIO_File_formats    format )
 {
-    Status   status;
+    VIO_Status   status;
 
     status = VIO_OK;
 
@@ -2410,7 +2410,7 @@ VIOAPI  Status  io_newline(
             : str
             : str_length
 @OUTPUT     :
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Inputs or outputs an ascii or binary quoted string.
 @METHOD     : 
 @GLOBALS    : 
@@ -2419,14 +2419,14 @@ VIOAPI  Status  io_newline(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  io_quoted_string(
+VIOAPI  VIO_Status  io_quoted_string(
     FILE            *file,
-    IO_types        io_flag,
-    File_formats    format,
-    STRING          *str )
+    VIO_IO_types        io_flag,
+    VIO_File_formats    format,
+    VIO_STR          *str )
 {
     int      length;
-    Status   status;
+    VIO_Status   status;
 
     status = VIO_OK;
 
@@ -2453,7 +2453,7 @@ VIOAPI  Status  io_quoted_string(
                                      sizeof((*str)[0]), length );
         }
 
-        str[length] = END_OF_STRING;
+        str[length] = VIO_END_OF_STRING;
     }
 
     if( status != VIO_OK )
@@ -2469,7 +2469,7 @@ VIOAPI  Status  io_quoted_string(
             : format
             : b              boolean value
 @OUTPUT     :
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Inputs or outputs an ascii or binary boolean value.
 @METHOD     : 
 @GLOBALS    : 
@@ -2478,13 +2478,13 @@ VIOAPI  Status  io_quoted_string(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  io_boolean(
+VIOAPI  VIO_Status  io_boolean(
     FILE            *file,
-    IO_types        io_flag,
-    File_formats    format,
-    BOOLEAN         *b )
+    VIO_IO_types        io_flag,
+    VIO_File_formats    format,
+    VIO_BOOL         *b )
 {
-    Status   status;
+    VIO_Status   status;
 
     status = VIO_OK;
 
@@ -2508,7 +2508,7 @@ VIOAPI  Status  io_boolean(
             : format
             : short_int              short value
 @OUTPUT     :
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Inputs or outputs an ascii or binary short value.
 @METHOD     : 
 @GLOBALS    : 
@@ -2517,13 +2517,13 @@ VIOAPI  Status  io_boolean(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  io_short(
+VIOAPI  VIO_Status  io_short(
     FILE            *file,
-    IO_types        io_flag,
-    File_formats    format,
+    VIO_IO_types        io_flag,
+    VIO_File_formats    format,
     short           *short_int )
 {
-    Status   status;
+    VIO_Status   status;
 
     status = VIO_OK;
 
@@ -2548,7 +2548,7 @@ VIOAPI  Status  io_short(
             : format
             : unsigned_short              short value
 @OUTPUT     :
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Inputs or outputs an ascii or binary unsigned short value.
 @METHOD     : 
 @GLOBALS    : 
@@ -2557,13 +2557,13 @@ VIOAPI  Status  io_short(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  io_unsigned_short(
+VIOAPI  VIO_Status  io_unsigned_short(
     FILE            *file,
-    IO_types        io_flag,
-    File_formats    format,
+    VIO_IO_types        io_flag,
+    VIO_File_formats    format,
     unsigned short  *unsigned_short )
 {
-    Status   status;
+    VIO_Status   status;
 
     status = VIO_OK;
 
@@ -2588,7 +2588,7 @@ VIOAPI  Status  io_unsigned_short(
             : format
             : c              unsigned char value
 @OUTPUT     :
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Inputs or outputs an ascii or binary unsigned char.
 @METHOD     : 
 @GLOBALS    : 
@@ -2597,14 +2597,14 @@ VIOAPI  Status  io_unsigned_short(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  io_unsigned_char(
+VIOAPI  VIO_Status  io_unsigned_char(
     FILE            *file,
-    IO_types        io_flag,
-    File_formats    format,
+    VIO_IO_types        io_flag,
+    VIO_File_formats    format,
     unsigned  char  *c )
 {
     int      i;
-    Status   status;
+    VIO_Status   status;
 
     status = VIO_OK;
 
@@ -2644,7 +2644,7 @@ VIOAPI  Status  io_unsigned_char(
             : format
             : i              integer value
 @OUTPUT     :
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Inputs or outputs an ascii or binary integer value.
 @METHOD     : 
 @GLOBALS    : 
@@ -2653,13 +2653,13 @@ VIOAPI  Status  io_unsigned_char(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  io_int(
+VIOAPI  VIO_Status  io_int(
     FILE            *file,
-    IO_types        io_flag,
-    File_formats    format,
+    VIO_IO_types        io_flag,
+    VIO_File_formats    format,
     int             *i )
 {
-    Status   status;
+    VIO_Status   status;
 
     status = VIO_OK;
 
@@ -2683,7 +2683,7 @@ VIOAPI  Status  io_int(
             : format
             : r              real value
 @OUTPUT     :
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Inputs or outputs an ascii or binary real value.
 @METHOD     : 
 @GLOBALS    : 
@@ -2692,13 +2692,13 @@ VIOAPI  Status  io_int(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  io_real(
+VIOAPI  VIO_Status  io_real(
     FILE            *file,
-    IO_types        io_flag,
-    File_formats    format,
-    Real            *r )
+    VIO_IO_types        io_flag,
+    VIO_File_formats    format,
+    VIO_Real            *r )
 {
-    Status   status;
+    VIO_Status   status;
 
     status = VIO_OK;
 
@@ -2722,7 +2722,7 @@ VIOAPI  Status  io_real(
             : format
             : f              float value
 @OUTPUT     :
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Inputs or outputs an ascii or binary double value.
 @METHOD     : 
 @GLOBALS    : 
@@ -2731,13 +2731,13 @@ VIOAPI  Status  io_real(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  io_float(
+VIOAPI  VIO_Status  io_float(
     FILE            *file,
-    IO_types        io_flag,
-    File_formats    format,
+    VIO_IO_types        io_flag,
+    VIO_File_formats    format,
     float           *f )
 {
-    Status   status;
+    VIO_Status   status;
 
     status = VIO_OK;
 
@@ -2761,7 +2761,7 @@ VIOAPI  Status  io_float(
             : format
             : d              double value
 @OUTPUT     :
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Inputs or outputs an ascii or binary double value.
 @METHOD     : 
 @GLOBALS    : 
@@ -2770,13 +2770,13 @@ VIOAPI  Status  io_float(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  io_double(
+VIOAPI  VIO_Status  io_double(
     FILE            *file,
-    IO_types        io_flag,
-    File_formats    format,
+    VIO_IO_types        io_flag,
+    VIO_File_formats    format,
     double          *d )
 {
-    Status   status;
+    VIO_Status   status;
 
     status = VIO_OK;
 
@@ -2801,7 +2801,7 @@ VIOAPI  Status  io_double(
             : n               number of ints
             : ints            array of ints
 @OUTPUT     : 
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Inputs or outputs a list of ascii or binary integers.
 @METHOD     : 
 @GLOBALS    : 
@@ -2810,14 +2810,14 @@ VIOAPI  Status  io_double(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  io_ints(
+VIOAPI  VIO_Status  io_ints(
     FILE            *file,
-    IO_types        io_flag,
-    File_formats    format,
+    VIO_IO_types        io_flag,
+    VIO_File_formats    format,
     int             n,
     int             *ints[] )
 {
-    Status   status;
+    VIO_Status   status;
     int      i;
 #define      INTS_PER_LINE   8
 
@@ -2861,7 +2861,7 @@ VIOAPI  Status  io_ints(
             : n               number of unsigned chars
             : unsigned_chars  array of unsigned chars
 @OUTPUT     : 
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Inputs or outputs a list of ascii or binary unsigned chars.
 @METHOD     : 
 @GLOBALS    : 
@@ -2870,14 +2870,14 @@ VIOAPI  Status  io_ints(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  io_unsigned_chars(
+VIOAPI  VIO_Status  io_unsigned_chars(
     FILE            *file,
-    IO_types        io_flag,
-    File_formats    format,
+    VIO_IO_types        io_flag,
+    VIO_File_formats    format,
     int             n,
     unsigned char   *unsigned_chars[] )
 {
-    Status   status;
+    VIO_Status   status;
     int      i;
 
     status = VIO_OK;

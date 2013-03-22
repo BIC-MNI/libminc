@@ -20,20 +20,20 @@
 /*--- Weighting functions which define the splines, all of which are
       interpolation splines, with the exception of the quadratic spline */
 
-static Real   constant_coefs[1][1] = {   { 1.0 }  };
+static VIO_Real   constant_coefs[1][1] = {   { 1.0 }  };
 
-static Real   linear_coefs[2][2] = {
+static VIO_Real   linear_coefs[2][2] = {
                                            {  1.0,  0.0 },
                                            { -1.0,  1.0 }
                                       };
 
-static Real   quadratic_coefs[3][3] = {
+static VIO_Real   quadratic_coefs[3][3] = {
                                            {  0.5,  0.5,  0.0 },
                                            { -1.0,  1.0,  0.0 },
                                            {  0.5, -1.0,  0.5 }
                                         };
 
-static Real   cubic_coefs[4][4] = {
+static VIO_Real   cubic_coefs[4][4] = {
                                         {  0.0,  1.0,  0.0,  0.0 },
                                         { -0.5,  0.0,  0.5,  0.0 },
                                         {  1.0, -2.5,  2.0, -0.5 },
@@ -54,7 +54,7 @@ static Real   cubic_coefs[4][4] = {
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  get_linear_spline_coefs(
-    Real  **coefs )
+    VIO_Real  **coefs )
 {
     int    i, j;
 
@@ -77,7 +77,7 @@ VIOAPI  void  get_linear_spline_coefs(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  get_quadratic_spline_coefs(
-    Real  **coefs )
+    VIO_Real  **coefs )
 {
     int    i, j;
 
@@ -101,7 +101,7 @@ VIOAPI  void  get_quadratic_spline_coefs(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  get_cubic_spline_coefs(
-    Real  **coefs )
+    VIO_Real  **coefs )
 {
     int    i, j;
 
@@ -129,14 +129,14 @@ VIOAPI  void  get_cubic_spline_coefs(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Real  cubic_interpolate(
-    Real   u,
-    Real   v0,
-    Real   v1,
-    Real   v2,
-    Real   v3 )
+VIOAPI  VIO_Real  cubic_interpolate(
+    VIO_Real   u,
+    VIO_Real   v0,
+    VIO_Real   v1,
+    VIO_Real   v2,
+    VIO_Real   v3 )
 {
-    Real   coefs[4], value;
+    VIO_Real   coefs[4], value;
 
     coefs[0] = v0;
     coefs[1] = v1;
@@ -166,11 +166,11 @@ VIOAPI  Real  cubic_interpolate(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  evaluate_univariate_interpolating_spline(
-    Real    u,
+    VIO_Real    u,
     int     degree,
-    Real    coefs[],
+    VIO_Real    coefs[],
     int     n_derivs,
-    Real    derivs[] )
+    VIO_Real    derivs[] )
 {
     evaluate_interpolating_spline( 1, &u, degree, 1, coefs, n_derivs, derivs );
 }
@@ -199,14 +199,14 @@ VIOAPI  void  evaluate_univariate_interpolating_spline(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  evaluate_bivariate_interpolating_spline(
-    Real    u,
-    Real    v,
+    VIO_Real    u,
+    VIO_Real    v,
     int     degree,
-    Real    coefs[],
+    VIO_Real    coefs[],
     int     n_derivs,
-    Real    derivs[] )
+    VIO_Real    derivs[] )
 {
-    Real   positions[2];
+    VIO_Real   positions[2];
 
     positions[0] = u;
     positions[1] = v;
@@ -241,15 +241,15 @@ VIOAPI  void  evaluate_bivariate_interpolating_spline(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  evaluate_trivariate_interpolating_spline(
-    Real    u,
-    Real    v,
-    Real    w,
+    VIO_Real    u,
+    VIO_Real    v,
+    VIO_Real    w,
     int     degree,
-    Real    coefs[],
+    VIO_Real    coefs[],
     int     n_derivs,
-    Real    derivs[] )
+    VIO_Real    derivs[] )
 {
-    Real   positions[3];
+    VIO_Real   positions[3];
 
     positions[0] = u;
     positions[1] = v;
@@ -292,15 +292,15 @@ VIOAPI  void  evaluate_trivariate_interpolating_spline(
 
 VIOAPI  void  evaluate_interpolating_spline(
     int     n_dims,
-    Real    parameters[],
+    VIO_Real    parameters[],
     int     degree,
     int     n_values,
-    Real    coefs[],
+    VIO_Real    coefs[],
     int     n_derivs,
-    Real    derivs[] )
+    VIO_Real    derivs[] )
 {
     int    d, degrees[MAX_DIMS], n_derivs_list[MAX_DIMS];
-    Real   *bases[MAX_DIMS];
+    VIO_Real   *bases[MAX_DIMS];
 
     if( degree < 1 || degree > 4 )
     {

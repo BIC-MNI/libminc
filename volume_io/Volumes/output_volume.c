@@ -27,7 +27,7 @@
 @OUTPUT     : dim_names
 @RETURNS    : VIO_OK or VIO_ERROR
 @DESCRIPTION: Gets the names of the dimensions from the specified file.
-              dim_names is an array of STRINGS, where the array has been
+              dim_names is an array of VIO_STRS, where the array has been
               allocated, but not each string.
 @METHOD     : 
 @GLOBALS    : 
@@ -37,13 +37,13 @@
 ---------------------------------------------------------------------------- */
 #ifdef HAVE_MINC1
 
-VIOAPI  Status   get_file_dimension_names(
-    STRING   filename,
+VIOAPI  VIO_Status   get_file_dimension_names(
+    VIO_STR   filename,
     int      *n_dims,
-    STRING   *dim_names[] )
+    VIO_STR   *dim_names[] )
 {
     int                   i;
-    Status                status;
+    VIO_Status                status;
     volume_input_struct   volume_input;
     Volume                tmp_volume;
 
@@ -93,18 +93,18 @@ VIOAPI  Status   get_file_dimension_names(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  STRING  *create_output_dim_names(
+VIOAPI  VIO_STR  *create_output_dim_names(
     Volume                volume,
-    STRING                original_filename,
+    VIO_STR                original_filename,
     minc_output_options   *options,
     int                   file_sizes[] )
 {
     int                  n_dims, n_file_dims, dim_index;
     int                  vol_sizes[MAX_DIMENSIONS];
     int                  i, j, n_found;
-    STRING               *file_dim_names;
-    STRING               *vol_dimension_names;
-    STRING               *dim_names;
+    VIO_STR               *file_dim_names;
+    VIO_STR               *vol_dimension_names;
+    VIO_STR               *dim_names;
 
     get_volume_sizes( volume, vol_sizes );
 
@@ -230,15 +230,15 @@ VIOAPI  STRING  *create_output_dim_names(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status   copy_volume_auxiliary_and_history(
+VIOAPI  VIO_Status   copy_volume_auxiliary_and_history(
     Minc_file   minc_file,
-    STRING      filename,
-    STRING      original_filename,
-    STRING      history )
+    VIO_STR      filename,
+    VIO_STR      original_filename,
+    VIO_STR      history )
 {
-    Status    status;
-    BOOLEAN   copy_original_file_data;
-    STRING    full_filename, full_original_filename;
+    VIO_Status    status;
+    VIO_BOOL   copy_original_file_data;
+    VIO_STR    full_filename, full_original_filename;
 
     copy_original_file_data = FALSE;
 
@@ -299,22 +299,22 @@ VIOAPI  Status   copy_volume_auxiliary_and_history(
                                             use_volume_starts_and_steps flag
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  output_modified_volume(
-    STRING                filename,
+VIOAPI  VIO_Status  output_modified_volume(
+    VIO_STR                filename,
     nc_type               file_nc_data_type,
-    BOOLEAN               file_signed_flag,
-    Real                  file_voxel_min,
-    Real                  file_voxel_max,
+    VIO_BOOL               file_signed_flag,
+    VIO_Real                  file_voxel_min,
+    VIO_Real                  file_voxel_max,
     Volume                volume,
-    STRING                original_filename,
-    STRING                history,
+    VIO_STR                original_filename,
+    VIO_STR                history,
     minc_output_options   *options )
 {
-    Status               status;
+    VIO_Status               status;
     Minc_file            minc_file;
     int                  n_dims, sizes[MAX_DIMENSIONS];
-    Real                 real_min, real_max;
-    STRING               *dim_names;
+    VIO_Real                 real_min, real_max;
+    VIO_STR               *dim_names;
     minc_output_options  used_options;
 
     dim_names = create_output_dim_names( volume, original_filename,
@@ -393,14 +393,14 @@ VIOAPI  Status  output_modified_volume(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  output_volume(
-    STRING                filename,
+VIOAPI  VIO_Status  output_volume(
+    VIO_STR                filename,
     nc_type               file_nc_data_type,
-    BOOLEAN               file_signed_flag,
-    Real                  file_voxel_min,
-    Real                  file_voxel_max,
+    VIO_BOOL               file_signed_flag,
+    VIO_Real                  file_voxel_min,
+    VIO_Real                  file_voxel_max,
     Volume                volume,
-    STRING                history,
+    VIO_STR                history,
     minc_output_options   *options )
 {
     return( output_modified_volume( filename, file_nc_data_type,

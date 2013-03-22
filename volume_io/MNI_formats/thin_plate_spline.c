@@ -45,8 +45,8 @@
 
 typedef  struct
 {
-    Real   **points;
-    Real   **weights;
+    VIO_Real   **points;
+    VIO_Real   **weights;
     int    n_points;
     int    n_dims;
 } spline_data_struct;
@@ -55,13 +55,13 @@ typedef  struct
 
 static  void   newton_function(
     void     *function_data,
-    Real     parameters[],
-    Real     values[],
-    Real     **first_derivs );
+    VIO_Real     parameters[],
+    VIO_Real     values[],
+    VIO_Real     **first_derivs );
 
-static  Real  thin_plate_spline_U_deriv(
-   Real   pos[],
-   Real   landmark[],
+static  VIO_Real  thin_plate_spline_U_deriv(
+   VIO_Real   pos[],
+   VIO_Real   landmark[],
    int    n_dims,
    int    deriv_dim );
 
@@ -95,14 +95,14 @@ VIOAPI  void  evaluate_thin_plate_spline(
     int     n_dims,
     int     n_values,
     int     n_points,
-    Real    **points,
-    Real    **weights,
-    Real    pos[],
-    Real    values[],
-    Real    **derivs )
+    VIO_Real    **points,
+    VIO_Real    **weights,
+    VIO_Real    pos[],
+    VIO_Real    values[],
+    VIO_Real    **derivs )
 {
     int       v, d, p;
-    Real      dist, dist_deriv;
+    VIO_Real      dist, dist_deriv;
 
     /* f(x,y[,z]) =a_{n} + a_{n+1}x + a_{n+1}y + sum_{0}^{n-1}
      *          w_{i}U(|P_{i} - (x,y)|) 
@@ -133,7 +133,7 @@ VIOAPI  void  evaluate_thin_plate_spline(
         /* --- add the weighted component to the values */
 
         for_less( v, 0, n_values )
-            values[v] = values[v] + (Real) weights[p][v] * dist;
+            values[v] = values[v] + (VIO_Real) weights[p][v] * dist;
 
         /* --- add the weighted component to the derivatives */
 
@@ -145,7 +145,7 @@ VIOAPI  void  evaluate_thin_plate_spline(
                 {
                     dist_deriv = thin_plate_spline_U_deriv( pos, points[p],
                                                             n_dims, d );
-                    derivs[v][d] += (Real) weights[p][v] * dist_deriv;
+                    derivs[v][d] += (VIO_Real) weights[p][v] * dist_deriv;
                 }
             }
         }
@@ -154,7 +154,7 @@ VIOAPI  void  evaluate_thin_plate_spline(
     /* --- add the constant component to the values */
 
     for_less( v, 0, n_values )
-        values[v] += (Real) weights[n_points][v];
+        values[v] += (VIO_Real) weights[n_points][v];
 
     /* --- add the linear components to the values and derivatives */
 
@@ -162,9 +162,9 @@ VIOAPI  void  evaluate_thin_plate_spline(
     {
         for_less( d, 0, n_dims )
         {
-            values[v]    += (Real) weights[n_points+1+d][v] * pos[d];
+            values[v]    += (VIO_Real) weights[n_points+1+d][v] * pos[d];
             if( derivs != NULL )
-                derivs[v][d] += (Real) weights[n_points+1+d][v];
+                derivs[v][d] += (VIO_Real) weights[n_points+1+d][v];
         }
     }
 }
@@ -200,16 +200,16 @@ VIOAPI  void  evaluate_thin_plate_spline(
 VIOAPI  VIO_Status  thin_plate_spline_transform(
     int     n_dims,
     int     n_points,
-    Real    **points,
-    Real    **weights,
-    Real    x,
-    Real    y,
-    Real    z,
-    Real    *x_transformed,
-    Real    *y_transformed,
-    Real    *z_transformed )
+    VIO_Real    **points,
+    VIO_Real    **weights,
+    VIO_Real    x,
+    VIO_Real    y,
+    VIO_Real    z,
+    VIO_Real    *x_transformed,
+    VIO_Real    *y_transformed,
+    VIO_Real    *z_transformed )
 {
-    Real      input_point[N_DIMENSIONS], output_point[N_DIMENSIONS];
+    VIO_Real      input_point[VIO_N_DIMENSIONS], output_point[VIO_N_DIMENSIONS];
 
     input_point[0] = x;
     input_point[1] = y;
@@ -260,29 +260,29 @@ VIOAPI  VIO_Status  thin_plate_spline_transform(
 VIOAPI  VIO_Status  thin_plate_spline_inverse_transform(
     int     n_dims,
     int     n_points,
-    Real    **points,
-    Real    **weights,
-    Real    x,
-    Real    y,
-    Real    z,
-    Real    *x_transformed,
-    Real    *y_transformed,
-    Real    *z_transformed )
+    VIO_Real    **points,
+    VIO_Real    **weights,
+    VIO_Real    x,
+    VIO_Real    y,
+    VIO_Real    z,
+    VIO_Real    *x_transformed,
+    VIO_Real    *y_transformed,
+    VIO_Real    *z_transformed )
 {
-    Real                x_in[N_DIMENSIONS], solution[N_DIMENSIONS];
+    VIO_Real                x_in[VIO_N_DIMENSIONS], solution[VIO_N_DIMENSIONS];
     spline_data_struct  data;
   
-    x_in[X] = x;
+    x_in[VIO_X] = x;
 
     if( n_dims >= 2 )
-        x_in[Y] = y;
+        x_in[VIO_Y] = y;
     else
-        x_in[Y] = 0.0;
+        x_in[VIO_Y] = 0.0;
 
     if( n_dims >= 3 )
-        x_in[Z] = z;
+        x_in[VIO_Z] = z;
     else
-        x_in[Z] = 0.0;
+        x_in[VIO_Z] = 0.0;
 
     data.points = points;
     data.weights = weights;
@@ -331,9 +331,9 @@ VIOAPI  VIO_Status  thin_plate_spline_inverse_transform(
 
 static  void   newton_function(
     void     *function_data,
-    Real     parameters[],
-    Real     values[],
-    Real     **first_derivs )
+    VIO_Real     parameters[],
+    VIO_Real     values[],
+    VIO_Real     **first_derivs )
 {
     spline_data_struct *spline_data;
 
@@ -363,24 +363,24 @@ static  void   newton_function(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Real  thin_plate_spline_U(
-    Real   pos[],
-    Real   landmark[],
+VIOAPI  VIO_Real  thin_plate_spline_U(
+    VIO_Real   pos[],
+    VIO_Real   landmark[],
     int    n_dims )
 {
-    Real r, fu, dx, dy, dz;
+    VIO_Real r, fu, dx, dy, dz;
 
     switch( n_dims )
     {
     case  1:
-        dx = pos[X] - landmark[X];
+        dx = pos[VIO_X] - landmark[VIO_X];
         r = FABS( dx );
         fu = r * r * r;
         break;
 
     case  2:   /* r is actually r^2 */
-        dx = pos[X] - landmark[X];
-        dy = pos[Y] - landmark[Y];
+        dx = pos[VIO_X] - landmark[VIO_X];
+        dy = pos[VIO_Y] - landmark[VIO_Y];
         r = dx * dx + dy * dy;
 
         if( r == 0.0 )
@@ -390,9 +390,9 @@ VIOAPI  Real  thin_plate_spline_U(
         break;
 
     case  3:
-        dx = pos[X] - landmark[X];
-        dy = pos[Y] - landmark[Y];
-        dz = pos[Z] - landmark[Z];
+        dx = pos[VIO_X] - landmark[VIO_X];
+        dy = pos[VIO_Y] - landmark[VIO_Y];
+        dz = pos[VIO_Z] - landmark[VIO_Z];
         r = sqrt( dx * dx + dy * dy + dz * dz );
         fu = r;
         break;
@@ -424,26 +424,26 @@ VIOAPI  Real  thin_plate_spline_U(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-static  Real  thin_plate_spline_U_deriv(
-   Real   pos[],
-   Real   landmark[],
+static  VIO_Real  thin_plate_spline_U_deriv(
+   VIO_Real   pos[],
+   VIO_Real   landmark[],
    int    n_dims,
    int    deriv_dim )
 {
-    Real r, r2, deriv, delta[N_DIMENSIONS];
+    VIO_Real r, r2, deriv, delta[VIO_N_DIMENSIONS];
 
     switch( n_dims )
     {
     case  1:
-        delta[X] = pos[X] - landmark[X];
-        r = delta[X];
+        delta[VIO_X] = pos[VIO_X] - landmark[VIO_X];
+        r = delta[VIO_X];
         deriv = 3.0 * r * r;
         break;
 
     case  2:   /* r2 is r^2 */
-        delta[X] = pos[X] - landmark[X];
-        delta[Y] = pos[Y] - landmark[Y];
-        r2 = delta[X] * delta[X] + delta[Y] * delta[Y];
+        delta[VIO_X] = pos[VIO_X] - landmark[VIO_X];
+        delta[VIO_Y] = pos[VIO_Y] - landmark[VIO_Y];
+        r2 = delta[VIO_X] * delta[VIO_X] + delta[VIO_Y] * delta[VIO_Y];
 
         if( r2 == 0.0 )
             deriv = 0.0;
@@ -452,11 +452,11 @@ static  Real  thin_plate_spline_U_deriv(
         break;
 
     case  3:
-        delta[X] = pos[X] - landmark[X];
-        delta[Y] = pos[Y] - landmark[Y];
-        delta[Z] = pos[Z] - landmark[Z];
-        r = sqrt( delta[X] * delta[X] + delta[Y] * delta[Y] +
-                  delta[Z] * delta[Z] );
+        delta[VIO_X] = pos[VIO_X] - landmark[VIO_X];
+        delta[VIO_Y] = pos[VIO_Y] - landmark[VIO_Y];
+        delta[VIO_Z] = pos[VIO_Z] - landmark[VIO_Z];
+        r = sqrt( delta[VIO_X] * delta[VIO_X] + delta[VIO_Y] * delta[VIO_Y] +
+                  delta[VIO_Z] * delta[VIO_Z] );
 
         if( r == 0.0 )
             deriv = 0.0;

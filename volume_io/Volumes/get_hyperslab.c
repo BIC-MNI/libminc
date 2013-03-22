@@ -20,13 +20,13 @@
 
 
 VIOAPI  void  convert_voxels_to_values(
-    Volume   volume,
+    VIO_Volume   volume,
     int      n_voxels,
-    Real     voxels[],
-    Real     values[] )
+    VIO_Real     voxels[],
+    VIO_Real     values[] )
 {
     int    v;
-    Real   scale, trans;
+    VIO_Real   scale, trans;
 
     if( !volume->real_range_set )
     {
@@ -46,7 +46,7 @@ VIOAPI  void  convert_voxels_to_values(
 }
 
 VIOAPI  void  get_volume_value_hyperslab(
-    Volume   volume,
+    VIO_Volume   volume,
     int      v0,
     int      v1,
     int      v2,
@@ -57,7 +57,7 @@ VIOAPI  void  get_volume_value_hyperslab(
     int      n2,
     int      n3,
     int      n4,
-    Real     values[] )
+    VIO_Real     values[] )
 {
     switch( get_volume_n_dimensions(volume) )
     {
@@ -82,7 +82,7 @@ VIOAPI  void  get_volume_value_hyperslab(
 }
 
 VIOAPI  void  get_volume_value_hyperslab_5d(
-    Volume   volume,
+    VIO_Volume   volume,
     int      v0,
     int      v1,
     int      v2,
@@ -93,7 +93,7 @@ VIOAPI  void  get_volume_value_hyperslab_5d(
     int      n2,
     int      n3,
     int      n4,
-    Real     values[] )
+    VIO_Real     values[] )
 {
     get_volume_voxel_hyperslab_5d( volume, v0, v1, v2, v3, v4,
                                    n0, n1, n2, n3, n4, values );
@@ -102,7 +102,7 @@ VIOAPI  void  get_volume_value_hyperslab_5d(
 }
 
 VIOAPI  void  get_volume_value_hyperslab_4d(
-    Volume   volume,
+    VIO_Volume   volume,
     int      v0,
     int      v1,
     int      v2,
@@ -111,7 +111,7 @@ VIOAPI  void  get_volume_value_hyperslab_4d(
     int      n1,
     int      n2,
     int      n3,
-    Real     values[] )
+    VIO_Real     values[] )
 {
     get_volume_voxel_hyperslab_4d( volume, v0, v1, v2, v3,
                                    n0, n1, n2, n3, values );
@@ -120,14 +120,14 @@ VIOAPI  void  get_volume_value_hyperslab_4d(
 }
 
 VIOAPI  void  get_volume_value_hyperslab_3d(
-    Volume   volume,
+    VIO_Volume   volume,
     int      v0,
     int      v1,
     int      v2,
     int      n0,
     int      n1,
     int      n2,
-    Real     values[] )
+    VIO_Real     values[] )
 {
     get_volume_voxel_hyperslab_3d( volume, v0, v1, v2, n0, n1, n2, values );
 
@@ -135,12 +135,12 @@ VIOAPI  void  get_volume_value_hyperslab_3d(
 }
 
 VIOAPI  void  get_volume_value_hyperslab_2d(
-    Volume   volume,
+    VIO_Volume   volume,
     int      v0,
     int      v1,
     int      n0,
     int      n1,
-    Real     values[] )
+    VIO_Real     values[] )
 {
     get_volume_voxel_hyperslab_2d( volume, v0, v1, n0, n1, values );
 
@@ -148,10 +148,10 @@ VIOAPI  void  get_volume_value_hyperslab_2d(
 }
 
 VIOAPI  void  get_volume_value_hyperslab_1d(
-    Volume   volume,
+    VIO_Volume   volume,
     int      v0,
     int      n0,
-    Real     values[] )
+    VIO_Real     values[] )
 {
     get_volume_voxel_hyperslab_1d( volume, v0, n0, values );
 
@@ -159,7 +159,7 @@ VIOAPI  void  get_volume_value_hyperslab_1d(
 }
 
 static  void  slow_get_volume_voxel_hyperslab(
-    Volume   volume,
+    VIO_Volume   volume,
     int      v0,
     int      v1,
     int      v2,
@@ -170,7 +170,7 @@ static  void  slow_get_volume_voxel_hyperslab(
     int      n2,
     int      n3,
     int      n4,
-    Real     values[] )
+    VIO_Real     values[] )
 {
     int    i0, i1, i2, i3, i4, n_dims;
 
@@ -199,11 +199,11 @@ static  void  slow_get_volume_voxel_hyperslab(
     }
 }
 
-static  Real  *int_to_real_conversion = NULL;
+static  VIO_Real  *int_to_real_conversion = NULL;
 
 static  void  check_real_conversion_lookup( void )
 {
-    Real   min_value1, max_value1, min_value2, max_value2;
+    VIO_Real   min_value1, max_value1, min_value2, max_value2;
     long   i, long_min, long_max;
 
     if( int_to_real_conversion != NULL )
@@ -224,20 +224,20 @@ static  void  check_real_conversion_lookup( void )
     int_to_real_conversion -= long_min;
 
     for_inclusive( i, long_min, long_max )
-        int_to_real_conversion[i] = (Real) i;
+        int_to_real_conversion[i] = (VIO_Real) i;
 }
 
 VIOAPI  void  get_voxel_values_5d(
-    Data_types  data_type,
+    VIO_Data_types  data_type,
     void        *void_ptr,
     int         steps[],
     int         counts[],
-    Real        values[] )
+    VIO_Real        values[] )
 {
     int              step0, step1, step2, step3, step4;
     int              i0, i1, i2, i3, i4;
     int              n0, n1, n2, n3, n4;
-    unsigned  char   *unsigned_byte_ptr;
+    unsigned  char   *VIO_UCHAR_ptr;
     signed  char     *signed_byte_ptr;
     unsigned  short  *unsigned_short_ptr;
     signed  short    *signed_short_ptr;
@@ -266,7 +266,7 @@ VIOAPI  void  get_voxel_values_5d(
     switch( data_type )
     {
     case UNSIGNED_BYTE:
-        ASSIGN_PTR(unsigned_byte_ptr) = void_ptr;
+        ASSIGN_PTR(VIO_UCHAR_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
             for_less( i1, 0, n1 )
@@ -278,17 +278,17 @@ VIOAPI  void  get_voxel_values_5d(
                         for_less( i4, 0, n4 )
                         {
                             *values = int_to_real_conversion[
-                                                (long) *unsigned_byte_ptr];
+                                                (long) *VIO_UCHAR_ptr];
                             ++values;
-                            unsigned_byte_ptr += step4;
+                            VIO_UCHAR_ptr += step4;
                         }
-                        unsigned_byte_ptr += step3;
+                        VIO_UCHAR_ptr += step3;
                     }
-                    unsigned_byte_ptr += step2;
+                    VIO_UCHAR_ptr += step2;
                 }
-                unsigned_byte_ptr += step1;
+                VIO_UCHAR_ptr += step1;
             }
-            unsigned_byte_ptr += step0;
+            VIO_UCHAR_ptr += step0;
         }
         break;
 
@@ -385,7 +385,7 @@ VIOAPI  void  get_voxel_values_5d(
                     {
                         for_less( i4, 0, n4 )
                         {
-                            *values = (Real) *unsigned_int_ptr;
+                            *values = (VIO_Real) *unsigned_int_ptr;
                             ++values;
                             unsigned_int_ptr += step4;
                         }
@@ -411,7 +411,7 @@ VIOAPI  void  get_voxel_values_5d(
                     {
                         for_less( i4, 0, n4 )
                         {
-                            *values = (Real) *signed_int_ptr;
+                            *values = (VIO_Real) *signed_int_ptr;
                             ++values;
                             signed_int_ptr += step4;
                         }
@@ -437,7 +437,7 @@ VIOAPI  void  get_voxel_values_5d(
                     {
                         for_less( i4, 0, n4 )
                         {
-                            *values = (Real) *float_ptr;
+                            *values = (VIO_Real) *float_ptr;
                             ++values;
                             float_ptr += step4;
                         }
@@ -463,7 +463,7 @@ VIOAPI  void  get_voxel_values_5d(
                     {
                         for_less( i4, 0, n4 )
                         {
-                            *values = (Real) *double_ptr;
+                            *values = (VIO_Real) *double_ptr;
                             ++values;
                             double_ptr += step4;
                         }
@@ -480,16 +480,16 @@ VIOAPI  void  get_voxel_values_5d(
 }
 
 VIOAPI  void  get_voxel_values_4d(
-    Data_types  data_type,
+    VIO_Data_types  data_type,
     void        *void_ptr,
     int         steps[],
     int         counts[],
-    Real        values[] )
+    VIO_Real        values[] )
 {
     int              step0, step1, step2, step3;
     int              i0, i1, i2, i3;
     int              n0, n1, n2, n3;
-    unsigned  char   *unsigned_byte_ptr;
+    unsigned  char   *VIO_UCHAR_ptr;
     signed  char     *signed_byte_ptr;
     unsigned  short  *unsigned_short_ptr;
     signed  short    *signed_short_ptr;
@@ -514,7 +514,7 @@ VIOAPI  void  get_voxel_values_4d(
     switch( data_type )
     {
     case UNSIGNED_BYTE:
-        ASSIGN_PTR(unsigned_byte_ptr) = void_ptr;
+        ASSIGN_PTR(VIO_UCHAR_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
             for_less( i1, 0, n1 )
@@ -524,15 +524,15 @@ VIOAPI  void  get_voxel_values_4d(
                     for_less( i3, 0, n3 )
                     {
                         *values = int_to_real_conversion[
-                                                (long) *unsigned_byte_ptr];
+                                                (long) *VIO_UCHAR_ptr];
                         ++values;
-                        unsigned_byte_ptr += step3;
+                        VIO_UCHAR_ptr += step3;
                     }
-                    unsigned_byte_ptr += step2;
+                    VIO_UCHAR_ptr += step2;
                 }
-                unsigned_byte_ptr += step1;
+                VIO_UCHAR_ptr += step1;
             }
-            unsigned_byte_ptr += step0;
+            VIO_UCHAR_ptr += step0;
         }
         break;
 
@@ -614,7 +614,7 @@ VIOAPI  void  get_voxel_values_4d(
                 {
                     for_less( i3, 0, n3 )
                     {
-                        *values = (Real) *unsigned_int_ptr;
+                        *values = (VIO_Real) *unsigned_int_ptr;
                         ++values;
                         unsigned_int_ptr += step3;
                     }
@@ -636,7 +636,7 @@ VIOAPI  void  get_voxel_values_4d(
                 {
                     for_less( i3, 0, n3 )
                     {
-                        *values = (Real) *signed_int_ptr;
+                        *values = (VIO_Real) *signed_int_ptr;
                         ++values;
                         signed_int_ptr += step3;
                     }
@@ -658,7 +658,7 @@ VIOAPI  void  get_voxel_values_4d(
                 {
                     for_less( i3, 0, n3 )
                     {
-                        *values = (Real) *float_ptr;
+                        *values = (VIO_Real) *float_ptr;
                         ++values;
                         float_ptr += step3;
                     }
@@ -680,7 +680,7 @@ VIOAPI  void  get_voxel_values_4d(
                 {
                     for_less( i3, 0, n3 )
                     {
-                        *values = (Real) *double_ptr;
+                        *values = (VIO_Real) *double_ptr;
                         ++values;
                         double_ptr += step3;
                     }
@@ -695,16 +695,16 @@ VIOAPI  void  get_voxel_values_4d(
 }
 
 VIOAPI  void  get_voxel_values_3d(
-    Data_types  data_type,
+    VIO_Data_types  data_type,
     void        *void_ptr,
     int         steps[],
     int         counts[],
-    Real        values[] )
+    VIO_Real        values[] )
 {
     int              step0, step1, step2;
     int              i0, i1, i2;
     int              n0, n1, n2;
-    unsigned  char   *unsigned_byte_ptr;
+    unsigned  char   *VIO_UCHAR_ptr;
     signed  char     *signed_byte_ptr;
     unsigned  short  *unsigned_short_ptr;
     signed  short    *signed_short_ptr;
@@ -730,24 +730,24 @@ VIOAPI  void  get_voxel_values_3d(
         step0 -= step1 + 1;
         step1 -= 1;
 
-        ASSIGN_PTR(unsigned_byte_ptr) = void_ptr;
+        ASSIGN_PTR(VIO_UCHAR_ptr) = void_ptr;
 
-        values[0] = int_to_real_conversion[(unsigned long) *unsigned_byte_ptr];
-        ++unsigned_byte_ptr;
-        values[1] = int_to_real_conversion[(unsigned long) *unsigned_byte_ptr];
-        unsigned_byte_ptr += step1;
-        values[2] = int_to_real_conversion[(unsigned long) *unsigned_byte_ptr];
-        ++unsigned_byte_ptr;
-        values[3] = int_to_real_conversion[(unsigned long) *unsigned_byte_ptr];
-        unsigned_byte_ptr += step0;
+        values[0] = int_to_real_conversion[(unsigned long) *VIO_UCHAR_ptr];
+        ++VIO_UCHAR_ptr;
+        values[1] = int_to_real_conversion[(unsigned long) *VIO_UCHAR_ptr];
+        VIO_UCHAR_ptr += step1;
+        values[2] = int_to_real_conversion[(unsigned long) *VIO_UCHAR_ptr];
+        ++VIO_UCHAR_ptr;
+        values[3] = int_to_real_conversion[(unsigned long) *VIO_UCHAR_ptr];
+        VIO_UCHAR_ptr += step0;
 
-        values[4] = int_to_real_conversion[(unsigned long) *unsigned_byte_ptr];
-        ++unsigned_byte_ptr;
-        values[5] = int_to_real_conversion[(unsigned long) *unsigned_byte_ptr];
-        unsigned_byte_ptr += step1;
-        values[6] = int_to_real_conversion[(unsigned long) *unsigned_byte_ptr];
-        ++unsigned_byte_ptr;
-        values[7] = int_to_real_conversion[(unsigned long) *unsigned_byte_ptr];
+        values[4] = int_to_real_conversion[(unsigned long) *VIO_UCHAR_ptr];
+        ++VIO_UCHAR_ptr;
+        values[5] = int_to_real_conversion[(unsigned long) *VIO_UCHAR_ptr];
+        VIO_UCHAR_ptr += step1;
+        values[6] = int_to_real_conversion[(unsigned long) *VIO_UCHAR_ptr];
+        ++VIO_UCHAR_ptr;
+        values[7] = int_to_real_conversion[(unsigned long) *VIO_UCHAR_ptr];
 
         return;
     }
@@ -758,7 +758,7 @@ VIOAPI  void  get_voxel_values_3d(
     switch( data_type )
     {
     case UNSIGNED_BYTE:
-        ASSIGN_PTR(unsigned_byte_ptr) = void_ptr;
+        ASSIGN_PTR(VIO_UCHAR_ptr) = void_ptr;
 
         for_less( i0, 0, n0 )
         {
@@ -766,13 +766,13 @@ VIOAPI  void  get_voxel_values_3d(
             {
                 for_less( i2, 0, n2 )
                 {
-                    *values = int_to_real_conversion[(long) *unsigned_byte_ptr];
+                    *values = int_to_real_conversion[(long) *VIO_UCHAR_ptr];
                     ++values;
-                    unsigned_byte_ptr += step2;
+                    VIO_UCHAR_ptr += step2;
                 }
-                unsigned_byte_ptr += step1;
+                VIO_UCHAR_ptr += step1;
             }
-            unsigned_byte_ptr += step0;
+            VIO_UCHAR_ptr += step0;
         }
         break;
 
@@ -838,7 +838,7 @@ VIOAPI  void  get_voxel_values_3d(
             {
                 for_less( i2, 0, n2 )
                 {
-                    *values = (Real) *unsigned_int_ptr;
+                    *values = (VIO_Real) *unsigned_int_ptr;
                     ++values;
                     unsigned_int_ptr += step2;
                 }
@@ -856,7 +856,7 @@ VIOAPI  void  get_voxel_values_3d(
             {
                 for_less( i2, 0, n2 )
                 {
-                    *values = (Real) *signed_int_ptr;
+                    *values = (VIO_Real) *signed_int_ptr;
                     ++values;
                     signed_int_ptr += step2;
                 }
@@ -874,7 +874,7 @@ VIOAPI  void  get_voxel_values_3d(
             {
                 for_less( i2, 0, n2 )
                 {
-                    *values = (Real) *float_ptr;
+                    *values = (VIO_Real) *float_ptr;
                     ++values;
                     float_ptr += step2;
                 }
@@ -892,7 +892,7 @@ VIOAPI  void  get_voxel_values_3d(
             {
                 for_less( i2, 0, n2 )
                 {
-                    *values = (Real) *double_ptr;
+                    *values = (VIO_Real) *double_ptr;
                     ++values;
                     double_ptr += step2;
                 }
@@ -905,16 +905,16 @@ VIOAPI  void  get_voxel_values_3d(
 }
 
 VIOAPI  void  get_voxel_values_2d(
-    Data_types  data_type,
+    VIO_Data_types  data_type,
     void        *void_ptr,
     int         steps[],
     int         counts[],
-    Real        values[] )
+    VIO_Real        values[] )
 {
     int              step0, step1;
     int              i0, i1;
     int              n0, n1;
-    unsigned  char   *unsigned_byte_ptr;
+    unsigned  char   *VIO_UCHAR_ptr;
     signed  char     *signed_byte_ptr;
     unsigned  short  *unsigned_short_ptr;
     signed  short    *signed_short_ptr;
@@ -933,16 +933,16 @@ VIOAPI  void  get_voxel_values_2d(
     switch( data_type )
     {
     case UNSIGNED_BYTE:
-        ASSIGN_PTR(unsigned_byte_ptr) = void_ptr;
+        ASSIGN_PTR(VIO_UCHAR_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
             for_less( i1, 0, n1 )
             {
-                *values = int_to_real_conversion[(long) *unsigned_byte_ptr];
+                *values = int_to_real_conversion[(long) *VIO_UCHAR_ptr];
                 ++values;
-                unsigned_byte_ptr += step1;
+                VIO_UCHAR_ptr += step1;
             }
-            unsigned_byte_ptr += step0;
+            VIO_UCHAR_ptr += step0;
         }
         break;
 
@@ -994,7 +994,7 @@ VIOAPI  void  get_voxel_values_2d(
         {
             for_less( i1, 0, n1 )
             {
-                *values = (Real) *unsigned_int_ptr;
+                *values = (VIO_Real) *unsigned_int_ptr;
                 ++values;
                 unsigned_int_ptr += step1;
             }
@@ -1008,7 +1008,7 @@ VIOAPI  void  get_voxel_values_2d(
         {
             for_less( i1, 0, n1 )
             {
-                *values = (Real) *signed_int_ptr;
+                *values = (VIO_Real) *signed_int_ptr;
                 ++values;
                 signed_int_ptr += step1;
             }
@@ -1022,7 +1022,7 @@ VIOAPI  void  get_voxel_values_2d(
         {
             for_less( i1, 0, n1 )
             {
-                *values = (Real) *float_ptr;
+                *values = (VIO_Real) *float_ptr;
                 ++values;
                 float_ptr += step1;
             }
@@ -1036,7 +1036,7 @@ VIOAPI  void  get_voxel_values_2d(
         {
             for_less( i1, 0, n1 )
             {
-                *values = (Real) *double_ptr;
+                *values = (VIO_Real) *double_ptr;
                 ++values;
                 double_ptr += step1;
             }
@@ -1047,14 +1047,14 @@ VIOAPI  void  get_voxel_values_2d(
 }
 
 VIOAPI  void  get_voxel_values_1d(
-    Data_types  data_type,
+    VIO_Data_types  data_type,
     void        *void_ptr,
     int         step0,
     int         n0,
-    Real        values[] )
+    VIO_Real        values[] )
 {
     int              i0;
-    unsigned  char   *unsigned_byte_ptr;
+    unsigned  char   *VIO_UCHAR_ptr;
     signed  char     *signed_byte_ptr;
     unsigned  short  *unsigned_short_ptr;
     signed  short    *signed_short_ptr;
@@ -1068,12 +1068,12 @@ VIOAPI  void  get_voxel_values_1d(
     switch( data_type )
     {
     case UNSIGNED_BYTE:
-        ASSIGN_PTR(unsigned_byte_ptr) = void_ptr;
+        ASSIGN_PTR(VIO_UCHAR_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
-            *values = int_to_real_conversion[(long) *unsigned_byte_ptr];
+            *values = int_to_real_conversion[(long) *VIO_UCHAR_ptr];
             ++values;
-            unsigned_byte_ptr += step0;
+            VIO_UCHAR_ptr += step0;
         }
         break;
 
@@ -1111,7 +1111,7 @@ VIOAPI  void  get_voxel_values_1d(
         ASSIGN_PTR(unsigned_int_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
-            *values = (Real) *unsigned_int_ptr;
+            *values = (VIO_Real) *unsigned_int_ptr;
             ++values;
             unsigned_int_ptr += step0;
         }
@@ -1121,7 +1121,7 @@ VIOAPI  void  get_voxel_values_1d(
         ASSIGN_PTR(signed_int_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
-            *values = (Real) *signed_int_ptr;
+            *values = (VIO_Real) *signed_int_ptr;
             ++values;
             signed_int_ptr += step0;
         }
@@ -1131,7 +1131,7 @@ VIOAPI  void  get_voxel_values_1d(
         ASSIGN_PTR(float_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
-            *values = (Real) *float_ptr;
+            *values = (VIO_Real) *float_ptr;
             ++values;
             float_ptr += step0;
         }
@@ -1141,7 +1141,7 @@ VIOAPI  void  get_voxel_values_1d(
         ASSIGN_PTR(double_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
-            *values = (Real) *double_ptr;
+            *values = (VIO_Real) *double_ptr;
             ++values;
             double_ptr += step0;
         }
@@ -1150,14 +1150,14 @@ VIOAPI  void  get_voxel_values_1d(
 }
 
 static  void  get_voxel_values(
-    Volume   volume,
+    VIO_Volume   volume,
     void     *void_ptr,
     int      n_dims,
     int      steps[],
     int      counts[],
-    Real     values[] )
+    VIO_Real     values[] )
 {
-    Data_types  data_type;
+    VIO_Data_types  data_type;
 
     data_type = get_volume_data_type( volume );
     switch( n_dims )
@@ -1184,7 +1184,7 @@ static  void  get_voxel_values(
 }
 
 VIOAPI  void  get_volume_voxel_hyperslab_5d(
-    Volume   volume,
+    VIO_Volume   volume,
     int      v0,
     int      v1,
     int      v2,
@@ -1195,11 +1195,11 @@ VIOAPI  void  get_volume_voxel_hyperslab_5d(
     int      n2,
     int      n3,
     int      n4,
-    Real     values[] )
+    VIO_Real     values[] )
 {
-    int         steps[MAX_DIMENSIONS];
-    int         counts[MAX_DIMENSIONS];
-    int         sizes[MAX_DIMENSIONS];
+    int         steps[VIO_MAX_DIMENSIONS];
+    int         counts[VIO_MAX_DIMENSIONS];
+    int         sizes[VIO_MAX_DIMENSIONS];
     int         dim, stride;
     void        *void_ptr;
 
@@ -1261,7 +1261,7 @@ VIOAPI  void  get_volume_voxel_hyperslab_5d(
 }
 
 VIOAPI  void  get_volume_voxel_hyperslab_4d(
-    Volume   volume,
+    VIO_Volume   volume,
     int      v0,
     int      v1,
     int      v2,
@@ -1270,11 +1270,11 @@ VIOAPI  void  get_volume_voxel_hyperslab_4d(
     int      n1,
     int      n2,
     int      n3,
-    Real     values[] )
+    VIO_Real     values[] )
 {
-    int         steps[MAX_DIMENSIONS];
-    int         counts[MAX_DIMENSIONS];
-    int         sizes[MAX_DIMENSIONS];
+    int         steps[VIO_MAX_DIMENSIONS];
+    int         counts[VIO_MAX_DIMENSIONS];
+    int         sizes[VIO_MAX_DIMENSIONS];
     int         dim, stride;
     void        *void_ptr;
 
@@ -1328,18 +1328,18 @@ VIOAPI  void  get_volume_voxel_hyperslab_4d(
 }
 
 VIOAPI  void  get_volume_voxel_hyperslab_3d(
-    Volume   volume,
+    VIO_Volume   volume,
     int      v0,
     int      v1,
     int      v2,
     int      n0,
     int      n1,
     int      n2,
-    Real     values[] )
+    VIO_Real     values[] )
 {
-    int         steps[MAX_DIMENSIONS];
-    int         counts[MAX_DIMENSIONS];
-    int         sizes[MAX_DIMENSIONS];
+    int         steps[VIO_MAX_DIMENSIONS];
+    int         counts[VIO_MAX_DIMENSIONS];
+    int         sizes[VIO_MAX_DIMENSIONS];
     int         dim, stride;
     void        *void_ptr;
 
@@ -1385,16 +1385,16 @@ VIOAPI  void  get_volume_voxel_hyperslab_3d(
 }
 
 VIOAPI  void  get_volume_voxel_hyperslab_2d(
-    Volume   volume,
+    VIO_Volume   volume,
     int      v0,
     int      v1,
     int      n0,
     int      n1,
-    Real     values[] )
+    VIO_Real     values[] )
 {
-    int         steps[MAX_DIMENSIONS];
-    int         counts[MAX_DIMENSIONS];
-    int         sizes[MAX_DIMENSIONS];
+    int         steps[VIO_MAX_DIMENSIONS];
+    int         counts[VIO_MAX_DIMENSIONS];
+    int         sizes[VIO_MAX_DIMENSIONS];
     int         dim, stride;
     void        *void_ptr;
 
@@ -1432,14 +1432,14 @@ VIOAPI  void  get_volume_voxel_hyperslab_2d(
 }
 
 VIOAPI  void  get_volume_voxel_hyperslab_1d(
-    Volume   volume,
+    VIO_Volume   volume,
     int      v0,
     int      n0,
-    Real     values[] )
+    VIO_Real     values[] )
 {
-    int         steps[MAX_DIMENSIONS];
-    int         counts[MAX_DIMENSIONS];
-    int         sizes[MAX_DIMENSIONS];
+    int         steps[VIO_MAX_DIMENSIONS];
+    int         counts[VIO_MAX_DIMENSIONS];
+    int         sizes[VIO_MAX_DIMENSIONS];
     int         dim;
     void        *void_ptr;
 
@@ -1468,7 +1468,7 @@ VIOAPI  void  get_volume_voxel_hyperslab_1d(
 }
 
 VIOAPI  void  get_volume_voxel_hyperslab(
-    Volume   volume,
+    VIO_Volume   volume,
     int      v0,
     int      v1,
     int      v2,
@@ -1479,7 +1479,7 @@ VIOAPI  void  get_volume_voxel_hyperslab(
     int      n2,
     int      n3,
     int      n4,
-    Real     voxels[] )
+    VIO_Real     voxels[] )
 {
     switch( get_volume_n_dimensions(volume) )
     {

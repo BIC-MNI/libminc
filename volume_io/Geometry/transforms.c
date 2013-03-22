@@ -30,7 +30,7 @@
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  void  make_identity_transform( Transform   *transform )
+VIOAPI  void  make_identity_transform( VIO_Transform   *transform )
 {
     Transform_elem( *transform, 0, 0 ) = 1.0;
     Transform_elem( *transform, 0, 1 ) = 0.0;
@@ -63,12 +63,12 @@ VIOAPI  void  make_identity_transform( Transform   *transform )
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  BOOLEAN  close_to_identity(
-    Transform   *transform )
+VIOAPI  VIO_BOOL  close_to_identity(
+    VIO_Transform   *transform )
 {
 #define   TOLERANCE   0.001
-    BOOLEAN    close;
-    Real       expected_val;
+    VIO_BOOL    close;
+    VIO_Real       expected_val;
     int        i, j;
 
     close = TRUE;
@@ -108,8 +108,8 @@ VIOAPI  BOOLEAN  close_to_identity(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  get_transform_origin(
-    Transform   *transform,
-    Point       *origin )
+    VIO_Transform   *transform,
+    VIO_Point       *origin )
 {
     fill_Point( *origin,
                 Transform_elem(*transform,0,3),
@@ -132,12 +132,12 @@ VIOAPI  void  get_transform_origin(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  set_transform_origin(
-    Transform   *transform,
-    Point       *origin )
+    VIO_Transform   *transform,
+    VIO_Point       *origin )
 {
-    Transform_elem(*transform,0,3) = (Transform_elem_type) Point_x(*origin);
-    Transform_elem(*transform,1,3) = (Transform_elem_type) Point_y(*origin);
-    Transform_elem(*transform,2,3) = (Transform_elem_type) Point_z(*origin);
+    Transform_elem(*transform,0,3) = (VIO_Transform_elem_type) Point_x(*origin);
+    Transform_elem(*transform,1,3) = (VIO_Transform_elem_type) Point_y(*origin);
+    Transform_elem(*transform,2,3) = (VIO_Transform_elem_type) Point_z(*origin);
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -155,12 +155,12 @@ VIOAPI  void  set_transform_origin(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  get_transform_origin_real(
-    Transform   *transform,
-    Real        origin[] )
+    VIO_Transform   *transform,
+    VIO_Real        origin[] )
 {
-    origin[X] = Transform_elem(*transform,0,3);
-    origin[Y] = Transform_elem(*transform,1,3);
-    origin[Z] = Transform_elem(*transform,2,3);
+    origin[VIO_X] = Transform_elem(*transform,0,3);
+    origin[VIO_Y] = Transform_elem(*transform,1,3);
+    origin[VIO_Z] = Transform_elem(*transform,2,3);
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -178,8 +178,8 @@ VIOAPI  void  get_transform_origin_real(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  get_transform_x_axis(
-    Transform   *transform,
-    Vector      *x_axis )
+    VIO_Transform   *transform,
+    VIO_Vector      *x_axis )
 {
     fill_Vector( *x_axis,
                  Transform_elem(*transform,0,0),
@@ -202,12 +202,12 @@ VIOAPI  void  get_transform_x_axis(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  get_transform_x_axis_real(
-    Transform   *transform,
-    Real        x_axis[] )
+    VIO_Transform   *transform,
+    VIO_Real        x_axis[] )
 {
-    x_axis[X] = Transform_elem(*transform,0,0);
-    x_axis[Y] = Transform_elem(*transform,1,0);
-    x_axis[Z] = Transform_elem(*transform,2,0);
+    x_axis[VIO_X] = Transform_elem(*transform,0,0);
+    x_axis[VIO_Y] = Transform_elem(*transform,1,0);
+    x_axis[VIO_Z] = Transform_elem(*transform,2,0);
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -225,12 +225,12 @@ VIOAPI  void  get_transform_x_axis_real(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  set_transform_x_axis(
-    Transform   *transform,
-    Vector      *x_axis )
+    VIO_Transform   *transform,
+    VIO_Vector      *x_axis )
 {
-    Transform_elem(*transform,0,0) = (Transform_elem_type) Vector_x(*x_axis);
-    Transform_elem(*transform,1,0) = (Transform_elem_type) Vector_y(*x_axis);
-    Transform_elem(*transform,2,0) = (Transform_elem_type) Vector_z(*x_axis);
+    Transform_elem(*transform,0,0) = (VIO_Transform_elem_type) Vector_x(*x_axis);
+    Transform_elem(*transform,1,0) = (VIO_Transform_elem_type) Vector_y(*x_axis);
+    Transform_elem(*transform,2,0) = (VIO_Transform_elem_type) Vector_z(*x_axis);
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -248,12 +248,12 @@ VIOAPI  void  set_transform_x_axis(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  set_transform_x_axis_real(
-    Transform   *transform,
-    Real        x_axis[] )
+    VIO_Transform   *transform,
+    VIO_Real        x_axis[] )
 {
-    Transform_elem(*transform,0,0) = (Transform_elem_type) x_axis[X];
-    Transform_elem(*transform,1,0) = (Transform_elem_type) x_axis[Y];
-    Transform_elem(*transform,2,0) = (Transform_elem_type) x_axis[Z];
+    Transform_elem(*transform,0,0) = (VIO_Transform_elem_type) x_axis[VIO_X];
+    Transform_elem(*transform,1,0) = (VIO_Transform_elem_type) x_axis[VIO_Y];
+    Transform_elem(*transform,2,0) = (VIO_Transform_elem_type) x_axis[VIO_Z];
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -271,8 +271,8 @@ VIOAPI  void  set_transform_x_axis_real(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  get_transform_y_axis(
-    Transform   *transform,
-    Vector      *y_axis )
+    VIO_Transform   *transform,
+    VIO_Vector      *y_axis )
 {
     fill_Vector( *y_axis,
                  Transform_elem(*transform,0,1),
@@ -295,12 +295,12 @@ VIOAPI  void  get_transform_y_axis(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  get_transform_y_axis_real(
-    Transform   *transform,
-    Real        y_axis[] )
+    VIO_Transform   *transform,
+    VIO_Real        y_axis[] )
 {
-    y_axis[X] = Transform_elem(*transform,0,1);
-    y_axis[Y] = Transform_elem(*transform,1,1);
-    y_axis[Z] = Transform_elem(*transform,2,1);
+    y_axis[VIO_X] = Transform_elem(*transform,0,1);
+    y_axis[VIO_Y] = Transform_elem(*transform,1,1);
+    y_axis[VIO_Z] = Transform_elem(*transform,2,1);
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -318,12 +318,12 @@ VIOAPI  void  get_transform_y_axis_real(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  set_transform_y_axis(
-    Transform   *transform,
-    Vector      *y_axis )
+    VIO_Transform   *transform,
+    VIO_Vector      *y_axis )
 {
-    Transform_elem(*transform,0,1) = (Transform_elem_type) Vector_x(*y_axis);
-    Transform_elem(*transform,1,1) = (Transform_elem_type) Vector_y(*y_axis);
-    Transform_elem(*transform,2,1) = (Transform_elem_type) Vector_z(*y_axis);
+    Transform_elem(*transform,0,1) = (VIO_Transform_elem_type) Vector_x(*y_axis);
+    Transform_elem(*transform,1,1) = (VIO_Transform_elem_type) Vector_y(*y_axis);
+    Transform_elem(*transform,2,1) = (VIO_Transform_elem_type) Vector_z(*y_axis);
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -341,12 +341,12 @@ VIOAPI  void  set_transform_y_axis(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  set_transform_y_axis_real(
-    Transform   *transform,
-    Real        y_axis[] )
+    VIO_Transform   *transform,
+    VIO_Real        y_axis[] )
 {
-    Transform_elem(*transform,0,1) = (Transform_elem_type) y_axis[X];
-    Transform_elem(*transform,1,1) = (Transform_elem_type) y_axis[Y];
-    Transform_elem(*transform,2,1) = (Transform_elem_type) y_axis[Z];
+    Transform_elem(*transform,0,1) = (VIO_Transform_elem_type) y_axis[VIO_X];
+    Transform_elem(*transform,1,1) = (VIO_Transform_elem_type) y_axis[VIO_Y];
+    Transform_elem(*transform,2,1) = (VIO_Transform_elem_type) y_axis[VIO_Z];
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -364,8 +364,8 @@ VIOAPI  void  set_transform_y_axis_real(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  get_transform_z_axis(
-    Transform   *transform,
-    Vector      *z_axis )
+    VIO_Transform   *transform,
+    VIO_Vector      *z_axis )
 {
     fill_Vector( *z_axis,
                  Transform_elem(*transform,0,2),
@@ -388,12 +388,12 @@ VIOAPI  void  get_transform_z_axis(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  get_transform_z_axis_real(
-    Transform   *transform,
-    Real        z_axis[] )
+    VIO_Transform   *transform,
+    VIO_Real        z_axis[] )
 {
-    z_axis[X] = Transform_elem(*transform,0,2);
-    z_axis[Y] = Transform_elem(*transform,1,2);
-    z_axis[Z] = Transform_elem(*transform,2,2);
+    z_axis[VIO_X] = Transform_elem(*transform,0,2);
+    z_axis[VIO_Y] = Transform_elem(*transform,1,2);
+    z_axis[VIO_Z] = Transform_elem(*transform,2,2);
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -411,12 +411,12 @@ VIOAPI  void  get_transform_z_axis_real(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  set_transform_z_axis(
-    Transform   *transform,
-    Vector      *z_axis )
+    VIO_Transform   *transform,
+    VIO_Vector      *z_axis )
 {
-    Transform_elem(*transform,0,2) = (Transform_elem_type) Vector_x(*z_axis);
-    Transform_elem(*transform,1,2) = (Transform_elem_type) Vector_y(*z_axis);
-    Transform_elem(*transform,2,2) = (Transform_elem_type) Vector_z(*z_axis);
+    Transform_elem(*transform,0,2) = (VIO_Transform_elem_type) Vector_x(*z_axis);
+    Transform_elem(*transform,1,2) = (VIO_Transform_elem_type) Vector_y(*z_axis);
+    Transform_elem(*transform,2,2) = (VIO_Transform_elem_type) Vector_z(*z_axis);
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -434,12 +434,12 @@ VIOAPI  void  set_transform_z_axis(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  set_transform_z_axis_real(
-    Transform   *transform,
-    Real        z_axis[] )
+    VIO_Transform   *transform,
+    VIO_Real        z_axis[] )
 {
-    Transform_elem(*transform,0,2) = (Transform_elem_type) z_axis[X];
-    Transform_elem(*transform,1,2) = (Transform_elem_type) z_axis[Y];
-    Transform_elem(*transform,2,2) = (Transform_elem_type) z_axis[Z];
+    Transform_elem(*transform,0,2) = (VIO_Transform_elem_type) z_axis[VIO_X];
+    Transform_elem(*transform,1,2) = (VIO_Transform_elem_type) z_axis[VIO_Y];
+    Transform_elem(*transform,2,2) = (VIO_Transform_elem_type) z_axis[VIO_Z];
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -461,24 +461,24 @@ VIOAPI  void  set_transform_z_axis_real(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void   make_change_to_bases_transform(
-    Point      *origin,
-    Vector     *x_axis,
-    Vector     *y_axis,
-    Vector     *z_axis,
-    Transform  *transform )
+    VIO_Point      *origin,
+    VIO_Vector     *x_axis,
+    VIO_Vector     *y_axis,
+    VIO_Vector     *z_axis,
+    VIO_Transform  *transform )
 {
-    Transform_elem( *transform,0,0 ) = (Transform_elem_type)Vector_x( *x_axis );
-    Transform_elem( *transform,0,1 ) = (Transform_elem_type)Vector_x( *y_axis );
-    Transform_elem( *transform,0,2 ) = (Transform_elem_type)Vector_x( *z_axis );
-    Transform_elem( *transform,0,3 ) = (Transform_elem_type)Point_x( *origin );
-    Transform_elem( *transform,1,0 ) = (Transform_elem_type)Vector_y( *x_axis );
-    Transform_elem( *transform,1,1 ) = (Transform_elem_type)Vector_y( *y_axis );
-    Transform_elem( *transform,1,2 ) = (Transform_elem_type)Vector_y( *z_axis );
-    Transform_elem( *transform,1,3 ) = (Transform_elem_type)Point_y( *origin );
-    Transform_elem( *transform,2,0 ) = (Transform_elem_type)Vector_z( *x_axis );
-    Transform_elem( *transform,2,1 ) = (Transform_elem_type)Vector_z( *y_axis );
-    Transform_elem( *transform,2,2 ) = (Transform_elem_type)Vector_z( *z_axis );
-    Transform_elem( *transform,2,3 ) = (Transform_elem_type)Point_z( *origin );
+    Transform_elem( *transform,0,0 ) = (VIO_Transform_elem_type)Vector_x( *x_axis );
+    Transform_elem( *transform,0,1 ) = (VIO_Transform_elem_type)Vector_x( *y_axis );
+    Transform_elem( *transform,0,2 ) = (VIO_Transform_elem_type)Vector_x( *z_axis );
+    Transform_elem( *transform,0,3 ) = (VIO_Transform_elem_type)Point_x( *origin );
+    Transform_elem( *transform,1,0 ) = (VIO_Transform_elem_type)Vector_y( *x_axis );
+    Transform_elem( *transform,1,1 ) = (VIO_Transform_elem_type)Vector_y( *y_axis );
+    Transform_elem( *transform,1,2 ) = (VIO_Transform_elem_type)Vector_y( *z_axis );
+    Transform_elem( *transform,1,3 ) = (VIO_Transform_elem_type)Point_y( *origin );
+    Transform_elem( *transform,2,0 ) = (VIO_Transform_elem_type)Vector_z( *x_axis );
+    Transform_elem( *transform,2,1 ) = (VIO_Transform_elem_type)Vector_z( *y_axis );
+    Transform_elem( *transform,2,2 ) = (VIO_Transform_elem_type)Vector_z( *z_axis );
+    Transform_elem( *transform,2,3 ) = (VIO_Transform_elem_type)Point_z( *origin );
     Transform_elem( *transform,3,0 ) = 0.0;
     Transform_elem( *transform,3,1 ) = 0.0;
     Transform_elem( *transform,3,2 ) = 0.0;
@@ -504,26 +504,26 @@ VIOAPI  void   make_change_to_bases_transform(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void   make_change_from_bases_transform(
-    Point      *origin,
-    Vector     *x_axis,
-    Vector     *y_axis,
-    Vector     *z_axis,
-    Transform  *transform )
+    VIO_Point      *origin,
+    VIO_Vector     *x_axis,
+    VIO_Vector     *y_axis,
+    VIO_Vector     *z_axis,
+    VIO_Transform  *transform )
 {
-    Transform_elem(*transform,0,0) = (Transform_elem_type)Vector_x( *x_axis );
-    Transform_elem(*transform,0,1) = (Transform_elem_type)Vector_y( *x_axis );
-    Transform_elem(*transform,0,2) = (Transform_elem_type)Vector_z( *x_axis );
-    Transform_elem(*transform,0,3) = (Transform_elem_type)
+    Transform_elem(*transform,0,0) = (VIO_Transform_elem_type)Vector_x( *x_axis );
+    Transform_elem(*transform,0,1) = (VIO_Transform_elem_type)Vector_y( *x_axis );
+    Transform_elem(*transform,0,2) = (VIO_Transform_elem_type)Vector_z( *x_axis );
+    Transform_elem(*transform,0,3) = (VIO_Transform_elem_type)
                                         - DOT_POINT_VECTOR( *origin, *x_axis );
-    Transform_elem(*transform,1,0) = (Transform_elem_type)Vector_x( *y_axis );
-    Transform_elem(*transform,1,1) = (Transform_elem_type)Vector_y( *y_axis );
-    Transform_elem(*transform,1,2) = (Transform_elem_type)Vector_z( *y_axis );
-    Transform_elem(*transform,1,3) = (Transform_elem_type)
+    Transform_elem(*transform,1,0) = (VIO_Transform_elem_type)Vector_x( *y_axis );
+    Transform_elem(*transform,1,1) = (VIO_Transform_elem_type)Vector_y( *y_axis );
+    Transform_elem(*transform,1,2) = (VIO_Transform_elem_type)Vector_z( *y_axis );
+    Transform_elem(*transform,1,3) = (VIO_Transform_elem_type)
                                         - DOT_POINT_VECTOR( *origin, *y_axis );
-    Transform_elem(*transform,2,0) = (Transform_elem_type)Vector_x( *z_axis );
-    Transform_elem(*transform,2,1) = (Transform_elem_type)Vector_y( *z_axis );
-    Transform_elem(*transform,2,2) = (Transform_elem_type)Vector_z( *z_axis );
-    Transform_elem(*transform,2,3) = (Transform_elem_type)
+    Transform_elem(*transform,2,0) = (VIO_Transform_elem_type)Vector_x( *z_axis );
+    Transform_elem(*transform,2,1) = (VIO_Transform_elem_type)Vector_y( *z_axis );
+    Transform_elem(*transform,2,2) = (VIO_Transform_elem_type)Vector_z( *z_axis );
+    Transform_elem(*transform,2,3) = (VIO_Transform_elem_type)
                                         - DOT_POINT_VECTOR( *origin, *z_axis );
     Transform_elem(*transform,3,0) = 0.0;
     Transform_elem(*transform,3,1) = 0.0;
@@ -550,14 +550,14 @@ VIOAPI  void   make_change_from_bases_transform(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void   concat_transforms(
-    Transform   *result,
-    Transform   *t1,
-    Transform   *t2 )
+    VIO_Transform   *result,
+    VIO_Transform   *t1,
+    VIO_Transform   *t2 )
 {
     int         i, j, k;
-    Real        sum;
-    BOOLEAN     result_is_also_an_arg;
-    Transform   tmp, *t;
+    VIO_Real        sum;
+    VIO_BOOL     result_is_also_an_arg;
+    VIO_Transform   tmp, *t;
 
     /*--- check if the result transform is same as one of the arguments */
 
@@ -602,7 +602,7 @@ VIOAPI  void   concat_transforms(
 @OUTPUT     : x_trans
               y_trans
               z_trans
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Transforms the point (x,y,z,w) by the homogenous transform
               matrix, resulting in (x_trans,y_trans,z_trans).
 @METHOD     : 
@@ -613,16 +613,16 @@ VIOAPI  void   concat_transforms(
 ---------------------------------------------------------------------------- */
 
 static  VIO_Status  homogenous_transform_point(
-    Transform  *transform,
-    Real       x,
-    Real       y,
-    Real       z,
-    Real       w,
-    Real       *x_trans,
-    Real       *y_trans,
-    Real       *z_trans )
+    VIO_Transform  *transform,
+    VIO_Real       x,
+    VIO_Real       y,
+    VIO_Real       z,
+    VIO_Real       w,
+    VIO_Real       *x_trans,
+    VIO_Real       *y_trans,
+    VIO_Real       *z_trans )
 {
-    Real       w_trans;
+    VIO_Real       w_trans;
 
     *x_trans = Transform_elem(*transform,0,0) * x +
                Transform_elem(*transform,0,1) * y +
@@ -662,7 +662,7 @@ static  VIO_Status  homogenous_transform_point(
 @OUTPUT     : x_trans
               y_trans
               z_trans
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Transforms the point (x,y,z) by the transform matrix, resulting
               in (x_trans,y_trans,z_trans).
 @METHOD     : 
@@ -673,13 +673,13 @@ static  VIO_Status  homogenous_transform_point(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  VIO_Status  transform_point(
-    Transform  *transform,
-    Real       x,
-    Real       y,
-    Real       z,
-    Real       *x_trans,
-    Real       *y_trans,
-    Real       *z_trans )
+    VIO_Transform  *transform,
+    VIO_Real       x,
+    VIO_Real       y,
+    VIO_Real       z,
+    VIO_Real       *x_trans,
+    VIO_Real       *y_trans,
+    VIO_Real       *z_trans )
 {
     return homogenous_transform_point( transform, x, y, z, 1.0,
                                 x_trans, y_trans, z_trans );
@@ -704,13 +704,13 @@ VIOAPI  VIO_Status  transform_point(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  VIO_Status  transform_vector(
-    Transform  *transform,
-    Real       x,
-    Real       y,
-    Real       z,
-    Real       *x_trans,
-    Real       *y_trans,
-    Real       *z_trans )
+    VIO_Transform  *transform,
+    VIO_Real       x,
+    VIO_Real       y,
+    VIO_Real       z,
+    VIO_Real       *x_trans,
+    VIO_Real       *y_trans,
+    VIO_Real       *z_trans )
 {
     return homogenous_transform_point( transform, x, y, z, 0.0,
                                 x_trans, y_trans, z_trans );

@@ -25,11 +25,11 @@
 
 #define  INVALID_AXIS   -1
 
-static  BOOLEAN  match_dimension_names(
+static  VIO_BOOL  match_dimension_names(
     int               n_volume_dims,
-    STRING            volume_dimension_names[],
+    VIO_STR            volume_dimension_names[],
     int               n_file_dims,
-    STRING            file_dimension_names[],
+    VIO_STR            file_dimension_names[],
     int               to_volume_index[] );
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -46,12 +46,12 @@ static  BOOLEAN  match_dimension_names(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  int   get_minc_file_n_dimensions(
-    STRING   filename )
+    VIO_STR   filename )
 {
     int       cdfid, img_var, n_dims;
     int       dim_vars[MAX_VAR_DIMS];
     nc_type   file_datatype;
-    STRING    expanded;
+    VIO_STR    expanded;
 
     ncopts = NC_VERBOSE;
 
@@ -107,11 +107,11 @@ VIOAPI  Minc_file  initialize_minc_input_from_minc_id(
     int                 dim_vars[MAX_VAR_DIMS], n_vol_dims;
     int                 i, slab_size, prev_sizes[MAX_VAR_DIMS];
     nc_type             prev_nc_type;
-    BOOLEAN             different;
-    BOOLEAN             range_specified;
+    VIO_BOOL             different;
+    VIO_BOOL             range_specified;
     double              valid_range[2];
     long                long_size;
-    BOOLEAN             converted_sign, space_type_consensus;
+    VIO_BOOL             converted_sign, space_type_consensus;
     nc_type             converted_type;
     char                signed_flag[MI_MAX_ATTSTR_LEN+1], *ptr;
     char                dim_name[MI_MAX_ATTSTR_LEN+1];
@@ -120,18 +120,18 @@ VIOAPI  Minc_file  initialize_minc_input_from_minc_id(
     nc_type             file_datatype;
     int                 sizes[MAX_VAR_DIMS];
     double              file_separations[MAX_VAR_DIMS];
-    Real                volume_separations[MAX_VAR_DIMS];
-    Real                volume_starts[MAX_VAR_DIMS];
-    Real                voxel_zero;
+    VIO_Real                volume_separations[MAX_VAR_DIMS];
+    VIO_Real                volume_starts[MAX_VAR_DIMS];
+    VIO_Real                voxel_zero;
     double              start_position[MAX_VAR_DIMS];
     double              dir_cosines[MAX_VAR_DIMS][MI_NUM_SPACE_DIMS];
     double              tmp_cosines[MI_NUM_SPACE_DIMS];
-    BOOLEAN             spatial_dim_flags[MAX_VAR_DIMS];
+    VIO_BOOL             spatial_dim_flags[MAX_VAR_DIMS];
     double              real_min, real_max;
     int                 d, dimvar, which_valid_axis, axis;
     int                 spatial_axis_indices[MAX_VAR_DIMS];
     minc_input_options  default_options;
-    BOOLEAN             no_volume_data_type;
+    VIO_BOOL             no_volume_data_type;
     char                spacing_type[MI_MAX_ATTSTR_LEN+1];
     double              *irr_starts[MAX_VAR_DIMS];
     double              *irr_widths[MAX_VAR_DIMS];
@@ -362,8 +362,8 @@ VIOAPI  Minc_file  initialize_minc_input_from_minc_id(
                     long count[1];
                     int i;
 
-                    irr_starts[d] = malloc(sizeof(Real) * file->sizes_in_file[d]);
-                    irr_widths[d] = malloc(sizeof(Real) * file->sizes_in_file[d]);
+                    irr_starts[d] = malloc(sizeof(VIO_Real) * file->sizes_in_file[d]);
+                    irr_widths[d] = malloc(sizeof(VIO_Real) * file->sizes_in_file[d]);
 
                     start[0] = 0;
                     count[0] = file->sizes_in_file[d];
@@ -648,13 +648,13 @@ VIOAPI  Minc_file  initialize_minc_input_from_minc_id(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  Minc_file  initialize_minc_input(
-    STRING               filename,
+    VIO_STR               filename,
     Volume               volume,
     minc_input_options   *options )
 {
     Minc_file    file;
     int          minc_id;
-    STRING       expanded;
+    VIO_STR       expanded;
 
     ncopts = 0;
 
@@ -714,7 +714,7 @@ VIOAPI  int  get_n_input_volumes(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  close_minc_input(
+VIOAPI  VIO_Status  close_minc_input(
     Minc_file   file )
 {
     int  d;
@@ -759,7 +759,7 @@ VIOAPI  Status  close_minc_input(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  input_minc_hyperslab(
+VIOAPI  VIO_Status  input_minc_hyperslab(
     Minc_file        file,
     Data_types       data_type,
     int              n_array_dims,
@@ -769,17 +769,17 @@ VIOAPI  Status  input_minc_hyperslab(
     int              start[],
     int              count[] )
 {
-    Status           status;
+    VIO_Status           status;
     int              ind, expected_ind, file_ind, d, i, dim;
     int              size0, size1, size2, size3, size4;
     int              n_tmp_dims, n_file_dims;
     void             *void_ptr;
-    BOOLEAN          direct_to_array, non_full_size_found;
+    VIO_BOOL          direct_to_array, non_full_size_found;
     int              tmp_ind, tmp_sizes[MAX_VAR_DIMS];
     int              vol1_indices[MAX_DIMENSIONS];
     int              v[MAX_DIMENSIONS], voxel[MAX_DIMENSIONS];
     long             used_start[MAX_VAR_DIMS], used_count[MAX_VAR_DIMS];
-    Real             rgb[4];
+    VIO_Real             rgb[4];
     Colour           colour;
     multidim_array   buffer_array, rgb_array;
 
@@ -903,7 +903,7 @@ VIOAPI  Status  input_minc_hyperslab(
                     else
                     {
                          voxel[n_tmp_dims] = file->rgba_indices[i];
-                         GET_MULTIDIM( rgb[i], (Real), rgb_array,
+                         GET_MULTIDIM( rgb[i], (VIO_Real), rgb_array,
                                        voxel[0], voxel[1],
                                        voxel[2], voxel[3], voxel[4] );
                     }
@@ -1000,14 +1000,14 @@ static  void  input_slab(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  BOOLEAN  input_more_minc_file(
+VIOAPI  VIO_BOOL  input_more_minc_file(
     Minc_file   file,
-    Real        *fraction_done )
+    VIO_Real        *fraction_done )
 {
     int      d, ind, n_done, total, n_slab;
     long     count[MAX_VAR_DIMS];
     Volume   volume;
-    BOOLEAN  increment;
+    VIO_BOOL  increment;
 
     if( file->end_volume_flag )
     {
@@ -1092,7 +1092,7 @@ VIOAPI  BOOLEAN  input_more_minc_file(
         }
         else
         {
-            *fraction_done = (Real) n_done / (Real) total;
+            *fraction_done = (VIO_Real) n_done / (VIO_Real) total;
         }
     }
 
@@ -1113,12 +1113,12 @@ VIOAPI  BOOLEAN  input_more_minc_file(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  BOOLEAN  advance_input_volume(
+VIOAPI  VIO_BOOL  advance_input_volume(
     Minc_file   file )
 {
     int                 ind, c, axis;
-    Real                voxel[MAX_DIMENSIONS], world_space[N_DIMENSIONS];
-    Real                vol_world_space[N_DIMENSIONS];
+    VIO_Real                voxel[MAX_DIMENSIONS], world_space[N_DIMENSIONS];
+    VIO_Real                vol_world_space[N_DIMENSIONS];
     Transform           offset;
     General_transform   offset_transform, new_transform;
 
@@ -1150,7 +1150,7 @@ VIOAPI  BOOLEAN  advance_input_volume(
         {
             axis = file->spatial_axes[c];
             if( axis != INVALID_AXIS )
-                voxel[c] = (Real) file->indices[axis];
+                voxel[c] = (VIO_Real) file->indices[axis];
             else
                 voxel[c] = 0.0;
         }
@@ -1239,17 +1239,17 @@ VIOAPI  void  reset_input_volume(
                                                 to the volume
 ---------------------------------------------------------------------------- */
 
-static  BOOLEAN  match_dimension_names(
+static  VIO_BOOL  match_dimension_names(
     int               n_volume_dims,
-    STRING            volume_dimension_names[],
+    VIO_STR            volume_dimension_names[],
     int               n_file_dims,
-    STRING            file_dimension_names[],
+    VIO_STR            file_dimension_names[],
     int               to_volume_index[] )
 {
     int      i, j, iteration, n_matches, dummy;
     int      to_file_index[MAX_DIMENSIONS];
-    BOOLEAN  match;
-    BOOLEAN  volume_dim_found[MAX_DIMENSIONS];
+    VIO_BOOL  match;
+    VIO_BOOL  volume_dim_found[MAX_DIMENSIONS];
 
     n_matches = 0;
 
@@ -1388,7 +1388,7 @@ VIOAPI  void  set_default_minc_input_options(
 
 VIOAPI  void  set_minc_input_promote_invalid_to_zero_flag(
     minc_input_options  *options,
-    BOOLEAN             flag )
+    VIO_BOOL             flag )
 {
     options->promote_invalid_to_zero_flag = flag;
 }
@@ -1410,7 +1410,7 @@ VIOAPI  void  set_minc_input_promote_invalid_to_zero_flag(
 
 VIOAPI  void  set_minc_input_promote_invalid_to_min_flag(
     minc_input_options  *options,
-    BOOLEAN             flag )
+    VIO_BOOL             flag )
 {
     set_minc_input_promote_invalid_to_zero_flag( options, flag );
 }
@@ -1430,7 +1430,7 @@ VIOAPI  void  set_minc_input_promote_invalid_to_min_flag(
 
 VIOAPI  void  set_minc_input_vector_to_scalar_flag(
     minc_input_options  *options,
-    BOOLEAN             flag )
+    VIO_BOOL             flag )
 {
     options->convert_vector_to_scalar_flag = flag;
 }
@@ -1452,7 +1452,7 @@ VIOAPI  void  set_minc_input_vector_to_scalar_flag(
 
 VIOAPI  void  set_minc_input_vector_to_colour_flag(
     minc_input_options  *options,
-    BOOLEAN             flag )
+    VIO_BOOL             flag )
 {
     options->convert_vector_to_colour_flag = flag;
 }

@@ -21,10 +21,10 @@
 #include  <limits.h>
 #include  <float.h>
 
-STRING   XYZ_dimension_names[] = { MIxspace, MIyspace, MIzspace };
-STRING   File_order_dimension_names[] = { "", "", "", "", "" };
+VIO_STR   XYZ_dimension_names[] = { MIxspace, MIyspace, MIzspace };
+VIO_STR   File_order_dimension_names[] = { "", "", "", "", "" };
 
-static  STRING  default_dimension_names[MAX_DIMENSIONS][MAX_DIMENSIONS] =
+static  VIO_STR  default_dimension_names[VIO_MAX_DIMENSIONS][VIO_MAX_DIMENSIONS] =
 {
     { MIxspace },
     { MIyspace, MIxspace },
@@ -47,7 +47,7 @@ static  STRING  default_dimension_names[MAX_DIMENSIONS][MAX_DIMENSIONS] =
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  STRING  *get_default_dim_names(
+VIOAPI  VIO_STR  *get_default_dim_names(
     int    n_dimensions )
 {
     return( default_dimension_names[n_dimensions-1] );
@@ -66,14 +66,14 @@ VIOAPI  STRING  *get_default_dim_names(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-static  STRING  convert_spatial_axis_to_dim_name(
+static  VIO_STR  convert_spatial_axis_to_dim_name(
     int   axis )
 {
     switch( axis )
     {
-    case X:  return( MIxspace );
-    case Y:  return( MIyspace );
-    case Z:  return( MIzspace );
+    case VIO_X:  return( MIxspace );
+    case VIO_Y:  return( MIyspace );
+    case VIO_Z:  return( MIzspace );
     default:  handle_internal_error(
         "convert_spatial_axis_to_dim_name" ); break;
     }
@@ -95,18 +95,18 @@ static  STRING  convert_spatial_axis_to_dim_name(
 @MODIFIED   :
 ---------------------------------------------------------------------------- */
 
-VIOAPI  BOOLEAN  convert_dim_name_to_spatial_axis(
-    STRING  name,
+VIOAPI  VIO_BOOL  convert_dim_name_to_spatial_axis(
+    VIO_STR  name,
     int     *axis )
 {
     *axis = -1;
 
     if( equal_strings( name, MIxspace ) )
-        *axis = X;
+        *axis = VIO_X;
     else if( equal_strings( name, MIyspace ) )
-        *axis = Y;
+        *axis = VIO_Y;
     else if( equal_strings( name, MIzspace ) )
-        *axis = Z;
+        *axis = VIO_Z;
 
     return( *axis >= 0 );
 }
@@ -142,25 +142,25 @@ VIOAPI  BOOLEAN  convert_dim_name_to_spatial_axis(
 
 VIOAPI   VIO_Volume   create_volume(
     int         n_dimensions,
-    STRING      dimension_names[],
+    VIO_STR      dimension_names[],
     nc_type     nc_data_type,
-    BOOLEAN     signed_flag,
-    Real        voxel_min,
-    Real        voxel_max )
+    VIO_BOOL     signed_flag,
+    VIO_Real        voxel_min,
+    VIO_Real        voxel_max )
 {
-    int             i, axis, sizes[MAX_DIMENSIONS];
-    Status          status;
-    STRING          name;
+    int             i, axis, sizes[VIO_MAX_DIMENSIONS];
+    VIO_Status          status;
+    VIO_STR          name;
     volume_struct   *volume;
-    Transform       identity;
+    VIO_Transform       identity;
 
     status = VIO_OK;
 
-    if( n_dimensions < 1 || n_dimensions > MAX_DIMENSIONS )
+    if( n_dimensions < 1 || n_dimensions > VIO_MAX_DIMENSIONS )
     {
         print_error(
             "create_volume(): n_dimensions (%d) not in range 1 to %d.\n",
-               n_dimensions, MAX_DIMENSIONS );
+               n_dimensions, VIO_MAX_DIMENSIONS );
         status = VIO_ERROR;
     }
 
@@ -178,16 +178,16 @@ VIOAPI   VIO_Volume   create_volume(
     volume->real_value_scale = 1.0;
     volume->real_value_translation = 0.0;
 
-    for_less( i, 0, N_DIMENSIONS )
+    for_less( i, 0, VIO_N_DIMENSIONS )
         volume->spatial_axes[i] = -1;
 
     for_less( i, 0, n_dimensions )
     {
         volume->starts[i] = 0.0;
         volume->separations[i] = 1.0;
-        volume->direction_cosines[i][X] = 0.0;
-        volume->direction_cosines[i][Y] = 0.0;
-        volume->direction_cosines[i][Z] = 0.0;
+        volume->direction_cosines[i][VIO_X] = 0.0;
+        volume->direction_cosines[i][VIO_Y] = 0.0;
+        volume->direction_cosines[i][VIO_Z] = 0.0;
         volume->irregular_starts[i] = NULL;
         volume->irregular_widths[i] = NULL;
 
@@ -241,11 +241,11 @@ VIOAPI   VIO_Volume   create_volume(
 VIOAPI  void  set_volume_type(
     VIO_Volume       volume,
     nc_type      nc_data_type,
-    BOOLEAN      signed_flag,
-    Real         voxel_min,
-    Real         voxel_max )
+    VIO_BOOL      signed_flag,
+    VIO_Real         voxel_min,
+    VIO_Real         voxel_max )
 {
-    Data_types      data_type;
+    VIO_Data_types      data_type;
 
     if( nc_data_type != MI_ORIGINAL_TYPE )
     {
@@ -306,9 +306,9 @@ VIOAPI  void  set_volume_type(
 
 VIOAPI  nc_type  get_volume_nc_data_type(
     VIO_Volume       volume,
-    BOOLEAN      *signed_flag )
+    VIO_BOOL      *signed_flag )
 {
-    if( signed_flag != (BOOLEAN *) NULL )
+    if( signed_flag != (VIO_BOOL *) NULL )
         *signed_flag = volume->signed_flag;
     return( volume->nc_data_type );
 }
@@ -326,7 +326,7 @@ VIOAPI  nc_type  get_volume_nc_data_type(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Data_types  get_volume_data_type(
+VIOAPI  VIO_Data_types  get_volume_data_type(
     VIO_Volume       volume )
 {
     return( get_multidim_data_type( &volume->array ) );
@@ -350,7 +350,7 @@ VIOAPI  Data_types  get_volume_data_type(
 
 VIOAPI  void  set_rgb_volume_flag(
     VIO_Volume   volume,
-    BOOLEAN  flag )
+    VIO_BOOL  flag )
 {
     if( !flag || get_volume_data_type(volume) == UNSIGNED_INT )
         volume->is_rgba_data = flag;
@@ -369,7 +369,7 @@ VIOAPI  void  set_rgb_volume_flag(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  BOOLEAN  is_an_rgb_volume(
+VIOAPI  VIO_BOOL  is_an_rgb_volume(
     VIO_Volume   volume )
 {
     return( volume->is_rgba_data );
@@ -427,7 +427,7 @@ VIOAPI  void  alloc_volume_data(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  BOOLEAN  volume_is_alloced(
+VIOAPI  VIO_BOOL  volume_is_alloced(
     VIO_Volume   volume )
 {
 #ifdef HAVE_MINC1
@@ -585,7 +585,7 @@ VIOAPI  unsigned int  get_volume_total_n_voxels(
     VIO_Volume    volume )
 {
     unsigned  int  n;
-    int       i, sizes[MAX_DIMENSIONS];
+    int       i, sizes[VIO_MAX_DIMENSIONS];
 
     n = 1;
 
@@ -614,7 +614,7 @@ VIOAPI  unsigned int  get_volume_total_n_voxels(
 
 static  void  assign_voxel_to_world_transform(
     VIO_Volume             volume,
-    General_transform  *transform )
+    VIO_General_transform  *transform )
 {
     delete_general_transform( &volume->voxel_to_world_transform );
 
@@ -637,13 +637,13 @@ static  void  assign_voxel_to_world_transform(
 @MODIFIED   :
 ---------------------------------------------------------------------------- */
 
-static  Real   dot_vectors(
+static  VIO_Real   dot_vectors(
     int    n,
-    Real   v1[],
-    Real   v2[] )
+    VIO_Real   v1[],
+    VIO_Real   v2[] )
 {
     int   i;
-    Real  d;
+    VIO_Real  d;
 
     d = 0.0;
     for_less( i, 0, n )
@@ -668,9 +668,9 @@ static  Real   dot_vectors(
 ---------------------------------------------------------------------------- */
 
 static  void   cross_3D_vector(
-    Real   v1[],
-    Real   v2[],
-    Real   cross[] )
+    VIO_Real   v1[],
+    VIO_Real   v2[],
+    VIO_Real   cross[] )
 {
     cross[0] = v1[1] * v2[2] - v1[2] * v2[1];
     cross[1] = v1[2] * v2[0] - v1[0] * v2[2];
@@ -693,19 +693,19 @@ static  void   cross_3D_vector(
 ---------------------------------------------------------------------------- */
 
 static  void   normalize_vector(
-    Real   v1[],
-    Real   v1_normalized[] )
+    VIO_Real   v1[],
+    VIO_Real   v1_normalized[] )
 {
     int    d;
-    Real   mag;
+    VIO_Real   mag;
 
-    mag = dot_vectors( N_DIMENSIONS, v1, v1 );
+    mag = dot_vectors( VIO_N_DIMENSIONS, v1, v1 );
     if( mag <= 0.0 )
         mag = 1.0;
 
     mag = sqrt( mag );
 
-    for_less( d, 0, N_DIMENSIONS )
+    for_less( d, 0, VIO_N_DIMENSIONS )
         v1_normalized[d] = v1[d] / mag;
 }
 
@@ -730,35 +730,35 @@ static  void   normalize_vector(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  compute_world_transform(
-    int                 spatial_axes[N_DIMENSIONS],
-    Real                separations[],
-    Real                direction_cosines[][N_DIMENSIONS],
-    Real                starts[],
-    General_transform   *world_transform )
+    int                 spatial_axes[VIO_N_DIMENSIONS],
+    VIO_Real                separations[],
+    VIO_Real                direction_cosines[][VIO_N_DIMENSIONS],
+    VIO_Real                starts[],
+    VIO_General_transform   *world_transform )
 {
-    Transform                transform;
-    Real                     separations_3D[N_DIMENSIONS];
-    Real                     directions[N_DIMENSIONS][N_DIMENSIONS];
-    Real                     starts_3D[N_DIMENSIONS];
-    Real                     normal[N_DIMENSIONS];
+    VIO_Transform                transform;
+    VIO_Real                     separations_3D[VIO_N_DIMENSIONS];
+    VIO_Real                     directions[VIO_N_DIMENSIONS][VIO_N_DIMENSIONS];
+    VIO_Real                     starts_3D[VIO_N_DIMENSIONS];
+    VIO_Real                     normal[VIO_N_DIMENSIONS];
     int                      dim, c, a1, a2, axis, n_axes;
-    int                      axis_list[N_DIMENSIONS];
+    int                      axis_list[VIO_N_DIMENSIONS];
 
     /*--- find how many direction cosines are specified, and set the
           3d separations and starts */
 
     n_axes = 0;
 
-    for_less( c, 0, N_DIMENSIONS )
+    for_less( c, 0, VIO_N_DIMENSIONS )
     {
         axis = spatial_axes[c];
         if( axis >= 0 )
         {
             separations_3D[c] = separations[axis];
             starts_3D[c] = starts[axis];
-            directions[c][X] = direction_cosines[axis][X];
-            directions[c][Y] = direction_cosines[axis][Y];
-            directions[c][Z] = direction_cosines[axis][Z];
+            directions[c][VIO_X] = direction_cosines[axis][VIO_X];
+            directions[c][VIO_Y] = direction_cosines[axis][VIO_Y];
+            directions[c][VIO_Z] = direction_cosines[axis][VIO_Z];
             axis_list[n_axes] = c;
             ++n_axes;
         }
@@ -779,17 +779,17 @@ VIOAPI  void  compute_world_transform(
 
     if( n_axes == 1 )
     {
-        a1 = (axis_list[0] + 1) % N_DIMENSIONS;
-        a2 = (axis_list[0] + 2) % N_DIMENSIONS;
+        a1 = (axis_list[0] + 1) % VIO_N_DIMENSIONS;
+        a2 = (axis_list[0] + 2) % VIO_N_DIMENSIONS;
 
         /*--- create an orthogonal vector */
 
-        directions[a1][X] = directions[axis_list[0]][Y] +
-                            directions[axis_list[0]][Z];
-        directions[a1][Y] = -directions[axis_list[0]][X] -
-                            directions[axis_list[0]][Z];
-        directions[a1][Z] = directions[axis_list[0]][Y] -
-                            directions[axis_list[0]][X];
+        directions[a1][VIO_X] = directions[axis_list[0]][VIO_Y] +
+                            directions[axis_list[0]][VIO_Z];
+        directions[a1][VIO_Y] = -directions[axis_list[0]][VIO_X] -
+                            directions[axis_list[0]][VIO_Z];
+        directions[a1][VIO_Z] = directions[axis_list[0]][VIO_Y] -
+                            directions[axis_list[0]][VIO_X];
 
         cross_3D_vector( directions[axis_list[0]], directions[a1],
                          directions[a2] );
@@ -798,7 +798,7 @@ VIOAPI  void  compute_world_transform(
     }
     else if( n_axes == 2 )
     {
-        a2 = N_DIMENSIONS - axis_list[0] - axis_list[1];
+        a2 = VIO_N_DIMENSIONS - axis_list[0] - axis_list[1];
 
         cross_3D_vector( directions[axis_list[0]], directions[axis_list[1]],
                directions[a2] );
@@ -808,15 +808,15 @@ VIOAPI  void  compute_world_transform(
 
     /*--- check to make sure that 3 axes are not a singular system */
 
-    for_less( dim, 0, N_DIMENSIONS )
+    for_less( dim, 0, VIO_N_DIMENSIONS )
     {
-        cross_3D_vector( directions[dim], directions[(dim+1)%N_DIMENSIONS],
+        cross_3D_vector( directions[dim], directions[(dim+1)%VIO_N_DIMENSIONS],
                          normal );
         if( normal[0] == 0.0 && normal[1] == 0.0 && normal[2] == 0.0 )
             break;
     }
 
-    if( dim < N_DIMENSIONS )
+    if( dim < VIO_N_DIMENSIONS )
     {
         directions[0][0] = 1.0;
         directions[0][1] = 0.0;
@@ -833,9 +833,9 @@ VIOAPI  void  compute_world_transform(
 
     make_identity_transform( &transform );
 
-    for_less( c, 0, N_DIMENSIONS )
+    for_less( c, 0, VIO_N_DIMENSIONS )
     {
-        for_less( dim, 0, N_DIMENSIONS )
+        for_less( dim, 0, VIO_N_DIMENSIONS )
         {
             Transform_elem(transform,dim,c) = directions[c][dim] *
                                               separations_3D[c];
@@ -865,7 +865,7 @@ VIOAPI  void  compute_world_transform(
 static  void  check_recompute_world_transform(
     VIO_Volume  volume )
 {
-    General_transform        world_transform;
+    VIO_General_transform        world_transform;
 
     if( !volume->voxel_to_world_transform_uptodate )
     {
@@ -899,16 +899,16 @@ static  void  check_recompute_world_transform(
 ---------------------------------------------------------------------------- */
 
 static  void  convert_transform_origin_to_starts(
-    Real               origin[],
+    VIO_Real               origin[],
     int                n_volume_dimensions,
     int                spatial_axes[],
-    Real               dir_cosines[][N_DIMENSIONS],
-    Real               starts[] )
+    VIO_Real               dir_cosines[][VIO_N_DIMENSIONS],
+    VIO_Real               starts[] )
 {
-    int         axis, dim, which[N_DIMENSIONS], n_axes, i, j;
-    Real        o_dot_c, c_dot_c;
-    Real        x_dot_x, x_dot_y, x_dot_v, y_dot_y, y_dot_v, bottom;
-    Real        **matrix, solution[N_DIMENSIONS];
+    int         axis, dim, which[VIO_N_DIMENSIONS], n_axes, i, j;
+    VIO_Real        o_dot_c, c_dot_c;
+    VIO_Real        x_dot_x, x_dot_y, x_dot_v, y_dot_y, y_dot_v, bottom;
+    VIO_Real        **matrix, solution[VIO_N_DIMENSIONS];
 
     for_less( dim, 0, n_volume_dimensions )
         starts[dim] = 0.0;
@@ -916,7 +916,7 @@ static  void  convert_transform_origin_to_starts(
     /*--- get the list of valid axes (which) */
 
     n_axes = 0;
-    for_less( dim, 0, N_DIMENSIONS )
+    for_less( dim, 0, VIO_N_DIMENSIONS )
     {
         axis = spatial_axes[dim];
         if( axis >= 0 )
@@ -930,8 +930,8 @@ static  void  convert_transform_origin_to_starts(
 
     if( n_axes == 1 )
     {
-        o_dot_c = dot_vectors( N_DIMENSIONS, origin, dir_cosines[which[0]] );
-        c_dot_c = dot_vectors( N_DIMENSIONS, dir_cosines[which[0]],
+        o_dot_c = dot_vectors( VIO_N_DIMENSIONS, origin, dir_cosines[which[0]] );
+        c_dot_c = dot_vectors( VIO_N_DIMENSIONS, dir_cosines[which[0]],
                                      dir_cosines[which[0]] );
 
         if( c_dot_c != 0.0 )
@@ -939,14 +939,14 @@ static  void  convert_transform_origin_to_starts(
     }
     else if( n_axes == 2 )
     {
-        x_dot_x = dot_vectors( N_DIMENSIONS, dir_cosines[which[0]],
+        x_dot_x = dot_vectors( VIO_N_DIMENSIONS, dir_cosines[which[0]],
                                      dir_cosines[which[0]] );
-        x_dot_v = dot_vectors( N_DIMENSIONS, dir_cosines[which[0]], origin );
-        x_dot_y = dot_vectors( N_DIMENSIONS, dir_cosines[which[0]],
+        x_dot_v = dot_vectors( VIO_N_DIMENSIONS, dir_cosines[which[0]], origin );
+        x_dot_y = dot_vectors( VIO_N_DIMENSIONS, dir_cosines[which[0]],
                                      dir_cosines[which[1]] );
-        y_dot_y = dot_vectors( N_DIMENSIONS, dir_cosines[which[1]],
+        y_dot_y = dot_vectors( VIO_N_DIMENSIONS, dir_cosines[which[1]],
                                      dir_cosines[which[1]] );
-        y_dot_v = dot_vectors( N_DIMENSIONS, dir_cosines[which[1]], origin );
+        y_dot_v = dot_vectors( VIO_N_DIMENSIONS, dir_cosines[which[1]], origin );
 
         bottom = x_dot_x * y_dot_y - x_dot_y * x_dot_y;
 
@@ -961,15 +961,15 @@ static  void  convert_transform_origin_to_starts(
         /*--- this is the usual case, solve the equations to find what
               starts give the desired origin */
 
-        ALLOC2D( matrix, N_DIMENSIONS, N_DIMENSIONS );
+        ALLOC2D( matrix, VIO_N_DIMENSIONS, VIO_N_DIMENSIONS );
 
-        for_less( i, 0, N_DIMENSIONS )
-        for_less( j, 0, N_DIMENSIONS )
+        for_less( i, 0, VIO_N_DIMENSIONS )
+        for_less( j, 0, VIO_N_DIMENSIONS )
         {
             matrix[i][j] = dir_cosines[which[j]][i];
         }
 
-        if( solve_linear_system( N_DIMENSIONS, matrix, origin, solution ) )
+        if( solve_linear_system( VIO_N_DIMENSIONS, matrix, origin, solution ) )
         {
             starts[which[0]] = solution[0];
             starts[which[1]] = solution[1];
@@ -1005,19 +1005,19 @@ static  void  convert_transform_origin_to_starts(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  convert_transform_to_starts_and_steps(
-    General_transform  *transform,
+    VIO_General_transform  *transform,
     int                n_volume_dimensions,
-    Real               step_signs[],
+    VIO_Real               step_signs[],
     int                spatial_axes[],
-    Real               starts[],
-    Real               steps[],
-    Real               dir_cosines[][N_DIMENSIONS] )
+    VIO_Real               starts[],
+    VIO_Real               steps[],
+    VIO_Real               dir_cosines[][VIO_N_DIMENSIONS] )
 {
-    Real        sign, mag;
+    VIO_Real        sign, mag;
     int         axis, dim;
-    Real        axes[N_DIMENSIONS][N_DIMENSIONS];
-    Real        origin[N_DIMENSIONS];
-    Transform   *linear_transform;
+    VIO_Real        axes[VIO_N_DIMENSIONS][VIO_N_DIMENSIONS];
+    VIO_Real        origin[VIO_N_DIMENSIONS];
+    VIO_Transform   *linear_transform;
 
     if( get_transform_type( transform ) != LINEAR )
     {
@@ -1028,9 +1028,9 @@ VIOAPI  void  convert_transform_to_starts_and_steps(
     linear_transform = get_linear_transform_ptr( transform );
 
     get_transform_origin_real( linear_transform, origin );
-    get_transform_x_axis_real( linear_transform, &axes[X][0] );
-    get_transform_y_axis_real( linear_transform, &axes[Y][0] );
-    get_transform_z_axis_real( linear_transform, &axes[Z][0] );
+    get_transform_x_axis_real( linear_transform, &axes[VIO_X][0] );
+    get_transform_y_axis_real( linear_transform, &axes[VIO_Y][0] );
+    get_transform_z_axis_real( linear_transform, &axes[VIO_Z][0] );
 
     /*--- assign default steps */
 
@@ -1039,12 +1039,12 @@ VIOAPI  void  convert_transform_to_starts_and_steps(
 
     /*--- assign the steps and dir_cosines for the spatial axes */
 
-    for_less( dim, 0, N_DIMENSIONS )
+    for_less( dim, 0, VIO_N_DIMENSIONS )
     {
         axis = spatial_axes[dim];
         if( axis >= 0 )
         {
-            mag = dot_vectors( N_DIMENSIONS, axes[dim], axes[dim] );
+            mag = dot_vectors( VIO_N_DIMENSIONS, axes[dim], axes[dim] );
 
             if( mag <= 0.0 )
                 mag = 1.0;
@@ -1066,9 +1066,9 @@ VIOAPI  void  convert_transform_to_starts_and_steps(
             }
 
             steps[axis] = sign * mag;
-            dir_cosines[axis][X] = axes[dim][X] / steps[axis];
-            dir_cosines[axis][Y] = axes[dim][Y] / steps[axis];
-            dir_cosines[axis][Z] = axes[dim][Z] / steps[axis];
+            dir_cosines[axis][VIO_X] = axes[dim][VIO_X] / steps[axis];
+            dir_cosines[axis][VIO_Y] = axes[dim][VIO_Y] / steps[axis];
+            dir_cosines[axis][VIO_Z] = axes[dim][VIO_Z] / steps[axis];
         }
     }
 
@@ -1094,7 +1094,7 @@ VIOAPI  void  convert_transform_to_starts_and_steps(
 
 VIOAPI  void  set_voxel_to_world_transform(
     VIO_Volume             volume,
-    General_transform  *transform )
+    VIO_General_transform  *transform )
 {
     assign_voxel_to_world_transform( volume, transform );
     volume->voxel_to_world_transform_uptodate = TRUE;
@@ -1124,7 +1124,7 @@ VIOAPI  void  set_voxel_to_world_transform(
 @MODIFIED   : May  22, 1997   D. MacDonald - now delays recomputing transform
 ---------------------------------------------------------------------------- */
 
-VIOAPI  General_transform  *get_voxel_to_world_transform(
+VIOAPI  VIO_General_transform  *get_voxel_to_world_transform(
     VIO_Volume   volume )
 {
     check_recompute_world_transform( volume );
@@ -1147,18 +1147,18 @@ VIOAPI  General_transform  *get_voxel_to_world_transform(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  STRING  *get_volume_dimension_names(
+VIOAPI  VIO_STR  *get_volume_dimension_names(
     VIO_Volume   volume )
 {
     int      i;
-    STRING   *names;
+    VIO_STR   *names;
 
     ALLOC( names, get_volume_n_dimensions(volume) );
 
     for_less( i, 0, get_volume_n_dimensions(volume) )
         names[i] = create_string( volume->dimension_names[i] );
 
-    for_less( i, 0, N_DIMENSIONS )
+    for_less( i, 0, VIO_N_DIMENSIONS )
     {
         if( volume->spatial_axes[i] >= 0 )
         {
@@ -1188,7 +1188,7 @@ VIOAPI  STRING  *get_volume_dimension_names(
 
 VIOAPI  void  delete_dimension_names(
     VIO_Volume   volume,
-    STRING   dimension_names[] )
+    VIO_STR   dimension_names[] )
 {
     int   i;
 
@@ -1213,7 +1213,7 @@ VIOAPI  void  delete_dimension_names(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  STRING  get_volume_space_type(
+VIOAPI  VIO_STR  get_volume_space_type(
     VIO_Volume   volume )
 {
     return( create_string( volume->coordinate_system_name ) );
@@ -1236,7 +1236,7 @@ VIOAPI  STRING  get_volume_space_type(
 
 VIOAPI  void  set_volume_space_type(
     VIO_Volume   volume,
-    STRING   name )
+    VIO_STR   name )
 {
     delete_string( volume->coordinate_system_name );
     volume->coordinate_system_name = create_string( name );
@@ -1248,7 +1248,7 @@ VIOAPI  void  set_volume_space_type(
 @OUTPUT     : separations
 @RETURNS    : 
 @DESCRIPTION: Passes back the slice separations for each dimensions.  Assumes
-              separations contains enough room for n_dimensions Reals.
+              separations contains enough room for n_dimensions VIO_Reals.
 @METHOD     : 
 @GLOBALS    : 
 @CALLS      : 
@@ -1258,7 +1258,7 @@ VIOAPI  void  set_volume_space_type(
 
 VIOAPI  void  get_volume_separations(
     VIO_Volume   volume,
-    Real     separations[] )
+    VIO_Real     separations[] )
 {
     int   i;
 
@@ -1282,7 +1282,7 @@ VIOAPI  void  get_volume_separations(
 
 VIOAPI  void  set_volume_separations(
     VIO_Volume   volume,
-    Real     separations[] )
+    VIO_Real     separations[] )
 {
     int   i;
 
@@ -1309,7 +1309,7 @@ VIOAPI  void  set_volume_separations(
 
 VIOAPI  void  set_volume_starts(
     VIO_Volume  volume,
-    Real    starts[] )
+    VIO_Real    starts[] )
 {
     int  c;
 
@@ -1334,7 +1334,7 @@ VIOAPI  void  set_volume_starts(
 
 VIOAPI  void  get_volume_starts(
     VIO_Volume  volume,
-    Real    starts[] )
+    VIO_Real    starts[] )
 {
     int  c;
 
@@ -1360,7 +1360,7 @@ VIOAPI  void  get_volume_starts(
 VIOAPI  void  set_volume_direction_unit_cosine(
     VIO_Volume   volume,
     int      axis,
-    Real     dir[] )
+    VIO_Real     dir[] )
 {
     int    dim;
 
@@ -1374,18 +1374,18 @@ VIOAPI  void  set_volume_direction_unit_cosine(
 
     /*--- check if this is a spatial axis */
 
-    for_less( dim, 0, N_DIMENSIONS )
+    for_less( dim, 0, VIO_N_DIMENSIONS )
     {
         if( volume->spatial_axes[dim] == axis )
             break;
     }
 
-    if( dim == N_DIMENSIONS )   /* this is not a spatial axis, ignore the dir */
+    if( dim == VIO_N_DIMENSIONS )   /* this is not a spatial axis, ignore the dir */
         return;
 
-    volume->direction_cosines[axis][X] = dir[X];
-    volume->direction_cosines[axis][Y] = dir[Y];
-    volume->direction_cosines[axis][Z] = dir[Z];
+    volume->direction_cosines[axis][VIO_X] = dir[VIO_X];
+    volume->direction_cosines[axis][VIO_Y] = dir[VIO_Y];
+    volume->direction_cosines[axis][VIO_Z] = dir[VIO_Z];
 
     volume->voxel_to_world_transform_uptodate = FALSE;
 }
@@ -1409,11 +1409,11 @@ VIOAPI  void  set_volume_direction_unit_cosine(
 VIOAPI  void  set_volume_direction_cosine(
     VIO_Volume   volume,
     int      axis,
-    Real     dir[] )
+    VIO_Real     dir[] )
 {
-    Real   len, unit_vector[N_DIMENSIONS];
+    VIO_Real   len, unit_vector[VIO_N_DIMENSIONS];
 
-    len = dir[X] * dir[X] + dir[Y] * dir[Y] + dir[Z] * dir[Z];
+    len = dir[VIO_X] * dir[VIO_X] + dir[VIO_Y] * dir[VIO_Y] + dir[VIO_Z] * dir[VIO_Z];
 
     if( len == 0.0 )
     {
@@ -1426,9 +1426,9 @@ VIOAPI  void  set_volume_direction_cosine(
 
     len = sqrt( len );
 
-    unit_vector[X] = dir[X] / len;
-    unit_vector[Y] = dir[Y] / len;
-    unit_vector[Z] = dir[Z] / len;
+    unit_vector[VIO_X] = dir[VIO_X] / len;
+    unit_vector[VIO_Y] = dir[VIO_Y] / len;
+    unit_vector[VIO_Z] = dir[VIO_Z] / len;
 
     set_volume_direction_unit_cosine( volume, axis, unit_vector );
 }
@@ -1451,7 +1451,7 @@ VIOAPI  void  set_volume_direction_cosine(
 VIOAPI  void  get_volume_direction_cosine(
     VIO_Volume   volume,
     int      axis,
-    Real     dir[] )
+    VIO_Real     dir[] )
 {
     int    d;
 
@@ -1463,23 +1463,23 @@ VIOAPI  void  get_volume_direction_cosine(
         return;
     }
 
-    for_less( d, 0, N_DIMENSIONS )
+    for_less( d, 0, VIO_N_DIMENSIONS )
     {
         if( volume->spatial_axes[d] == axis )
             break;
     }
 
-    if( d == N_DIMENSIONS )   /* this is not a spatial axis, ignore the dir */
+    if( d == VIO_N_DIMENSIONS )   /* this is not a spatial axis, ignore the dir */
     {
-        dir[X] = 0.0;
-        dir[Y] = 0.0;
-        dir[Z] = 0.0;
+        dir[VIO_X] = 0.0;
+        dir[VIO_Y] = 0.0;
+        dir[VIO_Z] = 0.0;
     }
     else
     {
-        dir[X] = volume->direction_cosines[axis][X];
-        dir[Y] = volume->direction_cosines[axis][Y];
-        dir[Z] = volume->direction_cosines[axis][Z];
+        dir[VIO_X] = volume->direction_cosines[axis][VIO_X];
+        dir[VIO_Y] = volume->direction_cosines[axis][VIO_Y];
+        dir[VIO_Z] = volume->direction_cosines[axis][VIO_Z];
     }
 }
 
@@ -1502,13 +1502,13 @@ VIOAPI  void  get_volume_direction_cosine(
 
 VIOAPI  void  set_volume_translation(
     VIO_Volume  volume,
-    Real    voxel[],
-    Real    world_space_voxel_maps_to[] )
+    VIO_Real    voxel[],
+    VIO_Real    world_space_voxel_maps_to[] )
 {
     int         dim, dim2, axis, n_axes, a1, a2;
-    Real        world_space_origin[N_DIMENSIONS], len;
-    Real        starts[MAX_DIMENSIONS], starts_3d[N_DIMENSIONS];
-    Transform   transform, inverse;
+    VIO_Real        world_space_origin[VIO_N_DIMENSIONS], len;
+    VIO_Real        starts[VIO_MAX_DIMENSIONS], starts_3d[VIO_N_DIMENSIONS];
+    VIO_Transform   transform, inverse;
 
     /*--- find the world position where ( 0, 0, 0 ) maps to by taking
           the world position - voxel[x_axis] * Xaxis - voxel[y_axis] * Yaxis
@@ -1516,11 +1516,11 @@ VIOAPI  void  set_volume_translation(
 
     make_identity_transform( &transform );
 
-    for_less( dim, 0, N_DIMENSIONS )
+    for_less( dim, 0, VIO_N_DIMENSIONS )
     {
         world_space_origin[dim] = world_space_voxel_maps_to[dim];
 
-        for_less( dim2, 0, N_DIMENSIONS )
+        for_less( dim2, 0, VIO_N_DIMENSIONS )
         {
             axis = volume->spatial_axes[dim2];
             if( axis >= 0 )
@@ -1536,7 +1536,7 @@ VIOAPI  void  set_volume_translation(
 
     n_axes = 0;
 
-    for_less( dim, 0, N_DIMENSIONS )
+    for_less( dim, 0, VIO_N_DIMENSIONS )
     {
         axis = volume->spatial_axes[dim];
         if( axis >= 0 )
@@ -1600,8 +1600,8 @@ VIOAPI  void  set_volume_translation(
         else if( volume->spatial_axes[0] < 0 )
             dim = 0;
 
-        a1 = (dim + 1) % N_DIMENSIONS;
-        a2 = (dim + 2) % N_DIMENSIONS;
+        a1 = (dim + 1) % VIO_N_DIMENSIONS;
+        a2 = (dim + 2) % VIO_N_DIMENSIONS;
 
         /*--- take cross product */
 
@@ -1639,17 +1639,17 @@ VIOAPI  void  set_volume_translation(
 
     compute_transform_inverse( &transform, &inverse );
 
-    transform_point( &inverse, world_space_origin[X],
-                               world_space_origin[Y],
-                               world_space_origin[Z],
-                               &starts_3d[X], &starts_3d[Y], &starts_3d[Z] );
+    transform_point( &inverse, world_space_origin[VIO_X],
+                               world_space_origin[VIO_Y],
+                               world_space_origin[VIO_Z],
+                               &starts_3d[VIO_X], &starts_3d[VIO_Y], &starts_3d[VIO_Z] );
 
-    /*--- map the X Y Z starts into the arbitrary axis ordering of the volume */
+    /*--- map the VIO_X VIO_Y VIO_Z starts into the arbitrary axis ordering of the volume */
 
     for_less( dim, 0, get_volume_n_dimensions(volume) )
         starts[dim] = 0.0;
 
-    for_less( dim, 0, N_DIMENSIONS )
+    for_less( dim, 0, VIO_N_DIMENSIONS )
     {
         axis = volume->spatial_axes[dim];
         if( axis >= 0 )
@@ -1678,17 +1678,17 @@ VIOAPI  void  set_volume_translation(
 
 VIOAPI  void  get_volume_translation(
     VIO_Volume  volume,
-    Real    voxel[],
-    Real    world_space_voxel_maps_to[] )
+    VIO_Real    voxel[],
+    VIO_Real    world_space_voxel_maps_to[] )
 {
     int   dim;
 
     for_less( dim, 0, get_volume_n_dimensions(volume) )
         voxel[dim] = 0.0;
 
-    convert_voxel_to_world( volume, voxel, &world_space_voxel_maps_to[X],
-                                           &world_space_voxel_maps_to[Y],
-                                           &world_space_voxel_maps_to[Z] );
+    convert_voxel_to_world( volume, voxel, &world_space_voxel_maps_to[VIO_X],
+                                           &world_space_voxel_maps_to[VIO_Y],
+                                           &world_space_voxel_maps_to[VIO_Z] );
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -1708,12 +1708,12 @@ VIOAPI  void  get_volume_translation(
 
 VIOAPI  void  reorder_voxel_to_xyz(
     VIO_Volume   volume,
-    Real     voxel[],
-    Real     xyz[] )
+    VIO_Real     voxel[],
+    VIO_Real     xyz[] )
 {
     int   c, axis;
 
-    for_less( c, 0, N_DIMENSIONS )
+    for_less( c, 0, VIO_N_DIMENSIONS )
     {
         axis = volume->spatial_axes[c];
         if( axis >= 0 )
@@ -1740,8 +1740,8 @@ VIOAPI  void  reorder_voxel_to_xyz(
 
 VIOAPI  void  reorder_xyz_to_voxel(
     VIO_Volume   volume,
-    Real     xyz[],
-    Real     voxel[] )
+    VIO_Real     xyz[],
+    VIO_Real     voxel[] )
 {
     int   c, axis, n_dims;
 
@@ -1749,7 +1749,7 @@ VIOAPI  void  reorder_xyz_to_voxel(
     for_less( c, 0, n_dims )
         voxel[c] = 0.0;
 
-    for_less( c, 0, N_DIMENSIONS )
+    for_less( c, 0, VIO_N_DIMENSIONS )
     {
         axis = volume->spatial_axes[c];
         if( axis >= 0 )
@@ -1776,12 +1776,12 @@ VIOAPI  void  reorder_xyz_to_voxel(
 
 VIOAPI  void  convert_voxel_to_world(
     VIO_Volume   volume,
-    Real     voxel[],
-    Real     *x_world,
-    Real     *y_world,
-    Real     *z_world )
+    VIO_Real     voxel[],
+    VIO_Real     *x_world,
+    VIO_Real     *y_world,
+    VIO_Real     *z_world )
 {
-    Real   xyz[N_DIMENSIONS];
+    VIO_Real   xyz[VIO_N_DIMENSIONS];
 
     check_recompute_world_transform( volume );
 
@@ -1790,7 +1790,7 @@ VIOAPI  void  convert_voxel_to_world(
     /* apply linear transform */
 
     general_transform_point( &volume->voxel_to_world_transform,
-                             xyz[X], xyz[Y], xyz[Z],
+                             xyz[VIO_X], xyz[VIO_Y], xyz[VIO_Z],
                              x_world, y_world, z_world );
 }
 
@@ -1815,14 +1815,14 @@ VIOAPI  void  convert_voxel_to_world(
 
 VIOAPI  void  convert_3D_voxel_to_world(
     VIO_Volume   volume,
-    Real     voxel1,
-    Real     voxel2,
-    Real     voxel3,
-    Real     *x_world,
-    Real     *y_world,
-    Real     *z_world )
+    VIO_Real     voxel1,
+    VIO_Real     voxel2,
+    VIO_Real     voxel3,
+    VIO_Real     *x_world,
+    VIO_Real     *y_world,
+    VIO_Real     *z_world )
 {
-    Real   voxel[MAX_DIMENSIONS];
+    VIO_Real   voxel[VIO_MAX_DIMENSIONS];
 
     if( get_volume_n_dimensions(volume) != 3 )
     {
@@ -1855,13 +1855,13 @@ VIOAPI  void  convert_3D_voxel_to_world(
 
 VIOAPI  void  convert_voxel_normal_vector_to_world(
     VIO_Volume          volume,
-    Real            voxel_vector[],
-    Real            *x_world,
-    Real            *y_world,
-    Real            *z_world )
+    VIO_Real            voxel_vector[],
+    VIO_Real            *x_world,
+    VIO_Real            *y_world,
+    VIO_Real            *z_world )
 {
-    Real        xyz[N_DIMENSIONS];
-    Transform   *inverse;
+    VIO_Real        xyz[VIO_N_DIMENSIONS];
+    VIO_Transform   *inverse;
 
     check_recompute_world_transform( volume );
 
@@ -1875,15 +1875,15 @@ VIOAPI  void  convert_voxel_normal_vector_to_world(
 
     reorder_voxel_to_xyz( volume, voxel_vector, xyz );
 
-    *x_world = Transform_elem(*inverse,0,0) * xyz[X] +
-               Transform_elem(*inverse,1,0) * xyz[Y] +
-               Transform_elem(*inverse,2,0) * xyz[Z];
-    *y_world = Transform_elem(*inverse,0,1) * xyz[X] +
-               Transform_elem(*inverse,1,1) * xyz[Y] +
-               Transform_elem(*inverse,2,1) * xyz[Z];
-    *z_world = Transform_elem(*inverse,0,2) * xyz[X] +
-               Transform_elem(*inverse,1,2) * xyz[Y] +
-               Transform_elem(*inverse,2,2) * xyz[Z];
+    *x_world = Transform_elem(*inverse,0,0) * xyz[VIO_X] +
+               Transform_elem(*inverse,1,0) * xyz[VIO_Y] +
+               Transform_elem(*inverse,2,0) * xyz[VIO_Z];
+    *y_world = Transform_elem(*inverse,0,1) * xyz[VIO_X] +
+               Transform_elem(*inverse,1,1) * xyz[VIO_Y] +
+               Transform_elem(*inverse,2,1) * xyz[VIO_Z];
+    *z_world = Transform_elem(*inverse,0,2) * xyz[VIO_X] +
+               Transform_elem(*inverse,1,2) * xyz[VIO_Y] +
+               Transform_elem(*inverse,2,2) * xyz[VIO_Z];
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -1901,15 +1901,15 @@ VIOAPI  void  convert_voxel_normal_vector_to_world(
 
 VIOAPI  void  convert_voxel_vector_to_world(
     VIO_Volume          volume,
-    Real            voxel_vector[],
-    Real            *x_world,
-    Real            *y_world,
-    Real            *z_world )
+    VIO_Real            voxel_vector[],
+    VIO_Real            *x_world,
+    VIO_Real            *y_world,
+    VIO_Real            *z_world )
 {
     int         i;
-    Real        origin[MAX_DIMENSIONS], x0, y0, z0, x1, y1, z1;
+    VIO_Real        origin[VIO_MAX_DIMENSIONS], x0, y0, z0, x1, y1, z1;
 
-    for_less( i, 0, MAX_DIMENSIONS )
+    for_less( i, 0, VIO_MAX_DIMENSIONS )
         origin[i] = 0.0;
 
     convert_voxel_to_world( volume, origin, &x0, &y0, &z0 );
@@ -1936,13 +1936,13 @@ VIOAPI  void  convert_voxel_vector_to_world(
 
 VIOAPI  void  convert_world_vector_to_voxel(
     VIO_Volume          volume,
-    Real            x_world,
-    Real            y_world,
-    Real            z_world,
-    Real            voxel_vector[] )
+    VIO_Real            x_world,
+    VIO_Real            y_world,
+    VIO_Real            z_world,
+    VIO_Real            voxel_vector[] )
 {
     int         c;
-    Real        voxel[MAX_DIMENSIONS], origin[MAX_DIMENSIONS];
+    VIO_Real        voxel[VIO_MAX_DIMENSIONS], origin[VIO_MAX_DIMENSIONS];
 
     convert_world_to_voxel( volume, 0.0, 0.0, 0.0, origin );
     convert_world_to_voxel( volume, x_world, y_world, z_world, voxel );
@@ -1968,18 +1968,18 @@ VIOAPI  void  convert_world_vector_to_voxel(
 
 VIOAPI  void  convert_world_to_voxel(
     VIO_Volume   volume,
-    Real     x_world,
-    Real     y_world,
-    Real     z_world,
-    Real     voxel[] )
+    VIO_Real     x_world,
+    VIO_Real     y_world,
+    VIO_Real     z_world,
+    VIO_Real     voxel[] )
 {
-    Real   xyz[N_DIMENSIONS];
+    VIO_Real   xyz[VIO_N_DIMENSIONS];
 
     check_recompute_world_transform( volume );
 
     general_inverse_transform_point( &volume->voxel_to_world_transform,
                                      x_world, y_world, z_world,
-                                     &xyz[X], &xyz[Y], &xyz[Z] );
+                                     &xyz[VIO_X], &xyz[VIO_Y], &xyz[VIO_Z] );
 
     reorder_xyz_to_voxel( volume, xyz, voxel );
 }
@@ -2005,14 +2005,14 @@ VIOAPI  void  convert_world_to_voxel(
 
 VIOAPI  void  convert_3D_world_to_voxel(
     VIO_Volume   volume,
-    Real     x_world,
-    Real     y_world,
-    Real     z_world,
-    Real     *voxel1,
-    Real     *voxel2,
-    Real     *voxel3 )
+    VIO_Real     x_world,
+    VIO_Real     y_world,
+    VIO_Real     z_world,
+    VIO_Real     *voxel1,
+    VIO_Real     *voxel2,
+    VIO_Real     *voxel3 )
 {
-    Real   voxel[MAX_DIMENSIONS];
+    VIO_Real   voxel[VIO_MAX_DIMENSIONS];
 
     if( get_volume_n_dimensions(volume) != 3 )
     {
@@ -2022,9 +2022,9 @@ VIOAPI  void  convert_3D_world_to_voxel(
 
     convert_world_to_voxel( volume, x_world, y_world, z_world, voxel );
 
-    *voxel1 = voxel[X];
-    *voxel2 = voxel[Y];
-    *voxel3 = voxel[Z];
+    *voxel1 = voxel[VIO_X];
+    *voxel2 = voxel[VIO_Y];
+    *voxel3 = voxel[VIO_Z];
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -2040,7 +2040,7 @@ VIOAPI  void  convert_3D_world_to_voxel(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Real  get_volume_voxel_min(
+VIOAPI  VIO_Real  get_volume_voxel_min(
     VIO_Volume   volume )
 {
     return( volume->voxel_min );
@@ -2059,7 +2059,7 @@ VIOAPI  Real  get_volume_voxel_min(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Real  get_volume_voxel_max(
+VIOAPI  VIO_Real  get_volume_voxel_max(
     VIO_Volume   volume )
 {
     return( volume->voxel_max );
@@ -2081,8 +2081,8 @@ VIOAPI  Real  get_volume_voxel_max(
 
 VIOAPI  void  get_volume_voxel_range(
     VIO_Volume     volume,
-    Real       *voxel_min,
-    Real       *voxel_max )
+    VIO_Real       *voxel_min,
+    VIO_Real       *voxel_max )
 {
     *voxel_min = get_volume_voxel_min( volume );
     *voxel_max = get_volume_voxel_max( volume );
@@ -2107,10 +2107,10 @@ VIOAPI  void  get_volume_voxel_range(
 
 VIOAPI  void  set_volume_voxel_range(
     VIO_Volume   volume,
-    Real     voxel_min,
-    Real     voxel_max )
+    VIO_Real     voxel_min,
+    VIO_Real     voxel_max )
 {
-    Real  real_min, real_max;
+    VIO_Real  real_min, real_max;
 
     if( voxel_min >= voxel_max )
     {
@@ -2118,29 +2118,29 @@ VIOAPI  void  set_volume_voxel_range(
         {
         case UNSIGNED_BYTE:
             voxel_min = 0.0;
-            voxel_max = (Real) UCHAR_MAX;     break;
+            voxel_max = (VIO_Real) UCHAR_MAX;     break;
         case SIGNED_BYTE:
-            voxel_min = (Real) SCHAR_MIN;
-            voxel_max = (Real) SCHAR_MAX;     break;
+            voxel_min = (VIO_Real) SCHAR_MIN;
+            voxel_max = (VIO_Real) SCHAR_MAX;     break;
         case UNSIGNED_SHORT:
             voxel_min = 0.0;
-            voxel_max = (Real) USHRT_MAX;     break;
+            voxel_max = (VIO_Real) USHRT_MAX;     break;
         case SIGNED_SHORT:
-            voxel_min = (Real) SHRT_MIN;
-            voxel_max = (Real) SHRT_MAX;      break;
+            voxel_min = (VIO_Real) SHRT_MIN;
+            voxel_max = (VIO_Real) SHRT_MAX;      break;
         case UNSIGNED_INT:
             voxel_min = 0.0;
-            voxel_max = (Real) UINT_MAX;     break;
+            voxel_max = (VIO_Real) UINT_MAX;     break;
         case SIGNED_INT:
-            voxel_min = (Real) INT_MIN;
-            voxel_max = (Real) INT_MAX;      break;
+            voxel_min = (VIO_Real) INT_MIN;
+            voxel_max = (VIO_Real) INT_MAX;      break;
         case FLOAT:
-            voxel_min = (Real) -FLT_MAX;
-            voxel_max = (Real) FLT_MAX;       break;
+            voxel_min = (VIO_Real) -FLT_MAX;
+            voxel_max = (VIO_Real) FLT_MAX;       break;
         default:
         case DOUBLE:
-            voxel_min = (Real) -DBL_MAX;
-            voxel_max = (Real) DBL_MAX;       break;
+            voxel_min = (VIO_Real) -DBL_MAX;
+            voxel_max = (VIO_Real) DBL_MAX;       break;
         }
     }
 
@@ -2176,8 +2176,8 @@ VIOAPI  void  set_volume_voxel_range(
 
 VIOAPI  void  get_volume_real_range(
     VIO_Volume     volume,
-    Real       *min_value,
-    Real       *max_value )
+    VIO_Real       *min_value,
+    VIO_Real       *max_value )
 {
     *min_value = get_volume_real_min( volume );
     *max_value = get_volume_real_max( volume );
@@ -2196,10 +2196,10 @@ VIOAPI  void  get_volume_real_range(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Real  get_volume_real_min(
+VIOAPI  VIO_Real  get_volume_real_min(
     VIO_Volume     volume )
 {
-    Real   real_min;
+    VIO_Real   real_min;
 
     real_min = get_volume_voxel_min( volume );
 
@@ -2222,10 +2222,10 @@ VIOAPI  Real  get_volume_real_min(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Real  get_volume_real_max(
+VIOAPI  VIO_Real  get_volume_real_max(
     VIO_Volume     volume )
 {
-    Real   real_max;
+    VIO_Real   real_max;
 
     real_max = get_volume_voxel_max( volume );
 
@@ -2253,10 +2253,10 @@ VIOAPI  Real  get_volume_real_max(
 
 VIOAPI  void  set_volume_real_range(
     VIO_Volume   volume,
-    Real     real_min,
-    Real     real_max )
+    VIO_Real     real_min,
+    VIO_Real     real_max )
 {
-    Real    voxel_min, voxel_max;
+    VIO_Real    voxel_min, voxel_max;
 
     if( get_volume_data_type(volume) == FLOAT ||
         get_volume_data_type(volume) == DOUBLE )
@@ -2320,14 +2320,14 @@ VIOAPI  void  set_volume_real_range(
 VIOAPI  VIO_Volume   copy_volume_definition_no_alloc(
     VIO_Volume   volume,
     nc_type  nc_data_type,
-    BOOLEAN  signed_flag,
-    Real     voxel_min,
-    Real     voxel_max )
+    VIO_BOOL  signed_flag,
+    VIO_Real     voxel_min,
+    VIO_Real     voxel_max )
 {
-    int                c, sizes[MAX_DIMENSIONS];
-    Real               separations[MAX_DIMENSIONS];
-    Real               starts[MAX_DIMENSIONS];
-    Real               dir_cosine[N_DIMENSIONS];
+    int                c, sizes[VIO_MAX_DIMENSIONS];
+    VIO_Real               separations[VIO_MAX_DIMENSIONS];
+    VIO_Real               starts[VIO_MAX_DIMENSIONS];
+    VIO_Real               dir_cosine[VIO_N_DIMENSIONS];
     VIO_Volume             copy;
 
     if( nc_data_type == MI_ORIGINAL_TYPE )
@@ -2341,7 +2341,7 @@ VIOAPI  VIO_Volume   copy_volume_definition_no_alloc(
                           volume->dimension_names, nc_data_type, signed_flag,
                           voxel_min, voxel_max );
 
-    for_less( c, 0, N_DIMENSIONS )
+    for_less( c, 0, VIO_N_DIMENSIONS )
         copy->spatial_axes[c] = volume->spatial_axes[c];
 
     set_volume_real_range( copy,
@@ -2368,8 +2368,8 @@ VIOAPI  VIO_Volume   copy_volume_definition_no_alloc(
     for_less( c, 0, get_volume_n_dimensions(volume) )
     {
         if (is_volume_dimension_irregular(volume, c)) {
-            Real *irr_starts = malloc(sizeof(Real) * sizes[c]);
-            Real *irr_widths = malloc(sizeof(Real) * sizes[c]);
+            VIO_Real *irr_starts = malloc(sizeof(VIO_Real) * sizes[c]);
+            VIO_Real *irr_widths = malloc(sizeof(VIO_Real) * sizes[c]);
             get_volume_irregular_starts( volume, c, sizes[c], irr_starts);
             set_volume_irregular_starts( volume, c, sizes[c], irr_starts);
 
@@ -2405,9 +2405,9 @@ VIOAPI  VIO_Volume   copy_volume_definition_no_alloc(
 VIOAPI  VIO_Volume   copy_volume_definition(
     VIO_Volume   volume,
     nc_type  nc_data_type,
-    BOOLEAN  signed_flag,
-    Real     voxel_min,
-    Real     voxel_max )
+    VIO_BOOL  signed_flag,
+    VIO_Real     voxel_min,
+    VIO_Real     voxel_max )
 {
     VIO_Volume   copy;
 
@@ -2442,7 +2442,7 @@ VIOAPI  VIO_Volume  copy_volume(
 {
     VIO_Volume   copy;
     void     *src, *dest;
-    int      d, n_voxels, sizes[MAX_DIMENSIONS];
+    int      d, n_voxels, sizes[VIO_MAX_DIMENSIONS];
 
     if( volume->is_cached_volume )
     {
@@ -2479,7 +2479,7 @@ VIOAPI  VIO_Volume  copy_volume(
 }
 
 /* These are not public functions, so they are not VIOAPI yet */
-BOOLEAN 
+VIO_BOOL 
 is_volume_dimension_irregular(VIO_Volume volume, int idim)
 {
     if (idim > volume->array.n_dimensions) {
@@ -2489,7 +2489,7 @@ is_volume_dimension_irregular(VIO_Volume volume, int idim)
 }
 
 int
-get_volume_irregular_starts(VIO_Volume volume, int idim, int count, Real *starts)
+get_volume_irregular_starts(VIO_Volume volume, int idim, int count, VIO_Real *starts)
 {
     int i;
 
@@ -2513,7 +2513,7 @@ get_volume_irregular_starts(VIO_Volume volume, int idim, int count, Real *starts
 }
 
 int
-get_volume_irregular_widths(VIO_Volume volume, int idim, int count, Real *widths)
+get_volume_irregular_widths(VIO_Volume volume, int idim, int count, VIO_Real *widths)
 {
     int i;
 
@@ -2537,7 +2537,7 @@ get_volume_irregular_widths(VIO_Volume volume, int idim, int count, Real *widths
 }
 
 int
-set_volume_irregular_starts(VIO_Volume volume, int idim, int count, Real *starts)
+set_volume_irregular_starts(VIO_Volume volume, int idim, int count, VIO_Real *starts)
 {
     int i;
 
@@ -2557,7 +2557,7 @@ set_volume_irregular_starts(VIO_Volume volume, int idim, int count, Real *starts
         count = volume->array.sizes[idim];
     }
 
-    volume->irregular_starts[idim] = malloc(count * sizeof (Real));
+    volume->irregular_starts[idim] = malloc(count * sizeof (VIO_Real));
     if (volume->irregular_starts[idim] == NULL) {
         return (0);
     }
@@ -2570,7 +2570,7 @@ set_volume_irregular_starts(VIO_Volume volume, int idim, int count, Real *starts
 }
 
 int
-set_volume_irregular_widths(VIO_Volume volume, int idim, int count, Real *widths)
+set_volume_irregular_widths(VIO_Volume volume, int idim, int count, VIO_Real *widths)
 {
     int i;
 
@@ -2590,7 +2590,7 @@ set_volume_irregular_widths(VIO_Volume volume, int idim, int count, Real *widths
         count = volume->array.sizes[idim];
     }
 
-    volume->irregular_widths[idim] = malloc(count * sizeof (Real));
+    volume->irregular_widths[idim] = malloc(count * sizeof (VIO_Real));
     if (volume->irregular_widths[idim] == NULL) {
         return (0);
     }

@@ -29,14 +29,14 @@
 #define  HALF_THRESHOLD            0.5
 
 static  void  show_one_line_progress(
-    progress_struct    *progress,
+    VIO_progress_struct    *progress,
     int                current_step );
 
 static  void  show_multi_line_progress(
-    progress_struct    *progress,
+    VIO_progress_struct    *progress,
     int                current_step,
-    Real               time_so_far,
-    Real               est_total_time );
+    VIO_Real               time_so_far,
+    VIO_Real               est_total_time );
 
 /* ----------------------------- MNI Header -----------------------------------
 @NAME       : initialize_progress_report
@@ -59,10 +59,10 @@ static  void  show_multi_line_progress(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  initialize_progress_report(
-    progress_struct   *progress,
-    BOOLEAN           one_line_only,
+    VIO_progress_struct   *progress,
+    VIO_BOOL           one_line_only,
     int               n_steps,
-    STRING            title )
+    VIO_STR            title )
 {
     progress->force_one_line = one_line_only;
     progress->first_msg_displayed = FALSE;
@@ -102,11 +102,11 @@ VIOAPI  void  initialize_progress_report(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  update_progress_report(
-    progress_struct   *progress,
+    VIO_progress_struct   *progress,
     int               current_step )
 {
-    Real    current_time, constant, n_seconds_per;
-    Real    time_so_far, est_total_time;
+    VIO_Real    current_time, constant, n_seconds_per;
+    VIO_Real    time_so_far, est_total_time;
 
     if( current_step < 1 || current_step < progress->next_check_step )
         return;
@@ -116,9 +116,9 @@ VIOAPI  void  update_progress_report(
 
     current_time = current_realtime_seconds();
 
-    n_seconds_per = (Real) progress->check_every *
+    n_seconds_per = (VIO_Real) progress->check_every *
                     (current_time - progress->last_check_time) /
-                    (Real) (current_step - progress->last_check_step);
+                    (VIO_Real) (current_step - progress->last_check_step);
 
     if( n_seconds_per < DOUBLE_THRESHOLD )
         progress->check_every *= 2;
@@ -134,19 +134,19 @@ VIOAPI  void  update_progress_report(
     time_so_far = current_time - progress->start_time;
 
     progress->sum_xy = RATIO_FOR_LINEAR * progress->sum_xy +
-                        (Real) current_step * time_so_far;
+                        (VIO_Real) current_step * time_so_far;
     progress->sum_xx = RATIO_FOR_LINEAR * progress->sum_xx +
-                        (Real) current_step * (Real) current_step;
+                        (VIO_Real) current_step * (VIO_Real) current_step;
 
     if( time_so_far > FIRST_MESSAGE_THRESHOLD )
     {
         constant = progress->sum_xy / progress->sum_xx;
-        est_total_time = (Real) progress->n_steps * constant;
+        est_total_time = (VIO_Real) progress->n_steps * constant;
 
         if( est_total_time <= time_so_far )
         {
-            est_total_time = time_so_far * (Real) progress->n_steps /
-                             (Real) current_step;
+            est_total_time = time_so_far * (VIO_Real) progress->n_steps /
+                             (VIO_Real) current_step;
         }
 
         if( progress->force_one_line ||
@@ -194,13 +194,13 @@ VIOAPI  void  update_progress_report(
 ---------------------------------------------------------------------------- */
 
 static  void  show_one_line_progress(
-    progress_struct    *progress,
+    VIO_progress_struct    *progress,
     int                current_step )
 {
     int     i, n_dots;
 
-    n_dots = ROUND( (Real) current_step / (Real) progress->n_steps *
-                    (Real) progress->total_n_dots );
+    n_dots = ROUND( (VIO_Real) current_step / (VIO_Real) progress->n_steps *
+                    (VIO_Real) progress->total_n_dots );
 
     if( n_dots > progress->total_n_dots )
         handle_internal_error( "show_one_line_progress" );
@@ -240,16 +240,16 @@ static  void  show_one_line_progress(
 ---------------------------------------------------------------------------- */
 
 static  void  show_multi_line_progress(
-    progress_struct    *progress,
+    VIO_progress_struct    *progress,
     int                current_step,
-    Real               time_so_far,
-    Real               est_total_time )
+    VIO_Real               time_so_far,
+    VIO_Real               est_total_time )
 {
     int     percent_done;
-    STRING  time_so_far_str, est_total_time_str;
+    VIO_STR  time_so_far_str, est_total_time_str;
 
-    percent_done = ROUND( 100.0 * (Real) current_step /
-                          (Real) progress->n_steps );
+    percent_done = ROUND( 100.0 * (VIO_Real) current_step /
+                          (VIO_Real) progress->n_steps );
 
     time_so_far_str = format_time( "%g %s", time_so_far );
     est_total_time_str = format_time( "%g %s", est_total_time );
@@ -278,10 +278,10 @@ static  void  show_multi_line_progress(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  terminate_progress_report(
-    progress_struct   *progress )
+    VIO_progress_struct   *progress )
 {
-    Real    total_time;
-    STRING  time_str;
+    VIO_Real    total_time;
+    VIO_STR  time_str;
 
     if( progress->first_msg_displayed )
     {

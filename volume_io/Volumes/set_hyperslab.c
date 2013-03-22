@@ -24,11 +24,11 @@
 VIOAPI  void  convert_values_to_voxels(
     Volume   volume,
     int      n_voxels,
-    Real     values[],
-    Real     voxels[] )
+    VIO_Real     values[],
+    VIO_Real     voxels[] )
 {
     int    v;
-    Real   scale, trans;
+    VIO_Real   scale, trans;
 
     if( !volume->real_range_set )
     {
@@ -59,7 +59,7 @@ VIOAPI  void  set_volume_value_hyperslab(
     int      n2,
     int      n3,
     int      n4,
-    Real     values[] )
+    VIO_Real     values[] )
 {
     switch( get_volume_n_dimensions(volume) )
     {
@@ -95,10 +95,10 @@ VIOAPI  void  set_volume_value_hyperslab_5d(
     int      n2,
     int      n3,
     int      n4,
-    Real     values[] )
+    VIO_Real     values[] )
 {
     int  size;
-    Real *voxels;
+    VIO_Real *voxels;
 
     size = n0 * n1 * n2 * n3 * n4;
     ALLOC( voxels, size );
@@ -121,10 +121,10 @@ VIOAPI  void  set_volume_value_hyperslab_4d(
     int      n1,
     int      n2,
     int      n3,
-    Real     values[] )
+    VIO_Real     values[] )
 {
     int  size;
-    Real *voxels;
+    VIO_Real *voxels;
 
     size = n0 * n1 * n2 * n3;
     ALLOC( voxels, size );
@@ -145,10 +145,10 @@ VIOAPI  void  set_volume_value_hyperslab_3d(
     int      n0,
     int      n1,
     int      n2,
-    Real     values[] )
+    VIO_Real     values[] )
 {
     int  size;
-    Real *voxels;
+    VIO_Real *voxels;
 
     size = n0 * n1 * n2;
     ALLOC( voxels, size );
@@ -166,10 +166,10 @@ VIOAPI  void  set_volume_value_hyperslab_2d(
     int      v1,
     int      n0,
     int      n1,
-    Real     values[] )
+    VIO_Real     values[] )
 {
     int  size;
-    Real *voxels;
+    VIO_Real *voxels;
 
     size = n0 * n1;
     ALLOC( voxels, size );
@@ -185,9 +185,9 @@ VIOAPI  void  set_volume_value_hyperslab_1d(
     Volume   volume,
     int      v0,
     int      n0,
-    Real     values[] )
+    VIO_Real     values[] )
 {
-    Real *voxels;
+    VIO_Real *voxels;
 
     ALLOC( voxels, n0 );
 
@@ -210,7 +210,7 @@ static  void  slow_set_volume_voxel_hyperslab(
     int      n2,
     int      n3,
     int      n4,
-    Real     values[] )
+    VIO_Real     values[] )
 {
     int    i0, i1, i2, i3, i4, n_dims;
 
@@ -244,12 +244,12 @@ static  void  set_voxel_values_5d(
     void        *void_ptr,
     int         steps[],
     int         counts[],
-    Real        values[] )
+    VIO_Real        values[] )
 {
     int              step0, step1, step2, step3, step4;
     int              i0, i1, i2, i3, i4;
     int              n0, n1, n2, n3, n4;
-    unsigned  char   *unsigned_byte_ptr;
+    unsigned  char   *VIO_UCHAR_ptr;
     signed  char     *signed_byte_ptr;
     unsigned  short  *unsigned_short_ptr;
     signed  short    *signed_short_ptr;
@@ -276,7 +276,7 @@ static  void  set_voxel_values_5d(
     switch( data_type )
     {
     case UNSIGNED_BYTE:
-        ASSIGN_PTR(unsigned_byte_ptr) = void_ptr;
+        ASSIGN_PTR(VIO_UCHAR_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
             for_less( i1, 0, n1 )
@@ -287,18 +287,18 @@ static  void  set_voxel_values_5d(
                     {
                         for_less( i4, 0, n4 )
                         {
-                            *unsigned_byte_ptr = (unsigned char)
+                            *VIO_UCHAR_ptr = (unsigned char)
                                                floor( *values + 0.5 );
                             ++values;
-                            unsigned_byte_ptr += step4;
+                            VIO_UCHAR_ptr += step4;
                         }
-                        unsigned_byte_ptr += step3;
+                        VIO_UCHAR_ptr += step3;
                     }
-                    unsigned_byte_ptr += step2;
+                    VIO_UCHAR_ptr += step2;
                 }
-                unsigned_byte_ptr += step1;
+                VIO_UCHAR_ptr += step1;
             }
-            unsigned_byte_ptr += step0;
+            VIO_UCHAR_ptr += step0;
         }
         break;
 
@@ -496,12 +496,12 @@ static  void  set_voxel_values_4d(
     void        *void_ptr,
     int         steps[],
     int         counts[],
-    Real        values[] )
+    VIO_Real        values[] )
 {
     int              step0, step1, step2, step3;
     int              i0, i1, i2, i3;
     int              n0, n1, n2, n3;
-    unsigned  char   *unsigned_byte_ptr;
+    unsigned  char   *VIO_UCHAR_ptr;
     signed  char     *signed_byte_ptr;
     unsigned  short  *unsigned_short_ptr;
     signed  short    *signed_short_ptr;
@@ -525,7 +525,7 @@ static  void  set_voxel_values_4d(
     switch( data_type )
     {
     case UNSIGNED_BYTE:
-        ASSIGN_PTR(unsigned_byte_ptr) = void_ptr;
+        ASSIGN_PTR(VIO_UCHAR_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
             for_less( i1, 0, n1 )
@@ -534,16 +534,16 @@ static  void  set_voxel_values_4d(
                 {
                     for_less( i3, 0, n3 )
                     {
-                        *unsigned_byte_ptr = (unsigned char)
+                        *VIO_UCHAR_ptr = (unsigned char)
                                            floor( *values + 0.5 );
                         ++values;
-                        unsigned_byte_ptr += step3;
+                        VIO_UCHAR_ptr += step3;
                     }
-                    unsigned_byte_ptr += step2;
+                    VIO_UCHAR_ptr += step2;
                 }
-                unsigned_byte_ptr += step1;
+                VIO_UCHAR_ptr += step1;
             }
-            unsigned_byte_ptr += step0;
+            VIO_UCHAR_ptr += step0;
         }
         break;
 
@@ -711,12 +711,12 @@ static  void  set_voxel_values_3d(
     void        *void_ptr,
     int         steps[],
     int         counts[],
-    Real        values[] )
+    VIO_Real        values[] )
 {
     int              step0, step1, step2;
     int              i0, i1, i2;
     int              n0, n1, n2;
-    unsigned  char   *unsigned_byte_ptr;
+    unsigned  char   *VIO_UCHAR_ptr;
     signed  char     *signed_byte_ptr;
     unsigned  short  *unsigned_short_ptr;
     signed  short    *signed_short_ptr;
@@ -737,20 +737,20 @@ static  void  set_voxel_values_3d(
     switch( data_type )
     {
     case UNSIGNED_BYTE:
-        ASSIGN_PTR(unsigned_byte_ptr) = void_ptr;
+        ASSIGN_PTR(VIO_UCHAR_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
             for_less( i1, 0, n1 )
             {
                 for_less( i2, 0, n2 )
                 {
-                    *unsigned_byte_ptr = (unsigned char) floor( *values + 0.5 );
+                    *VIO_UCHAR_ptr = (unsigned char) floor( *values + 0.5 );
                     ++values;
-                    unsigned_byte_ptr += step2;
+                    VIO_UCHAR_ptr += step2;
                 }
-                unsigned_byte_ptr += step1;
+                VIO_UCHAR_ptr += step1;
             }
-            unsigned_byte_ptr += step0;
+            VIO_UCHAR_ptr += step0;
         }
         break;
 
@@ -888,12 +888,12 @@ static  void  set_voxel_values_2d(
     void        *void_ptr,
     int         steps[],
     int         counts[],
-    Real        values[] )
+    VIO_Real        values[] )
 {
     int              step0, step1;
     int              i0, i1;
     int              n0, n1;
-    unsigned  char   *unsigned_byte_ptr;
+    unsigned  char   *VIO_UCHAR_ptr;
     signed  char     *signed_byte_ptr;
     unsigned  short  *unsigned_short_ptr;
     signed  short    *signed_short_ptr;
@@ -911,16 +911,16 @@ static  void  set_voxel_values_2d(
     switch( data_type )
     {
     case UNSIGNED_BYTE:
-        ASSIGN_PTR(unsigned_byte_ptr) = void_ptr;
+        ASSIGN_PTR(VIO_UCHAR_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
             for_less( i1, 0, n1 )
             {
-                *unsigned_byte_ptr = (unsigned char) floor( *values + 0.5 );
+                *VIO_UCHAR_ptr = (unsigned char) floor( *values + 0.5 );
                 ++values;
-                unsigned_byte_ptr += step1;
+                VIO_UCHAR_ptr += step1;
             }
-            unsigned_byte_ptr += step0;
+            VIO_UCHAR_ptr += step0;
         }
         break;
 
@@ -1030,10 +1030,10 @@ static  void  set_voxel_values_1d(
     void        *void_ptr,
     int         step0,
     int         n0,
-    Real        values[] )
+    VIO_Real        values[] )
 {
     int              i0;
-    unsigned  char   *unsigned_byte_ptr;
+    unsigned  char   *VIO_UCHAR_ptr;
     signed  char     *signed_byte_ptr;
     unsigned  short  *unsigned_short_ptr;
     signed  short    *signed_short_ptr;
@@ -1045,12 +1045,12 @@ static  void  set_voxel_values_1d(
     switch( data_type )
     {
     case UNSIGNED_BYTE:
-        ASSIGN_PTR(unsigned_byte_ptr) = void_ptr;
+        ASSIGN_PTR(VIO_UCHAR_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
-            *unsigned_byte_ptr = (unsigned char) floor( *values + 0.5 );
+            *VIO_UCHAR_ptr = (unsigned char) floor( *values + 0.5 );
             ++values;
-            unsigned_byte_ptr += step0;
+            VIO_UCHAR_ptr += step0;
         }
         break;
 
@@ -1133,7 +1133,7 @@ static  void  set_voxel_values(
     int      n_dims,
     int      steps[],
     int      counts[],
-    Real     values[] )
+    VIO_Real     values[] )
 {
     Data_types  data_type;
 
@@ -1173,7 +1173,7 @@ VIOAPI  void  set_volume_voxel_hyperslab_5d(
     int      n2,
     int      n3,
     int      n4,
-    Real     values[] )
+    VIO_Real     values[] )
 {
     int         steps[MAX_DIMENSIONS];
     int         counts[MAX_DIMENSIONS];
@@ -1248,7 +1248,7 @@ VIOAPI  void  set_volume_voxel_hyperslab_4d(
     int      n1,
     int      n2,
     int      n3,
-    Real     values[] )
+    VIO_Real     values[] )
 {
     int         steps[MAX_DIMENSIONS];
     int         counts[MAX_DIMENSIONS];
@@ -1313,7 +1313,7 @@ VIOAPI  void  set_volume_voxel_hyperslab_3d(
     int      n0,
     int      n1,
     int      n2,
-    Real     values[] )
+    VIO_Real     values[] )
 {
     int         steps[MAX_DIMENSIONS];
     int         counts[MAX_DIMENSIONS];
@@ -1368,7 +1368,7 @@ VIOAPI  void  set_volume_voxel_hyperslab_2d(
     int      v1,
     int      n0,
     int      n1,
-    Real     values[] )
+    VIO_Real     values[] )
 {
     int         steps[MAX_DIMENSIONS];
     int         counts[MAX_DIMENSIONS];
@@ -1413,7 +1413,7 @@ VIOAPI  void  set_volume_voxel_hyperslab_1d(
     Volume   volume,
     int      v0,
     int      n0,
-    Real     values[] )
+    VIO_Real     values[] )
 {
     int         steps[MAX_DIMENSIONS];
     int         counts[MAX_DIMENSIONS];
@@ -1457,7 +1457,7 @@ VIOAPI  void  set_volume_voxel_hyperslab(
     int      n2,
     int      n3,
     int      n4,
-    Real     voxels[] )
+    VIO_Real     voxels[] )
 {
     switch( get_volume_n_dimensions(volume) )
     {

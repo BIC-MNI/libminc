@@ -24,9 +24,9 @@
               g
               b
 @OUTPUT     : 
-@RETURNS    : Colour
+@RETURNS    : VIO_Colour
 @DESCRIPTION: Packs the three components, which are in the range 0 to 255,
-              into a Colour type, unsigned long.
+              into a VIO_Colour type, unsigned long.
 @METHOD     : 
 @GLOBALS    : 
 @CALLS      : 
@@ -34,7 +34,7 @@
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Colour  make_Colour(
+VIOAPI  VIO_Colour  make_Colour(
     int   r,
     int   g,
     int   b )
@@ -55,10 +55,10 @@ VIOAPI  Colour  make_Colour(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Real  get_Colour_r_0_1(
-    Colour   colour )
+VIOAPI  VIO_Real  get_Colour_r_0_1(
+    VIO_Colour   colour )
 {
-    return( (Real) get_Colour_r(colour) / 255.0 );
+    return( (VIO_Real) get_Colour_r(colour) / 255.0 );
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -75,10 +75,10 @@ VIOAPI  Real  get_Colour_r_0_1(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Real  get_Colour_g_0_1(
-    Colour   colour )
+VIOAPI  VIO_Real  get_Colour_g_0_1(
+    VIO_Colour   colour )
 {
-    return( (Real) get_Colour_g(colour) / 255.0 );
+    return( (VIO_Real) get_Colour_g(colour) / 255.0 );
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -95,10 +95,10 @@ VIOAPI  Real  get_Colour_g_0_1(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Real  get_Colour_b_0_1(
-    Colour   colour )
+VIOAPI  VIO_Real  get_Colour_b_0_1(
+    VIO_Colour   colour )
 {
-    return( (Real) get_Colour_b(colour) / 255.0 );
+    return( (VIO_Real) get_Colour_b(colour) / 255.0 );
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -115,10 +115,10 @@ VIOAPI  Real  get_Colour_b_0_1(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Real  get_Colour_a_0_1(
-    Colour   colour )
+VIOAPI  VIO_Real  get_Colour_a_0_1(
+    VIO_Colour   colour )
 {
-    return( (Real) get_Colour_a(colour) / 255.0 );
+    return( (VIO_Real) get_Colour_a(colour) / 255.0 );
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -127,7 +127,7 @@ VIOAPI  Real  get_Colour_a_0_1(
               g
               b
 @OUTPUT     : 
-@RETURNS    : Colour
+@RETURNS    : VIO_Colour
 @DESCRIPTION: Takes the three components, each in the range of 0 to 1,
               and packs them into a colour.
 @METHOD     : 
@@ -137,10 +137,10 @@ VIOAPI  Real  get_Colour_a_0_1(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Colour  make_Colour_0_1(
-    Real   r,
-    Real   g,
-    Real   b )
+VIOAPI  VIO_Colour  make_Colour_0_1(
+    VIO_Real   r,
+    VIO_Real   g,
+    VIO_Real   b )
 {
     return( make_Colour( (int) (r * 255.0 + 0.5),
                          (int) (g * 255.0 + 0.5),
@@ -154,7 +154,7 @@ VIOAPI  Colour  make_Colour_0_1(
               b
               a       - alpha (opacity)
 @OUTPUT     : 
-@RETURNS    : Colour
+@RETURNS    : VIO_Colour
 @DESCRIPTION: Takes the four components, each in the range of 0 to 1,
               and packs them into a colour.
 @METHOD     : 
@@ -164,11 +164,11 @@ VIOAPI  Colour  make_Colour_0_1(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Colour  make_rgba_Colour_0_1(
-    Real   r,
-    Real   g,
-    Real   b,
-    Real   a )
+VIOAPI  VIO_Colour  make_rgba_Colour_0_1(
+    VIO_Real   r,
+    VIO_Real   g,
+    VIO_Real   b,
+    VIO_Real   a )
 {
     return( make_rgba_Colour( (int) (r * 255.0 + 0.5),
                               (int) (g * 255.0 + 0.5),

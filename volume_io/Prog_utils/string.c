@@ -17,22 +17,22 @@
 
 #include  <internal_volume_io.h>
 
-static const  STRING  empty_string = "";
+static const  VIO_STR  empty_string = "";
 
-VIOAPI  STRING  alloc_string(
+VIOAPI  VIO_STR  alloc_string(
     int   length )
 {
-    STRING   str;
+    VIO_STR   str;
 
     ALLOC( str, length+1 );
 
     return( str );
 }
 
-VIOAPI  STRING  create_string(
-    STRING    initial )
+VIOAPI  VIO_STR  create_string(
+    VIO_STR    initial )
 {
-    STRING   str;
+    VIO_STR   str;
 
     if( initial == NULL )
         initial = empty_string;
@@ -45,17 +45,17 @@ VIOAPI  STRING  create_string(
 }
 
 VIOAPI  void  delete_string(
-    STRING   string )
+    VIO_STR   string )
 {
     if( string != NULL )
         FREE( string );
 }
 
-VIOAPI  STRING  concat_strings(
-    STRING   str1,
-    STRING   str2 )
+VIOAPI  VIO_STR  concat_strings(
+    VIO_STR   str1,
+    VIO_STR   str2 )
 {
-    STRING  str;
+    VIO_STR  str;
 
     if( str1 == NULL )
         str1 = empty_string;
@@ -72,15 +72,15 @@ VIOAPI  STRING  concat_strings(
 }
 
 VIOAPI  void  replace_string(
-    STRING   *string,
-    STRING   new_string )
+    VIO_STR   *string,
+    VIO_STR   new_string )
 {
     delete_string( *string );
     *string = new_string;
 }
 
 VIOAPI  void  concat_char_to_string(
-    STRING   *string,
+    VIO_STR   *string,
     char     ch )
 {
     int  len;
@@ -93,21 +93,21 @@ VIOAPI  void  concat_char_to_string(
         SET_ARRAY_SIZE( *string, len+1, len+2, 1 );
 
     (*string)[len] = ch;
-    (*string)[len+1] = END_OF_STRING;
+    (*string)[len+1] = VIO_END_OF_STRING;
 }
 
 VIOAPI  void  concat_to_string(
-    STRING   *string,
-    STRING   str2 )
+    VIO_STR   *string,
+    VIO_STR   str2 )
 {
-    STRING  new_string;
+    VIO_STR  new_string;
 
     new_string = concat_strings( *string, str2 );
     replace_string( string, new_string );
 }
 
 VIOAPI  int  string_length(
-    STRING   string )
+    VIO_STR   string )
 {
     if( string == NULL )
         return( 0 );
@@ -115,9 +115,9 @@ VIOAPI  int  string_length(
         return( (int) strlen( string ) );
 }
 
-VIOAPI  BOOLEAN  equal_strings(
-    STRING   str1,
-    STRING   str2 )
+VIOAPI  VIO_BOOL  equal_strings(
+    VIO_STR   str1,
+    VIO_STR   str2 )
 {
     if( str1 == NULL )
         str1 = empty_string;
@@ -127,13 +127,13 @@ VIOAPI  BOOLEAN  equal_strings(
     return( strcmp( str1, str2 ) == 0 );
 }
 
-VIOAPI  BOOLEAN  is_lower_case(
+VIOAPI  VIO_BOOL  is_lower_case(
     char  ch )
 {
     return( ch >= 'a' && ch <= 'z' );
 }
 
-VIOAPI  BOOLEAN  is_upper_case(
+VIOAPI  VIO_BOOL  is_upper_case(
     char  ch )
 {
     return( ch >= 'A' && ch <= 'Z' );
@@ -172,12 +172,12 @@ VIOAPI  char  get_upper_case(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  BOOLEAN  string_ends_in(
-    STRING   string,
-    STRING   ending )
+VIOAPI  VIO_BOOL  string_ends_in(
+    VIO_STR   string,
+    VIO_STR   ending )
 {
     int      len_string, len_ending;
-    BOOLEAN  ending_present;
+    VIO_BOOL  ending_present;
 
     len_string = string_length( string );
     len_ending = string_length( ending );
@@ -205,10 +205,10 @@ VIOAPI  BOOLEAN  string_ends_in(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI    STRING   strip_outer_blanks(
-    STRING  str )
+VIOAPI    VIO_STR   strip_outer_blanks(
+    VIO_STR  str )
 {
-    STRING  stripped;
+    VIO_STR  stripped;
     int  i, first_non_blank, last_non_blank, len;
 
     len = string_length( str );
@@ -239,7 +239,7 @@ VIOAPI    STRING   strip_outer_blanks(
     for_inclusive( i, first_non_blank, last_non_blank )
         stripped[i-first_non_blank] = str[i];
 
-    stripped[last_non_blank - first_non_blank + 1] = END_OF_STRING;
+    stripped[last_non_blank - first_non_blank + 1] = VIO_END_OF_STRING;
 
     return( stripped );
 }
@@ -259,7 +259,7 @@ VIOAPI    STRING   strip_outer_blanks(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  int  find_character(
-    STRING    string,
+    VIO_STR    string,
     char      ch )
 {
     int   i;
@@ -268,7 +268,7 @@ VIOAPI  int  find_character(
         return( -1 );
 
     i = 0;
-    while( string[i] != END_OF_STRING )
+    while( string[i] != VIO_END_OF_STRING )
     {
         if( string[i] == ch )
             return( i );
@@ -292,7 +292,7 @@ VIOAPI  int  find_character(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  make_string_upper_case(
-    STRING    string )
+    VIO_STR    string )
 {
     int   i, len;
 
@@ -318,18 +318,18 @@ VIOAPI  void  make_string_upper_case(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  BOOLEAN  blank_string(
-    STRING   string )
+VIOAPI  VIO_BOOL  blank_string(
+    VIO_STR   string )
 {
     int      i;
-    BOOLEAN  blank;
+    VIO_BOOL  blank;
 
     if( string == NULL )
         string = empty_string;
 
     blank = TRUE;
     i = 0;
-    while( string[i] != END_OF_STRING )
+    while( string[i] != VIO_END_OF_STRING )
     {
         if( string[i] != ' ' && string[i] != '\t' && string[i] != '\n' )
         {

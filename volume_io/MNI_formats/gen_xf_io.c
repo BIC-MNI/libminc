@@ -20,19 +20,19 @@
 
 /*--------------------- file format keywords ------------------------------ */
 
-static const STRING      TRANSFORM_FILE_HEADER = "MNI Transform File";
-static const STRING      TYPE_STRING = "Transform_Type";
-static const STRING      LINEAR_TRANSFORM_STRING = "Linear_Transform";
-static const STRING      LINEAR_TYPE = "Linear";
-static const STRING      THIN_PLATE_SPLINE_STRING ="Thin_Plate_Spline_Transform";
-static const STRING      INVERT_FLAG_STRING = "Invert_Flag";
-static const STRING      TRUE_STRING = "True";
-static const STRING      FALSE_STRING = "False";
-static const STRING      N_DIMENSIONS_STRING = "Number_Dimensions";
-static const STRING      POINTS_STRING = "Points";
-static const STRING      DISPLACEMENTS_STRING = "Displacements";
-static const STRING      GRID_TRANSFORM_STRING = "Grid_Transform";
-static const STRING      DISPLACEMENT_VOLUME = "Displacement_Volume";
+static const VIO_STR      TRANSFORM_FILE_HEADER = "MNI Transform File";
+static const VIO_STR      TYPE_STRING = "Transform_Type";
+static const VIO_STR      LINEAR_TRANSFORM_STRING = "Linear_Transform";
+static const VIO_STR      LINEAR_TYPE = "Linear";
+static const VIO_STR      THIN_PLATE_SPLINE_STRING ="Thin_Plate_Spline_Transform";
+static const VIO_STR      INVERT_FLAG_STRING = "Invert_Flag";
+static const VIO_STR      TRUE_STRING = "True";
+static const VIO_STR      FALSE_STRING = "False";
+static const VIO_STR      N_DIMENSIONS_STRING = "Number_Dimensions";
+static const VIO_STR      POINTS_STRING = "Points";
+static const VIO_STR      DISPLACEMENTS_STRING = "Displacements";
+static const VIO_STR      GRID_TRANSFORM_STRING = "Grid_Transform";
+static const VIO_STR      DISPLACEMENT_VOLUME = "Displacement_Volume";
 
 /* ----------------------------- MNI Header -----------------------------------
 @NAME       : get_default_transform_file_suffix
@@ -47,7 +47,7 @@ static const STRING      DISPLACEMENT_VOLUME = "Displacement_Volume";
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  STRING  get_default_transform_file_suffix( void )
+VIOAPI  VIO_STR  get_default_transform_file_suffix( void )
 {
     return( "xfm" );
 }
@@ -72,14 +72,14 @@ VIOAPI  STRING  get_default_transform_file_suffix( void )
 
 static  void  output_one_transform(
     FILE                *file,
-    STRING              filename,
+    VIO_STR              filename,
     int                 *volume_count,
-    BOOLEAN             invert,
+    VIO_BOOL             invert,
     VIO_General_transform   *transform )
 {
     int        i, c, trans;
-    Transform  *lin_transform;
-    STRING     volume_filename, base_filename, prefix_filename;
+    VIO_Transform  *lin_transform;
+    VIO_STR     volume_filename, base_filename, prefix_filename;
 
     switch( transform->type )
     {
@@ -169,7 +169,7 @@ static  void  output_one_transform(
                    prefix_filename[i] != '/' )
                 --i;
             if( i >= 0 && prefix_filename[i] == '.' )
-                prefix_filename[i] = END_OF_STRING;
+                prefix_filename[i] = VIO_END_OF_STRING;
         }
         
         if( transform->displacement_volume_file )
@@ -271,9 +271,9 @@ static  void  output_one_transform(
 
 VIOAPI  VIO_Status  output_transform(
     FILE                *file,
-    STRING              filename,
+    VIO_STR              filename,
     int                 *volume_count_ptr,
-    STRING              comments,
+    VIO_STR              comments,
     VIO_General_transform   *transform )
 {
     int    volume_count;
@@ -320,22 +320,22 @@ VIOAPI  VIO_Status  output_transform(
 @MODIFIED   : Feb. 21, 1995   David MacDonald - added grid transforms
 ---------------------------------------------------------------------------- */
 
-static Status input_one_transform(
+static VIO_Status input_one_transform(
     FILE                *file,
-    STRING              filename,
+    VIO_STR              filename,
     VIO_General_transform   *transform )
 {
-    Status        status;
-    int           i, j, n_points, n_dimensions;
-    Real          **points, **displacements;
-    Real          value, *points_1d;
-    STRING        type_name, str, volume_filename, directory, tmp_filename;
-    VIO_Volume    volume;
-    Transform     linear_transform;
-    Transform_types   type;
-    BOOLEAN       inverse_flag;
+    VIO_Status        status;
+    int               i, j, n_points, n_dimensions;
+    VIO_Real          **points, **displacements;
+    VIO_Real          value, *points_1d;
+    VIO_STR           type_name, str, volume_filename, directory, tmp_filename;
+    VIO_Volume        volume;
+    VIO_Transform     linear_transform;
+    VIO_Transform_types   type;
+    VIO_BOOL              inverse_flag;
     VIO_General_transform inverse;
-    minc_input_options  options;
+    minc_input_options    options;
 
     inverse_flag = FALSE;
 
@@ -485,7 +485,7 @@ static Status input_one_transform(
 
         n_points = n_points / n_dimensions;
 
-        ALLOC2D( points, n_points, n_dimensions );
+        VIO_ALLOC2D( points, n_points, n_dimensions );
         for_less( i, 0, n_points )
         {
             for_less( j, 0, n_dimensions )
@@ -494,11 +494,11 @@ static Status input_one_transform(
             }
         }
 
-        FREE( points_1d );
+        VIO_FREE( points_1d );
 
         /* --- allocate and input the displacements */
 
-        ALLOC2D( displacements, n_points + n_dimensions + 1, n_dimensions );
+        VIO_ALLOC2D( displacements, n_points + n_dimensions + 1, n_dimensions );
 
         if( mni_input_keyword_and_equal_sign( file, DISPLACEMENTS_STRING, TRUE )
                                                                        != VIO_OK )
@@ -524,8 +524,8 @@ static Status input_one_transform(
                                           n_points, points, displacements );
 
 
-        FREE2D( points );
-        FREE2D( displacements );
+        VIO_FREE2D( points );
+        VIO_FREE2D( displacements );
 
         break;
         
@@ -622,14 +622,14 @@ static Status input_one_transform(
 @MODIFIED   : Feb. 21, 1995   D. MacDonald
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  input_transform(
+VIOAPI  VIO_Status  input_transform(
     FILE                *file,
-    STRING              filename,
+    VIO_STR              filename,
     VIO_General_transform   *transform )
 {
-    Status              status;
+    VIO_Status              status;
     int                 n_transforms;
-    STRING              line;
+    VIO_STR              line;
     VIO_General_transform   next, concated;
 
     /* parameter checking */
@@ -703,11 +703,11 @@ VIOAPI  Status  input_transform(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  VIO_Status  output_transform_file(
-    STRING              filename,
-    STRING              comments,
+    VIO_STR              filename,
+    VIO_STR              comments,
     VIO_General_transform   *transform )
 {
-    Status  status;
+    VIO_Status  status;
     FILE    *file;
     int     volume_count;
 
@@ -740,11 +740,11 @@ VIOAPI  VIO_Status  output_transform_file(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  input_transform_file(
-    STRING              filename,
+VIOAPI  VIO_Status  input_transform_file(
+    VIO_STR              filename,
     VIO_General_transform   *transform )
 {
-    Status  status;
+    VIO_Status  status;
     FILE    *file;
 
     status = open_file_with_default_suffix( filename,

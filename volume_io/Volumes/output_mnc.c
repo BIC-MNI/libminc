@@ -27,11 +27,11 @@
 
 #define  UNITS           "mm"
 
-static  Status  get_dimension_ordering(
+static  VIO_Status  get_dimension_ordering(
     int          n_vol_dims,
-    STRING       vol_dim_names[],
+    VIO_STR       vol_dim_names[],
     int          n_file_dims,
-    STRING       file_dim_names[],
+    VIO_STR       file_dim_names[],
     int          to_volume[],
     int          to_file[] );
 
@@ -50,11 +50,11 @@ static  Status  get_dimension_ordering(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-static  BOOLEAN  is_default_direction_cosine(
+static  VIO_BOOL  is_default_direction_cosine(
     int        axis,
     double     dir_cosines[] )
 {
-    BOOLEAN   is_default;
+    VIO_BOOL   is_default;
     int       i;
 
     is_default = TRUE;
@@ -89,15 +89,15 @@ static  BOOLEAN  is_default_direction_cosine(
 @MODIFIED   : May  22, 1997   D. MacDonald - added use_volume_starts_and_steps
 ---------------------------------------------------------------------------- */
 
-static  Status  output_world_transform(
+static  VIO_Status  output_world_transform(
     Minc_file              file,
-    STRING                 space_type,
+    VIO_STR                 space_type,
     General_transform      *voxel_to_world_transform,
-    BOOLEAN                use_volume_starts_and_steps_flag )
+    VIO_BOOL                use_volume_starts_and_steps_flag )
 {
     double              step[MAX_VAR_DIMS];
-    Real                start[MAX_VAR_DIMS];
-    double              dir_cosines[MAX_DIMENSIONS][N_DIMENSIONS];
+    VIO_Real                start[MAX_VAR_DIMS];
+    double              dir_cosines[VIO_MAX_DIMENSIONS][N_DIMENSIONS];
     int                 dim, axis, spatial_axes[N_DIMENSIONS];
 
     /*--- set all starts/steps/dir_cosines to default */
@@ -286,7 +286,7 @@ static void create_image_variable(Minc_file file)
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-static Status end_file_def(Minc_file file)
+static VIO_Status end_file_def(Minc_file file)
 {
    int ret;
 
@@ -330,24 +330,24 @@ static Status end_file_def(Minc_file file)
 ---------------------------------------------------------------------------- */
 
 VIOAPI  Minc_file  initialize_minc_output(
-    STRING                 filename,
+    VIO_STR                 filename,
     int                    n_dimensions,
-    STRING                 dim_names[],
+    VIO_STR                 dim_names[],
     int                    sizes[],
     nc_type                file_nc_data_type,
-    BOOLEAN                file_signed_flag,
-    Real                   file_voxel_min,
-    Real                   file_voxel_max,
+    VIO_BOOL                file_signed_flag,
+    VIO_Real                   file_voxel_min,
+    VIO_Real                   file_voxel_max,
     General_transform      *voxel_to_world_transform,
     Volume                 volume_to_attach,
     minc_output_options    *options )
 {
     minc_file_struct    *file;
-    int                 volume_sizes[MAX_DIMENSIONS];
+    int                 volume_sizes[VIO_MAX_DIMENSIONS];
     int                 n_volume_dims;
     int                 d, vol_index, n_range_dims;
-    static  STRING      default_dim_names[] = { MIzspace, MIyspace, MIxspace };
-    STRING              *vol_dimension_names;
+    static  VIO_STR      default_dim_names[] = { MIzspace, MIyspace, MIxspace };
+    VIO_STR              *vol_dimension_names;
     minc_output_options default_options;
 
     if( options == (minc_output_options *) NULL )
@@ -561,14 +561,14 @@ VIOAPI  Minc_file  initialize_minc_output(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  copy_auxiliary_data_from_minc_file(
+VIOAPI  VIO_Status  copy_auxiliary_data_from_minc_file(
     Minc_file   file,
-    STRING      filename,
-    STRING      history_string )
+    VIO_STR      filename,
+    VIO_STR      history_string )
 {
-    Status  status;
+    VIO_Status  status;
     int     src_cdfid;
-    STRING  expanded;
+    VIO_STR  expanded;
 
     if( file->ignoring_because_cached )
         return( VIO_OK );
@@ -613,15 +613,15 @@ VIOAPI  Status  copy_auxiliary_data_from_minc_file(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  copy_auxiliary_data_from_open_minc_file(
+VIOAPI  VIO_Status  copy_auxiliary_data_from_open_minc_file(
     Minc_file   file,
     int         src_cdfid,
-    STRING      history_string )
+    VIO_STR      history_string )
 {
     int     src_img_var, varid, n_excluded, excluded_vars[10];
     int     i, src_min_id, src_max_id, src_root_id;
-    Status  status;
-    STRING  excluded_list[] = {
+    VIO_Status  status;
+    VIO_STR  excluded_list[] = {
                                   MIxspace,
                                   MIyspace,
                                   MIzspace,
@@ -736,13 +736,13 @@ VIOAPI  Status  copy_auxiliary_data_from_open_minc_file(
                                            concating to non-existent history
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  add_minc_history(
+VIOAPI  VIO_Status  add_minc_history(
     Minc_file   file,
-    STRING      history_string )
+    VIO_STR      history_string )
 {
     int      old_att_length;
     nc_type  datatype;
-    STRING   new_history;
+    VIO_STR   new_history;
 
     if( file->ignoring_because_cached )
         return( VIO_OK );
@@ -810,15 +810,15 @@ VIOAPI  Status  add_minc_history(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-static  Status  get_dimension_ordering(
+static  VIO_Status  get_dimension_ordering(
     int          n_vol_dims,
-    STRING       vol_dim_names[],
+    VIO_STR       vol_dim_names[],
     int          n_file_dims,
-    STRING       file_dim_names[],
+    VIO_STR       file_dim_names[],
     int          to_volume[],
     int          to_file[] )
 {
-    Status   status;
+    VIO_Status   status;
     int      v, f, n_found;
 
     for_less( f, 0, n_file_dims )
@@ -869,15 +869,15 @@ static  Status  get_dimension_ordering(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-static  Status  check_minc_output_variables(
+static  VIO_Status  check_minc_output_variables(
     Minc_file   file )
 {
     int               d, axis;
     long              start_index, mindex[MAX_VAR_DIMS];
-    Real              voxel_min, voxel_max, real_min, real_max;
+    VIO_Real              voxel_min, voxel_max, real_min, real_max;
     double            dim_value;
     Volume            volume;
-    Status            status;
+    VIO_Status            status;
 
     if( !file->end_def_done )
     {
@@ -978,10 +978,10 @@ static  Status  check_minc_output_variables(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  set_minc_output_random_order(
+VIOAPI  VIO_Status  set_minc_output_random_order(
     Minc_file   file )
 {
-    Status  status;
+    VIO_Status  status;
 
     status = check_minc_output_variables( file );
 
@@ -1010,7 +1010,7 @@ VIOAPI  Status  set_minc_output_random_order(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  output_minc_hyperslab(
+VIOAPI  VIO_Status  output_minc_hyperslab(
     Minc_file           file,
     Data_types          data_type,
     int                 n_array_dims,
@@ -1022,14 +1022,14 @@ VIOAPI  Status  output_minc_hyperslab(
 {
     int              ind, expected_ind, file_ind, dim;
     int              n_file_dims, n_tmp_dims;
-    long             long_file_start[MAX_DIMENSIONS];
-    long             long_file_count[MAX_DIMENSIONS];
+    long             long_file_start[VIO_MAX_DIMENSIONS];
+    long             long_file_count[VIO_MAX_DIMENSIONS];
     void             *void_ptr;
-    BOOLEAN          direct_from_array, non_full_size_found;
-    int              tmp_ind, tmp_sizes[MAX_DIMENSIONS];
-    int              array_indices[MAX_DIMENSIONS];
+    VIO_BOOL          direct_from_array, non_full_size_found;
+    int              tmp_ind, tmp_sizes[VIO_MAX_DIMENSIONS];
+    int              array_indices[VIO_MAX_DIMENSIONS];
     int              array_counts[MAX_VAR_DIMS];
-    Status           status;
+    VIO_Status           status;
     multidim_array   buffer_array;
 
     status = check_minc_output_variables( file );
@@ -1155,16 +1155,16 @@ static  void  output_slab(
     long        file_count[] )
 {
     int               dim, file_ind, ind, n_slab_dims;
-    int               to_array[MAX_DIMENSIONS];
-    int               volume_start[MAX_DIMENSIONS];
-    int               volume_sizes[MAX_DIMENSIONS];
-    int               array_to_volume[MAX_DIMENSIONS];
-    int               int_file_count[MAX_DIMENSIONS];
-    int               int_file_start[MAX_DIMENSIONS];
-    int               slab_sizes[MAX_DIMENSIONS];
-    int               v[MAX_DIMENSIONS];
+    int               to_array[VIO_MAX_DIMENSIONS];
+    int               volume_start[VIO_MAX_DIMENSIONS];
+    int               volume_sizes[VIO_MAX_DIMENSIONS];
+    int               array_to_volume[VIO_MAX_DIMENSIONS];
+    int               int_file_count[VIO_MAX_DIMENSIONS];
+    int               int_file_start[VIO_MAX_DIMENSIONS];
+    int               slab_sizes[VIO_MAX_DIMENSIONS];
+    int               v[VIO_MAX_DIMENSIONS];
     int               size0, size1, size2, size3, size4;
-    Real              value;
+    VIO_Real              value;
     void              *array_data_ptr;
     multidim_array    array;
 
@@ -1188,10 +1188,10 @@ static  void  output_slab(
         for_less( dim, 0, get_volume_n_dimensions(volume) )
             volume_sizes[dim] = 1;
 
-        for_less( dim, 0, MAX_DIMENSIONS )
+        for_less( dim, 0, VIO_MAX_DIMENSIONS )
             array_to_volume[dim] = 0;
 
-        for_less( dim, get_volume_n_dimensions(volume), MAX_DIMENSIONS )
+        for_less( dim, get_volume_n_dimensions(volume), VIO_MAX_DIMENSIONS )
         {
             volume_start[dim] = 0;
             volume_sizes[dim] = 1;
@@ -1293,23 +1293,23 @@ static  void  output_slab(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-static  Status  output_the_volume(
+static  VIO_Status  output_the_volume(
     Minc_file   file,
     Volume      volume,
     int         volume_count[],
     long        file_start[] )
 {
-    Status            status;
-    int               d, n_volume_dims, sizes[MAX_DIMENSIONS];
+    VIO_Status            status;
+    int               d, n_volume_dims, sizes[VIO_MAX_DIMENSIONS];
     int               slab_size, n_slab, this_count;
     int               vol_index, step, n_steps, n_range_dims;
     int               to_volume_index[MAX_VAR_DIMS];
-    int               to_file_index[MAX_DIMENSIONS];
+    int               to_file_index[VIO_MAX_DIMENSIONS];
     long              file_indices[MAX_VAR_DIMS];
     long              count[MAX_VAR_DIMS];
-    Real              real_min, real_max;
-    STRING            *vol_dimension_names;
-    BOOLEAN           increment;
+    VIO_Real              real_min, real_max;
+    VIO_STR            *vol_dimension_names;
+    VIO_BOOL           increment;
     progress_struct   progress;
 
     status = check_minc_output_variables( file );
@@ -1539,7 +1539,7 @@ static  Status  output_the_volume(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  output_volume_to_minc_file_position(
+VIOAPI  VIO_Status  output_volume_to_minc_file_position(
     Minc_file   file,
     Volume      volume,
     int         volume_count[],
@@ -1566,11 +1566,11 @@ VIOAPI  Status  output_volume_to_minc_file_position(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  output_minc_volume(
+VIOAPI  VIO_Status  output_minc_volume(
     Minc_file   file )
 {
-    int        d, volume_count[MAX_DIMENSIONS];
-    BOOLEAN    increment;
+    int        d, volume_count[VIO_MAX_DIMENSIONS];
+    VIO_BOOL    increment;
 
     if( file->ignoring_because_cached )
         return( VIO_OK );
@@ -1636,7 +1636,7 @@ VIOAPI  Status  output_minc_volume(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  close_minc_output(
+VIOAPI  VIO_Status  close_minc_output(
     Minc_file   file )
 {
     int    d;
@@ -1692,7 +1692,7 @@ VIOAPI  void  set_default_minc_output_options(
 {
     int   dim;
 
-    for_less( dim, 0, MAX_DIMENSIONS )
+    for_less( dim, 0, VIO_MAX_DIMENSIONS )
         options->dimension_names[dim] = NULL;
 
     options->global_image_range[0] = 0.0;
@@ -1727,7 +1727,7 @@ VIOAPI  void  copy_minc_output_options(
     {
         *dest = *src;
 
-        for_less( dim, 0, MAX_DIMENSIONS )
+        for_less( dim, 0, VIO_MAX_DIMENSIONS )
         {
             if( src->dimension_names[dim] != NULL )
                 dest->dimension_names[dim] = create_string(
@@ -1754,7 +1754,7 @@ VIOAPI  void  delete_minc_output_options(
 {
     int   i;
 
-    for_less( i, 0, MAX_DIMENSIONS )
+    for_less( i, 0, VIO_MAX_DIMENSIONS )
         delete_string( options->dimension_names[i] );
 }
 
@@ -1777,7 +1777,7 @@ VIOAPI  void  delete_minc_output_options(
 VIOAPI  void  set_minc_output_dimensions_order(
     minc_output_options  *options,
     int                  n_dimensions,
-    STRING               dimension_names[] )
+    VIO_STR               dimension_names[] )
 {
     int   i;
 
@@ -1805,8 +1805,8 @@ VIOAPI  void  set_minc_output_dimensions_order(
 
 VIOAPI  void  set_minc_output_real_range(
     minc_output_options  *options,
-    Real                 real_min,
-    Real                 real_max )
+    VIO_Real                 real_min,
+    VIO_Real                 real_max )
 {
     options->global_image_range[0] = real_min;
     options->global_image_range[1] = real_max;
@@ -1831,7 +1831,7 @@ VIOAPI  void  set_minc_output_real_range(
 
 VIOAPI  void  set_minc_output_use_volume_starts_and_steps_flag(
     minc_output_options  *options,
-    BOOLEAN              flag )
+    VIO_BOOL              flag )
 {
     options->use_volume_starts_and_steps = flag;
     options->use_starts_set = TRUE;

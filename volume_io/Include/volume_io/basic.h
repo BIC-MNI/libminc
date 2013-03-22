@@ -175,6 +175,8 @@ typedef VIO_Status Status;
 
 #define  FRACTION( x )  ((double) (x) - (double) FLOOR(x))
 
+#endif /* !VIO_PREFIX_NAMES */
+
 /* for loops */
 
 #define  for_less( i, start, end )  for( (i) = (start);  (i) < (end);  ++(i) )
@@ -193,7 +195,5 @@ typedef VIO_Status Status;
 
 #define  HANDLE_INTERNAL_ERROR( X )                                           \
          handle_internal_error( X )
-
-#endif /* !VIO_PREFIX_NAMES */
 
 #endif /* DEF_BASIC */

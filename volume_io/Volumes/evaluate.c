@@ -33,9 +33,9 @@
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Real  convert_voxel_to_value(
-    Volume   volume,
-    Real     voxel )
+VIOAPI  VIO_Real  convert_voxel_to_value(
+    VIO_Volume   volume,
+    VIO_Real     voxel )
 {
     if( volume->real_range_set )
         return( volume->real_value_scale * voxel +
@@ -58,9 +58,9 @@ VIOAPI  Real  convert_voxel_to_value(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Real  convert_value_to_voxel(
-    Volume   volume,
-    Real     value )
+VIOAPI  VIO_Real  convert_value_to_voxel(
+    VIO_Volume   volume,
+    VIO_Real     value )
 {
     if( volume->real_range_set )
         return( (value - volume->real_value_translation) /
@@ -87,17 +87,17 @@ VIOAPI  Real  convert_value_to_voxel(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Real  get_volume_voxel_value(
-    Volume   volume,
+VIOAPI  VIO_Real  get_volume_voxel_value(
+    VIO_Volume   volume,
     int      v0,
     int      v1,
     int      v2,
     int      v3,
     int      v4 )
 {
-    Real   voxel;
+    VIO_Real   voxel;
 
-    GET_VOXEL_TYPED( voxel, (Real), volume, v0, v1, v2, v3, v4 );
+    GET_VOXEL_TYPED( voxel, (VIO_Real), volume, v0, v1, v2, v3, v4 );
 
     return( voxel );
 }
@@ -111,7 +111,7 @@ VIOAPI  Real  get_volume_voxel_value(
               v3
               v4
 @OUTPUT     : 
-@RETURNS    : Real value
+@RETURNS    : VIO_Real value
 @DESCRIPTION: Returns the volume real value at the specified voxel index.
 @METHOD     : 
 @GLOBALS    : 
@@ -120,15 +120,15 @@ VIOAPI  Real  get_volume_voxel_value(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Real  get_volume_real_value(
-    Volume   volume,
+VIOAPI  VIO_Real  get_volume_real_value(
+    VIO_Volume   volume,
     int      v0,
     int      v1,
     int      v2,
     int      v3,
     int      v4 )
 {
-    Real   voxel, value;
+    VIO_Real   voxel, value;
 
     voxel = get_volume_voxel_value( volume, v0, v1, v2, v3, v4 );
 
@@ -157,13 +157,13 @@ VIOAPI  Real  get_volume_real_value(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  set_volume_voxel_value(
-    Volume   volume,
+    VIO_Volume   volume,
     int      v0,
     int      v1,
     int      v2,
     int      v3,
     int      v4,
-    Real     voxel )
+    VIO_Real     voxel )
 {
     SET_VOXEL( volume, v0, v1, v2, v3, v4, voxel );
 }
@@ -188,16 +188,16 @@ VIOAPI  void  set_volume_voxel_value(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  set_volume_real_value(
-    Volume   volume,
+    VIO_Volume   volume,
     int      v0,
     int      v1,
     int      v2,
     int      v3,
     int      v4,
-    Real     value )
+    VIO_Real     value )
 {
-    Real         voxel;
-    Data_types   data_type;
+    VIO_Real         voxel;
+    VIO_Data_types   data_type;
 
     voxel = convert_value_to_voxel( volume, value );
 
@@ -206,7 +206,7 @@ VIOAPI  void  set_volume_real_value(
     if( data_type != FLOAT &&
         data_type != DOUBLE )
     {
-        voxel = (Real) ROUND( voxel );
+        voxel = (VIO_Real) ROUND( voxel );
     }
 
     set_volume_voxel_value( volume, v0, v1, v2, v3, v4, voxel );
@@ -233,17 +233,17 @@ VIOAPI  void  set_volume_real_value(
 ---------------------------------------------------------------------------- */
 
 static void trilinear_interpolate(
-    Volume   volume,
-    Real     voxel[],
-    Real     outside_value,
-    Real     *value,
-    Real     derivs[] )
+    VIO_Volume   volume,
+    VIO_Real     voxel[],
+    VIO_Real     outside_value,
+    VIO_Real     *value,
+    VIO_Real     derivs[] )
 {
     int    c, i, j, k, *sizes, dx, dy, dz;
-    Real   x, y, z, u, v, w;
-    Real   coefs[8];
-    Real   du00, du01, du10, du11, c00, c01, c10, c11, c0, c1, du0, du1;
-    Real   dv0, dv1, dw, scale_factor;
+    VIO_Real   x, y, z, u, v, w;
+    VIO_Real   coefs[8];
+    VIO_Real   du00, du01, du10, du11, c00, c01, c10, c11, c0, c1, du0, du1;
+    VIO_Real   dv0, dv1, dw, scale_factor;
 
     sizes = &volume->array.sizes[0];
 
@@ -251,22 +251,22 @@ static void trilinear_interpolate(
     y = voxel[1];
     z = voxel[2];
 
-    if( x >= 0.0 && x < (Real) sizes[0]-1.0 &&
-        y >= 0.0 && y < (Real) sizes[1]-1.0 &&
-        z >= 0.0 && z < (Real) sizes[2]-1.0 )
+    if( x >= 0.0 && x < (VIO_Real) sizes[0]-1.0 &&
+        y >= 0.0 && y < (VIO_Real) sizes[1]-1.0 &&
+        z >= 0.0 && z < (VIO_Real) sizes[2]-1.0 )
     {
         i = (int) x;
         j = (int) y;
         k = (int) z;
 
-        GET_VOXEL_3D_TYPED( coefs[0], (Real), volume, i  , j  , k   );
-        GET_VOXEL_3D_TYPED( coefs[1], (Real), volume, i  , j  , k+1 );
-        GET_VOXEL_3D_TYPED( coefs[2], (Real), volume, i  , j+1, k   );
-        GET_VOXEL_3D_TYPED( coefs[3], (Real), volume, i  , j+1, k+1 );
-        GET_VOXEL_3D_TYPED( coefs[4], (Real), volume, i+1, j  , k   );
-        GET_VOXEL_3D_TYPED( coefs[5], (Real), volume, i+1, j  , k+1 );
-        GET_VOXEL_3D_TYPED( coefs[6], (Real), volume, i+1, j+1, k   );
-        GET_VOXEL_3D_TYPED( coefs[7], (Real), volume, i+1, j+1, k+1 );
+        GET_VOXEL_3D_TYPED( coefs[0], (VIO_Real), volume, i  , j  , k   );
+        GET_VOXEL_3D_TYPED( coefs[1], (VIO_Real), volume, i  , j  , k+1 );
+        GET_VOXEL_3D_TYPED( coefs[2], (VIO_Real), volume, i  , j+1, k   );
+        GET_VOXEL_3D_TYPED( coefs[3], (VIO_Real), volume, i  , j+1, k+1 );
+        GET_VOXEL_3D_TYPED( coefs[4], (VIO_Real), volume, i+1, j  , k   );
+        GET_VOXEL_3D_TYPED( coefs[5], (VIO_Real), volume, i+1, j  , k+1 );
+        GET_VOXEL_3D_TYPED( coefs[6], (VIO_Real), volume, i+1, j+1, k   );
+        GET_VOXEL_3D_TYPED( coefs[7], (VIO_Real), volume, i+1, j+1, k+1 );
     }
     else
     {
@@ -285,7 +285,7 @@ static void trilinear_interpolate(
                 j + dy >= 0 && j + dy < sizes[1] &&
                 k + dz >= 0 && k + dz < sizes[2] )
             {
-                GET_VOXEL_3D_TYPED( coefs[c], (Real), volume, i+dx, j+dy, k+dz);
+                GET_VOXEL_3D_TYPED( coefs[c], (VIO_Real), volume, i+dx, j+dy, k+dz);
             }
             else
                 coefs[c] = outside_value;
@@ -293,9 +293,9 @@ static void trilinear_interpolate(
         }
     }
 
-    u = x - (Real) i;
-    v = y - (Real) j;
-    w = z - (Real) k;
+    u = x - (VIO_Real) i;
+    v = y - (VIO_Real) j;
+    w = z - (VIO_Real) k;
 
     /*--- get the 4 differences in the u direction */
 
@@ -346,11 +346,11 @@ static void trilinear_interpolate(
         du0 = INTERPOLATE( v, du00, du10 );
         du1 = INTERPOLATE( v, du01, du11 );
 
-        /*--- interpolate the 1D problems in w, or for Z deriv, just use dw */
+        /*--- interpolate the 1D problems in w, or for VIO_Z deriv, just use dw */
 
-        derivs[X] = scale_factor * INTERPOLATE( w, du0, du1 );
-        derivs[Y] = scale_factor * INTERPOLATE( w, dv0, dv1 );
-        derivs[Z] = scale_factor * dw;
+        derivs[VIO_X] = scale_factor * INTERPOLATE( w, du0, du1 );
+        derivs[VIO_Y] = scale_factor * INTERPOLATE( w, dv0, dv1 );
+        derivs[VIO_Z] = scale_factor * dw;
     }
 }
 
@@ -378,17 +378,17 @@ static void trilinear_interpolate(
 
 static void   interpolate_volume(
     int      n_dims,
-    Real     parameters[],
+    VIO_Real     parameters[],
     int      n_values,
     int      degree,
-    Real     coefs[],
-    Real     values[],
-    Real     **first_deriv,
-    Real     ***second_deriv )
+    VIO_Real     coefs[],
+    VIO_Real     values[],
+    VIO_Real     **first_deriv,
+    VIO_Real     ***second_deriv )
 {
     int       v, d, d2, n_derivs, derivs_per_value, mult, mult2;
-    Real      fixed_size_derivs[MAX_DERIV_SIZE];
-    Real      *derivs;
+    VIO_Real      fixed_size_derivs[MAX_DERIV_SIZE];
+    VIO_Real      *derivs;
 
     /*--- determine how many derivatives should be computed */
 
@@ -508,10 +508,10 @@ static void   interpolate_volume(
 ---------------------------------------------------------------------------- */
 
 static void   extract_coefficients(
-    Volume         volume,
+    VIO_Volume         volume,
     int            start[],
     int            end[],
-    Real           coefs[],
+    VIO_Real           coefs[],
     int            inc[] )
 {
     int      inc0, inc1, inc2, inc3, inc4;
@@ -564,7 +564,7 @@ static void   extract_coefficients(
     case 1:
         for_less( v0, start0, end0 )
         {
-            GET_VALUE_1D_TYPED( coefs[ind], (Real), volume, v0 );
+            GET_VALUE_1D_TYPED( coefs[ind], (VIO_Real), volume, v0 );
             ind += inc0;
         }
         break;
@@ -574,7 +574,7 @@ static void   extract_coefficients(
         {
             for_less( v1, start1, end1 )
             {
-                GET_VALUE_2D_TYPED( coefs[ind], (Real), volume, v0, v1 );
+                GET_VALUE_2D_TYPED( coefs[ind], (VIO_Real), volume, v0, v1 );
                 ind += inc1;
             }
             ind += inc0;
@@ -588,7 +588,7 @@ static void   extract_coefficients(
             {
                 for_less( v2, start2, end2 )
                 {
-                    GET_VALUE_3D_TYPED( coefs[ind], (Real), volume, v0, v1, v2);
+                    GET_VALUE_3D_TYPED( coefs[ind], (VIO_Real), volume, v0, v1, v2);
                     ind += inc2;
                 }
                 ind += inc1;
@@ -606,7 +606,7 @@ static void   extract_coefficients(
                 {
                     for_less( v3, start3, end3 )
                     {
-                        GET_VALUE_4D_TYPED( coefs[ind], (Real),
+                        GET_VALUE_4D_TYPED( coefs[ind], (VIO_Real),
                                             volume, v0, v1, v2, v3 );
                         ind += inc3;
                     }
@@ -629,7 +629,7 @@ static void   extract_coefficients(
                     {
                         for_less( v4, start4, end4 )
                         {
-                            GET_VALUE_5D_TYPED( coefs[ind], (Real), volume,
+                            GET_VALUE_5D_TYPED( coefs[ind], (VIO_Real), volume,
                                                 v0, v1, v2, v3, v4 );
                             ind += inc4;
                         }
@@ -645,7 +645,7 @@ static void   extract_coefficients(
     }
 }
 
-static  Real   interpolation_tolerance = 0.0;
+static  VIO_Real   interpolation_tolerance = 0.0;
 
 /* ----------------------------- MNI Header -----------------------------------
 @NAME       : set_volume_interpolation_tolerance
@@ -663,7 +663,7 @@ static  Real   interpolation_tolerance = 0.0;
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  set_volume_interpolation_tolerance(
-    Real   tolerance )
+    VIO_Real   tolerance )
 {
     interpolation_tolerance = tolerance;
 }
@@ -704,27 +704,27 @@ VIOAPI  void  set_volume_interpolation_tolerance(
 #define MAX_COEF_SPACE   1000
 
 VIOAPI  int   evaluate_volume(
-    Volume         volume,
-    Real           voxel[],
-    BOOLEAN        interpolating_dimensions[],
+    VIO_Volume         volume,
+    VIO_Real           voxel[],
+    VIO_BOOL        interpolating_dimensions[],
     int            degrees_continuity,
-    BOOLEAN        use_linear_at_edge,
-    Real           outside_value,
-    Real           values[],
-    Real           **first_deriv,
-    Real           ***second_deriv )
+    VIO_BOOL        use_linear_at_edge,
+    VIO_Real           outside_value,
+    VIO_Real           values[],
+    VIO_Real           **first_deriv,
+    VIO_Real           ***second_deriv )
 {
-    int      inc[MAX_DIMENSIONS];
+    int      inc[VIO_MAX_DIMENSIONS];
     int      start_index, spline_degree;
     int      next_d;
-    int      n, v, d, dim, n_values, sizes[MAX_DIMENSIONS], n_dims;
-    int      start[MAX_DIMENSIONS], n_interp_dims;
-    int      end[MAX_DIMENSIONS];
-    int      interp_dims[MAX_DIMENSIONS];
+    int      n, v, d, dim, n_values, sizes[VIO_MAX_DIMENSIONS], n_dims;
+    int      start[VIO_MAX_DIMENSIONS], n_interp_dims;
+    int      end[VIO_MAX_DIMENSIONS];
+    int      interp_dims[VIO_MAX_DIMENSIONS];
     int      n_coefs;
-    Real     fraction[MAX_DIMENSIONS], bound, *coefs, pos;
-    Real     fixed_size_coefs[MAX_COEF_SPACE];
-    BOOLEAN  fully_inside, fully_outside, on_grid_point;
+    VIO_Real     fraction[VIO_MAX_DIMENSIONS], bound, *coefs, pos;
+    VIO_Real     fixed_size_coefs[MAX_COEF_SPACE];
+    VIO_BOOL  fully_inside, fully_outside, on_grid_point;
 
     n_dims = get_volume_n_dimensions(volume);
 
@@ -736,7 +736,7 @@ VIOAPI  int   evaluate_volume(
          interpolating_dimensions[1] &&
          interpolating_dimensions[2]) )
     {
-        Real   *deriv;
+        VIO_Real   *deriv;
 
         if( first_deriv == NULL )
             deriv = NULL;
@@ -772,7 +772,7 @@ VIOAPI  int   evaluate_volume(
         {
             if( interpolating_dimensions == NULL || interpolating_dimensions[d])
             {
-                pos = (Real) ROUND( voxel[d] );
+                pos = (VIO_Real) ROUND( voxel[d] );
                 if( voxel[d] < pos - interpolation_tolerance ||
                     voxel[d] > pos + interpolation_tolerance )
                 {
@@ -785,7 +785,7 @@ VIOAPI  int   evaluate_volume(
             degrees_continuity = -1;
     }
 
-    bound = (Real) degrees_continuity / 2.0;
+    bound = (VIO_Real) degrees_continuity / 2.0;
 
     /*--- if we must use linear interpolation near the boundaries, then
           check if we are near the boundaries, and adjust the degrees_continuity
@@ -799,13 +799,13 @@ VIOAPI  int   evaluate_volume(
             {
                 while( degrees_continuity >= 0 &&
                        (voxel[d] < bound  ||
-                        voxel[d] > (Real) sizes[d] - 1.0 - bound  ||
-                        bound == (Real) sizes[d] - 1.0 - bound ) )
+                        voxel[d] > (VIO_Real) sizes[d] - 1.0 - bound  ||
+                        bound == (VIO_Real) sizes[d] - 1.0 - bound ) )
                 {
                     --degrees_continuity;
                     if( degrees_continuity == 1 )
                         degrees_continuity = 0;
-                    bound = (Real) degrees_continuity / 2.0;
+                    bound = (VIO_Real) degrees_continuity / 2.0;
                 }
             }
         }
@@ -830,9 +830,9 @@ VIOAPI  int   evaluate_volume(
             interp_dims[n_interp_dims] = d;
             pos = voxel[d] - bound;
             start[d] =       FLOOR( pos );
-            fraction[n_interp_dims] = pos - (Real) start[d];
+            fraction[n_interp_dims] = pos - (VIO_Real) start[d];
 
-            if( voxel[d] == (Real) sizes[d] - 1.0 - bound )
+            if( voxel[d] == (VIO_Real) sizes[d] - 1.0 - bound )
             {
                 --start[d];
                 fraction[n_interp_dims] = 1.0;
@@ -955,7 +955,7 @@ VIOAPI  int   evaluate_volume(
     {
         /*--- get the necessary coeficients from the volume */
 
-        for_less( d, n_dims, MAX_DIMENSIONS )
+        for_less( d, n_dims, VIO_MAX_DIMENSIONS )
         {
             start[d] = 0;
             end[d] = 0;
@@ -1029,31 +1029,31 @@ VIOAPI  int   evaluate_volume(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void   evaluate_volume_in_world(
-    Volume         volume,
-    Real           x,
-    Real           y,
-    Real           z,
+    VIO_Volume         volume,
+    VIO_Real           x,
+    VIO_Real           y,
+    VIO_Real           z,
     int            degrees_continuity,
-    BOOLEAN        use_linear_at_edge,
-    Real           outside_value,
-    Real           values[],
-    Real           deriv_x[],
-    Real           deriv_y[],
-    Real           deriv_z[],
-    Real           deriv_xx[],
-    Real           deriv_xy[],
-    Real           deriv_xz[],
-    Real           deriv_yy[],
-    Real           deriv_yz[],
-    Real           deriv_zz[] )
+    VIO_BOOL        use_linear_at_edge,
+    VIO_Real           outside_value,
+    VIO_Real           values[],
+    VIO_Real           deriv_x[],
+    VIO_Real           deriv_y[],
+    VIO_Real           deriv_z[],
+    VIO_Real           deriv_xx[],
+    VIO_Real           deriv_xy[],
+    VIO_Real           deriv_xz[],
+    VIO_Real           deriv_yy[],
+    VIO_Real           deriv_yz[],
+    VIO_Real           deriv_zz[] )
 {
-    Real      ignore;
-    Real      voxel[MAX_DIMENSIONS];
-    Real      **first_deriv, ***second_deriv;
-    Real      t[N_DIMENSIONS][MAX_DIMENSIONS];
+    VIO_Real      ignore;
+    VIO_Real      voxel[VIO_MAX_DIMENSIONS];
+    VIO_Real      **first_deriv, ***second_deriv;
+    VIO_Real      t[VIO_N_DIMENSIONS][VIO_MAX_DIMENSIONS];
     int       c, d, dim, v, n_values, n_dims, axis;
-    int       sizes[MAX_DIMENSIONS], dims_interpolated[N_DIMENSIONS];
-    BOOLEAN   interpolating_dimensions[MAX_DIMENSIONS];
+    int       sizes[VIO_MAX_DIMENSIONS], dims_interpolated[VIO_N_DIMENSIONS];
+    VIO_BOOL   interpolating_dimensions[VIO_MAX_DIMENSIONS];
 
     /*--- convert the world space to a voxel coordinate */
 
@@ -1068,7 +1068,7 @@ VIOAPI  void   evaluate_volume_in_world(
 
     /*--- set each spatial dimension to being interpolated */
 
-    for_less( d, 0, N_DIMENSIONS )
+    for_less( d, 0, VIO_N_DIMENSIONS )
     {
         axis = volume->spatial_axes[d];
         if( axis < 0 )
@@ -1096,7 +1096,7 @@ VIOAPI  void   evaluate_volume_in_world(
 
     if( deriv_x != NULL )
     {
-        ALLOC2D( first_deriv, n_values, N_DIMENSIONS );
+        ALLOC2D( first_deriv, n_values, VIO_N_DIMENSIONS );
     }
     else
         first_deriv = NULL;
@@ -1105,7 +1105,7 @@ VIOAPI  void   evaluate_volume_in_world(
 
     if( deriv_xx != NULL )
     {
-        ALLOC3D( second_deriv, n_values, N_DIMENSIONS, N_DIMENSIONS );
+        ALLOC3D( second_deriv, n_values, VIO_N_DIMENSIONS, VIO_N_DIMENSIONS );
     }
     else
         second_deriv = NULL;
@@ -1140,7 +1140,7 @@ VIOAPI  void   evaluate_volume_in_world(
         {
             /*--- get the voxel coordinates of the first derivative */
 
-            for_less( c, 0, N_DIMENSIONS )
+            for_less( c, 0, VIO_N_DIMENSIONS )
                 voxel[dims_interpolated[c]] = first_deriv[v][c];
 
             /*--- convert the voxel-space derivative to a world derivative */
@@ -1155,34 +1155,34 @@ VIOAPI  void   evaluate_volume_in_world(
     /*--- if the derivative is desired, convert the voxel derivative
           to world space */
 
-    if( deriv_xx != (Real *) 0 )
+    if( deriv_xx != (VIO_Real *) 0 )
     {
         for_less( v, 0, n_values )    /*--- convert the deriv of each value */
         {
             /*--- get the voxel coordinates of the first derivative */
 
-            for_less( dim, 0, N_DIMENSIONS )
+            for_less( dim, 0, VIO_N_DIMENSIONS )
             {
-                for_less( c, 0, N_DIMENSIONS )
+                for_less( c, 0, VIO_N_DIMENSIONS )
                     voxel[dims_interpolated[c]] = second_deriv[v][dim][c];
 
                 /*--- convert the voxel-space derivative to a world derivative*/
 
                 convert_voxel_normal_vector_to_world( volume, voxel,
-                      &t[X][dims_interpolated[dim]],
-                      &t[Y][dims_interpolated[dim]],
-                      &t[Z][dims_interpolated[dim]] );
+                      &t[VIO_X][dims_interpolated[dim]],
+                      &t[VIO_Y][dims_interpolated[dim]],
+                      &t[VIO_Z][dims_interpolated[dim]] );
             }
 
             /*--- now convert the results to world */
     
-            convert_voxel_normal_vector_to_world( volume, t[X],
+            convert_voxel_normal_vector_to_world( volume, t[VIO_X],
                                               &deriv_xx[v], &ignore, &ignore );
     
-            convert_voxel_normal_vector_to_world( volume, t[Y],
+            convert_voxel_normal_vector_to_world( volume, t[VIO_Y],
                                           &deriv_xy[v], &deriv_yy[v], &ignore );
     
-            convert_voxel_normal_vector_to_world( volume, t[Z],
+            convert_voxel_normal_vector_to_world( volume, t[VIO_Z],
                                   &deriv_xz[v], &deriv_yz[v], &deriv_zz[v] );
         }
 

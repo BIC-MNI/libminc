@@ -20,7 +20,7 @@
 #define   DEGREES_CONTINUITY         2    /* -1 = Nearest; 0 = Linear; 1 = Quadratic; 2 = Cubic interpolation */
 #define   SPLINE_DEGREE         ((DEGREES_CONTINUITY) + 2)
 
-#define   N_COMPONENTS   N_DIMENSIONS /* displacement vector has 3 components */
+#define   N_COMPONENTS   VIO_N_DIMENSIONS /* displacement vector has 3 components */
 
 #define   FOUR_DIMS      4
 
@@ -34,7 +34,7 @@ static void   evaluate_grid_volume(
     VIO_Real           x,
     VIO_Real           y,
     VIO_Real           z,
-    int            degrees_continuity,
+    int                degrees_continuity,
     VIO_Real           values[],
     VIO_Real           deriv_x[],
     VIO_Real           deriv_y[],
@@ -82,9 +82,9 @@ VIOAPI  VIO_Status  grid_transform_point(
     evaluate_grid_volume( volume, x, y, z, DEGREES_CONTINUITY, displacements,
                           NULL, NULL, NULL );
 
-    *x_transformed = x + displacements[X];
-    *y_transformed = y + displacements[Y];
-    *z_transformed = z + displacements[Z];
+    *x_transformed = x + displacements[VIO_X];
+    *y_transformed = y + displacements[VIO_Y];
+    *z_transformed = z + displacements[VIO_Z];
     
     return VIO_OK;
 }
@@ -154,7 +154,7 @@ private  void  forward_function(
 @OUTPUT     : x_transformed
               y_transformed
               z_transformed
-@RETURNS    : Status
+@RETURNS    : VIO_Status
 @DESCRIPTION: Applies the inverse grid transform to the point.  This is done
               by using newton-rhapson steps to find the point which maps to
               the parameters (x,y,z).
@@ -263,8 +263,8 @@ VIOAPI  VIO_Status  grid_inverse_transform_point(
     VIO_Real   error_x, error_y, error_z, error, smallest_e;
     VIO_Real   ftol;
     VIO_Status status=VIO_ERROR;
-    int    sizes[MAX_DIMENSIONS];
-    VIO_Real   steps[MAX_DIMENSIONS];
+    int    sizes[VIO_MAX_DIMENSIONS];
+    VIO_Real   steps[VIO_MAX_DIMENSIONS];
     VIO_Volume volume;
     short d, vector_dim = -1;
 
@@ -306,10 +306,10 @@ VIOAPI  VIO_Status  grid_inverse_transform_point(
     /*--- find which of 4 dimensions is the vector dimension */
     
     for_less( vector_dim, 0, FOUR_DIMS ) {
-      for_less( d, 0, N_DIMENSIONS ) {
+      for_less( d, 0, VIO_N_DIMENSIONS ) {
         if( volume->spatial_axes[d] == vector_dim ) break;
       }
-      if( d == N_DIMENSIONS ) break;
+      if( d == VIO_N_DIMENSIONS ) break;
     }
 
     ftol = -1.0;
@@ -377,18 +377,18 @@ static  void   evaluate_grid_volume(
     VIO_Real           deriv_y[],
     VIO_Real           deriv_z[] )
 {
-    VIO_Real     voxel[MAX_DIMENSIONS], voxel_vector[MAX_DIMENSIONS];
-    int      inc0, inc1, inc2, inc3, inc[MAX_DIMENSIONS], derivs_per_value;
+    VIO_Real     voxel[VIO_MAX_DIMENSIONS], voxel_vector[VIO_MAX_DIMENSIONS];
+    int      inc0, inc1, inc2, inc3, inc[VIO_MAX_DIMENSIONS], derivs_per_value;
     int      ind0, vector_dim;
     int      start0, start1, start2, start3, inc_so_far;
     int      end0, end1, end2, end3;
     int      v0, v1, v2, v3;
-    int      v, d, id, sizes[MAX_DIMENSIONS];
-    int      start[MAX_DIMENSIONS];
-    int      end[MAX_DIMENSIONS];
-    VIO_Real     fraction[MAX_DIMENSIONS], bound, pos;
+    int      v, d, id, sizes[VIO_MAX_DIMENSIONS];
+    int      start[VIO_MAX_DIMENSIONS];
+    int      end[VIO_MAX_DIMENSIONS];
+    VIO_Real     fraction[VIO_MAX_DIMENSIONS], bound, pos;
     VIO_Real     coefs[SPLINE_DEGREE*SPLINE_DEGREE*SPLINE_DEGREE*N_COMPONENTS];
-    VIO_Real     values_derivs[N_COMPONENTS + N_COMPONENTS * N_DIMENSIONS];
+    VIO_Real     values_derivs[N_COMPONENTS + N_COMPONENTS * VIO_N_DIMENSIONS];
     int is_2dslice = -1;
 
 
@@ -400,11 +400,11 @@ static  void   evaluate_grid_volume(
     /*--- find which of 4 dimensions is the vector dimension */
 
     for_less( vector_dim, 0, FOUR_DIMS ) {
-        for_less( d, 0, N_DIMENSIONS ) {
+        for_less( d, 0, VIO_N_DIMENSIONS ) {
             if( volume->spatial_axes[d] == vector_dim )
                 break;
         }
-        if( d == N_DIMENSIONS )
+        if( d == VIO_N_DIMENSIONS )
             break;
     }
 
@@ -545,11 +545,11 @@ static  void   evaluate_grid_volume(
             values[v] = coefs[v];
     } else {
         if( is_2dslice == -1 ) {
-          evaluate_interpolating_spline( N_DIMENSIONS, fraction,
+          evaluate_interpolating_spline( VIO_N_DIMENSIONS, fraction,
                                          degrees_continuity + 2, 
                                          N_COMPONENTS, coefs, 0, values_derivs );
         } else {
-          evaluate_interpolating_spline( N_DIMENSIONS-1, fraction,
+          evaluate_interpolating_spline( VIO_N_DIMENSIONS-1, fraction,
                                          degrees_continuity + 2, 
                                          N_COMPONENTS, coefs, 0, values_derivs );
         }

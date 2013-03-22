@@ -35,16 +35,16 @@
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-static  BOOLEAN  scaled_maximal_pivoting_gaussian_elimination(
+static  VIO_BOOL  scaled_maximal_pivoting_gaussian_elimination(
     int   n,
     int   row[],
-    Real  **a,
+    VIO_Real  **a,
     int   n_values,
-    Real  **solution )
+    VIO_Real  **solution )
 {
     int       i, j, k, p, v, tmp;
-    Real      *s, val, best_val, m, scale_factor;
-    BOOLEAN   success;
+    VIO_Real      *s, val, best_val, m, scale_factor;
+    VIO_BOOL   success;
 
     ALLOC( s, n );
 
@@ -150,7 +150,7 @@ static  BOOLEAN  scaled_maximal_pivoting_gaussian_elimination(
               values
 @OUTPUT     : values has the solution on output
 @RETURNS    : TRUE if successful
-@DESCRIPTION: Performs gaussian elimination on a type-Real matrix, first
+@DESCRIPTION: Performs gaussian elimination on a type-VIO_Real matrix, first
               copying it into temporary storage, which is modified as
               the gaussian elimination is performed.
 @METHOD     : 
@@ -160,15 +160,15 @@ static  BOOLEAN  scaled_maximal_pivoting_gaussian_elimination(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-static BOOLEAN scaled_maximal_pivoting_gaussian_elimination_real(
+static VIO_BOOL scaled_maximal_pivoting_gaussian_elimination_real(
     int   n,
-    Real  **coefs,
+    VIO_Real  **coefs,
     int   n_values,
-    Real  **values )
+    VIO_Real  **values )
 {
     int       i, j, v, *row;
-    Real      **a, **solution;
-    BOOLEAN   success;
+    VIO_Real      **a, **solution;
+    VIO_BOOL   success;
 
     ALLOC( row, n );
     ALLOC2D( a, n, n );
@@ -218,11 +218,11 @@ static BOOLEAN scaled_maximal_pivoting_gaussian_elimination_real(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  BOOLEAN  solve_linear_system(
+VIOAPI  VIO_BOOL  solve_linear_system(
     int   n,
-    Real  **coefs,
-    Real  values[],
-    Real  solution[] )
+    VIO_Real  **coefs,
+    VIO_Real  values[],
+    VIO_Real  solution[] )
 {
     int       i;
 
@@ -247,13 +247,13 @@ VIOAPI  BOOLEAN  solve_linear_system(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  BOOLEAN  invert_square_matrix(
+VIOAPI  VIO_BOOL  invert_square_matrix(
     int   n,
-    Real  **matrix,
-    Real  **inverse )
+    VIO_Real  **matrix,
+    VIO_Real  **inverse )
 {
-    Real      tmp;
-    BOOLEAN   success;
+    VIO_Real      tmp;
+    VIO_BOOL   success;
     int       i, j;
 
     for_less( i, 0, n )

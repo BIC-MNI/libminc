@@ -1,11 +1,17 @@
 #define _GNU_SOURCE 1
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif /*HAVE_CONFIG_H*/
+
+
 #include <stdio.h>
 #include <stdlib.h>
 
 #include <volume_io.h>
 
  
-Real tolerance = 1e-8;
+VIO_Real tolerance = 1e-8;
 
 /*Windows compatibility hack*/
 #ifndef HAVE_SRAND48
@@ -18,13 +24,13 @@ void srand48(long seed)
 #ifndef HAVE_DRAND48
 double drand48(void)
 {
-  return (double)rand() / (RAND_MAX + 1);
+  return (double)rand() / ( + 1);
 }
 #endif /*HAVE_DRAND48*/
 
 
 
-int is_equal_real( Real e, Real a )
+int is_equal_real( VIO_Real e, VIO_Real a )
 {
     return fabs(e-a) < tolerance;
 }
@@ -33,8 +39,8 @@ int is_equal_real( Real e, Real a )
 
 /* Args: expected, actual.
  */
-void assert_equal_point( Real ex, Real ey, Real ez,
-			 Real ax, Real ay, Real az,
+void assert_equal_point( VIO_Real ex, VIO_Real ey, VIO_Real ez,
+			 VIO_Real ax, VIO_Real ay, VIO_Real az,
 			 const char* msg )
 {
     if ( is_equal_real(ex,ax) && 
@@ -55,7 +61,7 @@ void assert_equal_point( Real ex, Real ey, Real ez,
 int main( int ac, char* av[] )
 {
     int N;
-    General_transform xfm;
+    VIO_General_transform xfm;
 
 
     if ( ac != 3 && ac != 4 ) {
@@ -76,12 +82,12 @@ int main( int ac, char* av[] )
     /*Set the same seed number*/
     srand48(1);
     while (N-- > 0) {
-      Real x = 500.0 * ( drand48() - 0.5 );
-      Real y = 500.0 * ( drand48() - 0.5 );
-      Real z = 500.0 * ( drand48() - 0.5 );
+      VIO_Real x = 500.0 * ( drand48() - 0.5 );
+      VIO_Real y = 500.0 * ( drand48() - 0.5 );
+      VIO_Real z = 500.0 * ( drand48() - 0.5 );
 
-      Real tx,ty,tz;
-      Real a,b,c;
+      VIO_Real tx,ty,tz;
+      VIO_Real a,b,c;
 
       if(general_transform_point( &xfm,  x,y,z,  &tx,&ty,&tz ) != VIO_OK)
       {

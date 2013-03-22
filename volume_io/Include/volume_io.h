@@ -34,7 +34,7 @@ extern "C" {
 ---------------------------------------------------------------------------- */
 
 #ifndef VIO_PREFIX_NAMES
-#define VIO_PREFIX_NAMES 0      /* Allow old-fashioned namespace pollution */
+#define VIO_PREFIX_NAMES 1      /* Allow old-fashioned namespace pollution */
 #endif /* VIO_PREFIX_NAMES */
 
 #include  <volume_io/basic.h>

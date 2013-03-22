@@ -39,14 +39,14 @@
 static void multiply_basis_matrices(
     int    n_derivs,
     int    n_degs,
-    Real   m1[],
-    Real   m2[],
-    Real   prod[] )
+    VIO_Real   m1[],
+    VIO_Real   m2[],
+    VIO_Real   prod[] )
 {
     int   i, j, k, m2_inc;
-    Real  *m1_ptr, *m1_ptr1;
-    Real  *m2_ptr;
-    Real  sum, *prod_ptr;
+    VIO_Real  *m1_ptr, *m1_ptr1;
+    VIO_Real  *m2_ptr;
+    VIO_Real  sum, *prod_ptr;
 
     m1_ptr = m1;
     prod_ptr = prod;
@@ -100,20 +100,20 @@ static void multiply_basis_matrices(
 static void multiply_matrices(
     int    x1,
     int    y1,
-    Real   m1[],
+    VIO_Real   m1[],
     int    sa1,
     int    sb1,
     int    y2,
-    Real   m2[],
+    VIO_Real   m2[],
     int    sa2,
     int    sb2,
-    Real   prod[],
+    VIO_Real   prod[],
     int    sap,
     int    sbp )
 {
     int   i, j, k;
-    Real  *m1_ptr, *m1_ptr1, *m2_ptr;
-    Real  sum, *prod_ptr;
+    VIO_Real  *m1_ptr, *m1_ptr1, *m2_ptr;
+    VIO_Real  sum, *prod_ptr;
 
     m1_ptr = m1;
     prod_ptr = prod;
@@ -173,25 +173,25 @@ static void multiply_matrices(
 
 VIOAPI  void  spline_tensor_product(
     int     n_dims,
-    Real    positions[],
+    VIO_Real    positions[],
     int     degrees[],
-    Real    *bases[],
+    VIO_Real    *bases[],
     int     n_values,
-    Real    coefs[],
+    VIO_Real    coefs[],
     int     n_derivs[],
-    Real    results[] )
+    VIO_Real    results[] )
 {
     int       deriv, d, k, total_values, src;
     int       ind, prev_ind, max_degree, n_derivs_plus_1, deg;
     int       static_indices[MAX_DIMS];
     int       *indices, total_derivs;
-    Real      *input_coefs, u_power, u;
-    Real      static_us[MAX_DEGREE*MAX_DEGREE];
-    Real      static_weights[MAX_DEGREE*MAX_DEGREE];
-    Real      *us, *weights;
-    Real      *tmp_results[2], *r;
-    Real      static_tmp_results[2][MAX_TOTAL_VALUES];
-    BOOLEAN   results_alloced;
+    VIO_Real      *input_coefs, u_power, u;
+    VIO_Real      static_us[MAX_DEGREE*MAX_DEGREE];
+    VIO_Real      static_weights[MAX_DEGREE*MAX_DEGREE];
+    VIO_Real      *us, *weights;
+    VIO_Real      *tmp_results[2], *r;
+    VIO_Real      static_tmp_results[2][MAX_TOTAL_VALUES];
+    VIO_BOOL   results_alloced;
 
     /*--- check arguments */
 
@@ -292,7 +292,7 @@ VIOAPI  void  spline_tensor_product(
             prev_ind = IJ( deriv-1, deriv-1, deg );
             for_less( k, deriv, deg )
             {
-                us[ind] = us[prev_ind] * (Real) k;
+                us[ind] = us[prev_ind] * (VIO_Real) k;
                 ++ind;
                 ++prev_ind;
             }

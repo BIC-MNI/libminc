@@ -30,13 +30,13 @@
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  BOOLEAN   compute_transform_inverse(
-    Transform  *transform,
-    Transform  *inverse )
+VIOAPI  VIO_BOOL   compute_transform_inverse(
+    VIO_Transform  *transform,
+    VIO_Transform  *inverse )
 {
     int        i, j;
-    Real       **t, **inv;
-    BOOLEAN    success;
+    VIO_Real       **t, **inv;
+    VIO_BOOL    success;
 
     /* --- copy the transform to a numerical recipes type matrix */
 
@@ -68,7 +68,7 @@ VIOAPI  BOOLEAN   compute_transform_inverse(
         /* --- check if this really is an inverse, by multiplying */
 
         {
-            Transform  ident;
+            VIO_Transform  ident;
 
             concat_transforms( &ident, transform, inverse );
 

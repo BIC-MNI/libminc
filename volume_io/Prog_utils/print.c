@@ -20,7 +20,7 @@
 
 #define  MAX_PRINT_STACK  100
 
-typedef  void (*print_function_type) ( STRING );
+typedef  void (*print_function_type) ( VIO_STR );
 
 static  print_function_type  print_function[MAX_PRINT_STACK] = { NULL };
 static  int                  top_of_stack = 0;
@@ -45,7 +45,7 @@ static  int                  top_of_error_stack = 0;
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  void  set_print_function( void  (*function) ( STRING ) )
+VIOAPI  void  set_print_function( void  (*function) ( VIO_STR ) )
 {
     print_function[top_of_stack] = function;
 }
@@ -112,10 +112,10 @@ VIOAPI  void  pop_print_function( void )
 ---------------------------------------------------------------------------- */
 
 /* VARARGS */
-VIOAPI  void  print( STRING format, ... )
+VIOAPI  void  print( VIO_STR format, ... )
 {
     va_list  ap;
-    char     print_buffer[EXTREMELY_LARGE_STRING_SIZE];
+    char     print_buffer[VIO_EXTREMELY_LARGE_STRING_SIZE];
 
     va_start( ap, format );
     (void) vsprintf( print_buffer, format, ap );
@@ -214,7 +214,7 @@ VIOAPI  void  pop_print_error_function( void )
 VIOAPI  void  print_error( char format[], ... )
 {
     va_list  ap;
-    char     print_buffer[EXTREMELY_LARGE_STRING_SIZE];
+    char     print_buffer[VIO_EXTREMELY_LARGE_STRING_SIZE];
 
     va_start( ap, format );
     (void) vsprintf( print_buffer, format, ap );

@@ -45,7 +45,6 @@
          print_alloc_source_line( filename, line_number );
 #endif
 
-#if !VIO_PREFIX_NAMES
 
 /* ----------------------------- MNI Header -----------------------------------
 @NAME       : ALLOC
@@ -144,7 +143,7 @@
   _ALLOC_SOURCE_LINE )
 
 /* ----------------------------- MNI Header -----------------------------------
-@NAME       : ALLOC2D
+@NAME       : VIO_ALLOC2D
 @INPUT      : n1
             : n2
 @OUTPUT     : 
@@ -160,7 +159,7 @@
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-#define  ALLOC2D( ptr, n1, n2 )                                               \
+#define  VIO_ALLOC2D( ptr, n1, n2 )                                               \
    ASSIGN_PTR(ptr) = alloc_memory_2d( (size_t) (n1), (size_t) (n2),           \
                           sizeof(**(ptr)) _ALLOC_SOURCE_LINE )
 
@@ -177,7 +176,7 @@
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-#define  FREE2D( ptr )                                                        \
+#define  VIO_FREE2D( ptr )                                                        \
          free_memory_2d( (void ***) &(ptr) _ALLOC_SOURCE_LINE )
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -189,14 +188,14 @@
             : ptr
 @RETURNS    : 
 @DESCRIPTION: Macro to allocate an n1 by n2 by n3 array, assigning : ptr.
-@METHOD     : Similar to ALLOC2D, this requires only 3 mallocs.
+@METHOD     : Similar to VIO_ALLOC2D, this requires only 3 mallocs.
 @GLOBALS    : 
 @CALLS      : 
 @CREATED    :                      David MacDonald
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-#define  ALLOC3D( ptr, n1, n2, n3 )                                           \
+#define  VIO_ALLOC3D( ptr, n1, n2, n3 )                                           \
          ASSIGN_PTR(ptr) = alloc_memory_3d( (size_t) (n1), (size_t) (n2),     \
                           (size_t) (n3), sizeof(***(ptr)) _ALLOC_SOURCE_LINE )
 
@@ -213,7 +212,7 @@
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-#define  FREE3D( ptr )                                                        \
+#define  VIO_FREE3D( ptr )                                                        \
          free_memory_3d( (void ****) &(ptr) _ALLOC_SOURCE_LINE )
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -226,14 +225,14 @@
             : ptr
 @RETURNS    : 
 @DESCRIPTION: Macro to allocate an n1 by n2 by n3 by n4 array, assigning : ptr.
-@METHOD     : Similar to ALLOC2D, this requires only 4 mallocs.
+@METHOD     : Similar to VIO_ALLOC2D, this requires only 4 mallocs.
 @GLOBALS    : 
 @CALLS      : 
 @CREATED    :                      David MacDonald
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-#define  ALLOC4D( ptr, n1, n2, n3, n4 )                                       \
+#define  VIO_ALLOC4D( ptr, n1, n2, n3, n4 )                                       \
        ASSIGN_PTR(ptr) = alloc_memory_4d( (size_t) (n1), (size_t) (n2),       \
                           (size_t) (n3), (size_t) (n4),                       \
                           sizeof(****(ptr)) _ALLOC_SOURCE_LINE )
@@ -251,7 +250,7 @@
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-#define  FREE4D( ptr )                                                        \
+#define  VIO_FREE4D( ptr )                                                        \
          free_memory_4d( (void *****) &(ptr) _ALLOC_SOURCE_LINE )
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -266,14 +265,14 @@
 @RETURNS    : 
 @DESCRIPTION: Macro to allocate an n1 by n2 by n3 by n4 by n5 array, assigning
             : ptr.
-@METHOD     : Similar to ALLOC2D, this requires only 5 mallocs.
+@METHOD     : Similar to VIO_ALLOC2D, this requires only 5 mallocs.
 @GLOBALS    : 
 @CALLS      : 
 @CREATED    :                      David MacDonald
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-#define  ALLOC5D( ptr, n1, n2, n3, n4, n5 )                                   \
+#define  VIO_ALLOC5D( ptr, n1, n2, n3, n4, n5 )                                   \
      ASSIGN_PTR(ptr) = alloc_memory_5d( (size_t) (n1), (size_t) (n2),         \
                           (size_t) (n3), (size_t) (n4), (size_t) (n5),        \
                           sizeof(*****(ptr)) _ALLOC_SOURCE_LINE )
@@ -291,8 +290,9 @@
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-#define  FREE5D( ptr )                                                        \
+#define  VIO_FREE5D( ptr )                                                        \
          free_memory_5d( (void ******) &(ptr) _ALLOC_SOURCE_LINE )
 
+#if !VIO_PREFIX_NAMES
 #endif /* !VIO_PREFIX_NAMES */
 #endif

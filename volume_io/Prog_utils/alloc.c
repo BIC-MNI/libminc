@@ -60,7 +60,7 @@ static  void  set_up_array_pointers_2D(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-static  Status  private_alloc_memory(
+static  VIO_Status  private_alloc_memory(
     void         **ptr,
     size_t       n_bytes )
 {
@@ -92,7 +92,7 @@ static  Status  private_alloc_memory(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-static  Status  private_alloc_memory_2d(
+static  VIO_Status  private_alloc_memory_2d(
     void         ***ptr,
     size_t       n1,
     size_t       n2,
@@ -125,7 +125,7 @@ static  Status  private_alloc_memory_2d(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-static Status private_alloc_memory_3d(
+static VIO_Status private_alloc_memory_3d(
     void         ****ptr,
     size_t       n1,
     size_t       n2,
@@ -160,7 +160,7 @@ static Status private_alloc_memory_3d(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-static Status private_alloc_memory_4d(
+static VIO_Status private_alloc_memory_4d(
     void         *****ptr,
     size_t       n1,
     size_t       n2,
@@ -198,7 +198,7 @@ static Status private_alloc_memory_4d(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-static Status private_alloc_memory_5d(
+static VIO_Status private_alloc_memory_5d(
     void         ******ptr,
     size_t       n1,
     size_t       n2,
@@ -508,7 +508,7 @@ VIOAPI  void  *alloc_memory_5d(
               line_number
 @OUTPUT     : 
 @RETURNS    : 
-@DESCRIPTION: Reallocates the ptr.
+@DESCRIPTION: VIO_Reallocates the ptr.
 @METHOD     : 
 @GLOBALS    : 
 @CALLS      : 

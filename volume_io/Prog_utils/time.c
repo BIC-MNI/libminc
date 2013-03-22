@@ -61,18 +61,18 @@ void sleep(unsigned milliseconds)
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-static Real  get_clock_ticks_per_second( void )
+static VIO_Real  get_clock_ticks_per_second( void )
 {
-    static  BOOLEAN  initialized = FALSE;
-    static  Real     clock_ticks_per_second;
+    static  VIO_BOOL  initialized = FALSE;
+    static  VIO_Real     clock_ticks_per_second;
 
     if( !initialized )
     {
         initialized = TRUE;
 #if HAVE_SYSCONF
-        clock_ticks_per_second = (Real) sysconf( _SC_CLK_TCK );
+        clock_ticks_per_second = (VIO_Real) sysconf( _SC_CLK_TCK );
 #else
-        clock_ticks_per_second = (Real) CLK_TCK;
+        clock_ticks_per_second = (VIO_Real) CLK_TCK;
 #endif
     }
 
@@ -92,23 +92,23 @@ static Real  get_clock_ticks_per_second( void )
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI Real  current_cpu_seconds( void )
+VIOAPI VIO_Real  current_cpu_seconds( void )
 {
-    static BOOLEAN first_call = TRUE;
+    static VIO_BOOL first_call = TRUE;
     static clock_t first;
     clock_t current;
-    Real secs;
+    VIO_Real secs;
 
     if (first_call)
     {
         first_call = FALSE;
         first = clock();
-        secs = (Real) first / get_clock_ticks_per_second();
+        secs = (VIO_Real) first / get_clock_ticks_per_second();
     }
     else
     {
         current = clock();
-        secs = (Real) (current - first) / get_clock_ticks_per_second();
+        secs = (VIO_Real) (current - first) / get_clock_ticks_per_second();
     }
     return (secs);
 }
@@ -127,12 +127,12 @@ VIOAPI Real  current_cpu_seconds( void )
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Real  current_realtime_seconds( void )
+VIOAPI  VIO_Real  current_realtime_seconds( void )
 {
-    static BOOLEAN first_call = TRUE;
+    static VIO_BOOL first_call = TRUE;
     static time_t first;
     time_t current;
-    Real secs;
+    VIO_Real secs;
 
     if( first_call )
     {
@@ -164,17 +164,17 @@ VIOAPI  Real  current_realtime_seconds( void )
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  STRING  format_time(
-    STRING   format,
-    Real     seconds )
+VIOAPI  VIO_STR  format_time(
+    VIO_STR   format,
+    VIO_Real     seconds )
 {
     int      i;
     static   char   *units[] = { "us", "ms", "sec", "min", "hrs",
                                  "days", "years"
                                };
-    static   Real   scales[] = { 1000.0, 1000.0, 60.0, 60.0, 24.0, 365.0 };
-    char     buffer[EXTREMELY_LARGE_STRING_SIZE];
-    BOOLEAN  negative;
+    static   VIO_Real   scales[] = { 1000.0, 1000.0, 60.0, 60.0, 24.0, 365.0 };
+    char     buffer[VIO_EXTREMELY_LARGE_STRING_SIZE];
+    VIO_BOOL  negative;
 
     negative = seconds < 0.0;
     if( negative )  seconds = -seconds;
@@ -193,7 +193,7 @@ VIOAPI  STRING  format_time(
         }
     }
 
-    seconds = (Real) ROUND( 10.0 * seconds ) / 10.0;
+    seconds = (VIO_Real) ROUND( 10.0 * seconds ) / 10.0;
 
     if( negative )  seconds = -seconds;
 
@@ -217,10 +217,10 @@ VIOAPI  STRING  format_time(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  print_time(
-    STRING   format,
-    Real     seconds )
+    VIO_STR   format,
+    VIO_Real     seconds )
 {
-    STRING  str;
+    VIO_STR  str;
 
     str = format_time( format, seconds );
 
@@ -242,7 +242,7 @@ VIOAPI  void  print_time(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  STRING  get_clock_time( void )
+VIOAPI  VIO_STR  get_clock_time( void )
 {
     time_t           clock_time;
     struct  tm       *time_tm;
@@ -270,13 +270,13 @@ VIOAPI  STRING  get_clock_time( void )
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  void  sleep_program( Real seconds )
+VIOAPI  void  sleep_program( VIO_Real seconds )
 {
 #if HAVE_SELECT
     struct  timeval  timeout;
 
     timeout.tv_sec = (long) seconds;
-    timeout.tv_usec = (long) (1.0e6 * (seconds - (Real) timeout.tv_sec) + 0.5);
+    timeout.tv_usec = (long) (1.0e6 * (seconds - (VIO_Real) timeout.tv_sec) + 0.5);
 
     (void) select( 0, NULL, NULL, NULL, &timeout );
 #else
@@ -297,7 +297,7 @@ VIOAPI  void  sleep_program( Real seconds )
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  STRING  get_date( void )
+VIOAPI  VIO_STR  get_date( void )
 {
     time_t           clock_time;
     struct  tm       *time_tm;

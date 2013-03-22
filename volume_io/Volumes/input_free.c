@@ -27,7 +27,7 @@
 
 #define  NUM_BYTE_VALUES      256
 
-static  Status  input_slice(
+static  VIO_Status  input_slice(
     volume_input_struct   *volume_input );
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -44,13 +44,13 @@ static  Status  input_slice(
 @MODIFIED   : May  22, 1997   D. MacDonald  - now uses volume starts
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Status  initialize_free_format_input(
-    STRING               filename,
+VIOAPI  VIO_Status  initialize_free_format_input(
+    VIO_STR               filename,
     Volume               volume,
     volume_input_struct  *volume_input )
 {
-    Status         status, file_status;
-    STRING         volume_filename, abs_volume_filename, slice_filename;
+    VIO_Status         status, file_status;
+    VIO_STR         volume_filename, abs_volume_filename, slice_filename;
     int            sizes[N_DIMENSIONS];
     int            c, volume_byte_offset, int_size;
     int            n_bytes_per_voxel, min_value, max_value, i;
@@ -59,11 +59,11 @@ VIOAPI  Status  initialize_free_format_input(
     nc_type        desired_data_type;
     int            value;
     char           ch;
-    Real           file_separations[MAX_DIMENSIONS];
-    Real           volume_separations[MAX_DIMENSIONS];
-    Real           trans[N_DIMENSIONS];
+    VIO_Real           file_separations[MAX_DIMENSIONS];
+    VIO_Real           volume_separations[MAX_DIMENSIONS];
+    VIO_Real           trans[N_DIMENSIONS];
     FILE           *file;
-    BOOLEAN        axis_valid;
+    VIO_BOOL        axis_valid;
     int            axis;
 
     status = VIO_OK;
@@ -260,7 +260,7 @@ VIOAPI  Status  initialize_free_format_input(
             if( volume_separations[axis] < 0.0 )
             {
                 trans[axis] += -volume_separations[axis] *
-                               (Real) (sizes[axis]-1);
+                               (VIO_Real) (sizes[axis]-1);
             }
         }
 
@@ -327,7 +327,7 @@ VIOAPI  Status  initialize_free_format_input(
             }
         }
 
-        set_volume_voxel_range( volume, (Real) min_value, (Real) max_value );
+        set_volume_voxel_range( volume, (VIO_Real) min_value, (VIO_Real) max_value );
 
         if( status == VIO_OK && !volume_input->one_file_per_slice )
             status = close_file( volume_input->volume_file );
@@ -402,12 +402,12 @@ VIOAPI  void  delete_free_format_input(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-static  Status  input_slice(
+static  VIO_Status  input_slice(
     volume_input_struct   *volume_input )
 {
-    Status           status;
+    VIO_Status           status;
     FILE             *file;
-    STRING           slice_filename;
+    VIO_STR           slice_filename;
 
     status = VIO_OK;
 
@@ -479,18 +479,18 @@ static  Status  input_slice(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  BOOLEAN  input_more_free_format_file(
+VIOAPI  VIO_BOOL  input_more_free_format_file(
     Volume                volume,
     volume_input_struct   *volume_input,
-    Real                  *fraction_done )
+    VIO_Real                  *fraction_done )
 {
-    Real            min_value, max_value, value;
+    VIO_Real            min_value, max_value, value;
     int             x, y, z, sizes[MAX_DIMENSIONS];
     long            i;
-    Status          status;
-    BOOLEAN         more_to_do, scaling_flag;
-    Real            value_translation, value_scale;
-    Real            original_min_voxel, original_max_voxel;
+    VIO_Status          status;
+    VIO_BOOL         more_to_do, scaling_flag;
+    VIO_Real            value_translation, value_scale;
+    VIO_Real            original_min_voxel, original_max_voxel;
     int             *inner_index, indices[MAX_DIMENSIONS];
     unsigned char   *byte_buffer_ptr;
     unsigned short  *short_buffer_ptr;
@@ -512,7 +512,7 @@ VIOAPI  BOOLEAN  input_more_free_format_file(
                                     &original_max_voxel );
             value_translation = original_min_voxel;
             value_scale = (original_max_voxel - original_min_voxel) /
-                          (Real) (NUM_BYTE_VALUES - 1);
+                          (VIO_Real) (NUM_BYTE_VALUES - 1);
         }
 
         inner_index = &indices[volume_input->axis_index_from_file[2]];
@@ -532,7 +532,7 @@ VIOAPI  BOOLEAN  input_more_free_format_file(
                 {
                     if( scaling_flag )
                     {
-                        value = ((Real) (*byte_buffer_ptr) - value_translation)/
+                        value = ((VIO_Real) (*byte_buffer_ptr) - value_translation)/
                                    value_scale;
 
                         if( value < 0.0 )
@@ -541,7 +541,7 @@ VIOAPI  BOOLEAN  input_more_free_format_file(
                             value = 255.0;
                     }
                     else
-                        value = (Real) (*byte_buffer_ptr);
+                        value = (VIO_Real) (*byte_buffer_ptr);
 
                     set_volume_voxel_value( volume,
                                indices[X], indices[Y], indices[Z], 0, 0,
@@ -562,11 +562,11 @@ VIOAPI  BOOLEAN  input_more_free_format_file(
                     if( scaling_flag )
                     {
                         value = 
-                         ((Real) (*short_buffer_ptr) - value_translation) /
+                         ((VIO_Real) (*short_buffer_ptr) - value_translation) /
                                                value_scale;
                     }
                     else
-                        value = (Real) (*short_buffer_ptr);
+                        value = (VIO_Real) (*short_buffer_ptr);
 
                     set_volume_voxel_value( volume,
                                indices[X], indices[Y], indices[Z], 0, 0,
@@ -585,8 +585,8 @@ VIOAPI  BOOLEAN  input_more_free_format_file(
 
     get_volume_sizes( volume, sizes );
 
-    *fraction_done = (Real) volume_input->slice_index /
-                   (Real) sizes[volume_input->axis_index_from_file[0]];
+    *fraction_done = (VIO_Real) volume_input->slice_index /
+                   (VIO_Real) sizes[volume_input->axis_index_from_file[0]];
 
     more_to_do = TRUE;
 

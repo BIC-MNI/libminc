@@ -38,12 +38,12 @@ static   const char      COMMENT_CHAR2 = '#';
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI Status  mni_get_nonwhite_character(
+VIOAPI VIO_Status  mni_get_nonwhite_character(
     FILE   *file,
     char   *ch )
 {
-    BOOLEAN  in_comment;
-    Status   status;
+    VIO_BOOL  in_comment;
+    VIO_Status   status;
 
     in_comment = FALSE;
 
@@ -83,12 +83,12 @@ VIOAPI Status  mni_get_nonwhite_character(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI Status  mni_skip_expected_character(
+VIOAPI VIO_Status  mni_skip_expected_character(
     FILE   *file,
     char   expected_ch )
 {
     char     ch;
-    Status   status;
+    VIO_Status   status;
 
     status = mni_get_nonwhite_character( file, &ch );
 
@@ -123,11 +123,11 @@ VIOAPI Status  mni_skip_expected_character(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI Status  mni_input_line(
+VIOAPI VIO_Status  mni_input_line(
     FILE     *file,
-    STRING   *string )
+    VIO_STR   *string )
 {
-    Status   status;
+    VIO_Status   status;
     char     ch;
 
     *string = create_string( NULL );
@@ -171,15 +171,15 @@ VIOAPI Status  mni_input_line(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI Status  mni_input_string(
+VIOAPI VIO_Status  mni_input_string(
     FILE     *file,
-    STRING   *string,
+    VIO_STR   *string,
     char     termination_char1,
     char     termination_char2 )
 {
-    Status   status;
+    VIO_Status   status;
     char     ch;
-    BOOLEAN quoted;
+    VIO_BOOL quoted;
 
     *string = create_string( NULL );
 
@@ -209,7 +209,7 @@ VIOAPI Status  mni_input_string(
 
     while( string_length(*string) > 0 &&
            (*string)[string_length(*string)-1] == ' ' )
-        (*string)[string_length(*string)-1] = END_OF_STRING;
+        (*string)[string_length(*string)-1] = VIO_END_OF_STRING;
 
     if( status != VIO_OK )
     {
@@ -236,20 +236,20 @@ VIOAPI Status  mni_input_string(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI Status  mni_input_keyword_and_equal_sign(
+VIOAPI VIO_Status  mni_input_keyword_and_equal_sign(
     FILE         *file,
     const char   keyword[],
-    BOOLEAN     print_error_message )
+    VIO_BOOL     print_error_message )
 {
-    Status     status;
-    STRING     str;
+    VIO_Status     status;
+    VIO_STR     str;
 
     status = mni_input_string( file, &str, (char) '=', (char) 0 );
 
     if( status == VIO_END_OF_FILE )
         return( status );
 
-    if( status != VIO_OK || !equal_strings( str, (STRING) keyword ) ||
+    if( status != VIO_OK || !equal_strings( str, (VIO_STR) keyword ) ||
         mni_skip_expected_character( file, (char) '=' ) != VIO_OK )
     {
         if( print_error_message )
@@ -281,7 +281,7 @@ VIOAPI Status  mni_input_keyword_and_equal_sign(
 
 static void  unget_string(
     FILE    *file,
-    STRING  str )
+    VIO_STR  str )
 {
     int  len;
 
@@ -290,7 +290,7 @@ static void  unget_string(
     while( str[len] == ' ' || str[len] == '\t' )
         ++len;
 
-    if( str[len] != END_OF_STRING )
+    if( str[len] != VIO_END_OF_STRING )
         (void) unget_character( file, str[len] );
 }
 
@@ -307,12 +307,12 @@ static void  unget_string(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI Status  mni_input_real(
+VIOAPI VIO_Status  mni_input_real(
     FILE    *file,
-    Real    *d )
+    VIO_Real    *d )
 {
-    Status   status;
-    STRING   str;
+    VIO_Status   status;
+    VIO_STR   str;
 
     status = mni_input_string( file, &str, (char) ' ', (char) ';' );
 
@@ -342,12 +342,12 @@ VIOAPI Status  mni_input_real(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI Status  mni_input_reals(
+VIOAPI VIO_Status  mni_input_reals(
     FILE    *file,
     int     *n,
-    Real    *reals[] )
+    VIO_Real    *reals[] )
 {
-    Real  d;
+    VIO_Real  d;
 
     *n = 0;
 
@@ -372,12 +372,12 @@ VIOAPI Status  mni_input_reals(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI Status  mni_input_int(
+VIOAPI VIO_Status  mni_input_int(
     FILE    *file,
     int     *i )
 {
-    Status status;
-    STRING   str;
+    VIO_Status status;
+    VIO_STR   str;
 
     status = mni_input_string( file, &str, (char) ' ', (char) ';' );
 
@@ -411,7 +411,7 @@ VIOAPI Status  mni_input_int(
 
 VIOAPI  void  output_comments(
     FILE     *file,
-    STRING   comments )
+    VIO_STR   comments )
 {
     int   i, len;
 
