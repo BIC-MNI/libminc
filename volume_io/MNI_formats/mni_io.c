@@ -25,7 +25,7 @@ static   const char      COMMENT_CHAR2 = '#';
 @NAME       : mni_get_nonwhite_character
 @INPUT      : file
 @OUTPUT     : ch
-@RETURNS    : OK or END_OF_FILE
+@RETURNS    : VIO_OK or VIO_END_OF_FILE
 @DESCRIPTION: Gets the next non white space character from the MNI file
               (i.e., tags or transforms).  This routine handles comment
               characters, and is thus the base routine for all MNI tag or
@@ -50,7 +50,7 @@ VIOAPI Status  mni_get_nonwhite_character(
     do
     {
         status = input_character( file, ch );
-        if( status == OK )
+        if( status == VIO_OK )
         {
             if( *ch == COMMENT_CHAR1 || *ch == COMMENT_CHAR2 )
                 in_comment = TRUE;
@@ -58,12 +58,12 @@ VIOAPI Status  mni_get_nonwhite_character(
                 in_comment = FALSE;
         }
     }
-    while( status == OK &&
+    while( status == VIO_OK &&
            (in_comment || *ch == ' ' || *ch == '\t' || *ch == '\n' || 
             *ch == '\r') );     /* ignore carriage returns */
 
-    if( status == ERROR )
-        status = END_OF_FILE;
+    if( status == VIO_ERROR )
+        status = VIO_END_OF_FILE;
 
     return( status );
 }
@@ -73,7 +73,7 @@ VIOAPI Status  mni_get_nonwhite_character(
 @INPUT      : file
               expected_ch
 @OUTPUT     : 
-@RETURNS    : OK or ERROR
+@RETURNS    : VIO_OK or VIO_ERROR
 @DESCRIPTION: Gets the next nonwhite character.  If it is the expected
               character, fine, otherwise print an error message.
 @METHOD     : 
@@ -92,12 +92,12 @@ VIOAPI Status  mni_skip_expected_character(
 
     status = mni_get_nonwhite_character( file, &ch );
 
-    if( status == OK )
+    if( status == VIO_OK )
     {
         if( ch != expected_ch )
         {
             print_error( "Expected '%c', found '%c'.\n", expected_ch, ch );
-            status = ERROR;
+            status = VIO_ERROR;
         }
     }
     else
@@ -113,7 +113,7 @@ VIOAPI Status  mni_skip_expected_character(
 @INPUT      : file
               max_length
 @OUTPUT     : string
-@RETURNS    : OK or END_OF_FILE
+@RETURNS    : VIO_OK or VIO_END_OF_FILE
 @DESCRIPTION: Inputs a line of text from a file.  The carriage return is
               read, but not placed in the string.
 @METHOD     : 
@@ -134,7 +134,7 @@ VIOAPI Status  mni_input_line(
 
     status = input_character( file, &ch );
 
-    while( status == OK && ch != '\n' )
+    while( status == VIO_OK && ch != '\n' )
     {
         if (ch != '\r') {       /* Always ignore carriage returns */
             concat_char_to_string( string, ch );
@@ -143,7 +143,7 @@ VIOAPI Status  mni_input_line(
         status = input_character( file, &ch );
     }
 
-    if( status != OK )
+    if( status != VIO_OK )
     {
         delete_string( *string );
         *string = NULL;
@@ -159,7 +159,7 @@ VIOAPI Status  mni_input_line(
               termination_char1
               termination_char2
 @OUTPUT     : string
-@RETURNS    : OK or END_OF_FILE
+@RETURNS    : VIO_OK or VIO_END_OF_FILE
 @DESCRIPTION: Inputs a string from the file, up to the next occurrence of
               one of the termination characters or a carriage return.  If
               the first nonwhite character is a '"', then the termination
@@ -185,7 +185,7 @@ VIOAPI Status  mni_input_string(
 
     status = mni_get_nonwhite_character( file, &ch );
 
-    if( status == OK && ch == '"' )
+    if( status == VIO_OK && ch == '"' )
     {
         quoted = TRUE;
         status = mni_get_nonwhite_character( file, &ch );
@@ -195,7 +195,7 @@ VIOAPI Status  mni_input_string(
     else
         quoted = FALSE;
 
-    while( status == OK &&
+    while( status == VIO_OK &&
            ch != termination_char1 && ch != termination_char2 && ch != '\n' )
     {
         if (ch != '\r') {       /* Always ignore carriage returns */
@@ -211,7 +211,7 @@ VIOAPI Status  mni_input_string(
            (*string)[string_length(*string)-1] == ' ' )
         (*string)[string_length(*string)-1] = END_OF_STRING;
 
-    if( status != OK )
+    if( status != VIO_OK )
     {
         delete_string( *string );
         *string = NULL;
@@ -226,7 +226,7 @@ VIOAPI Status  mni_input_string(
               keyword
               print_error_message - whether to print error messages
 @OUTPUT     : 
-@RETURNS    : OK or ERROR
+@RETURNS    : VIO_OK or VIO_ERROR
 @DESCRIPTION: Inputs the desired keyword from the file and an equal sign.
               If there is no match, then an error message may be printed.
 @METHOD     : 
@@ -246,15 +246,15 @@ VIOAPI Status  mni_input_keyword_and_equal_sign(
 
     status = mni_input_string( file, &str, (char) '=', (char) 0 );
 
-    if( status == END_OF_FILE )
+    if( status == VIO_END_OF_FILE )
         return( status );
 
-    if( status != OK || !equal_strings( str, (STRING) keyword ) ||
-        mni_skip_expected_character( file, (char) '=' ) != OK )
+    if( status != VIO_OK || !equal_strings( str, (STRING) keyword ) ||
+        mni_skip_expected_character( file, (char) '=' ) != VIO_OK )
     {
         if( print_error_message )
             print_error( "Expected \"%s =\"\n", keyword );
-        status = ERROR;
+        status = VIO_ERROR;
     }
 
     delete_string( str );
@@ -298,7 +298,7 @@ static void  unget_string(
 @NAME       : mni_input_real
 @INPUT      : file
 @OUTPUT     : d
-@RETURNS    : OK or ERROR
+@RETURNS    : VIO_OK or VIO_ERROR
 @DESCRIPTION: Inputs an ascii representation of a real value.
 @METHOD     : 
 @GLOBALS    : 
@@ -316,10 +316,10 @@ VIOAPI Status  mni_input_real(
 
     status = mni_input_string( file, &str, (char) ' ', (char) ';' );
 
-    if( status == OK && sscanf( str, "%lf", d ) != 1 )
+    if( status == VIO_OK && sscanf( str, "%lf", d ) != 1 )
     {
         unget_string( file, str );
-        status = ERROR;
+        status = VIO_ERROR;
     }
 
     delete_string( str );
@@ -332,7 +332,7 @@ VIOAPI Status  mni_input_real(
 @INPUT      : file
 @OUTPUT     : n
               reals
-@RETURNS    : OK or ERROR
+@RETURNS    : VIO_OK or VIO_ERROR
 @DESCRIPTION: Inputs an arbitrary number of real values, up to the next
               semicolon.
 @METHOD     : 
@@ -351,7 +351,7 @@ VIOAPI Status  mni_input_reals(
 
     *n = 0;
 
-    while( mni_input_real( file, &d ) != ERROR )
+    while( mni_input_real( file, &d ) != VIO_ERROR )
     {
         ADD_ELEMENT_TO_ARRAY( *reals, *n, d, DEFAULT_CHUNK_SIZE );
     }
@@ -363,7 +363,7 @@ VIOAPI Status  mni_input_reals(
 @NAME       : mni_input_int
 @INPUT      : file
 @OUTPUT     : i
-@RETURNS    : OK or ERROR
+@RETURNS    : VIO_OK or VIO_ERROR
 @DESCRIPTION: Inputs an integer from an ascii file.
 @METHOD     : 
 @GLOBALS    : 
@@ -381,10 +381,10 @@ VIOAPI Status  mni_input_int(
 
     status = mni_input_string( file, &str, (char) ' ', (char) ';' );
 
-    if( status == OK && sscanf( str, "%d", i ) != 1 )
+    if( status == VIO_OK && sscanf( str, "%d", i ) != 1 )
     {
         unget_string( file, str );
-        status = ERROR;
+        status = VIO_ERROR;
     }
 
     delete_string( str );

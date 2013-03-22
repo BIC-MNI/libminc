@@ -32,7 +32,7 @@
               convert_to_byte_flag   - whether to convert volume data to byte
 @OUTPUT     : volume                 - the volume data
               input_info             - information for use while inputting
-@RETURNS    : OK if successful
+@RETURNS    : VIO_OK if successful
 @DESCRIPTION: Opens the file and reads the header, but does not read any
               volume data yet.  Allocates the data also.
 
@@ -60,7 +60,7 @@ VIOAPI  Status  start_volume_input(
     int             d;
     STRING          expanded_filename;
 
-    status = OK;
+    status = VIO_OK;
 
     if( create_volume_flag || *volume == (Volume) NULL )
     {
@@ -68,7 +68,7 @@ VIOAPI  Status  start_volume_input(
             n_dimensions = get_minc_file_n_dimensions( filename );
 
         if( n_dimensions < 1 )
-            return( ERROR );
+            return( VIO_ERROR );
 
         if( dim_names == (STRING *) NULL )
            dim_names = get_default_dim_names( n_dimensions );
@@ -100,7 +100,7 @@ VIOAPI  Status  start_volume_input(
         input_info->minc_file = initialize_minc_input( expanded_filename,
                                                        *volume, options );
         if( input_info->minc_file == (Minc_file) NULL )
-            status = ERROR;
+            status = VIO_ERROR;
         else
         {
             for_less( d, 0, MAX_DIMENSIONS )
@@ -115,7 +115,7 @@ VIOAPI  Status  start_volume_input(
         break;
     }
 
-    if( status != OK && create_volume_flag )
+    if( status != VIO_OK && create_volume_flag )
         delete_volume( *volume );
 
     delete_string( expanded_filename );
@@ -212,7 +212,7 @@ VIOAPI  void  cancel_volume_input(
               dim_names
               convert_to_byte_flag
 @OUTPUT     : volume
-@RETURNS    : OK if loaded alright
+@RETURNS    : VIO_OK if loaded alright
 @DESCRIPTION: Inputs the entire volume.
 @CREATED    :                      David MacDonald
 @MODIFIED   : 
@@ -242,7 +242,7 @@ VIOAPI  Status  input_volume(
                                  create_volume_flag, volume, options,
                                  &input_info );
 
-    if( status == OK )
+    if( status == VIO_OK )
     {
         initialize_progress_report( &progress, FALSE, FACTOR, "Reading Volume");
 
@@ -259,7 +259,7 @@ VIOAPI  Status  input_volume(
         if( !volume_is_alloced( *volume ) ) {
           delete_volume( *volume );
           *volume = NULL;
-          status = ERROR;
+          status = VIO_ERROR;
         }
     }
 

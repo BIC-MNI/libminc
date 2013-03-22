@@ -217,7 +217,7 @@ VIOAPI  BOOLEAN  check_clobber_file(
 
         delete_string( expanded );
 
-        while( input_character( stdin, &ch ) == OK && ch != 'y' && ch != 'n' &&
+        while( input_character( stdin, &ch ) == VIO_OK && ch != 'y' && ch != 'n' &&
                ch != 'N' && ch != 'Y' )
         {
             if( ch == '\n' )
@@ -350,7 +350,7 @@ static  STRING  create_backup_filename(
 @NAME       : make_backup_file
 @INPUT      : filename
 @OUTPUT     : backup_filename
-@RETURNS    : OK or ERROR
+@RETURNS    : VIO_OK or VIO_ERROR
 @DESCRIPTION: If the file exists, creates a backup of the file, and passes
               back the name of the backup file, which must be passed to
               cleanup_backup_file after the write of filename is performed.
@@ -367,7 +367,7 @@ VIOAPI  Status  make_backup_file(
 {
     Status   status;
 
-    status = OK;
+    status = VIO_OK;
 
     if( file_exists( filename ) )
     {
@@ -375,7 +375,7 @@ VIOAPI  Status  make_backup_file(
 
         status = copy_file( filename, *backup_filename );
 
-        if( status != OK )
+        if( status != VIO_OK )
         {
             print_error( "Error making backup file for: %s\n", filename );
             *backup_filename = NULL;
@@ -414,9 +414,9 @@ VIOAPI  void  cleanup_backup_file(
     if( backup_filename != NULL )
     {
         can_remove = TRUE;
-        if( status_of_write != OK )
+        if( status_of_write != VIO_OK )
         {
-            if( copy_file( backup_filename, filename ) != OK )
+            if( copy_file( backup_filename, filename ) != VIO_OK )
             {
                 print_error( "File %s was corrupted during a failed write,\n",
                              filename );
@@ -466,7 +466,7 @@ VIOAPI  void  remove_file(
 @INPUT      : src
               dest
 @OUTPUT     : 
-@RETURNS    : OK or ERROR
+@RETURNS    : VIO_OK or VIO_ERROR
 @DESCRIPTION: Copies the src file to the dest file.
 @METHOD     : Makes a UNIX system call, using /bin/cp
 @GLOBALS    : 
@@ -494,10 +494,10 @@ VIOAPI  Status  copy_file(
         print_error( "Error copying file %s to %s: ",
                      src_expanded, dest_expanded );
         print_system_error();
-        status = ERROR;
+        status = VIO_ERROR;
     }
     else
-        status = OK;
+        status = VIO_OK;
 
     delete_string( src_expanded );
     delete_string( dest_expanded );
@@ -511,7 +511,7 @@ VIOAPI  Status  copy_file(
 @INPUT      : src
               dest
 @OUTPUT     : 
-@RETURNS    : OK or ERROR
+@RETURNS    : VIO_OK or VIO_ERROR
 @DESCRIPTION: Move the src file to the dest file.
 @METHOD     : Makes a UNIX system call, using /bin/mv
 @GLOBALS    : 
@@ -539,10 +539,10 @@ VIOAPI  Status  move_file(
         print_error( "Error moving file %s to %s: ",
                      src_expanded, dest_expanded );
         print_system_error();
-        status = ERROR;
+        status = VIO_ERROR;
     }
     else
-        status = OK;
+        status = VIO_OK;
 
     delete_string( src_expanded );
     delete_string( dest_expanded );
@@ -1004,7 +1004,7 @@ VIOAPI  Status  open_file(
 
     /* --- if reading from a compressed file, decompress it to a temp file */
 
-    status = OK;
+    status = VIO_OK;
 
     if( gzipped )
     {
@@ -1027,7 +1027,7 @@ VIOAPI  Status  open_file(
         {
             print_error( "Error uncompressing %s into %s using gunzip and bunzip2\n",
                         expanded, tmp_name );
-            status = ERROR;
+            status = VIO_ERROR;
         }
         else
             replace_string( &expanded, create_string(tmp_name) );
@@ -1037,7 +1037,7 @@ VIOAPI  Status  open_file(
 
     /* --- finally, open the file */
 
-    if( status == OK )
+    if( status == VIO_OK )
     {
         *file = fopen( expanded, access_str );
 
@@ -1045,7 +1045,7 @@ VIOAPI  Status  open_file(
         {
             print_error( "Error:  could not open file \"%s\".  ", expanded );
             print_system_error();
-            status = ERROR;
+            status = VIO_ERROR;
         }
         else if( gzipped )           /* if reading a decompressed temp file, */
             remove_file( expanded ); /* unlink it, so that when the program  */
@@ -1176,13 +1176,13 @@ VIOAPI  Status  set_file_position(
 
     if( fseek( file, byte_position, 0 ) == 0 )
     {
-        status = OK;
+        status = VIO_OK;
     }
     else
     {
         print_error( "Error setting the file position.  " );
         print_system_error();
-        status = ERROR;
+        status = VIO_ERROR;
     }
 
     return( status );
@@ -1207,10 +1207,10 @@ VIOAPI  Status  close_file(
     if( file != NULL )
     {
         (void) fclose( file );
-        return( OK );
+        return( VIO_OK );
     }
     else
-        return( ERROR );
+        return( VIO_ERROR );
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -1325,13 +1325,13 @@ VIOAPI  Status  flush_file(
 
     if( fflush( file ) == 0 )
     {
-        status = OK;
+        status = VIO_OK;
     }
     else
     {
         print_error( "Error flushing file.  " );
         print_system_error();
-        status = ERROR;
+        status = VIO_ERROR;
     }
 
     return( status );
@@ -1342,7 +1342,7 @@ VIOAPI  Status  flush_file(
 @INPUT      : file
 @OUTPUT     : ch
 @RETURNS    : Status
-@DESCRIPTION: Inputs one character from the file, returning ERROR if eof.
+@DESCRIPTION: Inputs one character from the file, returning VIO_ERROR if eof.
 @METHOD     : 
 @GLOBALS    : 
 @CALLS      : 
@@ -1361,12 +1361,12 @@ VIOAPI  Status  input_character(
 
     if( c == EOF )
     {
-        status = ERROR;
+        status = VIO_ERROR;
     }
     else
     {
         *ch = (char) c;
-        status = OK;
+        status = VIO_OK;
     }
 
     return( status );
@@ -1395,9 +1395,9 @@ VIOAPI  Status  unget_character(
     c = ungetc( (int) ch, file );
 
     if( c == EOF )
-        status = ERROR;
+        status = VIO_ERROR;
     else
-        status = OK;
+        status = VIO_OK;
 
     return( status );
 }
@@ -1425,7 +1425,7 @@ VIOAPI  Status  input_nonwhite_character(
     {
         status = input_character( file, ch );
     }
-    while( status == OK && (*ch == ' ' || *ch == '\t' || *ch == '\n') );
+    while( status == VIO_OK && (*ch == ' ' || *ch == '\t' || *ch == '\n') );
 
     return( status );
 }
@@ -1452,11 +1452,11 @@ VIOAPI  Status  output_character(
 
     if( fputc( (int) ch, file ) != ch )
     {
-        status = ERROR;
+        status = VIO_ERROR;
     }
     else
     {
-        status = OK;
+        status = VIO_OK;
     }
 
     return( status );
@@ -1484,13 +1484,13 @@ VIOAPI  Status   skip_input_until(
     Status   status;
     char     ch;
 
-    status = OK;
+    status = VIO_OK;
 
     do
     {
         status = input_character( file, &ch );
     }
-    while( status == OK && ch != search_char );
+    while( status == VIO_OK && ch != search_char );
 
     return( status );
 }
@@ -1516,12 +1516,12 @@ VIOAPI  Status  output_string(
     Status   status;
 
     if( fprintf( file, "%s", str ) == string_length(str) )
-        status = OK;
+        status = VIO_OK;
     else
     {
         print_error( "Error outputting string.  " );
         print_system_error();
-        status = ERROR;
+        status = VIO_ERROR;
     }
 
     return( status );
@@ -1554,7 +1554,7 @@ VIOAPI  Status  input_string(
 
     *str = create_string( NULL );
 
-    while( status == OK && ch != termination_char && ch != '\n' )
+    while( status == VIO_OK && ch != termination_char && ch != '\n' )
     {
         concat_char_to_string( str, ch );
 
@@ -1564,7 +1564,7 @@ VIOAPI  Status  input_string(
     if( termination_char != '\n' && ch == '\n' )
         (void) unget_character( file, ch );
 
-    if( status != OK )
+    if( status != VIO_OK )
     {
         delete_string( *str );
         *str = NULL;
@@ -1597,22 +1597,22 @@ VIOAPI  Status  input_quoted_string(
 
     status = input_nonwhite_character( file, &quote );
 
-    if( status == OK && quote != '"' && quote != '\'' && quote != '`' )
-        status = ERROR;
+    if( status == VIO_OK && quote != '"' && quote != '\'' && quote != '`' )
+        status = VIO_ERROR;
 
-    if( status == OK )
+    if( status == VIO_OK )
         status = input_character( file, &ch );
 
     *str = create_string( NULL );
 
-    while( status == OK && ch != quote )
+    while( status == VIO_OK && ch != quote )
     {
         concat_char_to_string( str, ch );
 
         status = input_character( file, &ch );
     }
 
-    if( status != OK )
+    if( status != VIO_OK )
     {
         delete_string( *str );
         *str = NULL;
@@ -1649,7 +1649,7 @@ VIOAPI  Status  input_possibly_quoted_string(
 
     status = input_nonwhite_character( file, &quote );
 
-    if( status == OK )
+    if( status == VIO_OK )
     {
         if( quote == '"' || quote == '\'' || quote == '`' )
         {
@@ -1665,7 +1665,7 @@ VIOAPI  Status  input_possibly_quoted_string(
 
     *str = create_string( NULL );
 
-    while( status == OK &&
+    while( status == VIO_OK &&
            (quoted && ch != quote ||
             !quoted && ch != ' ' && ch != '\t' && ch != '\n') )
     {
@@ -1677,7 +1677,7 @@ VIOAPI  Status  input_possibly_quoted_string(
     if( !quoted )
         (void) unget_character( file, ch );
 
-    if( status != OK )
+    if( status != VIO_OK )
     {
         delete_string( *str );
         *str = NULL;
@@ -1707,9 +1707,9 @@ VIOAPI  Status  output_quoted_string(
     Status   status;
 
     if( fprintf( file, " \"%s\"", str ) > 0 )
-        status = OK;
+        status = VIO_OK;
     else
-        status = ERROR;
+        status = VIO_ERROR;
 
     return( status );
 }
@@ -1738,7 +1738,7 @@ VIOAPI  Status  input_binary_data(
     Status   status;
     int      n_done;
 
-    status = OK;
+    status = VIO_OK;
 
     n_done = (int) fread( data, element_size, (size_t) n, file );
     if( n_done != n )
@@ -1747,7 +1747,7 @@ VIOAPI  Status  input_binary_data(
         print_error( "     (%d out of %d items of size %ld).  ", n_done, n,
                      element_size );
         print_system_error();
-        status = ERROR;
+        status = VIO_ERROR;
     }
 
     return( status );
@@ -1778,7 +1778,7 @@ VIOAPI  Status  output_binary_data(
     Status   status;
     int      n_done;
 
-    status = OK;
+    status = VIO_OK;
 
     n_done = (int) fwrite( data, element_size, (size_t) n, file );
     if( n_done != n )
@@ -1787,7 +1787,7 @@ VIOAPI  Status  output_binary_data(
         print_error( "     (%d out of %d items of size %ld).  ", n_done, n,
                      element_size );
         print_system_error();
-        status = ERROR;
+        status = VIO_ERROR;
     }
 
     return( status );
@@ -1813,11 +1813,11 @@ VIOAPI  Status  input_newline(
 
     status = skip_input_until( file, '\n' );
 
-    if( status != OK )
+    if( status != VIO_OK )
     {
         print_error( "Error inputting newline.  " );
         print_system_error();
-        status = ERROR;
+        status = VIO_ERROR;
     }
 
     return( status );
@@ -1842,12 +1842,12 @@ VIOAPI  Status  output_newline(
     Status   status;
 
     if( fprintf( file, "\n" ) > 0 )
-        status = OK;
+        status = VIO_OK;
     else
     {
         print_error( "Error outputting newline.  " );
         print_system_error();
-        status = ERROR;
+        status = VIO_ERROR;
     }
 
     return( status );
@@ -1878,14 +1878,14 @@ VIOAPI  Status  input_line(
 
     status = input_character( file, &ch );
 
-    while( status == OK && ch != '\n' )
+    while( status == VIO_OK && ch != '\n' )
     {
         concat_char_to_string( line, ch );
 
         status = input_character( file, &ch );
     }
 
-    if( status != OK )
+    if( status != VIO_OK )
     {
         delete_string( *line );
         *line = NULL;
@@ -1916,14 +1916,14 @@ VIOAPI  Status  input_boolean(
 
     status = input_nonwhite_character( file, &ch );
 
-    if( status == OK )
+    if( status == VIO_OK )
     {
         if( ch == 'f' || ch == 'F' )
             *b = FALSE;
         else if( ch == 't' || ch == 'T' )
             *b = TRUE;
         else
-            status = ERROR;
+            status = VIO_ERROR;
     }
 
     return( status );
@@ -1950,7 +1950,7 @@ VIOAPI  Status  output_boolean(
     Status   status;
     STRING   str;
 
-    status = OK;
+    status = VIO_OK;
 
     if( b )
         str = "T";
@@ -1961,7 +1961,7 @@ VIOAPI  Status  output_boolean(
     {
         print_error( "Error outputting BOOLEAN.  " );
         print_system_error();
-        status = ERROR;
+        status = VIO_ERROR;
     }
 
     return( status );
@@ -1987,9 +1987,9 @@ VIOAPI  Status  input_short(
     Status   status;
 
     if( fscanf( file, "%hd", s ) == 1 )
-        status = OK;
+        status = VIO_OK;
     else
-        status = ERROR;
+        status = VIO_ERROR;
 
     return( status );
 }
@@ -2015,12 +2015,12 @@ VIOAPI  Status  output_short(
     Status   status;
 
     if( fprintf( file, " %d", s ) > 0 )
-        status = OK;
+        status = VIO_OK;
     else
     {
         print_error( "Error outputting short.  " );
         print_system_error();
-        status = ERROR;
+        status = VIO_ERROR;
     }
 
     return( status );
@@ -2049,10 +2049,10 @@ VIOAPI  Status  input_unsigned_short(
     if( fscanf( file, "%d", &i ) == 1 )
     {
         *s = (unsigned short) i;
-        status = OK;
+        status = VIO_OK;
     }
     else
-        status = ERROR;
+        status = VIO_ERROR;
 
     return( status );
 }
@@ -2078,12 +2078,12 @@ VIOAPI  Status  output_unsigned_short(
     Status   status;
 
     if( fprintf( file, " %d", (int) s ) > 0 )
-        status = OK;
+        status = VIO_OK;
     else
     {
         print_error( "Error outputting unsigned short.  " );
         print_system_error();
-        status = ERROR;
+        status = VIO_ERROR;
     }
 
     return( status );
@@ -2109,9 +2109,9 @@ VIOAPI  Status  input_int(
     Status   status;
 
     if( fscanf( file, "%d", i ) == 1 )
-        status = OK;
+        status = VIO_OK;
     else
-        status = ERROR;
+        status = VIO_ERROR;
 
     return( status );
 }
@@ -2137,12 +2137,12 @@ VIOAPI  Status  output_int(
     Status   status;
 
     if( fprintf( file, " %d", i ) > 0 )
-        status = OK;
+        status = VIO_OK;
     else
     {
         print_error( "Error outputting int.  " );
         print_system_error();
-        status = ERROR;
+        status = VIO_ERROR;
     }
 
     return( status );
@@ -2231,10 +2231,10 @@ VIOAPI  Status  input_float(
     Status   status;
 
     if( fscanf( file, "%f", f ) == 1 )
-        status = OK;
+        status = VIO_OK;
     else
     {
-        status = ERROR;
+        status = VIO_ERROR;
     }
 
     return( status );
@@ -2261,12 +2261,12 @@ VIOAPI  Status  output_float(
     Status   status;
 
     if( fprintf( file, " %g", f ) > 0 )
-        status = OK;
+        status = VIO_OK;
     else
     {
         print_error( "Error outputting float.  " );
         print_system_error();
-        status = ERROR;
+        status = VIO_ERROR;
     }
 
     return( status );
@@ -2292,10 +2292,10 @@ VIOAPI  Status  input_double(
     Status   status;
 
     if( fscanf( file, "%lf", d ) == 1 )
-        status = OK;
+        status = VIO_OK;
     else
     {
-        status = ERROR;
+        status = VIO_ERROR;
     }
 
     return( status );
@@ -2322,12 +2322,12 @@ VIOAPI  Status  output_double(
     Status   status;
 
     if( fprintf( file, " %g", d ) > 0 )
-        status = OK;
+        status = VIO_OK;
     else
     {
         print_error( "Error outputting double.  " );
         print_system_error();
-        status = ERROR;
+        status = VIO_ERROR;
     }
 
     return( status );
@@ -2389,12 +2389,12 @@ VIOAPI  Status  io_newline(
 {
     Status   status;
 
-    status = OK;
+    status = VIO_OK;
 
     if( format == ASCII_FORMAT )
     {
         if( io_flag == READ_FILE )
-            status = OK;
+            status = VIO_OK;
         else
             status = output_newline( file );
     }
@@ -2428,7 +2428,7 @@ VIOAPI  Status  io_quoted_string(
     int      length;
     Status   status;
 
-    status = OK;
+    status = VIO_OK;
 
     if( format == ASCII_FORMAT )
     {
@@ -2447,7 +2447,7 @@ VIOAPI  Status  io_quoted_string(
         if( io_flag == READ_FILE )
             *str = alloc_string( length );
 
-        if( status == OK )
+        if( status == VIO_OK )
         {
             status = io_binary_data( file, io_flag, (void *) (*str),
                                      sizeof((*str)[0]), length );
@@ -2456,7 +2456,7 @@ VIOAPI  Status  io_quoted_string(
         str[length] = END_OF_STRING;
     }
 
-    if( status != OK )
+    if( status != VIO_OK )
         print_error( "Error in quoted string in file.\n" );
 
     return( status );
@@ -2486,7 +2486,7 @@ VIOAPI  Status  io_boolean(
 {
     Status   status;
 
-    status = OK;
+    status = VIO_OK;
 
     if( format == ASCII_FORMAT )
     {
@@ -2525,7 +2525,7 @@ VIOAPI  Status  io_short(
 {
     Status   status;
 
-    status = OK;
+    status = VIO_OK;
 
     if( format == ASCII_FORMAT )
     {
@@ -2565,7 +2565,7 @@ VIOAPI  Status  io_unsigned_short(
 {
     Status   status;
 
-    status = OK;
+    status = VIO_OK;
 
     if( format == ASCII_FORMAT )
     {
@@ -2606,7 +2606,7 @@ VIOAPI  Status  io_unsigned_char(
     int      i;
     Status   status;
 
-    status = OK;
+    status = VIO_OK;
 
     if( format == ASCII_FORMAT )
     {
@@ -2618,7 +2618,7 @@ VIOAPI  Status  io_unsigned_char(
             {
                 print_error( "Error inputting unsigned char.  " );
                 print_system_error();
-                status = ERROR;
+                status = VIO_ERROR;
             }
         }
         else
@@ -2627,7 +2627,7 @@ VIOAPI  Status  io_unsigned_char(
             {
                 print_error( "Error outputting unsigned char.  " );
                 print_system_error();
-                status = ERROR;
+                status = VIO_ERROR;
             }
         }
     }
@@ -2661,7 +2661,7 @@ VIOAPI  Status  io_int(
 {
     Status   status;
 
-    status = OK;
+    status = VIO_OK;
 
     if( format == ASCII_FORMAT )
     {
@@ -2700,7 +2700,7 @@ VIOAPI  Status  io_real(
 {
     Status   status;
 
-    status = OK;
+    status = VIO_OK;
 
     if( format == ASCII_FORMAT )
     {
@@ -2739,7 +2739,7 @@ VIOAPI  Status  io_float(
 {
     Status   status;
 
-    status = OK;
+    status = VIO_OK;
 
     if( format == ASCII_FORMAT )
     {
@@ -2778,7 +2778,7 @@ VIOAPI  Status  io_double(
 {
     Status   status;
 
-    status = OK;
+    status = VIO_OK;
 
     if( format == ASCII_FORMAT )
     {
@@ -2821,7 +2821,7 @@ VIOAPI  Status  io_ints(
     int      i;
 #define      INTS_PER_LINE   8
 
-    status = OK;
+    status = VIO_OK;
 
     if( io_flag == READ_FILE )
     {
@@ -2834,13 +2834,13 @@ VIOAPI  Status  io_ints(
         {
             status = io_int( file, io_flag, format, &(*ints)[i] );
 
-            if( status == OK )
+            if( status == VIO_OK )
             {
                 if( i == n - 1 || (i+1) % INTS_PER_LINE == 0 )
                     status = io_newline( file, io_flag, format );
             }
 
-            if( status == ERROR )
+            if( status == VIO_ERROR )
                 break;
         }
     }
@@ -2880,7 +2880,7 @@ VIOAPI  Status  io_unsigned_chars(
     Status   status;
     int      i;
 
-    status = OK;
+    status = VIO_OK;
 
     if( io_flag == READ_FILE )
         ALLOC( *unsigned_chars, n );
@@ -2892,13 +2892,13 @@ VIOAPI  Status  io_unsigned_chars(
             status = io_unsigned_char( file, io_flag, format,
                                        &(*unsigned_chars)[i] );
 
-            if( status == OK )
+            if( status == VIO_OK )
             {
                 if( i == n - 1 || (i+1) % INTS_PER_LINE == 0 )
                     status = io_newline( file, io_flag, format );
             }
 
-            if( status == ERROR )
+            if( status == VIO_ERROR )
                 break;
         }
     }

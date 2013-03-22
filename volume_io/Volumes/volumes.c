@@ -154,17 +154,17 @@ VIOAPI   VIO_Volume   create_volume(
     volume_struct   *volume;
     Transform       identity;
 
-    status = OK;
+    status = VIO_OK;
 
     if( n_dimensions < 1 || n_dimensions > MAX_DIMENSIONS )
     {
         print_error(
             "create_volume(): n_dimensions (%d) not in range 1 to %d.\n",
                n_dimensions, MAX_DIMENSIONS );
-        status = ERROR;
+        status = VIO_ERROR;
     }
 
-    if( status == ERROR )
+    if( status == VIO_ERROR )
     {
         return( (VIO_Volume) NULL );
     }

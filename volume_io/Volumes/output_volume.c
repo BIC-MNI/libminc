@@ -25,7 +25,7 @@
 @INPUT      : filename
               n_dims
 @OUTPUT     : dim_names
-@RETURNS    : OK or ERROR
+@RETURNS    : VIO_OK or VIO_ERROR
 @DESCRIPTION: Gets the names of the dimensions from the specified file.
               dim_names is an array of STRINGS, where the array has been
               allocated, but not each string.
@@ -52,7 +52,7 @@ VIOAPI  Status   get_file_dimension_names(
                                  TRUE, &tmp_volume, (minc_input_options *) NULL,
                                  &volume_input );
 
-    if( status == OK )
+    if( status == VIO_OK )
     {
         *n_dims = get_volume_n_dimensions( tmp_volume );
 
@@ -125,7 +125,7 @@ VIOAPI  STRING  *create_output_dim_names(
     {
         if( original_filename != NULL && file_exists(original_filename) &&
             get_file_dimension_names( original_filename, &n_file_dims,
-                                      &file_dim_names ) == OK )
+                                      &file_dim_names ) == VIO_OK )
         {
             /*--- extract the dimension names from the file which match
                   those of the volume, so a 3D volume of z, y, x with a 4D file
@@ -219,7 +219,7 @@ VIOAPI  STRING  *create_output_dim_names(
               original_filename
               history
 @OUTPUT     : 
-@RETURNS    : OK or ERROR
+@RETURNS    : VIO_OK or VIO_ERROR
 @DESCRIPTION: If the original_filename is specified, Copies the auxiliary
               data from it.  If the history is specified, adds the history
               line.
@@ -257,7 +257,7 @@ VIOAPI  Status   copy_volume_auxiliary_and_history(
         delete_string( full_original_filename );
     }
 
-    status = OK;
+    status = VIO_OK;
 
     if( copy_original_file_data )
     {
@@ -283,7 +283,7 @@ VIOAPI  Status   copy_volume_auxiliary_and_history(
               history
               options
 @OUTPUT     : 
-@RETURNS    : OK or ERROR
+@RETURNS    : VIO_OK or VIO_ERROR
 @DESCRIPTION: Creates a Minc file and outputs the volume to it.  The data
               type of the file is either specified by the second through fifth
               parameters, or by the volume, if file_nc_data_type is
@@ -321,7 +321,7 @@ VIOAPI  Status  output_modified_volume(
                                          options, sizes );
 
     if( dim_names == NULL )
-        return( ERROR );
+        return( VIO_ERROR );
 
     n_dims = get_volume_n_dimensions(volume);
 
@@ -356,15 +356,15 @@ VIOAPI  Status  output_modified_volume(
                                         volume, &used_options );
 
     if( minc_file == NULL )
-        return( ERROR );
+        return( VIO_ERROR );
 
     status = copy_volume_auxiliary_and_history( minc_file, filename,
                                                 original_filename, history );
 
-    if( status == OK )
+    if( status == VIO_OK )
         status = output_minc_volume( minc_file );
 
-    if( status == OK )
+    if( status == VIO_OK )
         status = close_minc_output( minc_file );
 
     delete_dimension_names( volume, dim_names );

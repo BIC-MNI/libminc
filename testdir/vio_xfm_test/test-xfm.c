@@ -64,7 +64,7 @@ int main( int ac, char* av[] )
     }
 
     N = atoi( av[1] );
-    if ( input_transform_file( av[2], &xfm ) != OK ) {
+    if ( input_transform_file( av[2], &xfm ) != VIO_OK ) {
       fprintf( stderr, "Failed to load transform '%s'\n", av[2] );
       return 2;
     }
@@ -83,7 +83,7 @@ int main( int ac, char* av[] )
       Real tx,ty,tz;
       Real a,b,c;
 
-      if(general_transform_point( &xfm,  x,y,z,  &tx,&ty,&tz )!=OK)
+      if(general_transform_point( &xfm,  x,y,z,  &tx,&ty,&tz ) != VIO_OK)
       {
         fprintf( stderr, "Failed to transform point %f,%f,%f \n", x,y,z );
         return 3;
@@ -92,7 +92,7 @@ int main( int ac, char* av[] )
       /* Check that general_inverse_transform_point() and
         invert_general_transform() behave sensibly.
       */
-      if(general_inverse_transform_point( &xfm,  tx,ty,tz,  &a,&b,&c )!=OK)
+      if(general_inverse_transform_point( &xfm,  tx,ty,tz,  &a,&b,&c ) != VIO_OK)
       {
         fprintf( stderr, "Failed to invert transform point %f,%f,%f \n", tx,ty,tz );
         return 3;
@@ -102,7 +102,7 @@ int main( int ac, char* av[] )
 
       invert_general_transform( &xfm );
 
-      if(general_transform_point( &xfm, tx,ty,tz,  &a,&b,&c )!=OK)
+      if(general_transform_point( &xfm, tx,ty,tz,  &a,&b,&c ) != VIO_OK)
       {
         fprintf( stderr, "Failed to transform point %f,%f,%f \n", x,y,z );
         return 3;
@@ -111,7 +111,7 @@ int main( int ac, char* av[] )
       assert_equal_point( x,y,z, a,b,c,
               "general_transform_point() / inverted xfm" );
 
-      if(general_inverse_transform_point( &xfm,  x,y,z,  &a,&b,&c )!=OK)
+      if(general_inverse_transform_point( &xfm,  x,y,z,  &a,&b,&c ) != VIO_OK)
       {
         fprintf( stderr, "Failed to invert transform point %f,%f,%f \n", x,y,z );
         return 3;

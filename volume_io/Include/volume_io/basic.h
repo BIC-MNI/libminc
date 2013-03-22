@@ -61,11 +61,12 @@ typedef int VIO_BOOL;
 typedef double VIO_Real;
 typedef signed char VIO_SCHAR;
 typedef unsigned char VIO_UCHAR;
-typedef enum { OK=0,
-               ERROR,
-               INTERNAL_ERROR,
-               END_OF_FILE,
-               QUIT
+
+typedef enum { VIO_OK=0,
+               VIO_ERROR,
+               VIO_INTERNAL_ERROR,
+               VIO_END_OF_FILE,
+               VIO_QUIT
              } VIO_Status;
 
 

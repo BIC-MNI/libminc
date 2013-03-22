@@ -910,7 +910,7 @@ static  Status  open_cache_volume_output_file(
                                                  &cache->options, out_sizes );
 #endif 
         if( out_dim_names == NULL )
-            return( ERROR );
+            return( VIO_ERROR );
     }
 
     get_volume_real_range( volume, &min_value, &max_value );
@@ -930,7 +930,7 @@ static  Status  open_cache_volume_output_file(
                                         volume, &cache->options );
 #endif 
     if( out_minc_file == NULL )
-        return( ERROR );
+        return( VIO_ERROR );
 
 #ifdef HAVE_MINC1
     status = copy_volume_auxiliary_and_history( out_minc_file, output_filename,
@@ -939,7 +939,7 @@ static  Status  open_cache_volume_output_file(
 
 #endif 
     
-    if( status != OK )
+    if( status != VIO_OK )
         return( status );
 
     out_minc_file->converting_to_colour = FALSE;
@@ -953,7 +953,7 @@ static  Status  open_cache_volume_output_file(
     status = set_minc_output_random_order( out_minc_file );
 #endif 
 
-    if( status != OK )
+    if( status != VIO_OK )
         return( status );
 
     /*--- if the volume was previously reading a file, copy the volume to
@@ -976,7 +976,7 @@ static  Status  open_cache_volume_output_file(
 
     delete_string( output_filename );
 
-    return( OK );
+    return( VIO_OK );
 }
 
 VIOAPI  void  cache_volume_range_has_changed(

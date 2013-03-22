@@ -256,7 +256,7 @@ static  void  output_one_transform(
               transform
 @INPUT      : 
 @OUTPUT     : 
-@RETURNS    : OK or ERROR
+@RETURNS    : VIO_OK or VIO_ERROR
 @DESCRIPTION: Outputs the transform to the file in MNI transform format.
               The filename is used to define the prefix for writing out
               volumes that are part of grid transforms.  The volume_count_ptr
@@ -283,7 +283,7 @@ VIOAPI  VIO_Status  output_transform(
     if( file == NULL )
     {
         print_error( "output_transform(): passed NULL FILE ptr.\n" );
-        return( ERROR );
+        return( VIO_ERROR );
     }
 
     /* --- okay write the file */
@@ -303,7 +303,7 @@ VIOAPI  VIO_Status  output_transform(
 
     output_one_transform( file, filename, volume_count_ptr, FALSE, transform );
 
-    return( OK );
+    return( VIO_OK );
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -311,7 +311,7 @@ VIOAPI  VIO_Status  output_transform(
 @INPUT      : file
               filename    - used to get relative paths
 @OUTPUT     : transform
-@RETURNS    : OK or ERROR
+@RETURNS    : VIO_OK or VIO_ERROR
 @DESCRIPTION: Inputs a transform from the file.
 @METHOD     : 
 @GLOBALS    : 
@@ -343,16 +343,16 @@ static Status input_one_transform(
 
     status = mni_input_keyword_and_equal_sign( file, TYPE_STRING, FALSE );
 
-    if( status != OK )
+    if( status != VIO_OK )
         return( status );
 
-    if( mni_input_string( file, &type_name, (char) ';', (char) 0 ) != OK )
+    if( mni_input_string( file, &type_name, (char) ';', (char) 0 ) != VIO_OK )
     {
         print_error( "input_transform(): missing transform type.\n");
-        return( ERROR );
+        return( VIO_ERROR );
     }
-    if( mni_skip_expected_character( file, (char) ';' ) != OK )
-        return( ERROR );
+    if( mni_skip_expected_character( file, (char) ';' ) != VIO_OK )
+        return( VIO_ERROR );
 
     if( equal_strings( type_name, LINEAR_TYPE ) )
         type = LINEAR;
@@ -364,28 +364,28 @@ static Status input_one_transform(
     {
         delete_string( type_name );
         print_error( "input_transform(): invalid transform type.\n");
-        return( ERROR );
+        return( VIO_ERROR );
     }
 
     delete_string( type_name );
 
     /* --- read the next string */
 
-    if( mni_input_string( file, &str, (char) '=', (char) 0 ) != OK )
-        return( ERROR );
+    if( mni_input_string( file, &str, (char) '=', (char) 0 ) != VIO_OK )
+        return( VIO_ERROR );
 
     if( equal_strings( str, INVERT_FLAG_STRING ) )
     {
         delete_string( str );
 
-        if( mni_skip_expected_character( file, (char) '=' ) != OK )
-            return( ERROR );
-        if( mni_input_string( file, &str, (char) ';', (char) 0 ) != OK )
-            return( ERROR );
-        if( mni_skip_expected_character( file, (char) ';' ) != OK )
+        if( mni_skip_expected_character( file, (char) '=' ) != VIO_OK )
+            return( VIO_ERROR );
+        if( mni_input_string( file, &str, (char) ';', (char) 0 ) != VIO_OK )
+            return( VIO_ERROR );
+        if( mni_skip_expected_character( file, (char) ';' ) != VIO_OK )
         {
             delete_string( str );
-            return( ERROR );
+            return( VIO_ERROR );
         }
 
         if( equal_strings( str, TRUE_STRING ) )
@@ -397,13 +397,13 @@ static Status input_one_transform(
             delete_string( str );
             print_error( "Expected %s or %s after %s =\n",
                          TRUE_STRING, FALSE_STRING, INVERT_FLAG_STRING );
-            return( ERROR );
+            return( VIO_ERROR );
         }
 
         delete_string( str );
 
-        if( mni_input_string( file, &str, (char) '=', (char) 0 ) != OK )
-            return( ERROR );
+        if( mni_input_string( file, &str, (char) '=', (char) 0 ) != VIO_OK )
+            return( VIO_ERROR );
     }
 
     switch( type )
@@ -413,13 +413,13 @@ static Status input_one_transform(
         {
             print_error( "Expected %s =\n", LINEAR_TRANSFORM_STRING );
             delete_string( str );
-            return( ERROR );
+            return( VIO_ERROR );
         }
 
         delete_string( str );
 
-        if( mni_skip_expected_character( file, (char) '=' ) != OK )
-            return( ERROR );
+        if( mni_skip_expected_character( file, (char) '=' ) != VIO_OK )
+            return( VIO_ERROR );
 
         make_identity_transform( &linear_transform );
 
@@ -429,20 +429,20 @@ static Status input_one_transform(
         {
             for_less( j, 0, 4 )
             {
-                if( mni_input_real( file, &value ) != OK )
+                if( mni_input_real( file, &value ) != VIO_OK )
                 {
                     print_error(
                     "input_transform(): error reading transform elem [%d,%d]\n",
                     i+1, j+1 );
-                    return( ERROR );
+                    return( VIO_ERROR );
                 }
 
                 Transform_elem(linear_transform,i,j) = value;
             }
         }
 
-        if( mni_skip_expected_character( file, (char) ';' ) != OK )
-            return( ERROR );
+        if( mni_skip_expected_character( file, (char) ';' ) != VIO_OK )
+            return( VIO_ERROR );
 
         create_linear_transform( transform, &linear_transform );
 
@@ -456,31 +456,31 @@ static Status input_one_transform(
         {
             print_error( "Expected %s =\n", N_DIMENSIONS_STRING );
             delete_string( str );
-            return( ERROR );
+            return( VIO_ERROR );
         }
 
         delete_string( str );
 
-        if( mni_skip_expected_character( file, (char) '=' ) != OK )
-            return( ERROR );
-        if( mni_input_int( file, &n_dimensions ) != OK )
-            return( ERROR );
-        if( mni_skip_expected_character( file, (char) ';' ) != OK )
-            return( ERROR );
+        if( mni_skip_expected_character( file, (char) '=' ) != VIO_OK )
+            return( VIO_ERROR );
+        if( mni_input_int( file, &n_dimensions ) != VIO_OK )
+            return( VIO_ERROR );
+        if( mni_skip_expected_character( file, (char) ';' ) != VIO_OK )
+            return( VIO_ERROR );
 
         /* --- read Points = x y z x y z .... ; */
 
-        if( mni_input_keyword_and_equal_sign( file, POINTS_STRING, TRUE ) != OK)
-            return( ERROR );
-        if( mni_input_reals( file, &n_points, &points_1d ) != OK )
-            return( ERROR );
+        if( mni_input_keyword_and_equal_sign( file, POINTS_STRING, TRUE ) != VIO_OK)
+            return( VIO_ERROR );
+        if( mni_input_reals( file, &n_points, &points_1d ) != VIO_OK )
+            return( VIO_ERROR );
 
         if( n_points % n_dimensions != 0 )
         {
             print_error(
         "Number of points (%d) must be multiple of number of dimensions (%d)\n",
                   n_points, n_dimensions );
-            return( ERROR );
+            return( VIO_ERROR );
         }
 
         n_points = n_points / n_dimensions;
@@ -501,24 +501,24 @@ static Status input_one_transform(
         ALLOC2D( displacements, n_points + n_dimensions + 1, n_dimensions );
 
         if( mni_input_keyword_and_equal_sign( file, DISPLACEMENTS_STRING, TRUE )
-                                                                       != OK )
-            return( ERROR );
+                                                                       != VIO_OK )
+            return( VIO_ERROR );
 
         for_less( i, 0, n_points + n_dimensions + 1 )
         {
             for_less( j, 0, n_dimensions )
             {
-                if( mni_input_real( file, &value ) != OK )
+                if( mni_input_real( file, &value ) != VIO_OK )
                 {
                     print_error( "Expected more displacements.\n" );
-                    return( ERROR );
+                    return( VIO_ERROR );
                 }
                 displacements[i][j] = value;
             }
         }
 
-        if( mni_skip_expected_character( file, (char) ';' ) != OK )
-            return( ERROR );
+        if( mni_skip_expected_character( file, (char) ';' ) != VIO_OK )
+            return( VIO_ERROR );
 
         create_thin_plate_transform_real( transform, n_dimensions,
                                           n_points, points, displacements );
@@ -537,22 +537,22 @@ static Status input_one_transform(
         {
             print_error( "Expected %s =\n", DISPLACEMENT_VOLUME );
             delete_string( str );
-            return( ERROR );
+            return( VIO_ERROR );
         }
 
         delete_string( str );
 
-        if( mni_skip_expected_character( file, (char) '=' ) != OK )
-            return( ERROR );
+        if( mni_skip_expected_character( file, (char) '=' ) != VIO_OK )
+            return( VIO_ERROR );
 
         if( mni_input_string( file, &volume_filename,
-                              (char) ';', (char) 0 ) != OK )
-            return( ERROR );
+                              (char) ';', (char) 0 ) != VIO_OK )
+            return( VIO_ERROR );
 
-        if( mni_skip_expected_character( file, (char) ';' ) != OK )
+        if( mni_skip_expected_character( file, (char) ';' ) != VIO_OK )
         {
             delete_string( volume_filename );
-            return( ERROR );
+            return( VIO_ERROR );
         }
 
         /*--- if the volume filename is relative, add the required directory */
@@ -580,10 +580,10 @@ static Status input_one_transform(
 #ifdef HAVE_MINC1
         if( input_volume( volume_filename, 4, NULL, 
                           MI_ORIGINAL_TYPE, FALSE, 0.0, 0.0, 
-                          TRUE, &volume, &options ) != OK )
+                          TRUE, &volume, &options ) != VIO_OK )
         {
             delete_string( volume_filename );
-            return( ERROR );
+            return( VIO_ERROR );
         }
 #else
         /*TODO: read volume with minc2 here?*/
@@ -605,7 +605,7 @@ static Status input_one_transform(
         *transform = inverse;
     }
 
-    return( OK );
+    return( VIO_OK );
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -613,7 +613,7 @@ static Status input_one_transform(
 @INPUT      : file
               filename    - used to define directory for relative filename
 @OUTPUT     : transform
-@RETURNS    : OK or ERROR
+@RETURNS    : VIO_OK or VIO_ERROR
 @DESCRIPTION: Inputs the transform from the file.
 @METHOD     : 
 @GLOBALS    : 
@@ -637,29 +637,29 @@ VIOAPI  Status  input_transform(
     if( file == (FILE *) 0 )
     {
         print_error( "input_transform(): passed NULL FILE ptr.\n");
-        return( ERROR );
+        return( VIO_ERROR );
     }
 
     /* okay read the header */
 
-    if( mni_input_string( file, &line, (char) 0, (char) 0 ) != OK )
+    if( mni_input_string( file, &line, (char) 0, (char) 0 ) != VIO_OK )
     {
         delete_string( line );
         print_error( "input_transform(): could not read header in file.\n");
-        return( ERROR );
+        return( VIO_ERROR );
     }
 
     if( !equal_strings( line, TRANSFORM_FILE_HEADER ) )
     {
         delete_string( line );
         print_error( "input_transform(): invalid header in file.\n");
-        return( ERROR );
+        return( VIO_ERROR );
     }
 
     delete_string( line );
 
     n_transforms = 0;
-    while( (status = input_one_transform( file, filename, &next )) == OK )
+    while( (status = input_one_transform( file, filename, &next )) == VIO_OK )
     {
         if( n_transforms == 0 )
             *transform = next;
@@ -673,18 +673,18 @@ VIOAPI  Status  input_transform(
         ++n_transforms;
     }
 
-    if( status == ERROR )
+    if( status == VIO_ERROR )
     {
         print_error( "input_transform: error reading transform.\n" );
-        return( ERROR );
+        return( VIO_ERROR );
     }
     else if( n_transforms == 0 )
     {
         print_error( "input_transform: no transform present.\n" );
-        return( ERROR );
+        return( VIO_ERROR );
     }
 
-    return( OK );
+    return( VIO_OK );
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -693,7 +693,7 @@ VIOAPI  Status  input_transform(
               comments
               transform
 @OUTPUT     : 
-@RETURNS    : OK or ERROR
+@RETURNS    : VIO_OK or VIO_ERROR
 @DESCRIPTION: Opens the file, outputs the transform, and closes the file.
 @METHOD     : 
 @GLOBALS    : 
@@ -717,11 +717,11 @@ VIOAPI  VIO_Status  output_transform_file(
 
     volume_count = 0;
 
-    if( status == OK )
+    if( status == VIO_OK )
         status = output_transform( file, filename, &volume_count,
                                    comments, transform );
 
-    if( status == OK )
+    if( status == VIO_OK )
         status = close_file( file );
 
     return( status );
@@ -731,7 +731,7 @@ VIOAPI  VIO_Status  output_transform_file(
 @NAME       : input_transform_file
 @INPUT      : filename
 @OUTPUT     : transform
-@RETURNS    : OK or ERROR
+@RETURNS    : VIO_OK or VIO_ERROR
 @DESCRIPTION: Opens the file, inputs the transform, and closes the file.
 @METHOD     : 
 @GLOBALS    : 
@@ -751,10 +751,10 @@ VIOAPI  Status  input_transform_file(
                       get_default_transform_file_suffix(),
                       READ_FILE, ASCII_FORMAT, &file );
 
-    if( status == OK )
+    if( status == VIO_OK )
         status = input_transform( file, filename, transform );
 
-    if( status == OK )
+    if( status == VIO_OK )
         status = close_file( file );
 
     return( status );

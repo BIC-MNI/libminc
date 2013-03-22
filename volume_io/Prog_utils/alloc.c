@@ -69,12 +69,12 @@ static  Status  private_alloc_memory(
         *ptr = (void *) malloc( n_bytes );
 
         if( *ptr == NULL )
-            return( ERROR );
+            return( VIO_ERROR );
     }
     else
         *ptr = NULL;
 
-    return( OK );
+    return( VIO_OK );
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -98,15 +98,15 @@ static  Status  private_alloc_memory_2d(
     size_t       n2,
     size_t       type_size )
 {
-    if( private_alloc_memory( (void **) ptr, n1 * sizeof(**ptr) ) != OK ||
-        private_alloc_memory( *ptr, n1 * n2 * type_size ) != OK )
+    if( private_alloc_memory( (void **) ptr, n1 * sizeof(**ptr) ) != VIO_OK ||
+        private_alloc_memory( *ptr, n1 * n2 * type_size ) != VIO_OK )
     {
-        return( ERROR );
+        return( VIO_ERROR );
     }
 
     set_up_array_pointers_2D( *ptr, n1, n2, type_size );
 
-    return( OK );
+    return( VIO_OK );
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -132,15 +132,15 @@ static Status private_alloc_memory_3d(
     size_t       n3,
     size_t       type_size )
 {
-    if( private_alloc_memory_2d( (void ***) ptr, n1, n2, sizeof(***ptr) )!= OK||
-        private_alloc_memory( **ptr, n1 * n2 * n3 * type_size ) != OK)
+    if( private_alloc_memory_2d( (void ***) ptr, n1, n2, sizeof(***ptr) )!= VIO_OK||
+        private_alloc_memory( **ptr, n1 * n2 * n3 * type_size ) != VIO_OK)
     {
-        return( ERROR );
+        return( VIO_ERROR );
     }
 
     set_up_array_pointers_2D( **ptr, n1 * n2, n3, type_size );
 
-    return( OK );
+    return( VIO_OK );
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -169,15 +169,15 @@ static Status private_alloc_memory_4d(
     size_t       type_size )
 {
     if( private_alloc_memory_3d( (void ****) ptr, n1, n2, n3,
-                                 sizeof(****ptr) )!= OK ||
-        private_alloc_memory( ***ptr, n1 * n2 * n3 * n4 * type_size ) != OK )
+                                 sizeof(****ptr) )!= VIO_OK ||
+        private_alloc_memory( ***ptr, n1 * n2 * n3 * n4 * type_size ) != VIO_OK )
     {
-        return( ERROR );
+        return( VIO_ERROR );
     }
 
     set_up_array_pointers_2D( ***ptr, n1 * n2 * n3, n4, type_size );
 
-    return( OK );
+    return( VIO_OK );
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -208,15 +208,15 @@ static Status private_alloc_memory_5d(
     size_t       type_size )
 {
     if( private_alloc_memory_4d( (void *****) ptr, n1, n2, n3, n4,
-                                 sizeof(*****ptr) )!= OK ||
-        private_alloc_memory( ****ptr, n1 * n2 * n3 * n4 * n5 * type_size )!=OK)
+                                 sizeof(*****ptr) )!= VIO_OK ||
+        private_alloc_memory( ****ptr, n1 * n2 * n3 * n4 * n5 * type_size )!=VIO_OK)
     {
-        return( ERROR );
+        return( VIO_ERROR );
     }
 
     set_up_array_pointers_2D( ****ptr, n1 * n2 * n3 * n4, n5, type_size );
 
-    return( OK );
+    return( VIO_OK );
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -242,7 +242,7 @@ VIOAPI  void  *alloc_memory_in_bytes(
 {
     void         *ptr;
 
-    if( private_alloc_memory( &ptr, n_bytes ) != OK )
+    if( private_alloc_memory( &ptr, n_bytes ) != VIO_OK )
     {
         print_error( "Cannot alloc 1D array of %d bytes.\n", n_bytes );
         PRINT_ALLOC_SOURCE_LINE
@@ -279,7 +279,7 @@ VIOAPI  void  *alloc_memory_1d(
 {
     void   *ptr;
 
-    if( private_alloc_memory( &ptr, n_elements * type_size ) != OK )
+    if( private_alloc_memory( &ptr, n_elements * type_size ) != VIO_OK )
     {
         print_error( "Cannot alloc 1D array of %d elements of %d bytes.\n",
                      n_elements, type_size );
@@ -320,7 +320,7 @@ VIOAPI  void  *alloc_memory_2d(
 {
     void   **ptr;
 
-    if( private_alloc_memory_2d( &ptr, n1, n2, type_size ) != OK )
+    if( private_alloc_memory_2d( &ptr, n1, n2, type_size ) != VIO_OK )
     {
         print_error( "Cannot alloc 2D array of %d by %d elements of %d bytes.\n",
                      n1, n2, type_size );
@@ -367,7 +367,7 @@ VIOAPI  void  *alloc_memory_3d(
 {
     void         ***ptr;
 
-    if( private_alloc_memory_3d( &ptr, n1, n2, n3, type_size ) != OK )
+    if( private_alloc_memory_3d( &ptr, n1, n2, n3, type_size ) != VIO_OK )
     {
         print_error( "Cannot alloc 3D array of %d by %d by %d elements of %d bytes.\n",
                      n1, n2, n3, type_size );
@@ -418,7 +418,7 @@ VIOAPI  void  *alloc_memory_4d(
 {
     void         ****ptr;
 
-    if( private_alloc_memory_4d( &ptr, n1, n2, n3, n4, type_size ) != OK )
+    if( private_alloc_memory_4d( &ptr, n1, n2, n3, n4, type_size ) != VIO_OK )
     {
         print_error( "Cannot alloc 4D array of %d by %d by %d by %d elements of %d bytes.\n",
                      n1, n2, n3, n4, type_size );
@@ -473,7 +473,7 @@ VIOAPI  void  *alloc_memory_5d(
 {
     void         *****ptr;
 
-    if( private_alloc_memory_5d( &ptr, n1, n2, n3, n4, n5, type_size ) != OK )
+    if( private_alloc_memory_5d( &ptr, n1, n2, n3, n4, n5, type_size ) != VIO_OK )
     {
         print_error( "Cannot alloc 4D array of %d by %d by %d by %d by %d elements of %d bytes.\n",
                      n1, n2, n3, n4, n5, type_size );

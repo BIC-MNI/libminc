@@ -227,7 +227,7 @@ VIOAPI  VIO_Status  thin_plate_spline_transform(
     if( n_dims >= 3 )
         *z_transformed = output_point[2];
     
-    return OK;
+    return VIO_OK;
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -300,16 +300,16 @@ VIOAPI  VIO_Status  thin_plate_spline_inverse_transform(
         *x_transformed = solution[0];
         *y_transformed = solution[1];
         *z_transformed = solution[2];
-        return OK;
+        return VIO_OK;
     }
     else
     {
         *x_transformed = x_in[0];
         *y_transformed = x_in[1];
         *z_transformed = x_in[2];
-        return ERROR;
+        return VIO_ERROR;
     }
-    return ERROR;
+    return VIO_ERROR;
 }
 
 /* ----------------------------- MNI Header -----------------------------------

@@ -75,7 +75,7 @@ VIOAPI  VIO_Status  grid_transform_point(
            resulting offset to the given position */
 
     if(!transform->displacement_volume) 
-      return ERROR;
+      return VIO_ERROR;
     
     volume = (VIO_Volume) transform->displacement_volume;
 
@@ -86,7 +86,7 @@ VIOAPI  VIO_Status  grid_transform_point(
     *y_transformed = y + displacements[Y];
     *z_transformed = z + displacements[Z];
     
-    return OK;
+    return VIO_OK;
 }
 
 #ifdef USE_NEWTONS_METHOD
@@ -212,16 +212,16 @@ VIOAPI  VIO_Status  grid_inverse_transform_point(
         *x_transformed = solution[X];
         *y_transformed = solution[Y];
         *z_transformed = solution[Z];
-        return OK;
+        return VIO_OK;
     }
     else  /* --- if no solution found, not sure what is reasonable to return */
     {
         *x_transformed = x;
         *y_transformed = y;
         *z_transformed = z;
-        return ERROR;
+        return VIO_ERROR;
     }
-    return ERROR;
+    return VIO_ERROR;
 }
 #endif
 
@@ -262,19 +262,19 @@ VIOAPI  VIO_Status  grid_inverse_transform_point(
     VIO_Real   gx, gy, gz;
     VIO_Real   error_x, error_y, error_z, error, smallest_e;
     VIO_Real   ftol;
-    VIO_Status status=ERROR;
+    VIO_Status status=VIO_ERROR;
     int    sizes[MAX_DIMENSIONS];
     VIO_Real   steps[MAX_DIMENSIONS];
     VIO_Volume volume;
     short d, vector_dim = -1;
 
-    if((status=grid_transform_point( transform, x, y, z, &tx, &ty, &tz ))!=OK)
+    if((status=grid_transform_point( transform, x, y, z, &tx, &ty, &tz ))!=VIO_OK)
       return status;
     tx = x - (tx - x);
     ty = y - (ty - y);
     tz = z - (tz - z);
 
-    if((status=grid_transform_point( transform, tx, ty, tz, &gx, &gy, &gz ))!=OK)
+    if((status=grid_transform_point( transform, tx, ty, tz, &gx, &gy, &gz ))!=VIO_OK)
     return status;
 
     error_x = x - gx;
@@ -327,7 +327,7 @@ VIOAPI  VIO_Status  grid_inverse_transform_point(
         ty += 0.95 * error_y;
         tz += 0.95 * error_z;
 
-        if((status=grid_transform_point( transform, tx, ty, tz, &gx, &gy, &gz ))!=OK)
+        if((status=grid_transform_point( transform, tx, ty, tz, &gx, &gy, &gz ))!=VIO_OK)
           return status;
 
         error_x = x - gx;
@@ -347,7 +347,7 @@ VIOAPI  VIO_Status  grid_inverse_transform_point(
     *x_transformed = best_x;
     *y_transformed = best_y;
     *z_transformed = best_z;
-    return OK;
+    return VIO_OK;
 }
 
 /* ----------------------------- MNI Header -----------------------------------

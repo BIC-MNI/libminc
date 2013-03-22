@@ -650,7 +650,7 @@ static  VIO_Status  homogenous_transform_point(
         *y_trans /= w_trans;
         *z_trans /= w_trans;
     }
-    return OK;
+    return VIO_OK;
 }
 
 /* ----------------------------- MNI Header -----------------------------------

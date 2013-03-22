@@ -705,7 +705,7 @@ VIOAPI  int  get_n_input_volumes(
 @NAME       : close_minc_input
 @INPUT      : file
 @OUTPUT     : 
-@RETURNS    : OK or ERROR
+@RETURNS    : VIO_OK or VIO_ERROR
 @DESCRIPTION: Closes the minc input file.
 @METHOD     : 
 @GLOBALS    : 
@@ -722,7 +722,7 @@ VIOAPI  Status  close_minc_input(
     if( file == (Minc_file) NULL )
     {
         print_error( "close_minc_input(): NULL file.\n" );
-        return( ERROR );
+        return( VIO_ERROR );
     }
 
     (void) miclose( file->cdfid );
@@ -736,7 +736,7 @@ VIOAPI  Status  close_minc_input(
     delete_general_transform( &file->voxel_to_world_transform );
     FREE( file );
 
-    return( OK );
+    return( VIO_OK );
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -750,7 +750,7 @@ VIOAPI  Status  close_minc_input(
               start
               count
 @OUTPUT     : 
-@RETURNS    : OK or ERROR
+@RETURNS    : VIO_OK or VIO_ERROR
 @DESCRIPTION: Inputs a hyperslab from the file into the array pointer.
 @METHOD     : 
 @GLOBALS    : 
@@ -860,16 +860,16 @@ VIOAPI  Status  input_minc_hyperslab(
     if( miicv_get( file->minc_icv, used_start, used_count, void_ptr ) ==
                                                                  MI_ERROR )
     {
-        status = ERROR;
+        status = VIO_ERROR;
         if( file->converting_to_colour )
             delete_multidim_array( &rgb_array );
         if( !direct_to_array || file->converting_to_colour )
             delete_multidim_array( &buffer_array );
     }
     else
-        status = OK;
+        status = VIO_OK;
 
-    if( status == OK && (!direct_to_array || file->converting_to_colour) )
+    if( status == VIO_OK && (!direct_to_array || file->converting_to_colour) )
     {
         if( file->converting_to_colour )
         {

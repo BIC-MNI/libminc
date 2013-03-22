@@ -542,7 +542,7 @@ static  VIO_Status  transform_or_invert_point(
     Real                *z_transformed )
 {
     int      trans;
-    VIO_Status status=ERROR;
+    VIO_Status status=VIO_ERROR;
 
     switch( transform->type )
     {
@@ -582,7 +582,7 @@ static  VIO_Status  transform_or_invert_point(
     case GRID_TRANSFORM:
         if( !transform->displacement_volume ) {
           handle_internal_error( "Not initialized grid transform, make sure you have MINC1" );
-          return ERROR;
+          return VIO_ERROR;
           break;
         }
         if( inverse_flag )
@@ -615,7 +615,7 @@ static  VIO_Status  transform_or_invert_point(
                            x_transformed, y_transformed, z_transformed );
             /*TODO: add error handling?*/
         }
-        return OK;
+        return VIO_OK;
         break;
 
     case CONCATENATED_TRANSFORM:
@@ -629,7 +629,7 @@ static  VIO_Status  transform_or_invert_point(
             {
                 if( (status=general_inverse_transform_point( &transform->transforms[trans],
                              *x_transformed, *y_transformed, *z_transformed,
-                             x_transformed, y_transformed, z_transformed )) != OK)
+                             x_transformed, y_transformed, z_transformed )) != VIO_OK)
                   return status;
             }
         }
@@ -639,7 +639,7 @@ static  VIO_Status  transform_or_invert_point(
             {
                 if((status=general_transform_point( &transform->transforms[trans],
                              *x_transformed, *y_transformed, *z_transformed,
-                             x_transformed, y_transformed, z_transformed )) != OK)
+                             x_transformed, y_transformed, z_transformed )) != VIO_OK)
                   return status;
             }
         }
@@ -647,7 +647,7 @@ static  VIO_Status  transform_or_invert_point(
 
     default:
         handle_internal_error( "transform_or_invert_point" );
-        return ERROR;
+        return VIO_ERROR;
         break;
     }
     return status;

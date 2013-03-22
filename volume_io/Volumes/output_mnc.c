@@ -77,7 +77,7 @@ static  BOOLEAN  is_default_direction_cosine(
               space_type
               voxel_to_world_transform
 @OUTPUT     : 
-@RETURNS    : OK or ERROR
+@RETURNS    : VIO_OK or VIO_ERROR
 @DESCRIPTION: Outputs the voxel to world transformation, in terms of MINC
               starts, steps, and direction cosines.
 @METHOD     : 
@@ -181,7 +181,7 @@ static  Status  output_world_transform(
                                       file->dim_names[dim], NC_DOUBLE, 0, NULL);
 
             if( file->dim_ids[dim] < 0 )
-                return( ERROR );
+                return( VIO_ERROR );
 
             (void) miattputdbl( file->cdfid, file->dim_ids[dim], MIstep,
                                 step[dim]);
@@ -205,7 +205,7 @@ static  Status  output_world_transform(
             file->dim_ids[dim] = -1;
     }
 
-    return( OK );
+    return( VIO_OK );
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -294,7 +294,7 @@ static Status end_file_def(Minc_file file)
 
    ret = ncendef( file->cdfid );
 
-   return ( ret == MI_ERROR ? ERROR : OK );
+   return ( ret == MI_ERROR ? VIO_ERROR : VIO_OK );
 
 }
 
@@ -425,7 +425,7 @@ VIOAPI  Minc_file  initialize_minc_output(
 
     if( get_dimension_ordering( n_volume_dims, vol_dimension_names,
                                 n_dimensions, dim_names,
-                            file->to_volume_index, file->to_file_index ) != OK )
+                            file->to_volume_index, file->to_file_index ) != VIO_OK )
     {
         FREE( file );
         return( (Minc_file) NULL );
@@ -498,7 +498,7 @@ VIOAPI  Minc_file  initialize_minc_output(
 
     if( output_world_transform( file, volume_to_attach->coordinate_system_name,
                                 voxel_to_world_transform,
-                                options->use_volume_starts_and_steps ) != OK )
+                                options->use_volume_starts_and_steps ) != VIO_OK )
     {
         FREE( file );
         return( NULL );
@@ -551,7 +551,7 @@ VIOAPI  Minc_file  initialize_minc_output(
               filename
               history_string
 @OUTPUT     : 
-@RETURNS    : OK or ERROR
+@RETURNS    : VIO_OK or VIO_ERROR
 @DESCRIPTION: Copies the auxiliary data from the filename to the opened
               Minc file, 'file'.
 @METHOD     : 
@@ -571,7 +571,7 @@ VIOAPI  Status  copy_auxiliary_data_from_minc_file(
     STRING  expanded;
 
     if( file->ignoring_because_cached )
-        return( OK );
+        return( VIO_OK );
 
     ncopts = NC_VERBOSE;
 
@@ -582,7 +582,7 @@ VIOAPI  Status  copy_auxiliary_data_from_minc_file(
     if( src_cdfid == MI_ERROR )
     {
         print_error( "Error opening %s\n", expanded );
-        return( ERROR );
+        return( VIO_ERROR );
     }
 
     delete_string( expanded );
@@ -603,7 +603,7 @@ VIOAPI  Status  copy_auxiliary_data_from_minc_file(
               src_cdfid
               history_string
 @OUTPUT     : 
-@RETURNS    : OK or ERROR
+@RETURNS    : VIO_OK or VIO_ERROR
 @DESCRIPTION: Copies the auxiliary data from the opened minc file specified
               by src_cdfid to the opened minc file specified by 'file'.
 @METHOD     : 
@@ -634,12 +634,12 @@ VIOAPI  Status  copy_auxiliary_data_from_open_minc_file(
                                };
 
     if( file->ignoring_because_cached )
-        return( OK );
+        return( VIO_OK );
 
     if( file->end_def_done )
     {
         print_error( "Cannot call copy_auxiliary_data_from_open_minc_file when not in define mode\n" );
-        return( ERROR );
+        return( VIO_ERROR );
     }
 
     ncopts = 0;
@@ -685,12 +685,12 @@ VIOAPI  Status  copy_auxiliary_data_from_open_minc_file(
                                 ncvarid( file->cdfid, MIrootvariable) );
     }
 
-    status = OK;
+    status = VIO_OK;
 
     if( history_string != NULL )
         status = add_minc_history( file, history_string );
 
-    if( status == OK )
+    if( status == VIO_OK )
     {
 
         /* Set info for copying image attributes. Unset afterwards, just
@@ -702,13 +702,13 @@ VIOAPI  Status  copy_auxiliary_data_from_open_minc_file(
 
         file->src_img_var = MI_ERROR;
 
-        if( status != OK )
+        if( status != VIO_OK )
         {
             print_error( "Error outputting volume: possibly disk full?\n" );
         }
     }
 
-    if( status == OK )
+    if( status == VIO_OK )
     {
         file->end_def_done = TRUE;
 
@@ -745,12 +745,12 @@ VIOAPI  Status  add_minc_history(
     STRING   new_history;
 
     if( file->ignoring_because_cached )
-        return( OK );
+        return( VIO_OK );
 
     if( file->end_def_done )
     {
         print_error( "Cannot call add_minc_history when not in define mode\n" );
-        return( ERROR );
+        return( VIO_ERROR );
     }
 
     ncopts = 0;
@@ -789,7 +789,7 @@ VIOAPI  Status  add_minc_history(
 
     delete_string( new_history );
 
-    return( OK );
+    return( VIO_OK );
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -800,7 +800,7 @@ VIOAPI  Status  add_minc_history(
               file_dim_names
 @OUTPUT     : to_volume
               to_file
-@RETURNS    : OK or ERROR
+@RETURNS    : VIO_OK or VIO_ERROR
 @DESCRIPTION: Matches dimension names between the volume and file, setting
               the axis conversion from file to_volume and from volume to_file.
 @METHOD     : 
@@ -846,10 +846,10 @@ static  Status  get_dimension_ordering(
     if( n_found != n_vol_dims )
     {
         print_error( "Unsuccessful matching of volume and output dimension names.\n");
-        status = ERROR;
+        status = VIO_ERROR;
     }
     else
-        status = OK;
+        status = VIO_OK;
 
     return( status );
 }
@@ -888,7 +888,7 @@ static  Status  check_minc_output_variables(
         ncopts = NC_VERBOSE | NC_FATAL;
         file->end_def_done = TRUE;
 
-        if( status != OK )
+        if( status != VIO_OK )
         {
             print_error( "Error outputting volume: possibly disk full?\n" );
             return( status );
@@ -961,7 +961,7 @@ static  Status  check_minc_output_variables(
         ncopts = NC_VERBOSE | NC_FATAL;
     }
 
-    return( OK );
+    return( VIO_OK );
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -1001,7 +1001,7 @@ VIOAPI  Status  set_minc_output_random_order(
               file_start
               file_count
 @OUTPUT     : 
-@RETURNS    : OK or ERROR
+@RETURNS    : VIO_OK or VIO_ERROR
 @DESCRIPTION: Outputs a hyperslab from an array to the file.
 @METHOD     : 
 @GLOBALS    : 
@@ -1034,7 +1034,7 @@ VIOAPI  Status  output_minc_hyperslab(
 
     status = check_minc_output_variables( file );
 
-    if( status != OK )
+    if( status != VIO_OK )
         return( status );
 
     n_file_dims = file->n_file_dimensions;
@@ -1118,9 +1118,9 @@ VIOAPI  Status  output_minc_hyperslab(
 
     if( miicv_put( file->minc_icv, long_file_start, long_file_count,
                    void_ptr ) == MI_ERROR )
-        status = ERROR;
+        status = VIO_ERROR;
     else
-        status = OK;
+        status = VIO_OK;
 
     if( !direct_from_array )
         delete_multidim_array( &buffer_array );
@@ -1284,7 +1284,7 @@ static  void  output_slab(
               volume_count
               file_start
 @OUTPUT     : 
-@RETURNS    : OK or ERROR
+@RETURNS    : VIO_OK or VIO_ERROR
 @DESCRIPTION: Outputs the volume to the file in the given position.
 @METHOD     : 
 @GLOBALS    : 
@@ -1314,7 +1314,7 @@ static  Status  output_the_volume(
 
     status = check_minc_output_variables( file );
 
-    if( status != OK )
+    if( status != VIO_OK )
         return( status );
 
     /* --- check if dimension name correspondence between volume and file */
@@ -1326,7 +1326,7 @@ static  Status  output_the_volume(
         print_error( "output_volume_to_minc_file_position:" );
         print_error( " volume (%d) has more dimensions than file (%d).\n",
                      n_volume_dims, file->n_file_dimensions );
-        return( ERROR );
+        return( VIO_ERROR );
     }
 
     /*--- find correspondence between volume dimensions and file dimensions */
@@ -1339,8 +1339,8 @@ static  Status  output_the_volume(
 
     delete_dimension_names( volume, vol_dimension_names );
 
-    if( status != OK )
-        return( ERROR );
+    if( status != VIO_OK )
+        return( VIO_ERROR );
 
     /*--- check sizes match between volume and file */
 
@@ -1358,7 +1358,7 @@ static  Status  output_the_volume(
                 print_error( "output_the_volume: invalid volume count.\n" );
                 print_error( "    count[%d] = %d\n",
                        vol_index, volume_count[vol_index] );
-                return( ERROR );
+                return( VIO_ERROR );
             }
 
             this_count = volume_count[vol_index];
@@ -1374,7 +1374,7 @@ static  Status  output_the_volume(
             print_error( "output_the_volume:  invalid minc file position.\n" );
             print_error( "    start[%d] = %d     count[%d] = %d\n", d, file_start[d],
                       d, this_count );
-            return( ERROR );
+            return( VIO_ERROR );
         }
     }
 
@@ -1520,7 +1520,7 @@ static  Status  output_the_volume(
       exit(1);
     }
 
-    return( OK );
+    return( VIO_OK );
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -1546,7 +1546,7 @@ VIOAPI  Status  output_volume_to_minc_file_position(
     long        file_start[] )
 {
     if( file->ignoring_because_cached )
-        return( OK );
+        return( VIO_OK );
 
     file->outputting_in_order = FALSE;
 
@@ -1557,7 +1557,7 @@ VIOAPI  Status  output_volume_to_minc_file_position(
 @NAME       : output_minc_volume
 @INPUT      : file
 @OUTPUT     : 
-@RETURNS    : OK or ERROR
+@RETURNS    : VIO_OK or VIO_ERROR
 @DESCRIPTION: Outputs the attached volume to the MINC file.
 @METHOD     : 
 @GLOBALS    : 
@@ -1573,7 +1573,7 @@ VIOAPI  Status  output_minc_volume(
     BOOLEAN    increment;
 
     if( file->ignoring_because_cached )
-        return( OK );
+        return( VIO_OK );
 
     /*--- check number of volumes written */
 
@@ -1587,14 +1587,14 @@ VIOAPI  Status  output_minc_volume(
     {
         print_error(
              "output_minc_volume: attempted to write too many subvolumes.\n");
-        return( ERROR );
+        return( VIO_ERROR );
     }
 
     get_volume_sizes( file->volume, volume_count );
 
     if( output_the_volume( file, file->volume, volume_count,
-                           file->indices ) != OK )
-        return( ERROR );
+                           file->indices ) != VIO_OK )
+        return( VIO_ERROR );
 
     /*--- increment the file index dimensions which do not
           correspond to volume dimensions */
@@ -1620,14 +1620,14 @@ VIOAPI  Status  output_minc_volume(
     if( increment )
         file->entire_file_written = TRUE;
 
-    return( OK );
+    return( VIO_OK );
 }
 
 /* ----------------------------- MNI Header -----------------------------------
 @NAME       : close_minc_output
 @INPUT      : file
 @OUTPUT     : 
-@RETURNS    : OK or ERROR
+@RETURNS    : VIO_OK or VIO_ERROR
 @DESCRIPTION: Closes the MINC file.
 @METHOD     : 
 @GLOBALS    : 
@@ -1644,7 +1644,7 @@ VIOAPI  Status  close_minc_output(
     if( file == (Minc_file) NULL )
     {
         print_error( "close_minc_output(): NULL file.\n" );
-        return( ERROR );
+        return( VIO_ERROR );
     }
 
     if( !file->ignoring_because_cached )
@@ -1668,7 +1668,7 @@ VIOAPI  Status  close_minc_output(
 
     FREE( file );
 
-    return( OK );
+    return( VIO_OK );
 }
 #endif /*HAVE_MINC1*/
 

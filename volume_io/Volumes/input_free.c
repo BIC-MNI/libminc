@@ -35,7 +35,7 @@ static  Status  input_slice(
 @INPUT      : 
 @OUTPUT     : volume
               volume_input
-@RETURNS    : OK if successful
+@RETURNS    : VIO_OK if successful
 @DESCRIPTION: Initializes loading a free format file by reading the header.
               If the file contains short, but the convert_to_byte flag is set
               in volume_input, then the file is converted to bytes on input.
@@ -66,7 +66,7 @@ VIOAPI  Status  initialize_free_format_input(
     BOOLEAN        axis_valid;
     int            axis;
 
-    status = OK;
+    status = VIO_OK;
 
     file_status = open_file_with_default_suffix(
                          filename, DEFAULT_SUFFIX,
@@ -79,21 +79,21 @@ VIOAPI  Status  initialize_free_format_input(
     /* read the line containing: n_bytes_per_voxel
     */
 
-    if( status == OK )
+    if( status == VIO_OK )
         status = input_int( file, &n_bytes_per_voxel );
 
     /* input the 3 translation values used for the voxel_to_world_transform */
 
-    if( status == OK &&
-        (input_real( file, &trans[X] ) != OK ||
-         input_real( file, &trans[Y] ) != OK ||
-         input_real( file, &trans[Z] ) != OK) )
+    if( status == VIO_OK &&
+        (input_real( file, &trans[X] ) != VIO_OK ||
+         input_real( file, &trans[Y] ) != VIO_OK ||
+         input_real( file, &trans[Z] ) != VIO_OK) )
     {
         print_error( "Error reading x,y,z translations from %s.\n", filename );
-        status = ERROR;
+        status = VIO_ERROR;
     }
 
-    if( status == OK )
+    if( status == VIO_OK )
     {
         /* decide what type of data is in image file */
 
@@ -104,7 +104,7 @@ VIOAPI  Status  initialize_free_format_input(
         else
         {
             print_error( "Must be either 1 or 2 bytes per voxel.\n" );
-            status = ERROR;
+            status = VIO_ERROR;
         }
 
         /* decide how to store data in memory */
@@ -135,20 +135,20 @@ VIOAPI  Status  initialize_free_format_input(
         volume->spatial_axes[Z] = 2;
     }
 
-    if( status == OK )
+    if( status == VIO_OK )
     for_less( axis, 0, N_DIMENSIONS )
     {
-        status = ERROR;
+        status = VIO_ERROR;
 
-        if( input_int( file, &int_size ) != OK )
+        if( input_int( file, &int_size ) != VIO_OK )
             break;
 
         volume_input->sizes_in_file[axis] = (long) int_size;
 
-        if( input_real( file, &file_separations[axis] ) != OK )
+        if( input_real( file, &file_separations[axis] ) != VIO_OK )
             break;
 
-        if( input_nonwhite_character( file, &ch ) != OK )
+        if( input_nonwhite_character( file, &ch ) != VIO_OK )
             break;
 
         axis_valid = TRUE;
@@ -179,7 +179,7 @@ VIOAPI  Status  initialize_free_format_input(
             break;
         }
 
-        status = OK;
+        status = VIO_OK;
     }
 
     for_less( c, 0, N_DIMENSIONS )
@@ -191,7 +191,7 @@ VIOAPI  Status  initialize_free_format_input(
         volume->direction_cosines[c][c] = 1.0;
     }
 
-    if( status == OK &&
+    if( status == VIO_OK &&
         (volume_input->axis_index_from_file[X] ==
          volume_input->axis_index_from_file[Y] ||
          volume_input->axis_index_from_file[X] ==
@@ -200,17 +200,17 @@ VIOAPI  Status  initialize_free_format_input(
          volume_input->axis_index_from_file[Z]) )
     {
         print_error( "Two axis indices are equal.\n" );
-        status = ERROR;
+        status = VIO_ERROR;
     }
 
     volume_input->directory = extract_directory( filename );
 
-    if( status == OK )
+    if( status == VIO_OK )
     if( volume_input->sizes_in_file[0] <= 0 )
     {
         n_slices = 0;
 
-        while( input_string( file, &slice_filename, (char) ' ' )==OK)
+        while( input_string( file, &slice_filename, (char) ' ' )==VIO_OK)
         {
             SET_ARRAY_SIZE( volume_input->slice_filenames, n_slices, n_slices+1,
                             DEFAULT_CHUNK_SIZE );
@@ -219,7 +219,7 @@ VIOAPI  Status  initialize_free_format_input(
                             n_slices, n_slices+1, DEFAULT_CHUNK_SIZE );
 
             if( input_int( file, &volume_input->slice_byte_offsets[n_slices] )
-                != OK )
+                != VIO_OK )
             {
                 volume_input->slice_byte_offsets[n_slices] = 0;
             }
@@ -238,17 +238,17 @@ VIOAPI  Status  initialize_free_format_input(
                                                      volume_input->directory );
         delete_string( volume_filename );
 
-        if( input_int( file, &volume_byte_offset ) != OK )
+        if( input_int( file, &volume_byte_offset ) != VIO_OK )
             volume_byte_offset = 0;
 
     }
 
-    if( status == OK )
+    if( status == VIO_OK )
         status = close_file( file );
 
     /* record the information in the volume struct */
 
-    if( status == OK )
+    if( status == VIO_OK )
     {
         for_less( axis, 0, N_DIMENSIONS )
         {
@@ -276,7 +276,7 @@ VIOAPI  Status  initialize_free_format_input(
     n_voxels_in_slice = (int) volume_input->sizes_in_file[1] *
                         (int) volume_input->sizes_in_file[2];
 
-    if( status == OK )
+    if( status == VIO_OK )
     switch( volume_input->file_data_type )
     {
     case  UNSIGNED_BYTE:
@@ -296,15 +296,15 @@ VIOAPI  Status  initialize_free_format_input(
        to find the max and min values, and set the value_scale and
        value_translation */
 
-    if( status == OK &&
+    if( status == VIO_OK &&
         get_volume_data_type(volume) != volume_input->file_data_type )
     {
-        if( status == OK && !volume_input->one_file_per_slice )
+        if( status == VIO_OK && !volume_input->one_file_per_slice )
         {
             status = open_file( abs_volume_filename, READ_FILE, BINARY_FORMAT,
                                 &volume_input->volume_file );
 
-            if( status == OK )
+            if( status == VIO_OK )
                 status = set_file_position( file, (long) volume_byte_offset );
         }
 
@@ -329,18 +329,18 @@ VIOAPI  Status  initialize_free_format_input(
 
         set_volume_voxel_range( volume, (Real) min_value, (Real) max_value );
 
-        if( status == OK && !volume_input->one_file_per_slice )
+        if( status == VIO_OK && !volume_input->one_file_per_slice )
             status = close_file( volume_input->volume_file );
     }
 
-    if( status == OK && !volume_input->one_file_per_slice )
+    if( status == VIO_OK && !volume_input->one_file_per_slice )
     {
         status = open_file( abs_volume_filename, READ_FILE, BINARY_FORMAT,
                             &volume_input->volume_file );
 
         delete_string( abs_volume_filename );
 
-        if( status == OK )
+        if( status == VIO_OK )
             status = set_file_position( file, (long) volume_byte_offset );
     }
 
@@ -396,7 +396,7 @@ VIOAPI  void  delete_free_format_input(
 @INPUT      : volume
               volume_input
 @OUTPUT     : 
-@RETURNS    : OK if success
+@RETURNS    : VIO_OK if success
 @DESCRIPTION: Reads the next slice from the volume.
 @CREATED    :                      David MacDonald
 @MODIFIED   : 
@@ -409,7 +409,7 @@ static  Status  input_slice(
     FILE             *file;
     STRING           slice_filename;
 
-    status = OK;
+    status = VIO_OK;
 
     if( (long) volume_input->slice_index < volume_input->sizes_in_file[0] )
     {
@@ -423,7 +423,7 @@ static  Status  input_slice(
 
             delete_string( slice_filename );
 
-            if( status == OK )
+            if( status == VIO_OK )
                 status = set_file_position( file,
                            (long) (volume_input->slice_byte_offsets
                                            [volume_input->slice_index]) );
@@ -431,7 +431,7 @@ static  Status  input_slice(
         else
             file = volume_input->volume_file;
 
-        if( status == OK )
+        if( status == VIO_OK )
         switch( volume_input->file_data_type )
         {
         case  UNSIGNED_BYTE:
@@ -455,7 +455,7 @@ static  Status  input_slice(
             break;
         }
 
-        if( status == OK && volume_input->one_file_per_slice )
+        if( status == VIO_OK && volume_input->one_file_per_slice )
         {
             status = close_file( file );
         }
@@ -463,7 +463,7 @@ static  Status  input_slice(
         ++volume_input->slice_index;
     }
     else
-        status = ERROR;
+        status = VIO_ERROR;
 
     return( status );
 }
@@ -520,7 +520,7 @@ VIOAPI  BOOLEAN  input_more_free_format_file(
         indices[volume_input->axis_index_from_file[0]] =
                                          volume_input->slice_index-1;
 
-        if( status == OK )
+        if( status == VIO_OK )
         switch( volume_input->file_data_type )
         {
         case  UNSIGNED_BYTE:

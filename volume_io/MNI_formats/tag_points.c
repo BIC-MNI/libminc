@@ -46,7 +46,7 @@ VIOAPI  STRING  get_default_tag_file_suffix( void )
               comments
               n_volumes
 @OUTPUT     : 
-@RETURNS    : OK or ERROR
+@RETURNS    : VIO_OK or VIO_ERROR
 @DESCRIPTION: Writes the header and first part of a tag file.
 @METHOD     : 
 @GLOBALS    : 
@@ -64,12 +64,12 @@ VIOAPI  Status  initialize_tag_file_output(
 
     /* parameter checking */
 
-    status = OK;
+    status = VIO_OK;
 
     if( file == NULL )
     {
         print_error( "start_writing_tags(): passed NULL FILE ptr.\n");
-        status = ERROR;
+        status = VIO_ERROR;
     }
 
     if( n_volumes != 1 && n_volumes != 2 )
@@ -77,10 +77,10 @@ VIOAPI  Status  initialize_tag_file_output(
         print_error( "output_tag_points():" );
         print_error( " can only support 1 or 2 volumes;\n" );
         print_error( "     you've supplied %d.\n", n_volumes );
-        status = ERROR;
+        status = VIO_ERROR;
     }
 
-    if( status == OK )
+    if( status == VIO_OK )
     {
         /* okay write the file header and tag points header */
 
@@ -106,7 +106,7 @@ VIOAPI  Status  initialize_tag_file_output(
               patient_id    - NULL if not desired to specify
               label         - NULL if not desired to specify
 @OUTPUT     : 
-@RETURNS    : OK or ERROR
+@RETURNS    : VIO_OK or VIO_ERROR
 @DESCRIPTION: Writes one tag to the output.
 @METHOD     : 
 @GLOBALS    : 
@@ -130,7 +130,7 @@ VIOAPI  Status  output_one_tag(
 
     /* parameter checking */
 
-    status = OK;
+    status = VIO_OK;
 
     (void) fprintf( file, "\n %.15g %.15g %.15g",
                     tag_volume1[0],
@@ -207,7 +207,7 @@ VIOAPI  void  terminate_tag_file_output(
               patient_ids
               labels
 @OUTPUT     : 
-@RETURNS    : OK or ERROR
+@RETURNS    : VIO_OK or VIO_ERROR
 @DESCRIPTION: Outputs the tag points in MNI tag point format.  If weights,
               structure_ids, and patient_ids are all NULL, they are not
               written to the file.  If labels is NULL, it is not written.
@@ -237,7 +237,7 @@ VIOAPI  Status  output_tag_points(
 
     status = initialize_tag_file_output( file, comments, n_volumes );
 
-    if( status == OK )
+    if( status == VIO_OK )
     {
         for( i = 0;  i < n_tag_points;  ++i )
         {
@@ -249,12 +249,12 @@ VIOAPI  Status  output_tag_points(
                             patient_ids == NULL ? NULL : &patient_ids[i],
                             labels == NULL ? NULL : labels[i] );
 
-            if( status != OK )
+            if( status != VIO_OK )
                 break;
         }
     }
 
-    if( status == OK )
+    if( status == VIO_OK )
         terminate_tag_file_output( file );
 
     return( status );
@@ -402,7 +402,7 @@ static STRING extract_label(
 @NAME       : initialize_tag_file_input
 @INPUT      : file
 @OUTPUT     : n_volumes
-@RETURNS    : OK or ERROR
+@RETURNS    : VIO_OK or VIO_ERROR
 @DESCRIPTION: Reads the tag file header and first part of file.
 @METHOD     : 
 @GLOBALS    : 
@@ -423,52 +423,52 @@ VIOAPI  Status  initialize_tag_file_input(
     if( file == NULL )
     {
         print_error( "initialize_tag_file_input(): passed NULL FILE ptr.\n");
-        return( ERROR );
+        return( VIO_ERROR );
     }
 
     /* okay read the header */
 
-    if( mni_input_string( file, &line, (char) 0, (char) 0 ) != OK ||
+    if( mni_input_string( file, &line, (char) 0, (char) 0 ) != VIO_OK ||
         !equal_strings( line, (STRING) TAG_FILE_HEADER ) )
     {
         print_error( "input_tag_points(): invalid header in file.\n");
         delete_string( line );
-        return( ERROR );
+        return( VIO_ERROR );
     }
 
     delete_string( line );
 
     /* now read the number of volumes */
 
-    if( mni_input_keyword_and_equal_sign( file, VOLUMES_STRING, TRUE ) != OK )
-        return( ERROR );
+    if( mni_input_keyword_and_equal_sign( file, VOLUMES_STRING, TRUE ) != VIO_OK )
+        return( VIO_ERROR );
 
-    if( mni_input_int( file, &n_volumes ) != OK )
+    if( mni_input_int( file, &n_volumes ) != VIO_OK )
     {
         print_error( "input_tag_points(): expected # volumes after %s.\n",
                      VOLUMES_STRING );
-        return( ERROR );
+        return( VIO_ERROR );
     }
 
-    if( mni_skip_expected_character( file, (char) ';' ) != OK )
-        return( ERROR );
+    if( mni_skip_expected_character( file, (char) ';' ) != VIO_OK )
+        return( VIO_ERROR );
 
     if( n_volumes != 1 && n_volumes != 2 )
     {
         print_error( "input_tag_points(): invalid # volumes: %d \n",
                      n_volumes );
-        return( ERROR );
+        return( VIO_ERROR );
     }
 
     /* now read the tag points header */
 
-    if( mni_input_keyword_and_equal_sign( file, TAG_POINTS_STRING, TRUE ) != OK)
-        return( ERROR );
+    if( mni_input_keyword_and_equal_sign( file, TAG_POINTS_STRING, TRUE ) != VIO_OK)
+        return( VIO_ERROR );
 
     if( n_volumes_ptr != NULL )
         *n_volumes_ptr = n_volumes;
 
-    return( OK );
+    return( VIO_OK );
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -481,7 +481,7 @@ VIOAPI  Status  initialize_tag_file_input(
               structure_id_ptr
               patient_id_ptr
               label_ptr
-@RETURNS    : OK or ERROR
+@RETURNS    : VIO_OK or VIO_ERROR
 @DESCRIPTION: Inputs the file and passes back the data.  The last four arguments
               can each be set to NULL if the corresponding information is not
               desired.
@@ -516,22 +516,22 @@ static Status read_one_tag(
     if( file == NULL )
     {
         print_error( "read_one_tag(): passed NULL FILE ptr.\n");
-        return( ERROR );
+        return( VIO_ERROR );
     }
 
     status = mni_input_real( file, &x1 );
 
-    if( status == OK )
+    if( status == VIO_OK )
     {
-        if( mni_input_real( file, &y1 ) != OK ||
-            mni_input_real( file, &z1 ) != OK ||
+        if( mni_input_real( file, &y1 ) != VIO_OK ||
+            mni_input_real( file, &z1 ) != VIO_OK ||
             (n_volumes == 2 &&
-             (mni_input_real( file, &x2 ) != OK ||
-              mni_input_real( file, &y2 ) != OK ||
-              mni_input_real( file, &z2 ) != OK)) )
+             (mni_input_real( file, &x2 ) != VIO_OK ||
+              mni_input_real( file, &y2 ) != VIO_OK ||
+              mni_input_real( file, &z2 ) != VIO_OK)) )
         {
             print_error( "read_one_tag(): error reading tag point\n" );
-            return( ERROR );
+            return( VIO_ERROR );
         }
 
         if( tags_volume1_ptr != NULL )
@@ -554,7 +554,7 @@ static Status read_one_tag(
         patient_id = -1;
 
         n_strings = 0;
-        if( mni_input_line( file, &line ) == OK )
+        if( mni_input_line( file, &line ) == VIO_OK )
         {
             i = 0;
             last_was_blank = TRUE;
@@ -601,7 +601,7 @@ static Status read_one_tag(
                              &patient_id, &pos ) != 3 )
             {
                 print_error( "input_tag_points(): error reading tag point\n" );
-                return( ERROR );
+                return( VIO_ERROR );
             }
             else if( n_strings == 4 )
             {
@@ -626,12 +626,12 @@ static Status read_one_tag(
             delete_string( label );
     }
 
-    if( status == ERROR )  /* --- found no more tag points, should now find ; */
+    if( status == VIO_ERROR )  /* --- found no more tag points, should now find ; */
     {
-        if( mni_skip_expected_character( file, (char) ';' ) != OK )
-            status = ERROR;
+        if( mni_skip_expected_character( file, (char) ';' ) != VIO_OK )
+            status = VIO_ERROR;
         else
-            status = END_OF_FILE;
+            status = VIO_END_OF_FILE;
     }
 
     return( status );
@@ -650,7 +650,7 @@ static Status read_one_tag(
               patient_ids
               labels
 @OUTPUT     : 
-@RETURNS    : OK or ERROR
+@RETURNS    : VIO_OK or VIO_ERROR
 @DESCRIPTION: Opens the file, outputs the tag points, and closes the file.
 @METHOD     : 
 @GLOBALS    : 
@@ -678,12 +678,12 @@ VIOAPI  Status  output_tag_file(
                                             get_default_tag_file_suffix(),
                                             WRITE_FILE, ASCII_FORMAT, &file );
 
-    if( status == OK )
+    if( status == VIO_OK )
         status = output_tag_points( file, comments, n_volumes, n_tag_points,
                                     tags_volume1, tags_volume2, weights,
                                     structure_ids, patient_ids, labels );
 
-    if( status == OK )
+    if( status == VIO_OK )
         status = close_file( file );
 
     return( status );
@@ -700,7 +700,7 @@ VIOAPI  Status  output_tag_file(
               structure_ids
               patient_ids
               labels
-@RETURNS    : OK or ERROR
+@RETURNS    : VIO_OK or VIO_ERROR
 @DESCRIPTION: Opens the file, inputs the tag points, and closes the file.
 @METHOD     : 
 @GLOBALS    : 
@@ -727,12 +727,12 @@ VIOAPI  Status  input_tag_file(
                                             get_default_tag_file_suffix(),
                                             READ_FILE, ASCII_FORMAT, &file );
 
-    if( status == OK )
+    if( status == VIO_OK )
         status = input_tag_points( file, n_volumes, n_tag_points,
                                    tags_volume1, tags_volume2, weights,
                                    structure_ids, patient_ids, labels );
 
-    if( status == OK )
+    if( status == VIO_OK )
         status = close_file( file );
 
     return( status );
@@ -776,10 +776,10 @@ VIOAPI  BOOLEAN  input_one_tag(
                                 tag_volume1, tag_volume2, weight,
                                 structure_id, patient_id, label );
 
-    read_one = (read_status == OK);
+    read_one = (read_status == VIO_OK);
 
-    if( read_status == END_OF_FILE )
-        read_status = OK;
+    if( read_status == VIO_END_OF_FILE )
+        read_status = VIO_OK;
 
     if( status != NULL )
         *status = read_status;
@@ -798,7 +798,7 @@ VIOAPI  BOOLEAN  input_one_tag(
               structure_ids
               patient_ids
               labels
-@RETURNS    : OR or ERROR
+@RETURNS    : OR or VIO_ERROR
 @DESCRIPTION: Inputs an entire tag point file into a set of arrays.
 @METHOD     : 
 @GLOBALS    : 
@@ -832,7 +832,7 @@ VIOAPI  Status  input_tag_points(
 
     *n_tag_points = 0;
 
-    while( status == OK &&
+    while( status == VIO_OK &&
            input_one_tag( file, n_volumes,
                           tags1, tags2, &weight, &structure_id, &patient_id,
                           &label, &status ) )
