@@ -181,7 +181,7 @@ VIOAPI  VIO_STR  format_time(
 
     seconds *= 1.0e6;
 
-    for_less( i, 0, SIZEOF_STATIC_ARRAY(units)-1 )
+    for_less( i, 0, VIO_SIZEOF_STATIC_ARRAY(units)-1 )
     {
         if( seconds > 2.0 * scales[i] )
         {
@@ -193,7 +193,7 @@ VIOAPI  VIO_STR  format_time(
         }
     }
 
-    seconds = (VIO_Real) ROUND( 10.0 * seconds ) / 10.0;
+    seconds = (VIO_Real) VIO_ROUND( 10.0 * seconds ) / 10.0;
 
     if( negative )  seconds = -seconds;
 

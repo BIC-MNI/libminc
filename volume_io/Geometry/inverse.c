@@ -40,8 +40,8 @@ VIOAPI  VIO_BOOL   compute_transform_inverse(
 
     /* --- copy the transform to a numerical recipes type matrix */
 
-    ALLOC2D( t, 4, 4 );
-    ALLOC2D( inv, 4, 4 );
+    VIO_ALLOC2D( t, 4, 4 );
+    VIO_ALLOC2D( inv, 4, 4 );
 
     for_less( i, 0, 4 )
     {
@@ -82,8 +82,8 @@ VIOAPI  VIO_BOOL   compute_transform_inverse(
     else
         make_identity_transform( inverse );
 
-    FREE2D( t );
-    FREE2D( inv );
+    VIO_FREE2D( t );
+    VIO_FREE2D( inv );
 
     return( success );
 }

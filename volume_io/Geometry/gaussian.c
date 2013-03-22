@@ -53,11 +53,11 @@ static  VIO_BOOL  scaled_maximal_pivoting_gaussian_elimination(
 
     for_less( i, 0, n )
     {
-        s[i] = FABS( a[i][0] );
+        s[i] = VIO_FABS( a[i][0] );
         for_less( j, 1, n )
         {
-            if( FABS(a[i][j]) > s[i] )
-               s[i] = FABS(a[i][j]);
+            if( VIO_FABS(a[i][j]) > s[i] )
+               s[i] = VIO_FABS(a[i][j]);
         }
 
         if( s[i] == 0.0 )
@@ -74,11 +74,11 @@ static  VIO_BOOL  scaled_maximal_pivoting_gaussian_elimination(
     {
         p = i;
         best_val = a[row[i]][i] / s[row[i]];
-        best_val = FABS( best_val );
+        best_val = VIO_FABS( best_val );
         for_less( j, i+1, n )
         {
             val = a[row[j]][i] / s[row[j]];
-            val = FABS( val );
+            val = VIO_FABS( val );
             if( val > best_val )
             {
                 best_val = val;
@@ -171,8 +171,8 @@ static VIO_BOOL scaled_maximal_pivoting_gaussian_elimination_real(
     VIO_BOOL   success;
 
     ALLOC( row, n );
-    ALLOC2D( a, n, n );
-    ALLOC2D( solution, n, n_values );
+    VIO_ALLOC2D( a, n, n );
+    VIO_ALLOC2D( solution, n, n_values );
 
     for_less( i, 0, n )
     {
@@ -194,8 +194,8 @@ static VIO_BOOL scaled_maximal_pivoting_gaussian_elimination_real(
         }
     }
 
-    FREE2D( a );
-    FREE2D( solution );
+    VIO_FREE2D( a );
+    VIO_FREE2D( solution );
     FREE( row );
 
     return( success );

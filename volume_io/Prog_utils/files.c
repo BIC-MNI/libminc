@@ -743,7 +743,7 @@ VIOAPI  VIO_BOOL  filename_extension_matches(
 
     len = string_length( filename_no_z );
 
-    for_less( i, 0, SIZEOF_STATIC_ARRAY(compressed_endings) )
+    for_less( i, 0, VIO_SIZEOF_STATIC_ARRAY(compressed_endings) )
     {
         if( string_ends_in( filename_no_z, compressed_endings[i] ) )
         {
@@ -827,7 +827,7 @@ VIOAPI  VIO_BOOL  file_exists_as_compressed(
 
     /* --- check to see if file.z or file.Z, etc, exists */
 
-    for_less( i, 0, SIZEOF_STATIC_ARRAY( compressed_endings ) )
+    for_less( i, 0, VIO_SIZEOF_STATIC_ARRAY( compressed_endings ) )
     {
         compressed = concat_strings( expanded, compressed_endings[i] );
 
@@ -985,7 +985,7 @@ VIOAPI  VIO_Status  open_file(
     {
         /* --- check if the filename ends in one of the compressed suffixes */
 
-        for_less( i, 0, SIZEOF_STATIC_ARRAY( compressed_endings ) )
+        for_less( i, 0, VIO_SIZEOF_STATIC_ARRAY( compressed_endings ) )
         {
             if( string_ends_in( expanded, compressed_endings[i] ) )
             {

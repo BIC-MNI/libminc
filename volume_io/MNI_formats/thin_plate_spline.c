@@ -374,7 +374,7 @@ VIOAPI  VIO_Real  thin_plate_spline_U(
     {
     case  1:
         dx = pos[VIO_X] - landmark[VIO_X];
-        r = FABS( dx );
+        r = VIO_FABS( dx );
         fu = r * r * r;
         break;
 

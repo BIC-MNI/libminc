@@ -67,7 +67,7 @@ VIOAPI  VIO_BOOL  newton_root_find(
     ALLOC( position, n_dimensions );
     ALLOC( values, n_dimensions );
     ALLOC( delta, n_dimensions );
-    ALLOC2D( derivatives, n_dimensions, n_dimensions );
+    VIO_ALLOC2D( derivatives, n_dimensions, n_dimensions );
 
     /*--- initialize function position to the initial guess */
 
@@ -92,7 +92,7 @@ VIOAPI  VIO_BOOL  newton_root_find(
         for_less( dim, 0, n_dimensions )
         {
             values[dim] = desired_values[dim] - values[dim];
-            error += FABS( values[dim] );
+            error += VIO_FABS( values[dim] );
         }
 
         /*--- if this is best so far, record it */
@@ -122,7 +122,7 @@ VIOAPI  VIO_BOOL  newton_root_find(
         for_less( dim, 0, n_dimensions )
         {
             position[dim] += STEP_RATIO * delta[dim];
-            step_size += FABS( delta[dim] );
+            step_size += VIO_FABS( delta[dim] );
         }
 
         if( step_size < delta_tolerance )
@@ -136,7 +136,7 @@ VIOAPI  VIO_BOOL  newton_root_find(
 
     FREE( values );
     FREE( delta );
-    FREE2D( derivatives );
+    VIO_FREE2D( derivatives );
     FREE( position );
 
     return( success );

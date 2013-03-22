@@ -70,6 +70,64 @@ typedef enum { VIO_OK=0,
              } VIO_Status;
 
 
+             
+/* --------- gets the address of a 2-d array element in a 1-d array ----- */
+
+#define  VIO_IJ( i, j, nj )          ( (i) * (nj) + (j) )
+
+/* --------- gets the address of a 3-d array element in a 1-d array ----- */
+
+#define  VIO_IJK( i, j, k, nj, nk )  ( (k) + (nk) * ((j) + (nj) * (i)) )
+
+
+/* --------- Absolute value, min, and max.  Bear in mind that these
+             may evaluate an expression multiple times, i.e., ABS( x - y ),
+             and therefore may be inefficient, or incorrect,
+             i.e, ABS( ++x );                          ------------------ */
+
+#define  VIO_ABS( x )   ( ((x) > 0) ? (x) : (-(x)) )
+#define  VIO_FABS( x )   fabs( (double) x )
+#define  VIO_SIGN( x )  ( ((x) > 0) ? 1 : (((x) < 0) ? -1 : 0) )
+#define  VIO_FSIGN( x )  ( ((x) > 0.0) ? 1.0 : (((x) < 0.0) ? -1.0 : 0.0) )
+
+#ifdef   MAX
+#undef   MAX
+#endif
+#define  MAX( x, y )  ( ((x) >= (y)) ? (x) : (y) )
+
+#define  MAX3( x, y, z )  ( ((x) >= (y)) ? MAX( x, z ) : MAX( y, z ) )
+
+#ifdef   MIN
+#undef   MIN
+#endif
+#define  MIN( x, y )  ( ((x) <= (y)) ? (x) : (y) )
+
+#define  MIN3( x, y, z )  ( ((x) <= (y)) ? MIN( x, z ) : MIN( y, z ) )
+
+
+#define  VIO_IS_INT( x )    ((double) (x) == (double) ((int) (x)))
+
+#define  VIO_FLOOR( x )     ((int) floor(x))
+
+#define  VIO_ROUND( x )     VIO_FLOOR( (double) (x) + 0.5 )
+
+#define  VIO_CEILING( x )   ((int) ceil(x))
+
+#define  VIO_FRACTION( x )  ((double) (x) - (double) VIO_FLOOR(x))
+
+#define  VIO_ENV_EXISTS( env ) ( getenv(env) != (char *) 0 )
+
+/* --------- macro to determine the size of a static array,
+             e.g.,   int  array[] = { 1, 3, 9, 5 };           ------------ */
+
+#define  VIO_SIZEOF_STATIC_ARRAY( array ) \
+         (int) ( sizeof(array) / sizeof((array)[0]))
+
+/* --------- interpolate between a and b ------------------- */
+
+#define  VIO_INTERPOLATE( alpha, a, b ) ((a) + (alpha) * ((b) - (a)))
+
+
 #if !VIO_PREFIX_NAMES           /* Play nice with others */
 
 #ifndef __cplusplus
@@ -103,43 +161,13 @@ typedef enum { VIO_OK=0,
 #define  DEG_TO_RAD   (PI / 180.0)
 #define  RAD_TO_DEG   (180.0 / PI)
 
-/* --------- Absolute value, min, and max.  Bear in mind that these
-             may evaluate an expression multiple times, i.e., ABS( x - y ),
-             and therefore may be inefficient, or incorrect,
-             i.e, ABS( ++x );                          ------------------ */
-
-#define  ABS( x )   ( ((x) > 0) ? (x) : (-(x)) )
-#define  FABS( x )   fabs( (double) x )
-#define  SIGN( x )  ( ((x) > 0) ? 1 : (((x) < 0) ? -1 : 0) )
-#define  FSIGN( x )  ( ((x) > 0.0) ? 1.0 : (((x) < 0.0) ? -1.0 : 0.0) )
-
-#ifdef   MAX
-#undef   MAX
-#endif
-#define  MAX( x, y )  ( ((x) >= (y)) ? (x) : (y) )
-
-#define  MAX3( x, y, z )  ( ((x) >= (y)) ? MAX( x, z ) : MAX( y, z ) )
-
-#ifdef   MIN
-#undef   MIN
-#endif
-#define  MIN( x, y )  ( ((x) <= (y)) ? (x) : (y) )
-
-#define  MIN3( x, y, z )  ( ((x) <= (y)) ? MIN( x, z ) : MIN( y, z ) )
-
-/* --------- gets the address of a 2-d array element in a 1-d array ----- */
-
-#define  IJ( i, j, nj )          ( (i) * (nj) + (j) )
-
-/* --------- gets the address of a 3-d array element in a 1-d array ----- */
-
-#define  IJK( i, j, k, nj, nk )  ( (k) + (nk) * ((j) + (nj) * (i)) )
 
 /* --------- environment variables -------------------------- */
 
 #define  ENV_EXISTS( env ) ( getenv(env) != (char *) 0 )
 
 /* --------- C and LINT stuff -------------------------- */
+
 
 #ifdef __STDC__
 #define GLUE(x,y) x##y
@@ -175,7 +203,13 @@ typedef VIO_Status Status;
 
 #define  FRACTION( x )  ((double) (x) - (double) FLOOR(x))
 
+#define IJ( i, j, nj ) VIO_IJ( i, j, nj )
+
+#define IJK( i, j,  nj, nk )  VIO_IJK( i, j, k, nj, nk )
+
 #endif /* !VIO_PREFIX_NAMES */
+
+
 
 /* for loops */
 

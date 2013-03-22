@@ -289,7 +289,7 @@ VIOAPI  void  spline_tensor_product(
                 ++ind;
             }
    
-            prev_ind = IJ( deriv-1, deriv-1, deg );
+            prev_ind = VIO_IJ( deriv-1, deriv-1, deg );
             for_less( k, deriv, deg )
             {
                 us[ind] = us[prev_ind] * (VIO_Real) k;

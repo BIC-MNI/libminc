@@ -206,7 +206,7 @@ VIOAPI  void  set_volume_real_value(
     if( data_type != FLOAT &&
         data_type != DOUBLE )
     {
-        voxel = (VIO_Real) ROUND( voxel );
+        voxel = (VIO_Real) VIO_ROUND( voxel );
     }
 
     set_volume_voxel_value( volume, v0, v1, v2, v3, v4, voxel );
@@ -272,9 +272,9 @@ static void trilinear_interpolate(
     {
         outside_value = convert_value_to_voxel( volume, outside_value );
 
-        i = FLOOR( x );
-        j = FLOOR( y );
-        k = FLOOR( z );
+        i = VIO_FLOOR( x );
+        j = VIO_FLOOR( y );
+        k = VIO_FLOOR( z );
 
         c = 0;
         for_less( dx, 0, 2 )
@@ -343,13 +343,13 @@ static void trilinear_interpolate(
 
         /*--- reduce the 2D u derivs to 1D */
 
-        du0 = INTERPOLATE( v, du00, du10 );
-        du1 = INTERPOLATE( v, du01, du11 );
+        du0 = VIO_INTERPOLATE( v, du00, du10 );
+        du1 = VIO_INTERPOLATE( v, du01, du11 );
 
         /*--- interpolate the 1D problems in w, or for VIO_Z deriv, just use dw */
 
-        derivs[VIO_X] = scale_factor * INTERPOLATE( w, du0, du1 );
-        derivs[VIO_Y] = scale_factor * INTERPOLATE( w, dv0, dv1 );
+        derivs[VIO_X] = scale_factor * VIO_INTERPOLATE( w, du0, du1 );
+        derivs[VIO_Y] = scale_factor * VIO_INTERPOLATE( w, dv0, dv1 );
         derivs[VIO_Z] = scale_factor * dw;
     }
 }
@@ -772,7 +772,7 @@ VIOAPI  int   evaluate_volume(
         {
             if( interpolating_dimensions == NULL || interpolating_dimensions[d])
             {
-                pos = (VIO_Real) ROUND( voxel[d] );
+                pos = (VIO_Real) VIO_ROUND( voxel[d] );
                 if( voxel[d] < pos - interpolation_tolerance ||
                     voxel[d] > pos + interpolation_tolerance )
                 {
@@ -829,7 +829,7 @@ VIOAPI  int   evaluate_volume(
         {
             interp_dims[n_interp_dims] = d;
             pos = voxel[d] - bound;
-            start[d] =       FLOOR( pos );
+            start[d] =       VIO_FLOOR( pos );
             fraction[n_interp_dims] = pos - (VIO_Real) start[d];
 
             if( voxel[d] == (VIO_Real) sizes[d] - 1.0 - bound )
@@ -1096,7 +1096,7 @@ VIOAPI  void   evaluate_volume_in_world(
 
     if( deriv_x != NULL )
     {
-        ALLOC2D( first_deriv, n_values, VIO_N_DIMENSIONS );
+        VIO_ALLOC2D( first_deriv, n_values, VIO_N_DIMENSIONS );
     }
     else
         first_deriv = NULL;
@@ -1105,7 +1105,7 @@ VIOAPI  void   evaluate_volume_in_world(
 
     if( deriv_xx != NULL )
     {
-        ALLOC3D( second_deriv, n_values, VIO_N_DIMENSIONS, VIO_N_DIMENSIONS );
+        VIO_ALLOC3D( second_deriv, n_values, VIO_N_DIMENSIONS, VIO_N_DIMENSIONS );
     }
     else
         second_deriv = NULL;
@@ -1149,7 +1149,7 @@ VIOAPI  void   evaluate_volume_in_world(
                                    &deriv_x[v], &deriv_y[v], &deriv_z[v] );
         }
 
-        FREE2D( first_deriv );
+        VIO_FREE2D( first_deriv );
     }
 
     /*--- if the derivative is desired, convert the voxel derivative
@@ -1186,7 +1186,7 @@ VIOAPI  void   evaluate_volume_in_world(
                                   &deriv_xz[v], &deriv_yz[v], &deriv_zz[v] );
         }
 
-        FREE3D( second_deriv );
+        VIO_FREE3D( second_deriv );
     }
 }
 #ifdef HAVE_MINC1

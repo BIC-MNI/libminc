@@ -562,7 +562,7 @@ VIOAPI  VIO_BOOL  alloc_checking_enabled( void )
 #else
     if( !enabled_initialized )
     {
-        set_alloc_checking( ENV_EXISTS( "DEBUG_ALLOC" ) );
+        set_alloc_checking( VIO_ENV_EXISTS( "DEBUG_ALLOC" ) );
     }
 
     return( checking_enabled );
@@ -599,7 +599,7 @@ static  VIO_BOOL  size_display_enabled( void )
 
     if( first )
     {
-        enabled = ENV_EXISTS( "ALLOC_SIZE" );
+        enabled = VIO_ENV_EXISTS( "ALLOC_SIZE" );
         first = FALSE;
     }
 

@@ -100,8 +100,8 @@ static  void  initialize_thin_plate_transform(
     transform->n_dimensions = n_dimensions;
     transform->n_points = n_points;
 
-    ALLOC2D( transform->points, n_points, n_dimensions );
-    ALLOC2D( transform->displacements, n_points + n_dimensions + 1,
+    VIO_ALLOC2D( transform->points, n_points, n_dimensions );
+    VIO_ALLOC2D( transform->displacements, n_points + n_dimensions + 1,
              n_dimensions );
 }
 
@@ -764,8 +764,8 @@ static  void  copy_and_invert_transform(
         break;
 
     case THIN_PLATE_SPLINE:
-        ALLOC2D( copy->points, copy->n_points, copy->n_dimensions);
-        ALLOC2D( copy->displacements, copy->n_points + copy->n_dimensions + 1,
+        VIO_ALLOC2D( copy->points, copy->n_points, copy->n_dimensions);
+        VIO_ALLOC2D( copy->displacements, copy->n_points + copy->n_dimensions + 1,
                  copy->n_dimensions);
 
         for_less( i, 0, copy->n_points )
@@ -948,8 +948,8 @@ VIOAPI  void  concat_general_transforms(
         second_step = 1;
     }
 
-    result_ptr->n_transforms = ABS( first_end - first_start ) + 1 +
-                               ABS( second_end - second_start ) + 1;
+    result_ptr->n_transforms = VIO_ABS( first_end - first_start ) + 1 +
+                               VIO_ABS( second_end - second_start ) + 1;
 
     crunching_linear = FALSE;
     if( get_nth_general_transform( first, first_end )->type == LINEAR &&
@@ -1065,8 +1065,8 @@ VIOAPI  void  delete_general_transform(
     case THIN_PLATE_SPLINE:
         if( transform->n_points > 0 && transform->n_dimensions > 0 )
         {
-            FREE2D( transform->points );
-            FREE2D( transform->displacements );
+            VIO_FREE2D( transform->points );
+            VIO_FREE2D( transform->displacements );
         }
         break;
 

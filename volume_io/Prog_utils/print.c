@@ -263,7 +263,7 @@ VIOAPI  void  abort_if_allowed( void )
 {
     char  ch;
 
-    if( ENV_EXISTS( "ABORT_FLAG" ) )
+    if( VIO_ENV_EXISTS( "ABORT_FLAG" ) )
     {
         print_error( "Do you wish to abort (y/n): " );
         do

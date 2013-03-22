@@ -961,7 +961,7 @@ static  void  convert_transform_origin_to_starts(
         /*--- this is the usual case, solve the equations to find what
               starts give the desired origin */
 
-        ALLOC2D( matrix, VIO_N_DIMENSIONS, VIO_N_DIMENSIONS );
+        VIO_ALLOC2D( matrix, VIO_N_DIMENSIONS, VIO_N_DIMENSIONS );
 
         for_less( i, 0, VIO_N_DIMENSIONS )
         for_less( j, 0, VIO_N_DIMENSIONS )
@@ -976,7 +976,7 @@ static  void  convert_transform_origin_to_starts(
             starts[which[2]] = solution[2];
         }
 
-        FREE2D( matrix );
+        VIO_FREE2D( matrix );
     }
     else
     {
@@ -2651,7 +2651,7 @@ nonspatial_world_to_voxel(VIO_Volume volume, int idim, VIO_Real world)
         }
     }
     else {
-        voxel = ROUND((world - volume->starts[idim]) / volume->separations[idim]);
+        voxel = VIO_ROUND((world - volume->starts[idim]) / volume->separations[idim]);
     }
     return (voxel);
 }

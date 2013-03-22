@@ -490,11 +490,11 @@ static VIO_Status input_one_transform(
         {
             for_less( j, 0, n_dimensions )
             {
-                points[i][j] = points_1d[IJ(i,j,n_dimensions)];
+                points[i][j] = points_1d[VIO_IJ(i,j,n_dimensions)];
             }
         }
 
-        VIO_FREE( points_1d );
+        FREE( points_1d );
 
         /* --- allocate and input the displacements */
 

@@ -283,7 +283,7 @@ VIOAPI  VIO_Status  grid_inverse_transform_point(
 
     tries = 0;
 
-    error = smallest_e = FABS(error_x) + FABS(error_y) + FABS(error_z);
+    error = smallest_e = VIO_FABS(error_x) + VIO_FABS(error_y) + VIO_FABS(error_z);
     best_x = tx;
     best_y = ty;
     best_z = tz;
@@ -334,7 +334,7 @@ VIOAPI  VIO_Status  grid_inverse_transform_point(
         error_y = y - gy;
         error_z = z - gz;
     
-        error = FABS(error_x) + FABS(error_y) + FABS(error_z);
+        error = VIO_FABS(error_x) + VIO_FABS(error_y) + VIO_FABS(error_z);
 
         if( error < smallest_e ) {
             smallest_e = error;
@@ -475,7 +475,7 @@ static  void   evaluate_grid_volume(
             end[d] = 1;
         } else {
             pos = voxel[d] - bound;
-            start[d] = FLOOR( pos );
+            start[d] = VIO_FLOOR( pos );
             if( start[d] < 0 ) {
                 start[d] = 0;
             } else if( start[d]+degrees_continuity+1 >= sizes[d] ) {
