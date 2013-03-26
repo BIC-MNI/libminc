@@ -52,7 +52,7 @@ VIOAPI  VIO_Status  start_volume_input(
     VIO_Real                 volume_voxel_min,
     VIO_Real                 volume_voxel_max,
     VIO_BOOL              create_volume_flag,
-    Volume               *volume,
+    VIO_Volume           *volume,
     minc_input_options   *options,
     volume_input_struct  *input_info )
 {
@@ -62,9 +62,9 @@ VIOAPI  VIO_Status  start_volume_input(
 
     status = VIO_OK;
 
-    if( create_volume_flag || *volume == (Volume) NULL )
+    if( create_volume_flag || *volume == (VIO_Volume) NULL )
     {
-        if( n_dimensions < 1 || n_dimensions > MAX_DIMENSIONS )
+        if( n_dimensions < 1 || n_dimensions > VIO_MAX_DIMENSIONS )
             n_dimensions = get_minc_file_n_dimensions( filename );
 
         if( n_dimensions < 1 )
@@ -103,7 +103,7 @@ VIOAPI  VIO_Status  start_volume_input(
             status = VIO_ERROR;
         else
         {
-            for_less( d, 0, MAX_DIMENSIONS )
+            for_less( d, 0, VIO_MAX_DIMENSIONS )
                 input_info->axis_index_from_file[d] = d;
         }
 
@@ -163,7 +163,7 @@ VIOAPI  void  delete_volume_input(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  VIO_BOOL  input_more_of_volume(
-    Volume                volume,
+    VIO_Volume            volume,
     volume_input_struct   *input_info,
     VIO_Real                  *fraction_done )
 {
@@ -198,7 +198,7 @@ VIOAPI  VIO_BOOL  input_more_of_volume(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  cancel_volume_input(
-    Volume                volume,
+    VIO_Volume            volume,
     volume_input_struct   *input_info )
 {
     delete_volume( volume );
@@ -219,21 +219,21 @@ VIOAPI  void  cancel_volume_input(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  VIO_Status  input_volume(
-    VIO_STR               filename,
+    VIO_STR              filename,
     int                  n_dimensions,
-    VIO_STR               dim_names[],
+    VIO_STR              dim_names[],
     nc_type              volume_nc_data_type,
-    VIO_BOOL              volume_signed_flag,
-    VIO_Real                 volume_voxel_min,
-    VIO_Real                 volume_voxel_max,
-    VIO_BOOL              create_volume_flag,
-    Volume               *volume,
+    VIO_BOOL             volume_signed_flag,
+    VIO_Real             volume_voxel_min,
+    VIO_Real             volume_voxel_max,
+    VIO_BOOL             create_volume_flag,
+    VIO_Volume           *volume,
     minc_input_options   *options )
 {
     VIO_Status               status;
     VIO_Real                 amount_done;
     volume_input_struct  input_info;
-    progress_struct      progress;
+    VIO_progress_struct  progress;
     static const int     FACTOR = 1000;
 
     status = start_volume_input( filename, n_dimensions, dim_names,
@@ -249,7 +249,7 @@ VIOAPI  VIO_Status  input_volume(
         while( input_more_of_volume( *volume, &input_info, &amount_done ) )
         {
             update_progress_report( &progress,
-                                    ROUND( (VIO_Real) FACTOR * amount_done));
+                                    VIO_ROUND( (VIO_Real) FACTOR * amount_done));
         }
 
         terminate_progress_report( &progress );

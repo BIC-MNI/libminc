@@ -100,7 +100,7 @@ VIOAPI  int   get_minc_file_n_dimensions(
 
 VIOAPI  Minc_file  initialize_minc_input_from_minc_id(
     int                  minc_id,
-    Volume               volume,
+    VIO_Volume           volume,
     minc_input_options   *options )
 {
     minc_file_struct    *file;
@@ -260,7 +260,7 @@ VIOAPI  Minc_file  initialize_minc_input_from_minc_id(
 
     which_valid_axis = 0;
 
-    for_less( d, 0, N_DIMENSIONS )
+    for_less( d, 0, VIO_N_DIMENSIONS )
     {
         volume->spatial_axes[d] = INVALID_AXIS;
         file->spatial_axes[d] = INVALID_AXIS;
@@ -649,7 +649,7 @@ VIOAPI  Minc_file  initialize_minc_input_from_minc_id(
 
 VIOAPI  Minc_file  initialize_minc_input(
     VIO_STR               filename,
-    Volume               volume,
+    VIO_Volume            volume,
     minc_input_options   *options )
 {
     Minc_file    file;
@@ -761,7 +761,7 @@ VIOAPI  VIO_Status  close_minc_input(
 
 VIOAPI  VIO_Status  input_minc_hyperslab(
     Minc_file        file,
-    Data_types       data_type,
+    VIO_Data_types   data_type,
     int              n_array_dims,
     int              array_sizes[],
     void             *array_data_ptr,
@@ -776,12 +776,12 @@ VIOAPI  VIO_Status  input_minc_hyperslab(
     void             *void_ptr;
     VIO_BOOL          direct_to_array, non_full_size_found;
     int              tmp_ind, tmp_sizes[MAX_VAR_DIMS];
-    int              vol1_indices[MAX_DIMENSIONS];
-    int              v[MAX_DIMENSIONS], voxel[MAX_DIMENSIONS];
+    int              vol1_indices[VIO_MAX_DIMENSIONS];
+    int              v[VIO_MAX_DIMENSIONS], voxel[VIO_MAX_DIMENSIONS];
     long             used_start[MAX_VAR_DIMS], used_count[MAX_VAR_DIMS];
     VIO_Real             rgb[4];
-    Colour           colour;
-    multidim_array   buffer_array, rgb_array;
+    VIO_Colour           colour;
+    VIO_multidim_array   buffer_array, rgb_array;
 
     n_file_dims = file->n_file_dimensions;
     direct_to_array = TRUE;
@@ -873,7 +873,7 @@ VIOAPI  VIO_Status  input_minc_hyperslab(
     {
         if( file->converting_to_colour )
         {
-            for_less( dim, n_tmp_dims, MAX_DIMENSIONS )
+            for_less( dim, n_tmp_dims, VIO_MAX_DIMENSIONS )
                 tmp_sizes[dim] = 1;           
 
             size0 = tmp_sizes[0];
@@ -949,16 +949,16 @@ VIOAPI  VIO_Status  input_minc_hyperslab(
 
 static  void  input_slab(
     Minc_file   file,
-    Volume      volume,
+    VIO_Volume  volume,
     int         to_volume[],
     long        start[],
     long        count[] )
 {
     int      file_ind, ind;
     int      volume_start[MAX_VAR_DIMS];
-    int      file_start[MAX_DIMENSIONS];
-    int      file_count[MAX_DIMENSIONS];
-    int      array_sizes[MAX_DIMENSIONS];
+    int      file_start[VIO_MAX_DIMENSIONS];
+    int      file_count[VIO_MAX_DIMENSIONS];
+    int      array_sizes[VIO_MAX_DIMENSIONS];
     void     *array_data_ptr;
 
     for_less( file_ind, 0, file->n_file_dimensions )
@@ -1006,7 +1006,7 @@ VIOAPI  VIO_BOOL  input_more_minc_file(
 {
     int      d, ind, n_done, total, n_slab;
     long     count[MAX_VAR_DIMS];
-    Volume   volume;
+    VIO_Volume volume;
     VIO_BOOL  increment;
 
     if( file->end_volume_flag )
@@ -1117,10 +1117,10 @@ VIOAPI  VIO_BOOL  advance_input_volume(
     Minc_file   file )
 {
     int                 ind, c, axis;
-    VIO_Real                voxel[MAX_DIMENSIONS], world_space[N_DIMENSIONS];
-    VIO_Real                vol_world_space[N_DIMENSIONS];
-    Transform           offset;
-    General_transform   offset_transform, new_transform;
+    VIO_Real                voxel[VIO_MAX_DIMENSIONS], world_space[VIO_N_DIMENSIONS];
+    VIO_Real                vol_world_space[VIO_N_DIMENSIONS];
+    VIO_Transform           offset;
+    VIO_General_transform   offset_transform, new_transform;
 
     ind = file->n_file_dimensions-1;
 
@@ -1146,7 +1146,7 @@ VIOAPI  VIO_BOOL  advance_input_volume(
 
         /*--- update the volume's voxel-to-world transform */
 
-        for_less( c, 0, N_DIMENSIONS )
+        for_less( c, 0, VIO_N_DIMENSIONS )
         {
             axis = file->spatial_axes[c];
             if( axis != INVALID_AXIS )
@@ -1157,18 +1157,18 @@ VIOAPI  VIO_BOOL  advance_input_volume(
 
         general_transform_point( &file->voxel_to_world_transform,
                                  voxel[0], voxel[1], voxel[2],
-                                 &world_space[X], &world_space[Y],
-                                 &world_space[Z]);
+                                 &world_space[VIO_X], &world_space[VIO_Y],
+                                 &world_space[VIO_Z]);
 
         for_less( c, 0, get_volume_n_dimensions(file->volume) )
             voxel[c] = 0.0;
         
         convert_voxel_to_world( file->volume, voxel,
-                                &vol_world_space[X], &vol_world_space[Y],
-                                &vol_world_space[Z]);
+                                &vol_world_space[VIO_X], &vol_world_space[VIO_Y],
+                                &vol_world_space[VIO_Z]);
 
         make_identity_transform( &offset );
-        for_less( c, 0, N_DIMENSIONS )
+        for_less( c, 0, VIO_N_DIMENSIONS )
             Transform_elem(offset,c,3) = world_space[c] - vol_world_space[c];
         create_linear_transform( &offset_transform, &offset );
         concat_general_transforms( get_voxel_to_world_transform(file->volume),
@@ -1247,9 +1247,9 @@ static  VIO_BOOL  match_dimension_names(
     int               to_volume_index[] )
 {
     int      i, j, iteration, n_matches, dummy;
-    int      to_file_index[MAX_DIMENSIONS];
+    int      to_file_index[VIO_MAX_DIMENSIONS];
     VIO_BOOL  match;
-    VIO_BOOL  volume_dim_found[MAX_DIMENSIONS];
+    VIO_BOOL  volume_dim_found[VIO_MAX_DIMENSIONS];
 
     n_matches = 0;
 

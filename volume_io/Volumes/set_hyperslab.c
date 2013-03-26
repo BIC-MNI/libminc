@@ -22,7 +22,7 @@
 #ifdef HAVE_MINC1
 
 VIOAPI  void  convert_values_to_voxels(
-    Volume   volume,
+    VIO_Volume   volume,
     int      n_voxels,
     VIO_Real     values[],
     VIO_Real     voxels[] )
@@ -48,7 +48,7 @@ VIOAPI  void  convert_values_to_voxels(
 }
 
 VIOAPI  void  set_volume_value_hyperslab(
-    Volume   volume,
+    VIO_Volume   volume,
     int      v0,
     int      v1,
     int      v2,
@@ -84,7 +84,7 @@ VIOAPI  void  set_volume_value_hyperslab(
 }
 
 VIOAPI  void  set_volume_value_hyperslab_5d(
-    Volume   volume,
+    VIO_Volume   volume,
     int      v0,
     int      v1,
     int      v2,
@@ -112,7 +112,7 @@ VIOAPI  void  set_volume_value_hyperslab_5d(
 }
 
 VIOAPI  void  set_volume_value_hyperslab_4d(
-    Volume   volume,
+    VIO_Volume   volume,
     int      v0,
     int      v1,
     int      v2,
@@ -138,7 +138,7 @@ VIOAPI  void  set_volume_value_hyperslab_4d(
 }
 
 VIOAPI  void  set_volume_value_hyperslab_3d(
-    Volume   volume,
+    VIO_Volume   volume,
     int      v0,
     int      v1,
     int      v2,
@@ -161,7 +161,7 @@ VIOAPI  void  set_volume_value_hyperslab_3d(
 }
 
 VIOAPI  void  set_volume_value_hyperslab_2d(
-    Volume   volume,
+    VIO_Volume   volume,
     int      v0,
     int      v1,
     int      n0,
@@ -182,7 +182,7 @@ VIOAPI  void  set_volume_value_hyperslab_2d(
 }
 
 VIOAPI  void  set_volume_value_hyperslab_1d(
-    Volume   volume,
+    VIO_Volume   volume,
     int      v0,
     int      n0,
     VIO_Real     values[] )
@@ -199,7 +199,7 @@ VIOAPI  void  set_volume_value_hyperslab_1d(
 }
 
 static  void  slow_set_volume_voxel_hyperslab(
-    Volume   volume,
+    VIO_Volume   volume,
     int      v0,
     int      v1,
     int      v2,
@@ -240,7 +240,7 @@ static  void  slow_set_volume_voxel_hyperslab(
 }
 
 static  void  set_voxel_values_5d(
-    Data_types  data_type,
+    VIO_Data_types  data_type,
     void        *void_ptr,
     int         steps[],
     int         counts[],
@@ -492,7 +492,7 @@ static  void  set_voxel_values_5d(
 }
 
 static  void  set_voxel_values_4d(
-    Data_types  data_type,
+    VIO_Data_types  data_type,
     void        *void_ptr,
     int         steps[],
     int         counts[],
@@ -707,7 +707,7 @@ static  void  set_voxel_values_4d(
 }
 
 static  void  set_voxel_values_3d(
-    Data_types  data_type,
+    VIO_Data_types  data_type,
     void        *void_ptr,
     int         steps[],
     int         counts[],
@@ -884,7 +884,7 @@ static  void  set_voxel_values_3d(
 }
 
 static  void  set_voxel_values_2d(
-    Data_types  data_type,
+    VIO_Data_types  data_type,
     void        *void_ptr,
     int         steps[],
     int         counts[],
@@ -1026,7 +1026,7 @@ static  void  set_voxel_values_2d(
 }
 
 static  void  set_voxel_values_1d(
-    Data_types  data_type,
+    VIO_Data_types  data_type,
     void        *void_ptr,
     int         step0,
     int         n0,
@@ -1128,14 +1128,14 @@ static  void  set_voxel_values_1d(
 }
 
 static  void  set_voxel_values(
-    Volume   volume,
+    VIO_Volume   volume,
     void     *void_ptr,
     int      n_dims,
     int      steps[],
     int      counts[],
     VIO_Real     values[] )
 {
-    Data_types  data_type;
+    VIO_Data_types  data_type;
 
     data_type = get_volume_data_type( volume );
     switch( n_dims )
@@ -1162,7 +1162,7 @@ static  void  set_voxel_values(
 }
 
 VIOAPI  void  set_volume_voxel_hyperslab_5d(
-    Volume   volume,
+    VIO_Volume   volume,
     int      v0,
     int      v1,
     int      v2,
@@ -1175,9 +1175,9 @@ VIOAPI  void  set_volume_voxel_hyperslab_5d(
     int      n4,
     VIO_Real     values[] )
 {
-    int         steps[MAX_DIMENSIONS];
-    int         counts[MAX_DIMENSIONS];
-    int         sizes[MAX_DIMENSIONS];
+    int         steps[VIO_MAX_DIMENSIONS];
+    int         counts[VIO_MAX_DIMENSIONS];
+    int         sizes[VIO_MAX_DIMENSIONS];
     int         dim, stride;
     void        *void_ptr;
 
@@ -1239,7 +1239,7 @@ VIOAPI  void  set_volume_voxel_hyperslab_5d(
 }
 
 VIOAPI  void  set_volume_voxel_hyperslab_4d(
-    Volume   volume,
+    VIO_Volume   volume,
     int      v0,
     int      v1,
     int      v2,
@@ -1250,9 +1250,9 @@ VIOAPI  void  set_volume_voxel_hyperslab_4d(
     int      n3,
     VIO_Real     values[] )
 {
-    int         steps[MAX_DIMENSIONS];
-    int         counts[MAX_DIMENSIONS];
-    int         sizes[MAX_DIMENSIONS];
+    int         steps[VIO_MAX_DIMENSIONS];
+    int         counts[VIO_MAX_DIMENSIONS];
+    int         sizes[VIO_MAX_DIMENSIONS];
     int         dim, stride;
     void        *void_ptr;
 
@@ -1306,7 +1306,7 @@ VIOAPI  void  set_volume_voxel_hyperslab_4d(
 }
 
 VIOAPI  void  set_volume_voxel_hyperslab_3d(
-    Volume   volume,
+    VIO_Volume   volume,
     int      v0,
     int      v1,
     int      v2,
@@ -1315,9 +1315,9 @@ VIOAPI  void  set_volume_voxel_hyperslab_3d(
     int      n2,
     VIO_Real     values[] )
 {
-    int         steps[MAX_DIMENSIONS];
-    int         counts[MAX_DIMENSIONS];
-    int         sizes[MAX_DIMENSIONS];
+    int         steps[VIO_MAX_DIMENSIONS];
+    int         counts[VIO_MAX_DIMENSIONS];
+    int         sizes[VIO_MAX_DIMENSIONS];
     int         dim, stride;
     void        *void_ptr;
 
@@ -1363,16 +1363,16 @@ VIOAPI  void  set_volume_voxel_hyperslab_3d(
 }
 
 VIOAPI  void  set_volume_voxel_hyperslab_2d(
-    Volume   volume,
+    VIO_Volume   volume,
     int      v0,
     int      v1,
     int      n0,
     int      n1,
     VIO_Real     values[] )
 {
-    int         steps[MAX_DIMENSIONS];
-    int         counts[MAX_DIMENSIONS];
-    int         sizes[MAX_DIMENSIONS];
+    int         steps[VIO_MAX_DIMENSIONS];
+    int         counts[VIO_MAX_DIMENSIONS];
+    int         sizes[VIO_MAX_DIMENSIONS];
     int         dim, stride;
     void        *void_ptr;
 
@@ -1410,14 +1410,14 @@ VIOAPI  void  set_volume_voxel_hyperslab_2d(
 }
 
 VIOAPI  void  set_volume_voxel_hyperslab_1d(
-    Volume   volume,
+    VIO_Volume   volume,
     int      v0,
     int      n0,
     VIO_Real     values[] )
 {
-    int         steps[MAX_DIMENSIONS];
-    int         counts[MAX_DIMENSIONS];
-    int         sizes[MAX_DIMENSIONS];
+    int         steps[VIO_MAX_DIMENSIONS];
+    int         counts[VIO_MAX_DIMENSIONS];
+    int         sizes[VIO_MAX_DIMENSIONS];
     int         dim;
     void        *void_ptr;
 
@@ -1446,7 +1446,7 @@ VIOAPI  void  set_volume_voxel_hyperslab_1d(
 }
 
 VIOAPI  void  set_volume_voxel_hyperslab(
-    Volume   volume,
+    VIO_Volume   volume,
     int      v0,
     int      v1,
     int      v2,

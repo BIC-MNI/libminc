@@ -46,12 +46,12 @@ static  VIO_Status  input_slice(
 
 VIOAPI  VIO_Status  initialize_free_format_input(
     VIO_STR               filename,
-    Volume               volume,
+    VIO_Volume               volume,
     volume_input_struct  *volume_input )
 {
     VIO_Status         status, file_status;
     VIO_STR         volume_filename, abs_volume_filename, slice_filename;
-    int            sizes[N_DIMENSIONS];
+    int            sizes[VIO_N_DIMENSIONS];
     int            c, volume_byte_offset, int_size;
     int            n_bytes_per_voxel, min_value, max_value, i;
     int            n_slices, n_voxels_in_slice;
@@ -59,9 +59,9 @@ VIOAPI  VIO_Status  initialize_free_format_input(
     nc_type        desired_data_type;
     int            value;
     char           ch;
-    VIO_Real           file_separations[MAX_DIMENSIONS];
-    VIO_Real           volume_separations[MAX_DIMENSIONS];
-    VIO_Real           trans[N_DIMENSIONS];
+    VIO_Real           file_separations[VIO_MAX_DIMENSIONS];
+    VIO_Real           volume_separations[VIO_MAX_DIMENSIONS];
+    VIO_Real           trans[VIO_N_DIMENSIONS];
     FILE           *file;
     VIO_BOOL        axis_valid;
     int            axis;
@@ -85,9 +85,9 @@ VIOAPI  VIO_Status  initialize_free_format_input(
     /* input the 3 translation values used for the voxel_to_world_transform */
 
     if( status == VIO_OK &&
-        (input_real( file, &trans[X] ) != VIO_OK ||
-         input_real( file, &trans[Y] ) != VIO_OK ||
-         input_real( file, &trans[Z] ) != VIO_OK) )
+        (input_real( file, &trans[VIO_X] ) != VIO_OK ||
+         input_real( file, &trans[VIO_Y] ) != VIO_OK ||
+         input_real( file, &trans[VIO_Z] ) != VIO_OK) )
     {
         print_error( "Error reading x,y,z translations from %s.\n", filename );
         status = VIO_ERROR;
@@ -124,19 +124,19 @@ VIOAPI  VIO_Status  initialize_free_format_input(
              negative voxel separation means flip on display 
     */
 
-    if( volume->spatial_axes[X] < 0 ||
-        volume->spatial_axes[Y] < 0 ||
-        volume->spatial_axes[Z] < 0 )
+    if( volume->spatial_axes[VIO_X] < 0 ||
+        volume->spatial_axes[VIO_Y] < 0 ||
+        volume->spatial_axes[VIO_Z] < 0 )
     {
         print_error(
          "warning initialize_free_format_input: setting spatial axes to XYZ.\n");
-        volume->spatial_axes[X] = 0;
-        volume->spatial_axes[Y] = 1;
-        volume->spatial_axes[Z] = 2;
+        volume->spatial_axes[VIO_X] = 0;
+        volume->spatial_axes[VIO_Y] = 1;
+        volume->spatial_axes[VIO_Z] = 2;
     }
 
     if( status == VIO_OK )
-    for_less( axis, 0, N_DIMENSIONS )
+    for_less( axis, 0, VIO_N_DIMENSIONS )
     {
         status = VIO_ERROR;
 
@@ -157,17 +157,17 @@ VIOAPI  VIO_Status  initialize_free_format_input(
         {
         case 'x':
         case 'X':  volume_input->axis_index_from_file[axis] =
-                                           volume->spatial_axes[X];
+                                           volume->spatial_axes[VIO_X];
                    break;
 
         case 'y':
         case 'Y':  volume_input->axis_index_from_file[axis] =
-                                           volume->spatial_axes[Y];
+                                           volume->spatial_axes[VIO_Y];
                    break;
 
         case 'z':
         case 'Z':  volume_input->axis_index_from_file[axis] =
-                                           volume->spatial_axes[Z];
+                                           volume->spatial_axes[VIO_Z];
                    break;
 
         default:   axis_valid = FALSE;    break;
@@ -182,22 +182,22 @@ VIOAPI  VIO_Status  initialize_free_format_input(
         status = VIO_OK;
     }
 
-    for_less( c, 0, N_DIMENSIONS )
+    for_less( c, 0, VIO_N_DIMENSIONS )
     {
         volume->spatial_axes[c] = c;
-        volume->direction_cosines[c][X] = 0.0;
-        volume->direction_cosines[c][Y] = 0.0;
-        volume->direction_cosines[c][Z] = 0.0;
+        volume->direction_cosines[c][VIO_X] = 0.0;
+        volume->direction_cosines[c][VIO_Y] = 0.0;
+        volume->direction_cosines[c][VIO_Z] = 0.0;
         volume->direction_cosines[c][c] = 1.0;
     }
 
     if( status == VIO_OK &&
-        (volume_input->axis_index_from_file[X] ==
-         volume_input->axis_index_from_file[Y] ||
-         volume_input->axis_index_from_file[X] ==
-         volume_input->axis_index_from_file[Z] ||
-         volume_input->axis_index_from_file[Y] ==
-         volume_input->axis_index_from_file[Z]) )
+        (volume_input->axis_index_from_file[VIO_X] ==
+         volume_input->axis_index_from_file[VIO_Y] ||
+         volume_input->axis_index_from_file[VIO_X] ==
+         volume_input->axis_index_from_file[VIO_Z] ||
+         volume_input->axis_index_from_file[VIO_Y] ==
+         volume_input->axis_index_from_file[VIO_Z]) )
     {
         print_error( "Two axis indices are equal.\n" );
         status = VIO_ERROR;
@@ -250,7 +250,7 @@ VIOAPI  VIO_Status  initialize_free_format_input(
 
     if( status == VIO_OK )
     {
-        for_less( axis, 0, N_DIMENSIONS )
+        for_less( axis, 0, VIO_N_DIMENSIONS )
         {
             sizes[volume_input->axis_index_from_file[axis]] =
                                  (int) volume_input->sizes_in_file[axis];
@@ -480,18 +480,18 @@ static  VIO_Status  input_slice(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  VIO_BOOL  input_more_free_format_file(
-    Volume                volume,
+    VIO_Volume                volume,
     volume_input_struct   *volume_input,
     VIO_Real                  *fraction_done )
 {
     VIO_Real            min_value, max_value, value;
-    int             x, y, z, sizes[MAX_DIMENSIONS];
+    int             x, y, z, sizes[VIO_MAX_DIMENSIONS];
     long            i;
     VIO_Status          status;
     VIO_BOOL         more_to_do, scaling_flag;
     VIO_Real            value_translation, value_scale;
     VIO_Real            original_min_voxel, original_max_voxel;
-    int             *inner_index, indices[MAX_DIMENSIONS];
+    int             *inner_index, indices[VIO_MAX_DIMENSIONS];
     unsigned char   *byte_buffer_ptr;
     unsigned short  *short_buffer_ptr;
 
@@ -544,7 +544,7 @@ VIOAPI  VIO_BOOL  input_more_free_format_file(
                         value = (VIO_Real) (*byte_buffer_ptr);
 
                     set_volume_voxel_value( volume,
-                               indices[X], indices[Y], indices[Z], 0, 0,
+                               indices[VIO_X], indices[VIO_Y], indices[VIO_Z], 0, 0,
                                value );
 
                     ++byte_buffer_ptr;
@@ -569,7 +569,7 @@ VIOAPI  VIO_BOOL  input_more_free_format_file(
                         value = (VIO_Real) (*short_buffer_ptr);
 
                     set_volume_voxel_value( volume,
-                               indices[X], indices[Y], indices[Z], 0, 0,
+                               indices[VIO_X], indices[VIO_Y], indices[VIO_Z], 0, 0,
                                value );
 
                     ++short_buffer_ptr;
@@ -597,11 +597,11 @@ VIOAPI  VIO_BOOL  input_more_free_format_file(
 
         min_value = get_volume_voxel_value( volume, 0, 0, 0, 0, 0 );
         max_value = min_value;
-        for_less( x, 0, sizes[X] )
+        for_less( x, 0, sizes[VIO_X] )
         {
-            for_less( y, 0, sizes[Y] )
+            for_less( y, 0, sizes[VIO_Y] )
             {
-                for_less( z, 0, sizes[Z] )
+                for_less( z, 0, sizes[VIO_Z] )
                 {
                     value = get_volume_voxel_value( volume, x, y, z, 0,0);
                     if( value < min_value )

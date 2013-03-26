@@ -43,9 +43,9 @@ VIOAPI  VIO_Status   get_file_dimension_names(
     VIO_STR   *dim_names[] )
 {
     int                   i;
-    VIO_Status                status;
+    VIO_Status            status;
     volume_input_struct   volume_input;
-    Volume                tmp_volume;
+    VIO_Volume            tmp_volume;
 
     status = start_volume_input( filename, -1, File_order_dimension_names,
                                  MI_ORIGINAL_TYPE, FALSE, 0.0, 0.0,
@@ -94,13 +94,13 @@ VIOAPI  VIO_Status   get_file_dimension_names(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  VIO_STR  *create_output_dim_names(
-    Volume                volume,
-    VIO_STR                original_filename,
+    VIO_Volume            volume,
+    VIO_STR               original_filename,
     minc_output_options   *options,
     int                   file_sizes[] )
 {
     int                  n_dims, n_file_dims, dim_index;
-    int                  vol_sizes[MAX_DIMENSIONS];
+    int                  vol_sizes[VIO_MAX_DIMENSIONS];
     int                  i, j, n_found;
     VIO_STR               *file_dim_names;
     VIO_STR               *vol_dimension_names;
@@ -301,19 +301,19 @@ VIOAPI  VIO_Status   copy_volume_auxiliary_and_history(
 
 VIOAPI  VIO_Status  output_modified_volume(
     VIO_STR                filename,
-    nc_type               file_nc_data_type,
+    nc_type                file_nc_data_type,
     VIO_BOOL               file_signed_flag,
-    VIO_Real                  file_voxel_min,
-    VIO_Real                  file_voxel_max,
-    Volume                volume,
+    VIO_Real               file_voxel_min,
+    VIO_Real               file_voxel_max,
+    VIO_Volume             volume,
     VIO_STR                original_filename,
     VIO_STR                history,
     minc_output_options   *options )
 {
-    VIO_Status               status;
+    VIO_Status           status;
     Minc_file            minc_file;
-    int                  n_dims, sizes[MAX_DIMENSIONS];
-    VIO_Real                 real_min, real_max;
+    int                  n_dims, sizes[VIO_MAX_DIMENSIONS];
+    VIO_Real             real_min, real_max;
     VIO_STR               *dim_names;
     minc_output_options  used_options;
 
@@ -394,13 +394,13 @@ VIOAPI  VIO_Status  output_modified_volume(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  VIO_Status  output_volume(
-    VIO_STR                filename,
+    VIO_STR               filename,
     nc_type               file_nc_data_type,
-    VIO_BOOL               file_signed_flag,
-    VIO_Real                  file_voxel_min,
-    VIO_Real                  file_voxel_max,
-    Volume                volume,
-    VIO_STR                history,
+    VIO_BOOL              file_signed_flag,
+    VIO_Real              file_voxel_min,
+    VIO_Real              file_voxel_max,
+    VIO_Volume            volume,
+    VIO_STR               history,
     minc_output_options   *options )
 {
     return( output_modified_volume( filename, file_nc_data_type,

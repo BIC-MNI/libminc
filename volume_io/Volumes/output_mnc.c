@@ -58,7 +58,7 @@ static  VIO_BOOL  is_default_direction_cosine(
     int       i;
 
     is_default = TRUE;
-    for_less( i, 0, N_DIMENSIONS )
+    for_less( i, 0, VIO_N_DIMENSIONS )
     {
         if( i == axis && dir_cosines[i] != 1.0 ||
             i != axis && dir_cosines[i] != 0.0 )
@@ -92,13 +92,13 @@ static  VIO_BOOL  is_default_direction_cosine(
 static  VIO_Status  output_world_transform(
     Minc_file              file,
     VIO_STR                 space_type,
-    General_transform      *voxel_to_world_transform,
+    VIO_General_transform   *voxel_to_world_transform,
     VIO_BOOL                use_volume_starts_and_steps_flag )
 {
     double              step[MAX_VAR_DIMS];
-    VIO_Real                start[MAX_VAR_DIMS];
-    double              dir_cosines[VIO_MAX_DIMENSIONS][N_DIMENSIONS];
-    int                 dim, axis, spatial_axes[N_DIMENSIONS];
+    VIO_Real            start[MAX_VAR_DIMS];
+    double              dir_cosines[VIO_MAX_DIMENSIONS][VIO_N_DIMENSIONS];
+    int                 dim, axis, spatial_axes[VIO_N_DIMENSIONS];
 
     /*--- set all starts/steps/dir_cosines to default */
 
@@ -106,9 +106,9 @@ static  VIO_Status  output_world_transform(
     {
         start[dim] = 0.0;
         step[dim] = 1.0;
-        dir_cosines[dim][X] = 0.0;
-        dir_cosines[dim][Y] = 0.0;
-        dir_cosines[dim][Z] = 0.0;
+        dir_cosines[dim][VIO_X] = 0.0;
+        dir_cosines[dim][VIO_Y] = 0.0;
+        dir_cosines[dim][VIO_Z] = 0.0;
     }
 
     /*--- if must use the volume's starts and steps */
@@ -127,12 +127,12 @@ static  VIO_Status  output_world_transform(
                           file->volume->starts[file->to_volume_index[dim]];
                     step[dim] =
                           file->volume->separations[file->to_volume_index[dim]];
-                    dir_cosines[dim][X] = file->volume->direction_cosines
-                                       [file->to_volume_index[dim]][X];
-                    dir_cosines[dim][Y] = file->volume->direction_cosines
-                                       [file->to_volume_index[dim]][Y];
-                    dir_cosines[dim][Z] = file->volume->direction_cosines
-                                       [file->to_volume_index[dim]][Z];
+                    dir_cosines[dim][VIO_X] = file->volume->direction_cosines
+                                       [file->to_volume_index[dim]][VIO_X];
+                    dir_cosines[dim][VIO_Y] = file->volume->direction_cosines
+                                       [file->to_volume_index[dim]][VIO_Y];
+                    dir_cosines[dim][VIO_Z] = file->volume->direction_cosines
+                                       [file->to_volume_index[dim]][VIO_Z];
                 }
             }
         }
@@ -191,7 +191,7 @@ static  VIO_Status  output_world_transform(
             {
                 (void) ncattput( file->cdfid, file->dim_ids[dim],
                                  MIdirection_cosines,
-                                 NC_DOUBLE, N_DIMENSIONS, dir_cosines[dim]);
+                                 NC_DOUBLE, VIO_N_DIMENSIONS, dir_cosines[dim]);
             }
             (void) miattputstr( file->cdfid, file->dim_ids[dim], MIunits,
                                 UNITS );
@@ -330,16 +330,16 @@ static VIO_Status end_file_def(Minc_file file)
 ---------------------------------------------------------------------------- */
 
 VIOAPI  Minc_file  initialize_minc_output(
-    VIO_STR                 filename,
+    VIO_STR                filename,
     int                    n_dimensions,
-    VIO_STR                 dim_names[],
+    VIO_STR                dim_names[],
     int                    sizes[],
     nc_type                file_nc_data_type,
-    VIO_BOOL                file_signed_flag,
-    VIO_Real                   file_voxel_min,
-    VIO_Real                   file_voxel_max,
-    General_transform      *voxel_to_world_transform,
-    Volume                 volume_to_attach,
+    VIO_BOOL               file_signed_flag,
+    VIO_Real               file_voxel_min,
+    VIO_Real               file_voxel_max,
+    VIO_General_transform  *voxel_to_world_transform,
+    VIO_Volume             volume_to_attach,
     minc_output_options    *options )
 {
     minc_file_struct    *file;
@@ -646,7 +646,7 @@ VIOAPI  VIO_Status  copy_auxiliary_data_from_open_minc_file(
 
     n_excluded = 0;
 
-    for_less( i, 0, SIZEOF_STATIC_ARRAY( excluded_list ) )
+    for_less( i, 0, VIO_SIZEOF_STATIC_ARRAY( excluded_list ) )
     {
         if( (varid = ncvarid(src_cdfid, excluded_list[i] )) != MI_ERROR )
             excluded_vars[n_excluded++] = varid;
@@ -874,10 +874,10 @@ static  VIO_Status  check_minc_output_variables(
 {
     int               d, axis;
     long              start_index, mindex[MAX_VAR_DIMS];
-    VIO_Real              voxel_min, voxel_max, real_min, real_max;
+    VIO_Real          voxel_min, voxel_max, real_min, real_max;
     double            dim_value;
-    Volume            volume;
-    VIO_Status            status;
+    VIO_Volume        volume;
+    VIO_Status        status;
 
     if( !file->end_def_done )
     {
@@ -1012,7 +1012,7 @@ VIOAPI  VIO_Status  set_minc_output_random_order(
 
 VIOAPI  VIO_Status  output_minc_hyperslab(
     Minc_file           file,
-    Data_types          data_type,
+    VIO_Data_types      data_type,
     int                 n_array_dims,
     int                 array_sizes[],
     void                *array_data_ptr,
@@ -1029,8 +1029,8 @@ VIOAPI  VIO_Status  output_minc_hyperslab(
     int              tmp_ind, tmp_sizes[VIO_MAX_DIMENSIONS];
     int              array_indices[VIO_MAX_DIMENSIONS];
     int              array_counts[MAX_VAR_DIMS];
-    VIO_Status           status;
-    multidim_array   buffer_array;
+    VIO_Status       status;
+    VIO_multidim_array buffer_array;
 
     status = check_minc_output_variables( file );
 
@@ -1149,7 +1149,7 @@ VIOAPI  VIO_Status  output_minc_hyperslab(
 
 static  void  output_slab(
     Minc_file   file,
-    Volume      volume,
+    VIO_Volume  volume,
     int         to_volume[],
     long        file_start[],
     long        file_count[] )
@@ -1166,7 +1166,7 @@ static  void  output_slab(
     int               size0, size1, size2, size3, size4;
     VIO_Real              value;
     void              *array_data_ptr;
-    multidim_array    array;
+    VIO_multidim_array    array;
 
     for_less( file_ind, 0, file->n_file_dimensions )
     {
@@ -1256,7 +1256,7 @@ static  void  output_slab(
     }
     else
     {
-#endif /8HAVE_MINC1*/
+#endif /*HAVE_MINC1*/
         GET_MULTIDIM_PTR( array_data_ptr, volume->array,
                           volume_start[0], volume_start[1], volume_start[2],
                           volume_start[3], volume_start[4] );
@@ -1295,7 +1295,7 @@ static  void  output_slab(
 
 static  VIO_Status  output_the_volume(
     Minc_file   file,
-    Volume      volume,
+    VIO_Volume  volume,
     int         volume_count[],
     long        file_start[] )
 {
@@ -1310,7 +1310,7 @@ static  VIO_Status  output_the_volume(
     VIO_Real              real_min, real_max;
     VIO_STR            *vol_dimension_names;
     VIO_BOOL           increment;
-    progress_struct   progress;
+    VIO_progress_struct   progress;
 
     status = check_minc_output_variables( file );
 
@@ -1541,7 +1541,7 @@ static  VIO_Status  output_the_volume(
 
 VIOAPI  VIO_Status  output_volume_to_minc_file_position(
     Minc_file   file,
-    Volume      volume,
+    VIO_Volume  volume,
     int         volume_count[],
     long        file_start[] )
 {

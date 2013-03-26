@@ -42,7 +42,7 @@ VIOAPI  void  create_orthogonal_vector(
     y = (VIO_Real) Vector_y(*v);
     z = (VIO_Real) Vector_z(*v);
 
-    fill_VIO_Vector( *ortho, y+z, -x-z, y-x );
+    fill_Vector( *ortho, y+z, -x-z, y-x );
 }
 
 /* ----------------------------- MNI Header -----------------------------------

@@ -183,7 +183,7 @@ typedef enum { VIO_OK=0,
 
 typedef VIO_SCHAR Smallest_int;
 typedef VIO_UCHAR unsigned_byte;
-typedef VIO_BOOL BOOLEAN;
+typedef VIO_BOOL VIO_BOOL;
 typedef VIO_Real Real;
 typedef VIO_STR STRING;
 typedef VIO_Status Status;
