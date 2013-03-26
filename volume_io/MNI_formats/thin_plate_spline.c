@@ -51,7 +51,7 @@ typedef  struct
     int    n_dims;
 } spline_data_struct;
 
-/*------------ private functions -----------------*/
+/*------------ static functions -----------------*/
 
 static  void   newton_function(
     void     *function_data,

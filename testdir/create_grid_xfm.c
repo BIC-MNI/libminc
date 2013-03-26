@@ -8,10 +8,10 @@
 
 int main( int ac, char* av[] )
 {
-    Volume v;
+    VIO_Volume v;
     minc_input_options mio;
-    General_transform t;
-    Status st;
+    VIO_General_transform t;
+    VIO_Status st;
 
     if ( ac != 3 ) {
 	fprintf( stderr, "usage: %s in_grid.mnc out.xfm\n", av[0] );
@@ -29,7 +29,7 @@ int main( int ac, char* av[] )
 		       MI_ORIGINAL_TYPE, FALSE, 0.0, 0.0,
 		       TRUE, &v,
 		       &mio );
-    if ( st != OK ) {
+    if ( st != VIO_OK ) {
 	fprintf( stderr, "failed to read grid volume \"%s\"\n", av[1] );
 	return 1;
     }
@@ -37,7 +37,7 @@ int main( int ac, char* av[] )
     create_grid_transform( &t, v, NULL );
     st = output_transform_file( av[2], time_stamp(ac,av), &t );
 
-    if ( st != OK ) {
+    if ( st != VIO_OK ) {
 	fprintf( stderr, "error writing to xfm file \"%s\"\n", av[2] );
 	return 1;
     }

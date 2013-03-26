@@ -128,6 +128,10 @@ typedef enum { VIO_OK=0,
 #define  VIO_INTERPOLATE( alpha, a, b ) ((a) + (alpha) * ((b) - (a)))
 
 
+#define  VIO_DEG_TO_RAD   (M_PI / 180.0)
+#define  VIO_RAD_TO_DEG   (180.0 / M_PI)
+
+
 #if !VIO_PREFIX_NAMES           /* Play nice with others */
 
 #ifndef __cplusplus
@@ -142,7 +146,7 @@ typedef enum { VIO_OK=0,
 #endif /* semiprivate */
 #endif /* __cplusplus */
 
-#define  OFF     FALSE
+#define  FALSE     FALSE
 #define  ON      TRUE
 
 /* --------- macro to determine the size of a static array,
@@ -158,8 +162,8 @@ typedef enum { VIO_OK=0,
 /* --------- PI, and angles -------------------------------- */
 
 #define  PI           M_PI                  /* from math.h */
-#define  DEG_TO_RAD   (PI / 180.0)
-#define  RAD_TO_DEG   (180.0 / PI)
+#define  DEG_TO_RAD   VIO_DEG_TO_RAD
+#define  RAD_TO_DEG   VIO_RAD_TO_DEG
 
 
 /* --------- environment variables -------------------------- */
@@ -183,9 +187,9 @@ typedef enum { VIO_OK=0,
 
 typedef VIO_SCHAR Smallest_int;
 typedef VIO_UCHAR unsigned_byte;
-typedef VIO_BOOL VIO_BOOL;
+typedef VIO_BOOL BOOLEAN;
 typedef VIO_Real Real;
-typedef VIO_STR STRING;
+typedef VIO_STR  STRING;
 typedef VIO_Status Status;
 
 #define  REAL_MAX        DBL_MAX
@@ -208,7 +212,6 @@ typedef VIO_Status Status;
 #define IJK( i, j,  nj, nk )  VIO_IJK( i, j, k, nj, nk )
 
 #endif /* !VIO_PREFIX_NAMES */
-
 
 
 /* for loops */

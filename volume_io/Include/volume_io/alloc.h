@@ -164,7 +164,7 @@
                           sizeof(**(ptr)) _ALLOC_SOURCE_LINE )
 
 /* ----------------------------- MNI Header -----------------------------------
-@NAME       : FREE2D
+@NAME       : VIO_FREE2D
 @INPUT      : ptr
 @OUTPUT     : 
 @RETURNS    : 
@@ -180,7 +180,7 @@
          free_memory_2d( (void ***) &(ptr) _ALLOC_SOURCE_LINE )
 
 /* ----------------------------- MNI Header -----------------------------------
-@NAME       : ALLOC3D
+@NAME       : VIO_ALLOC3D
 @INPUT      : n1
             : n2
             : n3
@@ -200,7 +200,7 @@
                           (size_t) (n3), sizeof(***(ptr)) _ALLOC_SOURCE_LINE )
 
 /* ----------------------------- MNI Header -----------------------------------
-@NAME       : FREE3D
+@NAME       : VIO_FREE3D
 @INPUT      : ptr
 @OUTPUT     : 
 @RETURNS    : 

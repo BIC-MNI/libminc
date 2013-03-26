@@ -116,7 +116,7 @@ typedef  struct
 typedef  volume_struct  *VIO_Volume;
 
 #if !VIO_PREFIX_NAMES
-typedef VIO_Volume Volume;
+typedef VIO_Volume VIO_Volume;
 #endif /* !VIO_PREFIX_NAMES */
 
 /* ---- macro for stepping through entire volume */
@@ -257,31 +257,31 @@ typedef VIO_Volume Volume;
 
 #define  GET_VOXEL_PTR_1D( ptr, volume, x )       \
            if( (volume)->is_cached_volume ) \
-/*              handle_internal_error( "Cannot get pointer to cached Volume.\n");\
+/*              handle_internal_error( "Cannot get pointer to cached VIO_Volume.\n");\
            else */ \
               GET_MULTIDIM_PTR_1D( ptr, (volume)->array, x )
 
 #define  GET_VOXEL_PTR_2D( ptr, volume, x, y )       \
            if( (volume)->is_cached_volume ) \
-              handle_internal_error( "Cannot get pointer to cached Volume.\n");\
+              handle_internal_error( "Cannot get pointer to cached VIO_Volume.\n");\
            else \
               GET_MULTIDIM_PTR_2D( ptr, (volume)->array, x, y )
 
 #define  GET_VOXEL_PTR_3D( ptr, volume, x, y, z )       \
            if( (volume)->is_cached_volume ) \
-              handle_internal_error( "Cannot get pointer to cached Volume.\n");\
+              handle_internal_error( "Cannot get pointer to cached VIO_Volume.\n");\
            else \
               GET_MULTIDIM_PTR_3D( ptr, (volume)->array, x, y, z )
 
 #define  GET_VOXEL_PTR_4D( ptr, volume, x, y, z, t )       \
            if( (volume)->is_cached_volume ) \
-              handle_internal_error( "Cannot get pointer to cached Volume.\n");\
+              handle_internal_error( "Cannot get pointer to cached VIO_Volume.\n");\
            else \
               GET_MULTIDIM_PTR_4D( ptr, (volume)->array, x, y, z, t )
 
 #define  GET_VOXEL_PTR_5D( ptr, volume, x, y, z, t, v )       \
            if( (volume)->is_cached_volume ) \
-              handle_internal_error( "Cannot get pointer to cached Volume.\n");\
+              handle_internal_error( "Cannot get pointer to cached VIO_Volume.\n");\
            else \
               GET_MULTIDIM_PTR_5D( ptr, (volume)->array, x, y, z, t, v )
 
@@ -289,7 +289,7 @@ typedef VIO_Volume Volume;
 
 #define  GET_VOXEL_PTR( ptr, volume, x, y, z, t, v )       \
            if( (volume)->is_cached_volume ) \
-              handle_internal_error( "Cannot get pointer to cached Volume.\n");\
+              handle_internal_error( "Cannot get pointer to cached VIO_Volume.\n");\
            else \
               GET_MULTIDIM_PTR( ptr, (volume)->array, x, y, z, t, v )
 

@@ -108,7 +108,7 @@ VIOAPI  VIO_Status  grid_transform_point(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-private  void  forward_function(
+static  void  forward_function(
     void   *function_data,
     VIO_Real   parameters[],
     VIO_Real   values[],
@@ -185,9 +185,9 @@ VIOAPI  VIO_Status  grid_inverse_transform_point(
     VIO_Real                *y_transformed,
     VIO_Real                *z_transformed )
 {
-    VIO_Real   solution[N_DIMENSIONS];
-    VIO_Real   initial_guess[N_DIMENSIONS];
-    VIO_Real   desired_values[N_DIMENSIONS];
+    VIO_Real   solution[VIO_N_DIMENSIONS];
+    VIO_Real   initial_guess[VIO_N_DIMENSIONS];
+    VIO_Real   desired_values[VIO_N_DIMENSIONS];
 
     /* --- fill in the initial guess */
 
@@ -203,7 +203,7 @@ VIOAPI  VIO_Status  grid_inverse_transform_point(
 
     /* --- find the x,y,z that are mapped to the desired values */
 
-    if( newton_root_find( N_DIMENSIONS, forward_function,
+    if( newton_root_find( VIO_N_DIMENSIONS, forward_function,
                           (void *) transform,
                           initial_guess, desired_values,
                           solution, INVERSE_FUNCTION_TOLERANCE, 
