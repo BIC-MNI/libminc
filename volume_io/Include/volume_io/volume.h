@@ -116,7 +116,7 @@ typedef  struct
 typedef  volume_struct  *VIO_Volume;
 
 #if !VIO_PREFIX_NAMES
-typedef VIO_Volume VIO_Volume;
+typedef VIO_Volume Volume;
 #endif /* !VIO_PREFIX_NAMES */
 
 /* ---- macro for stepping through entire volume */

@@ -213,11 +213,11 @@ typedef  struct
 
 #define  fill_Surfprop( s, amb, diff, spec, spec_exp, trans ) \
          { \
-             Surfprop_a(s) = (Spr_type) (amb); \
-             Surfprop_d(s) = (Spr_type) (diff); \
-             Surfprop_s(s) = (Spr_type) (spec); \
-             Surfprop_se(s) = (Spr_type) (spec_exp); \
-             Surfprop_t(s) = (Spr_type) (trans); \
+             Surfprop_a(s) = (VIO_Spr_type) (amb); \
+             Surfprop_d(s) = (VIO_Spr_type) (diff); \
+             Surfprop_s(s) = (VIO_Spr_type) (spec); \
+             Surfprop_se(s) = (VIO_Spr_type) (spec_exp); \
+             Surfprop_t(s) = (VIO_Spr_type) (trans); \
          }
 
 /* ----------------------------- MNI Header -----------------------------------
