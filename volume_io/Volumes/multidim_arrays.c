@@ -112,14 +112,15 @@ VIOAPI  int  get_type_size(
 
     switch( type )
     {
-    case  UNSIGNED_BYTE:    size = sizeof( unsigned char );   break;
-    case  SIGNED_BYTE:      size = sizeof( signed   char );   break;
-    case  UNSIGNED_SHORT:   size = sizeof( unsigned short );  break;
-    case  SIGNED_SHORT:     size = sizeof( signed   short );  break;
-    case  UNSIGNED_INT:     size = sizeof( unsigned int );    break;
-    case  SIGNED_INT:       size = sizeof( signed   int );    break;
-    case  FLOAT:            size = sizeof( float );           break;
-    case  DOUBLE:           size = sizeof( double );          break;
+    case  VIO_UNSIGNED_BYTE:    size = sizeof( unsigned char );   break;
+    case  VIO_SIGNED_BYTE:      size = sizeof( signed   char );   break;
+    case  VIO_UNSIGNED_SHORT:   size = sizeof( unsigned short );  break;
+    case  VIO_SIGNED_SHORT:     size = sizeof( signed   short );  break;
+    case  VIO_UNSIGNED_INT:     size = sizeof( unsigned int );    break;
+    case  VIO_SIGNED_INT:       size = sizeof( signed   int );    break;
+    case  VIO_FLOAT:            size = sizeof( float );           break;
+    default:
+    case  VIO_DOUBLE:           size = sizeof( double );          break;
     }
 
     return( size );
@@ -135,28 +136,29 @@ VIOAPI  void  get_type_range(
   
     switch( type )
     {
-    case UNSIGNED_BYTE:
+    case VIO_UNSIGNED_BYTE:
         *min_value = 0.0;
         *max_value = (VIO_Real) UCHAR_MAX;     break;
-    case SIGNED_BYTE:
+    case VIO_SIGNED_BYTE:
         *min_value = (VIO_Real) SCHAR_MIN;
         *max_value = (VIO_Real) SCHAR_MAX;     break;
-    case UNSIGNED_SHORT:
+    case VIO_UNSIGNED_SHORT:
         *min_value = 0.0;
         *max_value = (VIO_Real) USHRT_MAX;     break;
-    case SIGNED_SHORT:
+    case VIO_SIGNED_SHORT:
         *min_value = (VIO_Real) SHRT_MIN;
         *max_value = (VIO_Real) SHRT_MAX;      break;
-    case UNSIGNED_INT:
+    case VIO_UNSIGNED_INT:
         *min_value = 0.0;
         *max_value = (VIO_Real) UINT_MAX;     break;
-    case SIGNED_INT:
+    case VIO_SIGNED_INT:
         *min_value = (VIO_Real) INT_MIN;
         *max_value = (VIO_Real) INT_MAX;      break;
-    case FLOAT:
+    case VIO_FLOAT:
         *min_value = (VIO_Real) -FLT_MAX;
         *max_value = (VIO_Real) FLT_MAX;       break;
-    case DOUBLE:
+    default:
+    case VIO_DOUBLE:
         *min_value = (VIO_Real) -DBL_MAX;
         *max_value = (VIO_Real) DBL_MAX;       break;
     }
@@ -288,7 +290,7 @@ VIOAPI  void  alloc_multidim_array(
     if( multidim_array_is_alloced( array ) )
         delete_multidim_array( array );
 
-    if( array->data_type == NO_DATA_TYPE )
+    if( array->data_type == VIO_NO_DATA_TYPE )
     {
         print_error(
            "Error: cannot allocate array data until size specified.\n" );

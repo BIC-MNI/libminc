@@ -203,8 +203,8 @@ VIOAPI  void  set_volume_real_value(
 
     data_type = get_volume_data_type( volume );
 
-    if( data_type != FLOAT &&
-        data_type != DOUBLE )
+    if( data_type != VIO_FLOAT &&
+        data_type != VIO_DOUBLE )
     {
         voxel = (VIO_Real) VIO_ROUND( voxel );
     }

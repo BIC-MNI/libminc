@@ -98,9 +98,9 @@ VIOAPI  VIO_Status  initialize_free_format_input(
         /* decide what type of data is in image file */
 
         if( n_bytes_per_voxel == 1 )
-            volume_input->file_data_type = UNSIGNED_BYTE;
+            volume_input->file_data_type = VIO_UNSIGNED_BYTE;
         else if( n_bytes_per_voxel == 2 )
-            volume_input->file_data_type = UNSIGNED_SHORT;
+            volume_input->file_data_type = VIO_UNSIGNED_SHORT;
         else
         {
             print_error( "Must be either 1 or 2 bytes per voxel.\n" );
@@ -109,7 +109,7 @@ VIOAPI  VIO_Status  initialize_free_format_input(
 
         /* decide how to store data in memory */
 
-        if( get_volume_data_type(volume) == NO_DATA_TYPE )
+        if( get_volume_data_type(volume) == VIO_NO_DATA_TYPE )
             desired_data_type = NC_BYTE;
         else
             desired_data_type = volume->nc_data_type;
@@ -279,11 +279,11 @@ VIOAPI  VIO_Status  initialize_free_format_input(
     if( status == VIO_OK )
     switch( volume_input->file_data_type )
     {
-    case  UNSIGNED_BYTE:
+    case  VIO_UNSIGNED_BYTE:
         ALLOC( volume_input->byte_slice_buffer, n_voxels_in_slice );
         break;
 
-    case  UNSIGNED_SHORT:
+    case  VIO_UNSIGNED_SHORT:
         ALLOC( volume_input->short_slice_buffer, n_voxels_in_slice );
         break;
 
@@ -366,7 +366,7 @@ VIOAPI  void  delete_free_format_input(
 {
     long   slice;
 
-    if( volume_input->file_data_type == UNSIGNED_BYTE )
+    if( volume_input->file_data_type == VIO_UNSIGNED_BYTE )
     {
         FREE( volume_input->byte_slice_buffer );
     }
@@ -434,7 +434,7 @@ static  VIO_Status  input_slice(
         if( status == VIO_OK )
         switch( volume_input->file_data_type )
         {
-        case  UNSIGNED_BYTE:
+        case  VIO_UNSIGNED_BYTE:
             status = io_binary_data( file, READ_FILE,
                                  (void *) volume_input->byte_slice_buffer,
                                  sizeof(volume_input->byte_slice_buffer[0]),
@@ -442,7 +442,7 @@ static  VIO_Status  input_slice(
                                  (int) volume_input->sizes_in_file[2] );
             break;
 
-        case  UNSIGNED_SHORT:
+        case  VIO_UNSIGNED_SHORT:
             status = io_binary_data( file, READ_FILE,
                                  (void *) volume_input->short_slice_buffer,
                                  sizeof(volume_input->short_slice_buffer[0]),
@@ -523,7 +523,7 @@ VIOAPI  VIO_BOOL  input_more_free_format_file(
         if( status == VIO_OK )
         switch( volume_input->file_data_type )
         {
-        case  UNSIGNED_BYTE:
+        case  VIO_UNSIGNED_BYTE:
             byte_buffer_ptr = volume_input->byte_slice_buffer;
             for_less( i, 0, volume_input->sizes_in_file[1] )
             {
@@ -552,7 +552,7 @@ VIOAPI  VIO_BOOL  input_more_free_format_file(
             }
             break;
 
-        case  UNSIGNED_SHORT:
+        case  VIO_UNSIGNED_SHORT:
             short_buffer_ptr = volume_input->short_slice_buffer;
             for_less( i, 0, volume_input->sizes_in_file[1] )
             {

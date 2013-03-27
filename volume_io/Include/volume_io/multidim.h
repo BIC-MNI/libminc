@@ -33,16 +33,16 @@
 
 /* -------------------------- Data_types ------------------------- */
 
-typedef  enum  { NO_DATA_TYPE,
-                 UNSIGNED_BYTE,
-                 SIGNED_BYTE,
-                 UNSIGNED_SHORT,
-                 SIGNED_SHORT,
-                 UNSIGNED_INT,
-                 SIGNED_INT,
-                 FLOAT,
-                 DOUBLE,
-                 MAX_DATA_TYPE }   VIO_Data_types;
+typedef  enum  { VIO_NO_DATA_TYPE,
+                 VIO_UNSIGNED_BYTE,
+                 VIO_SIGNED_BYTE,
+                 VIO_UNSIGNED_SHORT,
+                 VIO_SIGNED_SHORT,
+                 VIO_UNSIGNED_INT,
+                 VIO_SIGNED_INT,
+                 VIO_FLOAT,
+                 VIO_DOUBLE,
+                 VIO_MAX_DATA_TYPE }   VIO_Data_types;
 
 typedef  struct
 {
@@ -62,29 +62,29 @@ typedef  struct
 #define  SET_GIVEN_DIM( array, asterisks, subscripts, value )   \
          switch( (array).data_type )  \
          {  \
-         case UNSIGNED_BYTE:  \
+         case VIO_UNSIGNED_BYTE:  \
              SET_ONE( array, unsigned char, asterisks, subscripts, value);\
              break;  \
-         case SIGNED_BYTE:  \
+         case VIO_SIGNED_BYTE:  \
              SET_ONE( array, signed char, asterisks, subscripts, value);\
              break;  \
-         case UNSIGNED_SHORT:  \
+         case VIO_UNSIGNED_SHORT:  \
              SET_ONE( array, unsigned short, asterisks, subscripts, value);\
              break;  \
-         case SIGNED_SHORT:  \
+         case VIO_SIGNED_SHORT:  \
              SET_ONE( array, signed short, asterisks, subscripts, value);\
              break;  \
-         case UNSIGNED_INT:  \
+         case VIO_UNSIGNED_INT:  \
              SET_ONE( array, unsigned int, asterisks, subscripts, value);\
              break;  \
-         case SIGNED_INT:  \
+         case VIO_SIGNED_INT:  \
              SET_ONE( array, signed int, asterisks, subscripts, value);\
              break;  \
-         case FLOAT:  \
+         case VIO_FLOAT:  \
              SET_ONE( array, float, asterisks, subscripts, value);\
              break;  \
          default: \
-         case DOUBLE:  \
+         case VIO_DOUBLE:  \
              SET_ONE( array, double, asterisks, subscripts, value);\
              break;  \
          }
@@ -159,29 +159,29 @@ typedef  struct
 #define  GET_GIVEN_DIM( value, vtype, array, asterisks, subscripts )   \
          switch( (array).data_type )  \
          {  \
-         case UNSIGNED_BYTE:  \
+         case VIO_UNSIGNED_BYTE:  \
              GET_ONE( value, vtype, array, unsigned char, asterisks, subscripts );\
              break;  \
-         case SIGNED_BYTE:  \
+         case VIO_SIGNED_BYTE:  \
              GET_ONE( value, vtype, array, signed char, asterisks, subscripts );\
              break;  \
-         case UNSIGNED_SHORT:  \
+         case VIO_UNSIGNED_SHORT:  \
              GET_ONE( value, vtype, array, unsigned short, asterisks, subscripts );\
              break;  \
-         case SIGNED_SHORT:  \
+         case VIO_SIGNED_SHORT:  \
              GET_ONE( value, vtype, array, signed short, asterisks, subscripts );\
              break;  \
-         case UNSIGNED_INT:  \
+         case VIO_UNSIGNED_INT:  \
              GET_ONE( value, vtype, array, unsigned int, asterisks, subscripts );\
              break;  \
-         case SIGNED_INT:  \
+         case VIO_SIGNED_INT:  \
              GET_ONE( value, vtype, array, signed int, asterisks, subscripts );\
              break;  \
-         case FLOAT:  \
+         case VIO_FLOAT:  \
              GET_ONE( value, vtype, array, float, asterisks, subscripts );\
              break;  \
          default: \
-         case DOUBLE:  \
+         case VIO_DOUBLE:  \
              GET_ONE( value, vtype, array, double, asterisks, subscripts );\
              break;  \
          }
@@ -226,29 +226,29 @@ typedef  struct
 #define  GET_GIVEN_DIM_PTR( ptr, array, asterisks, subscripts )   \
          switch( (array).data_type )  \
          {  \
-         case UNSIGNED_BYTE:  \
+         case VIO_UNSIGNED_BYTE:  \
              GET_ONE_PTR( ptr, array, unsigned char, asterisks, subscripts );\
              break;  \
-         case SIGNED_BYTE:  \
+         case VIO_SIGNED_BYTE:  \
              GET_ONE_PTR( ptr, array, signed char, asterisks, subscripts );\
              break;  \
-         case UNSIGNED_SHORT:  \
+         case VIO_UNSIGNED_SHORT:  \
              GET_ONE_PTR( ptr, array, unsigned short, asterisks, subscripts );\
              break;  \
-         case SIGNED_SHORT:  \
+         case VIO_SIGNED_SHORT:  \
              GET_ONE_PTR( ptr, array, signed short, asterisks, subscripts );\
              break;  \
-         case UNSIGNED_INT:  \
+         case VIO_UNSIGNED_INT:  \
              GET_ONE_PTR( ptr, array, unsigned int, asterisks, subscripts );\
              break;  \
-         case SIGNED_INT:  \
+         case VIO_SIGNED_INT:  \
              GET_ONE_PTR( ptr, array, signed int, asterisks, subscripts );\
              break;  \
-         case FLOAT:  \
+         case VIO_FLOAT:  \
              GET_ONE_PTR( ptr, array, float, asterisks, subscripts );\
              break;  \
          default: \
-         case DOUBLE:  \
+         case VIO_DOUBLE:  \
              GET_ONE_PTR( ptr, array, double, asterisks, subscripts );\
              break;  \
          }

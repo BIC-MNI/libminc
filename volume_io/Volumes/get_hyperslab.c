@@ -209,8 +209,8 @@ static  void  check_real_conversion_lookup( void )
     if( int_to_real_conversion != NULL )
         return;
 
-    get_type_range( UNSIGNED_SHORT, &min_value1, &max_value1 );
-    get_type_range( SIGNED_SHORT, &min_value2, &max_value2 );
+    get_type_range( VIO_UNSIGNED_SHORT, &min_value1, &max_value1 );
+    get_type_range( VIO_SIGNED_SHORT, &min_value2, &max_value2 );
 
     long_min = (long) MIN( min_value1, min_value2 );
     long_max = (long) MAX( max_value1, max_value2 );
@@ -265,7 +265,7 @@ VIOAPI  void  get_voxel_values_5d(
 
     switch( data_type )
     {
-    case UNSIGNED_BYTE:
+    case VIO_UNSIGNED_BYTE:
         ASSIGN_PTR(VIO_UCHAR_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
@@ -292,7 +292,7 @@ VIOAPI  void  get_voxel_values_5d(
         }
         break;
 
-    case SIGNED_BYTE:
+    case VIO_SIGNED_BYTE:
         ASSIGN_PTR(signed_byte_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
@@ -319,7 +319,7 @@ VIOAPI  void  get_voxel_values_5d(
         }
         break;
 
-    case UNSIGNED_SHORT:
+    case VIO_UNSIGNED_SHORT:
         ASSIGN_PTR(unsigned_short_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
@@ -346,7 +346,7 @@ VIOAPI  void  get_voxel_values_5d(
         }
         break;
 
-    case SIGNED_SHORT:
+    case VIO_SIGNED_SHORT:
         ASSIGN_PTR(signed_short_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
@@ -373,7 +373,7 @@ VIOAPI  void  get_voxel_values_5d(
         }
         break;
 
-    case UNSIGNED_INT:
+    case VIO_UNSIGNED_INT:
         ASSIGN_PTR(unsigned_int_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
@@ -399,7 +399,7 @@ VIOAPI  void  get_voxel_values_5d(
         }
         break;
 
-    case SIGNED_INT:
+    case VIO_SIGNED_INT:
         ASSIGN_PTR(signed_int_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
@@ -425,7 +425,7 @@ VIOAPI  void  get_voxel_values_5d(
         }
         break;
 
-    case FLOAT:
+    case VIO_FLOAT:
         ASSIGN_PTR(float_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
@@ -451,7 +451,7 @@ VIOAPI  void  get_voxel_values_5d(
         }
         break;
 
-    case DOUBLE:
+    case VIO_DOUBLE:
         ASSIGN_PTR(double_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
@@ -513,7 +513,7 @@ VIOAPI  void  get_voxel_values_4d(
 
     switch( data_type )
     {
-    case UNSIGNED_BYTE:
+    case VIO_UNSIGNED_BYTE:
         ASSIGN_PTR(VIO_UCHAR_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
@@ -536,7 +536,7 @@ VIOAPI  void  get_voxel_values_4d(
         }
         break;
 
-    case SIGNED_BYTE:
+    case VIO_SIGNED_BYTE:
         ASSIGN_PTR(signed_byte_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
@@ -558,7 +558,7 @@ VIOAPI  void  get_voxel_values_4d(
         }
         break;
 
-    case UNSIGNED_SHORT:
+    case VIO_UNSIGNED_SHORT:
         ASSIGN_PTR(unsigned_short_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
@@ -581,7 +581,7 @@ VIOAPI  void  get_voxel_values_4d(
         }
         break;
 
-    case SIGNED_SHORT:
+    case VIO_SIGNED_SHORT:
         ASSIGN_PTR(signed_short_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
@@ -604,7 +604,7 @@ VIOAPI  void  get_voxel_values_4d(
         }
         break;
 
-    case UNSIGNED_INT:
+    case VIO_UNSIGNED_INT:
         ASSIGN_PTR(unsigned_int_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
@@ -626,7 +626,7 @@ VIOAPI  void  get_voxel_values_4d(
         }
         break;
 
-    case SIGNED_INT:
+    case VIO_SIGNED_INT:
         ASSIGN_PTR(signed_int_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
@@ -648,7 +648,7 @@ VIOAPI  void  get_voxel_values_4d(
         }
         break;
 
-    case FLOAT:
+    case VIO_FLOAT:
         ASSIGN_PTR(float_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
@@ -670,7 +670,7 @@ VIOAPI  void  get_voxel_values_4d(
         }
         break;
 
-    case DOUBLE:
+    case VIO_DOUBLE:
         ASSIGN_PTR(double_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
@@ -724,7 +724,7 @@ VIOAPI  void  get_voxel_values_3d(
 
     /*--- special case, for speed */
 
-    if( data_type == UNSIGNED_BYTE && n0 == 2 && n1 == 2 && n2 == 2 &&
+    if( data_type == VIO_UNSIGNED_BYTE && n0 == 2 && n1 == 2 && n2 == 2 &&
         step2 == 1 )
     {
         step0 -= step1 + 1;
@@ -757,7 +757,7 @@ VIOAPI  void  get_voxel_values_3d(
 
     switch( data_type )
     {
-    case UNSIGNED_BYTE:
+    case VIO_UNSIGNED_BYTE:
         ASSIGN_PTR(VIO_UCHAR_ptr) = void_ptr;
 
         for_less( i0, 0, n0 )
@@ -776,7 +776,7 @@ VIOAPI  void  get_voxel_values_3d(
         }
         break;
 
-    case SIGNED_BYTE:
+    case VIO_SIGNED_BYTE:
         ASSIGN_PTR(signed_byte_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
@@ -794,7 +794,7 @@ VIOAPI  void  get_voxel_values_3d(
         }
         break;
 
-    case UNSIGNED_SHORT:
+    case VIO_UNSIGNED_SHORT:
         ASSIGN_PTR(unsigned_short_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
@@ -812,7 +812,7 @@ VIOAPI  void  get_voxel_values_3d(
         }
         break;
 
-    case SIGNED_SHORT:
+    case VIO_SIGNED_SHORT:
         ASSIGN_PTR(signed_short_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
@@ -830,7 +830,7 @@ VIOAPI  void  get_voxel_values_3d(
         }
         break;
 
-    case UNSIGNED_INT:
+    case VIO_UNSIGNED_INT:
         ASSIGN_PTR(unsigned_int_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
@@ -848,7 +848,7 @@ VIOAPI  void  get_voxel_values_3d(
         }
         break;
 
-    case SIGNED_INT:
+    case VIO_SIGNED_INT:
         ASSIGN_PTR(signed_int_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
@@ -866,7 +866,7 @@ VIOAPI  void  get_voxel_values_3d(
         }
         break;
 
-    case FLOAT:
+    case VIO_FLOAT:
         ASSIGN_PTR(float_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
@@ -884,7 +884,7 @@ VIOAPI  void  get_voxel_values_3d(
         }
         break;
 
-    case DOUBLE:
+    case VIO_DOUBLE:
         ASSIGN_PTR(double_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
@@ -932,7 +932,7 @@ VIOAPI  void  get_voxel_values_2d(
 
     switch( data_type )
     {
-    case UNSIGNED_BYTE:
+    case VIO_UNSIGNED_BYTE:
         ASSIGN_PTR(VIO_UCHAR_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
@@ -946,7 +946,7 @@ VIOAPI  void  get_voxel_values_2d(
         }
         break;
 
-    case SIGNED_BYTE:
+    case VIO_SIGNED_BYTE:
         ASSIGN_PTR(signed_byte_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
@@ -960,7 +960,7 @@ VIOAPI  void  get_voxel_values_2d(
         }
         break;
 
-    case UNSIGNED_SHORT:
+    case VIO_UNSIGNED_SHORT:
         ASSIGN_PTR(unsigned_short_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
@@ -974,7 +974,7 @@ VIOAPI  void  get_voxel_values_2d(
         }
         break;
 
-    case SIGNED_SHORT:
+    case VIO_SIGNED_SHORT:
         ASSIGN_PTR(signed_short_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
@@ -988,7 +988,7 @@ VIOAPI  void  get_voxel_values_2d(
         }
         break;
 
-    case UNSIGNED_INT:
+    case VIO_UNSIGNED_INT:
         ASSIGN_PTR(unsigned_int_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
@@ -1002,7 +1002,7 @@ VIOAPI  void  get_voxel_values_2d(
         }
         break;
 
-    case SIGNED_INT:
+    case VIO_SIGNED_INT:
         ASSIGN_PTR(signed_int_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
@@ -1016,7 +1016,7 @@ VIOAPI  void  get_voxel_values_2d(
         }
         break;
 
-    case FLOAT:
+    case VIO_FLOAT:
         ASSIGN_PTR(float_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
@@ -1030,7 +1030,7 @@ VIOAPI  void  get_voxel_values_2d(
         }
         break;
 
-    case DOUBLE:
+    case VIO_DOUBLE:
         ASSIGN_PTR(double_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
@@ -1067,7 +1067,7 @@ VIOAPI  void  get_voxel_values_1d(
 
     switch( data_type )
     {
-    case UNSIGNED_BYTE:
+    case VIO_UNSIGNED_BYTE:
         ASSIGN_PTR(VIO_UCHAR_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
@@ -1077,7 +1077,7 @@ VIOAPI  void  get_voxel_values_1d(
         }
         break;
 
-    case SIGNED_BYTE:
+    case VIO_SIGNED_BYTE:
         ASSIGN_PTR(signed_byte_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
@@ -1087,7 +1087,7 @@ VIOAPI  void  get_voxel_values_1d(
         }
         break;
 
-    case UNSIGNED_SHORT:
+    case VIO_UNSIGNED_SHORT:
         ASSIGN_PTR(unsigned_short_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
@@ -1097,7 +1097,7 @@ VIOAPI  void  get_voxel_values_1d(
         }
         break;
 
-    case SIGNED_SHORT:
+    case VIO_SIGNED_SHORT:
         ASSIGN_PTR(signed_short_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
@@ -1107,7 +1107,7 @@ VIOAPI  void  get_voxel_values_1d(
         }
         break;
 
-    case UNSIGNED_INT:
+    case VIO_UNSIGNED_INT:
         ASSIGN_PTR(unsigned_int_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
@@ -1117,7 +1117,7 @@ VIOAPI  void  get_voxel_values_1d(
         }
         break;
 
-    case SIGNED_INT:
+    case VIO_SIGNED_INT:
         ASSIGN_PTR(signed_int_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
@@ -1127,7 +1127,7 @@ VIOAPI  void  get_voxel_values_1d(
         }
         break;
 
-    case FLOAT:
+    case VIO_FLOAT:
         ASSIGN_PTR(float_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {
@@ -1137,7 +1137,7 @@ VIOAPI  void  get_voxel_values_1d(
         }
         break;
 
-    case DOUBLE:
+    case VIO_DOUBLE:
         ASSIGN_PTR(double_ptr) = void_ptr;
         for_less( i0, 0, n0 )
         {

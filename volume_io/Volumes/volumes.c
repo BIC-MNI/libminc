@@ -207,7 +207,7 @@ VIOAPI   VIO_Volume   create_volume(
         volume->dimension_names[i] = create_string( name );
     }
 
-    create_empty_multidim_array( &volume->array, n_dimensions, NO_DATA_TYPE );
+    create_empty_multidim_array( &volume->array, n_dimensions, VIO_NO_DATA_TYPE );
 
     set_volume_type( volume, nc_data_type, signed_flag, voxel_min, voxel_max );
     set_volume_sizes( volume, sizes );
@@ -253,31 +253,32 @@ VIOAPI  void  set_volume_type(
         {
         case  NC_BYTE:
             if( signed_flag )
-                data_type = SIGNED_BYTE;
+                data_type = VIO_SIGNED_BYTE;
             else
-                data_type = UNSIGNED_BYTE;
+                data_type = VIO_UNSIGNED_BYTE;
             break;
 
         case  NC_SHORT:
             if( signed_flag )
-                data_type = SIGNED_SHORT;
+                data_type = VIO_SIGNED_SHORT;
             else
-                data_type = UNSIGNED_SHORT;
+                data_type = VIO_UNSIGNED_SHORT;
             break;
 
         case  NC_INT:
             if( signed_flag )
-                data_type = SIGNED_INT;
+                data_type = VIO_SIGNED_INT;
             else
-                data_type = UNSIGNED_INT;
+                data_type = VIO_UNSIGNED_INT;
             break;
 
         case  NC_FLOAT:
-            data_type = FLOAT;
+            data_type = VIO_FLOAT;
             break;
-
+            
+        default:
         case  NC_DOUBLE:
-            data_type = DOUBLE;
+            data_type = VIO_DOUBLE;
             break;
         }
 
@@ -352,7 +353,7 @@ VIOAPI  void  set_rgb_volume_flag(
     VIO_Volume   volume,
     VIO_BOOL  flag )
 {
-    if( !flag || get_volume_data_type(volume) == UNSIGNED_INT )
+    if( !flag || get_volume_data_type(volume) == VIO_UNSIGNED_INT )
         volume->is_rgba_data = flag;
 }
 
@@ -2116,29 +2117,29 @@ VIOAPI  void  set_volume_voxel_range(
     {
         switch( get_volume_data_type( volume ) )
         {
-        case UNSIGNED_BYTE:
+        case VIO_UNSIGNED_BYTE:
             voxel_min = 0.0;
             voxel_max = (VIO_Real) UCHAR_MAX;     break;
-        case SIGNED_BYTE:
+        case VIO_SIGNED_BYTE:
             voxel_min = (VIO_Real) SCHAR_MIN;
             voxel_max = (VIO_Real) SCHAR_MAX;     break;
-        case UNSIGNED_SHORT:
+        case VIO_UNSIGNED_SHORT:
             voxel_min = 0.0;
             voxel_max = (VIO_Real) USHRT_MAX;     break;
-        case SIGNED_SHORT:
+        case VIO_SIGNED_SHORT:
             voxel_min = (VIO_Real) SHRT_MIN;
             voxel_max = (VIO_Real) SHRT_MAX;      break;
-        case UNSIGNED_INT:
+        case VIO_UNSIGNED_INT:
             voxel_min = 0.0;
             voxel_max = (VIO_Real) UINT_MAX;     break;
-        case SIGNED_INT:
+        case VIO_SIGNED_INT:
             voxel_min = (VIO_Real) INT_MIN;
             voxel_max = (VIO_Real) INT_MAX;      break;
-        case FLOAT:
+        case VIO_FLOAT:
             voxel_min = (VIO_Real) -FLT_MAX;
             voxel_max = (VIO_Real) FLT_MAX;       break;
         default:
-        case DOUBLE:
+        case VIO_DOUBLE:
             voxel_min = (VIO_Real) -DBL_MAX;
             voxel_max = (VIO_Real) DBL_MAX;       break;
         }
@@ -2258,8 +2259,8 @@ VIOAPI  void  set_volume_real_range(
 {
     VIO_Real    voxel_min, voxel_max;
 
-    if( get_volume_data_type(volume) == FLOAT ||
-        get_volume_data_type(volume) == DOUBLE )
+    if( get_volume_data_type(volume) == VIO_FLOAT ||
+        get_volume_data_type(volume) == VIO_DOUBLE )
     {
 		/* as float and double use the voxel range */
         volume->real_range_set = FALSE;

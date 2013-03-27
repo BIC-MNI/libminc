@@ -433,7 +433,7 @@ VIOAPI  Minc_file  initialize_minc_input_from_minc_id(
     }
     else
     {
-        no_volume_data_type = (get_volume_data_type(volume) == NO_DATA_TYPE);
+        no_volume_data_type = (get_volume_data_type(volume) == VIO_NO_DATA_TYPE);
         if( no_volume_data_type )     /* --- use type of file */
         {
             if( miattgetstr( file->cdfid, file->img_var, MIsigntype,
@@ -843,7 +843,7 @@ VIOAPI  VIO_Status  input_minc_hyperslab(
             used_count[n_file_dims] = file->sizes_in_file[n_file_dims];
             tmp_sizes[n_tmp_dims] = (int) used_count[n_file_dims];
 
-            create_multidim_array( &rgb_array, n_tmp_dims+1, tmp_sizes, FLOAT );
+            create_multidim_array( &rgb_array, n_tmp_dims+1, tmp_sizes, VIO_FLOAT );
 
             GET_MULTIDIM_PTR( void_ptr, rgb_array, 0, 0, 0, 0, 0 );
         }
