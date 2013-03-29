@@ -864,13 +864,14 @@ static  VIO_Status  open_cache_volume_output_file(
     VIO_volume_cache_struct   *cache,
     VIO_Volume                volume )
 {
-    VIO_Status     status;
-    int        dim, n_dims;
-    int        out_sizes[VIO_MAX_DIMENSIONS], vol_sizes[VIO_MAX_DIMENSIONS];
-    VIO_Real       min_value, max_value;
-    Minc_file  out_minc_file;
-    VIO_STR     *vol_dim_names;
-    VIO_STR     *out_dim_names, output_filename;
+    VIO_Status  status=VIO_ERROR;
+    int         dim, n_dims;
+    int         out_sizes[VIO_MAX_DIMENSIONS];
+    int         vol_sizes[VIO_MAX_DIMENSIONS];
+    VIO_Real    min_value, max_value;
+    Minc_file   out_minc_file=NULL;
+    VIO_STR     *vol_dim_names=NULL;
+    VIO_STR     *out_dim_names=NULL, output_filename;
 
     n_dims = get_volume_n_dimensions( volume );
 
