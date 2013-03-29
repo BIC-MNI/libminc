@@ -450,7 +450,8 @@ VIOAPI  void  get_voxel_values_5d(
             float_ptr += step0;
         }
         break;
-
+        
+    default:
     case VIO_DOUBLE:
         ASSIGN_PTR(double_ptr) = void_ptr;
         for_less( i0, 0, n0 )
@@ -669,7 +670,7 @@ VIOAPI  void  get_voxel_values_4d(
             float_ptr += step0;
         }
         break;
-
+    default:
     case VIO_DOUBLE:
         ASSIGN_PTR(double_ptr) = void_ptr;
         for_less( i0, 0, n0 )
@@ -883,7 +884,7 @@ VIOAPI  void  get_voxel_values_3d(
             float_ptr += step0;
         }
         break;
-
+    default:
     case VIO_DOUBLE:
         ASSIGN_PTR(double_ptr) = void_ptr;
         for_less( i0, 0, n0 )
@@ -1029,7 +1030,8 @@ VIOAPI  void  get_voxel_values_2d(
             float_ptr += step0;
         }
         break;
-
+        
+    default:
     case VIO_DOUBLE:
         ASSIGN_PTR(double_ptr) = void_ptr;
         for_less( i0, 0, n0 )
@@ -1136,7 +1138,8 @@ VIOAPI  void  get_voxel_values_1d(
             float_ptr += step0;
         }
         break;
-
+    
+    default:
     case VIO_DOUBLE:
         ASSIGN_PTR(double_ptr) = void_ptr;
         for_less( i0, 0, n0 )

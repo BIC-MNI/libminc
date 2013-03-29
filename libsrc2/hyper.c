@@ -1005,11 +1005,11 @@ cleanup:
     for(_i=0;_i<total_number_of_slices;_i++)\
       for(_j=0;_j<image_slice_length;_j++)\
       {\
-        double _temp=(double)((( (*_buffer_in) - voxel_offset) / voxel_range)*(image_slice_max_buffer[_i]-image_slice_min_buffer[_i]) + image_slice_min_buffer[_i] );\
+        double _temp=(( (*_buffer_in) - voxel_offset) / voxel_range)*(image_slice_max_buffer[_i]-image_slice_min_buffer[_i]) + image_slice_min_buffer[_i] ;\
         _temp=(_temp-data_offset)/data_range;\
         if(_temp<0.0) _temp=0.0;\
         if(_temp>1.0) _temp=1.0;\
-        *_buffer_out=(type_in)(rint((_temp+norm_offset)*norm_range)); \
+        *_buffer_out=(type_in)(rint(_temp*norm_range)+norm_offset); \
         _buffer_in++;\
         _buffer_out++;\
       }\
@@ -1149,7 +1149,7 @@ static int mirw_hyperslab_normalized(int opcode,
 #endif  
   
   if(volume->has_slice_scaling && 
-    !(volume->volume_type==MI_TYPE_FLOAT || volume->volume_type==MI_TYPE_DOUBLE || 
+    !(volume->volume_type==MI_TYPE_FLOAT    || volume->volume_type==MI_TYPE_DOUBLE || 
       volume->volume_type==MI_TYPE_FCOMPLEX || volume->volume_type==MI_TYPE_DCOMPLEX) )
   {
     hid_t image_max_fspc_id;
@@ -1355,15 +1355,17 @@ static int mirw_hyperslab_normalized(int opcode,
         break;
       default:
         /*TODO: report unsupported conversion*/
+        free(temp_buffer2);
         result=MI_ERROR;
         goto cleanup;
     }
+    free(temp_buffer2);
+    
     MI_CHECK_HDF_CALL(result = H5Dwrite(dset_id, volume_type_id, mspc_id, fspc_id, H5P_DEFAULT, temp_buffer),"H5Dwrite");
     if(result<0)
     {
       goto cleanup;
     }
-    free(temp_buffer2);
   }
       
 cleanup:

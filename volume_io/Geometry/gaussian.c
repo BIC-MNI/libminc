@@ -15,7 +15,7 @@
 #include "config.h"
 #endif /*HAVE_CONFIG_H*/
 
-#include  <internal_volume_io.h>
+#include  "internal_volume_io.h"
 
 /* ----------------------------- MNI Header -----------------------------------
 @NAME       : scaled_maximal_pivoting_gaussian_elimination

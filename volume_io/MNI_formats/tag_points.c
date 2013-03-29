@@ -388,8 +388,8 @@ static VIO_STR extract_label(
     label = create_string( NULL );
 
     while( str[i] != VIO_END_OF_STRING &&
-           (quoted && str[i] != '"' ||
-            !quoted && str[i] != ' ' && str[i] != '\t') )
+           ( (quoted && str[i] != '"') ||
+             (!quoted && str[i] != ' ' && str[i] != '\t') ) )
     {
         concat_char_to_string( &label, str[i] );
         ++i;

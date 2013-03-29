@@ -35,6 +35,14 @@
 
 #ifdef HAVE_INTTYPES_H
 #include <inttypes.h>
+#endif
+
+#ifdef HAVE_MINC2
+#include "minc.h"
+#endif
+
+#ifdef HAVE_MINC2
+#include <hdf5.h>
 #endif 
 
 #include <math.h>
@@ -484,14 +492,14 @@ static void PrintVersion(ArgvInfo *argTable)
         }
     }
     printf("program: %s\n", versionStr);
-#if MINC1
+#ifdef HAVE_MINC1
     {
       printf("libminc: %s\n", miget_version());
       printf("netcdf : %s\n", nc_inq_libvers());
     }
 #endif
     
-#if MINC2
+#ifdef HAVE_MINC2
     {
         unsigned int major, minor, release;
         H5get_libversion(&major, &minor, &release);

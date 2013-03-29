@@ -1666,8 +1666,8 @@ VIOAPI  VIO_Status  input_possibly_quoted_string(
     *str = create_string( NULL );
 
     while( status == VIO_OK &&
-           (quoted && ch != quote ||
-            !quoted && ch != ' ' && ch != '\t' && ch != '\n') )
+           ((quoted && ch != quote) ||
+            (!quoted && ch != ' ' && ch != '\t' && ch != '\n')) )
     {
         concat_char_to_string( str, ch );
 

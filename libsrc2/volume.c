@@ -1521,6 +1521,14 @@ void miinit_default_range(mitype_t mitype, double *valid_max, double *valid_min)
     *valid_min = -DBL_MAX;
     *valid_max = DBL_MAX;
     break;
+  case MI_TYPE_DCOMPLEX:
+    *valid_min = -DBL_MAX;
+    *valid_max = DBL_MAX;
+    break;
+  case MI_TYPE_FCOMPLEX:
+    *valid_min = -FLT_MAX;
+    *valid_max = FLT_MAX;
+    break;      
   default:
     *valid_min = 0;
     *valid_max = 1;

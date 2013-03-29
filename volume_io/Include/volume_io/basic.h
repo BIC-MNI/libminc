@@ -134,6 +134,8 @@ typedef enum { VIO_OK=0,
 
 #if !VIO_PREFIX_NAMES           /* Play nice with others */
 
+#warning "Using old-style Volume IO names!"
+
 #ifndef __cplusplus
 #ifndef private
 #define private static
@@ -146,7 +148,7 @@ typedef enum { VIO_OK=0,
 #endif /* semiprivate */
 #endif /* __cplusplus */
 
-#define  FALSE     FALSE
+#define  OFF     FALSE
 #define  ON      TRUE
 
 /* --------- macro to determine the size of a static array,

@@ -322,10 +322,10 @@ int micreate_group ( mihandle_t vol, const char *path, const char *name )
   strncpy ( fullpath, MI_ROOT_PATH "/" MI_INFO_NAME, sizeof ( fullpath ) );
 
   if ( *path != '/' && *path!=0  ) {
-    strncat ( fullpath, "/", sizeof ( fullpath ) - strlen ( fullpath ) );
+    strncat ( fullpath, "/", sizeof ( fullpath ) - strlen ( fullpath ) - 1 );
   }
 
-  strncat ( fullpath, path, sizeof ( fullpath ) - strlen ( fullpath ) );
+  strncat ( fullpath, path, sizeof ( fullpath ) - strlen ( fullpath ) - 1 );
 
   /* Search through the path, descending into each group encountered.
    */
@@ -383,10 +383,10 @@ int midelete_attr ( mihandle_t vol, const char *path, const char *name )
   strncpy ( fullpath, MI_ROOT_PATH "/" MI_INFO_NAME, sizeof ( fullpath ) );
 
   if ( *path != '/' && *path!=0 ) {
-    strncat ( fullpath, "/", sizeof ( fullpath ) - strlen ( fullpath ) );
+    strncat ( fullpath, "/", sizeof ( fullpath ) - strlen ( fullpath ) - 1 );
   }
 
-  strncat ( fullpath, path, sizeof ( fullpath ) - strlen ( fullpath ) );
+  strncat ( fullpath, path, sizeof ( fullpath ) - strlen ( fullpath ) - 1  );
 
   /* Search through the path, descending into each group encountered.
    */
@@ -437,10 +437,10 @@ int midelete_group ( mihandle_t vol, const char *path, const char *name )
   strncpy ( fullpath, MI_ROOT_PATH "/" MI_INFO_NAME, sizeof ( fullpath ) );
 
   if ( *path != '/' && *path!=0 ) {
-    strncat ( fullpath, "/", sizeof ( fullpath ) - strlen ( fullpath ) );
+    strncat ( fullpath, "/", sizeof ( fullpath ) - strlen ( fullpath ) - 1 );
   }
 
-  strncat ( fullpath, path, sizeof ( fullpath ) - strlen ( fullpath ) );
+  strncat ( fullpath, path, sizeof ( fullpath ) - strlen ( fullpath ) - 1 );
 
   /* Search through the path, descending into each group encountered.
    */
@@ -499,10 +499,10 @@ int miget_attr_length ( mihandle_t vol, const char *path, const char *name,
   }
   
   if ( *path != '/' && *path!=0 ) {
-    strncat ( fullpath, "/", sizeof ( fullpath ) - strlen ( fullpath ) );
+    strncat ( fullpath, "/", sizeof ( fullpath ) - strlen ( fullpath ) - 1  );
   }
 
-  strncat ( fullpath, path, sizeof ( fullpath ) - strlen ( fullpath ) );
+  strncat ( fullpath, path, sizeof ( fullpath ) - strlen ( fullpath ) - 1 );
 
   /* Search through the path, descending into each group encountered.
    */
@@ -597,10 +597,10 @@ int miget_attr_type ( mihandle_t vol, const char *path, const char *name,
   }
   
   if ( *path != '/' && *path!=0 ) {
-    strncat ( fullpath, "/", sizeof ( fullpath ) - strlen ( fullpath ) );
+    strncat ( fullpath, "/", sizeof ( fullpath ) - strlen ( fullpath ) - 1  );
   }
 
-  strncat ( fullpath, path, sizeof ( fullpath ) - strlen ( fullpath ) );
+  strncat ( fullpath, path, sizeof ( fullpath ) - strlen ( fullpath ) - 1 );
 
   /* Search through the path, descending into each group encountered.
    */
@@ -662,8 +662,8 @@ cleanup:
  */
 int micopy_attr ( mihandle_t vol, const char *path, mihandle_t new_vol )
 {
-  milisthandle_t hlist;
-  mitype_t data_type;
+  milisthandle_t hlist = NULL;
+  mitype_t data_type = MI_TYPE_UNKNOWN;
   char namebuf[256];
   char pathbuf[256];
   char valstr[128];
@@ -734,10 +734,10 @@ int miget_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
   }
 
   if ( *path != '/' && *path!=0 ) {
-    strncat ( fullpath, "/", sizeof ( fullpath ) - strlen ( fullpath ) );
+    strncat ( fullpath, "/", sizeof ( fullpath ) - strlen ( fullpath ) - 1 );
   }
 
-  strncat ( fullpath, path, sizeof ( fullpath ) - strlen ( fullpath ) );
+  strncat ( fullpath, path, sizeof ( fullpath ) - strlen ( fullpath ) - 1 );
 
   /* Search through the path, descending into each group encountered.
    */
@@ -843,10 +843,10 @@ int miset_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
   }
   
   if ( *path != '/' && *path!=0 ) {
-    strncat ( fullpath, "/", sizeof ( fullpath ) - strlen ( fullpath ) );
+    strncat ( fullpath, "/", sizeof ( fullpath ) - strlen ( fullpath ) - 1 );
   }
 
-  strncat ( fullpath, path, sizeof ( fullpath ) - strlen ( fullpath ) );
+  strncat ( fullpath, path, sizeof ( fullpath ) - strlen ( fullpath ) - 1 );
 
   /* find last occurance of '/' */
   pch = strrchr ( path, '/' );

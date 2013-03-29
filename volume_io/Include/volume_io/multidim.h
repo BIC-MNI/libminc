@@ -208,7 +208,7 @@ typedef  struct
 #define  GET_MULTIDIM( value, vtype, array, x, y, z, t, v )       \
          switch( (array).n_dimensions ) \
          { \
-         defalut: \
+         default: \
          case 1:  GET_MULTIDIM_1D( value, vtype, array, x );              break; \
          case 2:  GET_MULTIDIM_2D( value, vtype, array, x, y );           break; \
          case 3:  GET_MULTIDIM_3D( value, vtype, array, x, y, z );        break; \
@@ -276,6 +276,7 @@ typedef  struct
 #define  GET_MULTIDIM_PTR( ptr, array, x, y, z, t, v )       \
          switch( (array).n_dimensions ) \
          { \
+         default: \
          case 1:  GET_MULTIDIM_PTR_1D( ptr, array, x );              break; \
          case 2:  GET_MULTIDIM_PTR_2D( ptr, array, x, y );           break; \
          case 3:  GET_MULTIDIM_PTR_3D( ptr, array, x, y, z );        break; \

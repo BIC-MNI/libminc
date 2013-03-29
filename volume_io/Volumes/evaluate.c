@@ -732,9 +732,9 @@ VIOAPI  int   evaluate_volume(
 
     if( n_dims == 3 && degrees_continuity == 0 && second_deriv == NULL &&
         (interpolating_dimensions == NULL ||
-         interpolating_dimensions[0] &&
-         interpolating_dimensions[1] &&
-         interpolating_dimensions[2]) )
+         (interpolating_dimensions[0] &&
+          interpolating_dimensions[1] &&
+          interpolating_dimensions[2])) )
     {
         VIO_Real   *deriv;
 

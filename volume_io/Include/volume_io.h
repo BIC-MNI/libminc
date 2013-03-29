@@ -25,7 +25,7 @@ extern "C" {
 @INPUT      : 
 @OUTPUT     : 
 @RETURNS    : 
-@DESCRIPTION: A set of macros and definitions useful for all MNI programs.
+@DESCRIPTION: Header for Volume IO API
 @METHOD     : 
 @GLOBALS    : 
 @CALLS      : 
@@ -34,7 +34,7 @@ extern "C" {
 ---------------------------------------------------------------------------- */
 
 #ifndef VIO_PREFIX_NAMES
-#define VIO_PREFIX_NAMES 1      /* Allow old-fashioned namespace pollution */
+#define VIO_PREFIX_NAMES 1      /* Don't allow old-fashioned namespace pollution */
 #endif /* VIO_PREFIX_NAMES */
 
 #include  <volume_io/basic.h>
@@ -48,11 +48,7 @@ extern "C" {
 #include  <volume_io/transforms.h>
 
 #ifndef  VIOAPI
-#if defined(_MSC_VER)
-#define       VIOAPI   /*__declspec(dllimport)*/
-#else
-#define       VIOAPI   /*extern*/
-#endif /* _MSC_VER not defined */
+#define  VIOAPI /*TODO: Could be used for dll linking in Windows*/
 #endif /* VIOAPI not defined */
 
 #include  <volume_io/vol_io_prototypes.h>

@@ -93,6 +93,7 @@ int micopy_dimension ( midimhandle_t dim_ptr, midimhandle_t *new_dim_ptr )
     handle->offsets = ( double * ) malloc ( dim_ptr->length * sizeof ( double ) );
 
     if ( handle->offsets == NULL ) {
+      free(handle);
       return ( MI_ERROR );
     }
 
@@ -266,7 +267,8 @@ int micreate_dimension(const char *name, midimclass_t dimclass, midimattr_t attr
     break;
   case MI_DIMCLASS_ANY:
   default:
-    return ( MI_ERROR );
+    free(handle);
+    return MI_ERROR;
   }
 
   handle->offsets = NULL;
@@ -1560,8 +1562,9 @@ int miget_dimension_widths ( midimhandle_t dimension,
   }
 
   /* Allocate space for the widths array
+   TODO: This is suspicious, didn't we just pass a pointer to this array?
    */
-  widths = ( double * ) malloc ( diff * sizeof ( double ) );
+  /* widths = ( double * ) malloc ( diff * sizeof ( double ) ); */
 
   /* Check to see whether the dimension is regularly sampled.
    */
@@ -1591,8 +1594,8 @@ int miget_dimension_widths ( midimhandle_t dimension,
     }
 
   }
-
-  return ( MI_NOERROR );
+  
+  return MI_NOERROR;
 }
 
 /**

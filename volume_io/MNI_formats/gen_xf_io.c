@@ -332,7 +332,7 @@ static VIO_Status input_one_transform(
     VIO_STR           type_name, str, volume_filename, directory, tmp_filename;
     VIO_Volume        volume;
     VIO_Transform     linear_transform;
-    VIO_Transform_types   type;
+    VIO_Transform_types   transform_type;
     VIO_BOOL              inverse_flag;
     VIO_General_transform inverse;
     minc_input_options    options;
@@ -355,11 +355,11 @@ static VIO_Status input_one_transform(
         return( VIO_ERROR );
 
     if( equal_strings( type_name, LINEAR_TYPE ) )
-        type = LINEAR;
+        transform_type = LINEAR;
     else if( equal_strings( type_name, THIN_PLATE_SPLINE_STRING ) )
-        type = THIN_PLATE_SPLINE;
+        transform_type = THIN_PLATE_SPLINE;
     else if( equal_strings( type_name, GRID_TRANSFORM_STRING ) )
-        type = GRID_TRANSFORM;
+        transform_type = GRID_TRANSFORM;
     else
     {
         delete_string( type_name );
@@ -406,8 +406,13 @@ static VIO_Status input_one_transform(
             return( VIO_ERROR );
     }
 
-    switch( type )
+    switch( transform_type )
     {
+    default:
+        print_error( "Unsupported transform type %d \n", transform_type );
+        delete_string( str );
+        return( VIO_ERROR );
+        
     case LINEAR:
         if( !equal_strings( str, LINEAR_TRANSFORM_STRING ) )
         {
@@ -478,8 +483,8 @@ static VIO_Status input_one_transform(
         if( n_points % n_dimensions != 0 )
         {
             print_error(
-        "Number of points (%d) must be multiple of number of dimensions (%d)\n",
-                  n_points, n_dimensions );
+                        "Number of points (%d) must be multiple of number of dimensions (%d)\n",
+                        n_points, n_dimensions );
             return( VIO_ERROR );
         }
 

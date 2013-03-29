@@ -16,7 +16,7 @@
 #endif /*HAVE_CONFIG_H*/
 
 
-#include  <internal_volume_io.h>
+#include  "internal_volume_io.h"
 
 /* ----------------------------- MNI Header -----------------------------------
 @NAME       : make_Colour

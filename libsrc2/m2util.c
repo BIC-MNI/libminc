@@ -1644,7 +1644,7 @@ minc_update_thumbnail ( mihandle_t volume, hid_t loc_id, int igrp, int ogrp )
   int in_bytes;
   int out_bytes;
   double smax, smin;          /* Slice minimum and maximum */
-  hid_t omax_id;              /* Output image-max dataset */
+  hid_t omax_id=-1;              /* Output image-max dataset */
   hid_t omin_id;              /* Output image-min dataset */
   hid_t tfspc_id;             /* Dimensionality of image-max/image-min */
   hid_t tmspc_id;
@@ -1819,7 +1819,7 @@ minc_update_thumbnail ( mihandle_t volume, hid_t loc_id, int igrp, int ogrp )
   free ( in_ptr );
   free ( out_ptr );
 
-  H5Dclose ( omax_id );
+  if(omax_id>0) H5Dclose ( omax_id );
   H5Dclose ( omin_id );
   H5Sclose ( tfspc_id );
   H5Sclose ( tmspc_id );

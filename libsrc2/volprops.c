@@ -1,16 +1,16 @@
 /** \file volprops.c
  * \brief MINC 2.0 Volume properties functions
  * \author Leila Baghdadi
- * 
+ *
  * These functions manipulate "volume properties" objects, which are
  * used to control several options related to MINC 2.0 volume structure.
  * These include compression, blocking, multi-resolution, and record s
  * structure.
  *
- * This approach was adopted with the intent that it would make the 
+ * This approach was adopted with the intent that it would make the
  * default volume creation as simple as possible, while allowing a
- * lot of control for more advanced applications.  This approach to 
- * managing properties is also believed to be more readily extensible than 
+ * lot of control for more advanced applications.  This approach to
+ * managing properties is also believed to be more readily extensible than
  * any obvious alternative.
  ************************************************************************/
 #ifdef HAVE_CONFIG_H
@@ -31,7 +31,7 @@
 #define MI2_MAX_CD_ELEMENTS 100
 
 /** Create a volume property list.  The new list will be returned in the
- * \a props parameter.    When the program is finished 
+ * \a props parameter.    When the program is finished
  * using the property list it should call  mifree_volume_props() to free the
  * memory associated with the list.
  * \param props A pointer to the returned volume properties handle.
@@ -58,9 +58,9 @@ int minew_volume_props(mivolumeprops_t  *props)
   handle->record_length = 0;
   handle->record_name = NULL;
   handle->template_flag = 0;
-
+  
   *props = handle;
-
+  
   return (MI_NOERROR);
 }
 
@@ -83,7 +83,7 @@ int mifree_volume_props(mivolumeprops_t props)
   return (MI_NOERROR);
 }
 
-/*! Get a copy of the volume property list.  When the program is finished 
+/*! Get a copy of the volume property list.  When the program is finished
  * using the property list it should call  mifree_volume_props() to free the
  * memory associated with the list.
  * \param volume A volume handle
@@ -101,7 +101,7 @@ int miget_volume_props(mihandle_t volume, mivolumeprops_t *props)
   unsigned int cd_values[MI2_MAX_CD_ELEMENTS];
   char fname[MI2_CHAR_LENGTH];
   int fcode;
-                    
+  
   if (volume->hdf_id < 0) {
     return (MI_ERROR);
   }
@@ -120,62 +120,64 @@ int miget_volume_props(mihandle_t volume, mivolumeprops_t *props)
   /* Get the layout of the raw data for a dataset.
    */
   if (H5Pget_layout(hdf_plist) == H5D_CHUNKED) {
-      hsize_t dims[MI2_MAX_VAR_DIMS];
-      int i;
-      /* Returns chunk dimensionality */
-      handle->edge_count = H5Pget_chunk(hdf_plist, MI2_MAX_VAR_DIMS, dims);
-      if (handle->edge_count < 0) {
-	return (MI_ERROR);
-      }
-      handle->edge_lengths = (int *)malloc(handle->edge_count*sizeof(int));
-      if (handle->edge_lengths == NULL) {
-	  return (MI_ERROR);
-      }
-      for (i = 0; i < handle->edge_count; i++) {
-	  handle->edge_lengths[i] = dims[i];
-      }
-      /* Get the number of filters in the pipeline */
-      nfilters = H5Pget_nfilters(hdf_plist);
-      if (nfilters == 0) {
-	handle->zlib_level = 0;
-	handle->compression_type = MI_COMPRESS_NONE;
-      }
-      else {
-	for (i = 0; i < nfilters; i++) {
-	  cd_nelmts = MI2_MAX_CD_ELEMENTS;
-          fcode = H5Pget_filter1(hdf_plist, i, &flags, &cd_nelmts,
-                                cd_values, sizeof(fname), fname);
-	  switch (fcode) {
-	  case H5Z_FILTER_DEFLATE:
-            handle->compression_type = MI_COMPRESS_ZLIB;
-            handle->zlib_level = cd_values[0];
-	    break;
-          case H5Z_FILTER_SHUFFLE:
-	    break;
-          case H5Z_FILTER_FLETCHER32:
-	    break;
-          case H5Z_FILTER_SZIP:
-	    break;
-          default:
-	    break;
-	  }
-	}
-      }
-  }
-  else {
-      handle->edge_count = 0;
-      handle->edge_lengths = NULL;
+    hsize_t dims[MI2_MAX_VAR_DIMS];
+    int i;
+    /* Returns chunk dimensionality */
+    handle->edge_count = H5Pget_chunk(hdf_plist, MI2_MAX_VAR_DIMS, dims);
+    if (handle->edge_count < 0) {
+      free(handle);
+      return (MI_ERROR);
+    }
+    handle->edge_lengths = (int *)malloc(handle->edge_count*sizeof(int));
+    if (handle->edge_lengths == NULL) {
+      free(handle);
+      return (MI_ERROR);
+    }
+    for (i = 0; i < handle->edge_count; i++) {
+      handle->edge_lengths[i] = dims[i];
+    }
+    /* Get the number of filters in the pipeline */
+    nfilters = H5Pget_nfilters(hdf_plist);
+    if (nfilters == 0) {
       handle->zlib_level = 0;
       handle->compression_type = MI_COMPRESS_NONE;
+    }
+    else {
+      for (i = 0; i < nfilters; i++) {
+        cd_nelmts = MI2_MAX_CD_ELEMENTS;
+        fcode = H5Pget_filter1(hdf_plist, i, &flags, &cd_nelmts,
+                               cd_values, sizeof(fname), fname);
+        switch (fcode) {
+          case H5Z_FILTER_DEFLATE:
+            handle->compression_type = MI_COMPRESS_ZLIB;
+            handle->zlib_level = cd_values[0];
+            break;
+          case H5Z_FILTER_SHUFFLE:
+            break;
+          case H5Z_FILTER_FLETCHER32:
+            break;
+          case H5Z_FILTER_SZIP:
+            break;
+          default:
+            break;
+        }
+      }
+    }
+  }
+  else {
+    handle->edge_count = 0;
+    handle->edge_lengths = NULL;
+    handle->zlib_level = 0;
+    handle->compression_type = MI_COMPRESS_NONE;
   }
   
   *props = handle;
-   
+  
   H5Pclose(hdf_plist);
   H5Dclose(hdf_vol_dataset);
-
+  
   return (MI_NOERROR);
-
+  
 }
 
 
@@ -187,36 +189,36 @@ int miget_volume_props(mihandle_t volume, mivolumeprops_t *props)
  * is #2, etc. Therefore a \a depth value of 2 implies both the half
  * and quarter resolution thumbnails will be calculated and stored in
  * the file.
- * \param props A volume property list handle 
+ * \param props A volume property list handle
  * \param enable_flag TRUE if multiresolution support should be enabled in
- * this file.  
+ * this file.
  * \param depth The maximum depth of multiresolution data
  * to support.
  * \ingroup mi2VPrp
  */
 int miset_props_multi_resolution(mivolumeprops_t props, miboolean_t enable_flag,
-			    int depth)
+                                 int depth)
 {
-    if (props == NULL || depth > MI2_MAX_RESOLUTION_GROUP || depth <= 0) {
-        return (MI_ERROR);
-    }
+  if (props == NULL || depth > MI2_MAX_RESOLUTION_GROUP || depth <= 0) {
+    return (MI_ERROR);
+  }
   
-    props->enable_flag = enable_flag;
-    props->depth = depth;
-    return (MI_NOERROR);
+  props->enable_flag = enable_flag;
+  props->depth = depth;
+  return (MI_NOERROR);
 }
-  
+
 /** Get multi-resolution properties.  Returns the value of the \a enable_flag
  * and \a depth parameters.
  * \param props A volume property list handle
- * \param enable_flag Pointer to a boolean which will be set to TRUE if 
+ * \param enable_flag Pointer to a boolean which will be set to TRUE if
  * multiresolution has been enabled.
  * \param depth Pointer to a integer which will contain the maximum resolution
  * depth enabled if multiresolution is enabled.
  * \ingroup mi2VPrp
  */
 int miget_props_multi_resolution(mivolumeprops_t props, miboolean_t *enable_flag,
-      int *depth)
+                                 int *depth)
 {
   if (props == NULL || enable_flag == NULL || depth == NULL) {
     return (MI_ERROR);
@@ -224,7 +226,7 @@ int miget_props_multi_resolution(mivolumeprops_t props, miboolean_t *enable_flag
   
   *enable_flag = props->enable_flag;
   *depth = props->depth;
-
+  
   return (MI_NOERROR);
 }
 
@@ -245,7 +247,7 @@ int miselect_resolution(mihandle_t volume, int depth)
     return (MI_ERROR);
   }
   /* Check given depth with the available depth in file.
-     Make sure the selected resolution does exist.
+   Make sure the selected resolution does exist.
    */
   if (depth > volume->create_props->depth) {
     return (MI_ERROR);
@@ -255,33 +257,33 @@ int miselect_resolution(mihandle_t volume, int depth)
       return (MI_ERROR);
     }
   }
-
+  
   volume->selected_resolution = depth;
-
+  
   if (volume->image_id >= 0) {
-      H5Dclose(volume->image_id);
+    H5Dclose(volume->image_id);
   }
   sprintf(path, "%d/image", depth);
   volume->image_id = H5Dopen1(grp_id, path);
-
+  
   if (volume->volume_class == MI_CLASS_REAL) {
-      if (volume->imax_id >= 0) {
-          H5Dclose(volume->imax_id);
-      }
-      sprintf(path, "%d/image-max", depth);
-      volume->imax_id = H5Dopen1(grp_id, path);
-
-      if (volume->imin_id >= 0) {
-          H5Dclose(volume->imin_id);
-      }
-      sprintf(path, "%d/image-min", depth);
-      volume->imin_id = H5Dopen1(grp_id, path);
+    if (volume->imax_id >= 0) {
+      H5Dclose(volume->imax_id);
+    }
+    sprintf(path, "%d/image-max", depth);
+    volume->imax_id = H5Dopen1(grp_id, path);
+    
+    if (volume->imin_id >= 0) {
+      H5Dclose(volume->imin_id);
+    }
+    sprintf(path, "%d/image-min", depth);
+    volume->imin_id = H5Dopen1(grp_id, path);
   }
   return (MI_NOERROR);
 }
 
 /** Compute or recompute all resolution groups.
- * 
+ *
  * \ingroup mi2VPrp
  */
 int miflush_from_resolution(mihandle_t volume, int depth)
@@ -300,42 +302,42 @@ int miflush_from_resolution(mihandle_t volume, int depth)
     volume->is_dirty = FALSE;
   }
   
- return (MI_NOERROR);
+  return (MI_NOERROR);
 }
 
 /** Set compression type for a volume property list
- * Note that enabling compression will automatically 
- * enable blocking with default parameters. 
+ * Note that enabling compression will automatically
+ * enable blocking with default parameters.
  * \param props A volume properties list
  * \param compression_type The type of compression to use (MI_COMPRESS_NONE
  * or MI_COMPRESS_ZLIB)
  * \ingroup mi2VPrp
  */
 int miset_props_compression_type(mivolumeprops_t props,
-                             micompression_t compression_type)
+                                 micompression_t compression_type)
 {
-    int i;
-    int edge_lengths[MI2_MAX_VAR_DIMS];
-
- if (props == NULL) {
+  int i;
+  int edge_lengths[MI2_MAX_VAR_DIMS];
+  
+  if (props == NULL) {
     return (MI_ERROR);
   }
- switch (compression_type) {
- case MI_COMPRESS_NONE:
-   props->compression_type = MI_COMPRESS_NONE;
-   break;
- case MI_COMPRESS_ZLIB:
-   props->compression_type = MI_COMPRESS_ZLIB;
-   props->zlib_level = MI2_DEFAULT_ZLIB_LEVEL;
-   for (i = 0; i < MI2_MAX_VAR_DIMS; i++) {
-       edge_lengths[i] = MI2_CHUNK_SIZE;
-   }
-   miset_props_blocking(props, MI2_MAX_VAR_DIMS, edge_lengths);
-   break;
- default:
-   return (MI_ERROR);
- }
- return (MI_NOERROR);
+  switch (compression_type) {
+    case MI_COMPRESS_NONE:
+      props->compression_type = MI_COMPRESS_NONE;
+      break;
+    case MI_COMPRESS_ZLIB:
+      props->compression_type = MI_COMPRESS_ZLIB;
+      props->zlib_level = MI2_DEFAULT_ZLIB_LEVEL;
+      for (i = 0; i < MI2_MAX_VAR_DIMS; i++) {
+        edge_lengths[i] = MI2_CHUNK_SIZE;
+      }
+      miset_props_blocking(props, MI2_MAX_VAR_DIMS, edge_lengths);
+      break;
+    default:
+      return (MI_ERROR);
+  }
+  return (MI_NOERROR);
 }
 
 /** Get compression type for a volume property list
@@ -344,10 +346,10 @@ int miset_props_compression_type(mivolumeprops_t props,
  * compression type will be assigned.
  * \ingroup mi2VPrp
  */
-int miget_props_compression_type(mivolumeprops_t props, 
-                             micompression_t *compression_type)
+int miget_props_compression_type(mivolumeprops_t props,
+                                 micompression_t *compression_type)
 {
-
+  
   if (props == NULL) {
     return (MI_ERROR);
   }
@@ -383,7 +385,7 @@ int miset_props_zlib_compression(mivolumeprops_t props, int zlib_level)
  */
 int miget_props_zlib_compression(mivolumeprops_t props, int *zlib_level)
 {
-if (props == NULL) {
+  if (props == NULL) {
     return (MI_ERROR);
   }
   
@@ -393,7 +395,7 @@ if (props == NULL) {
 
 /** Set blocking structure properties for the volume
  * \param props A volume property list handle
- * \param edge_count 
+ * \param edge_count
  * \param edge_lengths
  * \ingroup mi2VPrp
  */
@@ -406,21 +408,21 @@ int miset_props_blocking(mivolumeprops_t props, int edge_count, const int *edge_
   }
   
   if (props->edge_lengths != NULL) {
-      free(props->edge_lengths);
-      props->edge_lengths = NULL;
+    free(props->edge_lengths);
+    props->edge_lengths = NULL;
   }
   
   props->edge_count = edge_count;
   if (edge_count != 0) {
-      props->edge_lengths = (int *) malloc(edge_count*sizeof(int));
-      if (props->edge_lengths == NULL) {
-	  return (MI_ERROR);
-      }
-      for (i=0; i< edge_count; i++){
-	  props->edge_lengths[i] = edge_lengths[i];
-      }
+    props->edge_lengths = (int *) malloc(edge_count*sizeof(int));
+    if (props->edge_lengths == NULL) {
+      return (MI_ERROR);
+    }
+    for (i=0; i< edge_count; i++){
+      props->edge_lengths[i] = edge_lengths[i];
+    }
   }
-
+  
   return (MI_NOERROR);
 }
 
@@ -432,9 +434,9 @@ int miset_props_blocking(mivolumeprops_t props, int edge_count, const int *edge_
  * \ingroup mi2VPrp
  */
 int miget_props_blocking(mivolumeprops_t props, int *edge_count, int *edge_lengths,
-		     int max_lengths)
+                         int max_lengths)
 {
-  int i; 
+  int i;
   
   if (props == NULL) {
     return (MI_ERROR);
@@ -444,9 +446,11 @@ int miget_props_blocking(mivolumeprops_t props, int *edge_count, int *edge_lengt
    * to the edge_count
    */
   if (max_lengths > props->edge_count) {
-      max_lengths = props->edge_count;
+    max_lengths = props->edge_count;
   }
-  edge_lengths = (int *) malloc(max_lengths *sizeof(int));
+  
+  /*edge_lengths = (int *) malloc(max_lengths *sizeof(int));*/
+  
   for (i=0; i< max_lengths; i++){
     edge_lengths[i] = props->edge_lengths[i];
   }
@@ -466,18 +470,18 @@ int miset_props_record(mivolumeprops_t props, misize_t record_length, char *reco
     props->record_length = record_length;
   }
   if (props->record_name != NULL) {
-      free(props->record_name);
-      props->record_name = NULL;
+    free(props->record_name);
+    props->record_name = NULL;
   }
   
   props->record_name = strdup(record_name);
   
   return (MI_NOERROR);
 }
-  
+
 /** Set the template volume flag
  * \ingroup mi2VPrp
- */ 
+ */
 int miset_props_template(mivolumeprops_t props, int template_flag)
 {
   if (props == NULL) {
