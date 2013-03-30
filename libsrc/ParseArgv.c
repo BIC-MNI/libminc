@@ -37,7 +37,7 @@
 #include <inttypes.h>
 #endif
 
-#ifdef HAVE_MINC2
+#ifdef HAVE_MINC1
 #include "minc.h"
 #endif
 
