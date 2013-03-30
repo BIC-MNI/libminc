@@ -990,26 +990,24 @@ cleanup:
   return (result);
 }
 
-
-#define APPLY_DESCALING_NORM(type_in,buffer_in,buffer_out,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,voxel_min,voxel_max,data_min,data_max,norm_min,norm_max) \
+#define APPLY_DESCALING_NORM(type_out,buffer_in,buffer_out,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,voxel_min,voxel_max,data_min,data_max,norm_min,norm_max) \
   { \
     hsize_t _i,_j;\
     double voxel_offset=voxel_min;\
     double voxel_range=voxel_max-voxel_min;\
     double norm_offset=norm_min;\
-    double norm_range=norm_max-norm_min;\
+    double norm_range=(double)norm_max-(double)norm_min;\
     double data_offset=data_min;\
-    double data_range=data_max-data_min;\
-    type_in *_buffer_out=(type_in *)buffer_out;\
+    double data_range=(double)data_max-(double)data_min;\
+    type_out *_buffer_out=(type_out *)buffer_out;\
     double *_buffer_in=(double *)buffer_in; \
     for(_i=0;_i<total_number_of_slices;_i++)\
       for(_j=0;_j<image_slice_length;_j++)\
       {\
         double _temp=(( (*_buffer_in) - voxel_offset) / voxel_range)*(image_slice_max_buffer[_i]-image_slice_min_buffer[_i]) + image_slice_min_buffer[_i] ;\
         _temp=(_temp-data_offset)/data_range;\
-        if(_temp<0.0) _temp=0.0;\
-        if(_temp>1.0) _temp=1.0;\
-        *_buffer_out=(type_in)(rint(_temp*norm_range)+norm_offset); \
+        _temp=_temp<0.0?norm_min:_temp>=1.0?norm_max:(rint(_temp*norm_range)+norm_offset); \
+        *_buffer_out=(type_out)(_temp);\
         _buffer_in++;\
         _buffer_out++;\
       }\
@@ -1022,7 +1020,7 @@ cleanup:
     double voxel_range=voxel_max-voxel_min;\
     double voxel_offset=voxel_min;\
     double norm_offset=norm_min;\
-    double norm_range=norm_max-norm_min;\
+    double norm_range=(double)norm_max-(double)norm_min;\
     type_in *_buffer_in=(type_in *)buffer_in;\
     for(_i=0;_i<total_number_of_slices;_i++)\
       for(_j=0;_j<image_slice_length;_j++)\
@@ -1265,7 +1263,7 @@ static int mirw_hyperslab_normalized(int opcode,
     switch(buffer_data_type)
     {
       case MI_TYPE_FLOAT:
-        APPLY_DESCALING_NORM(float,temp_buffer,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max,data_min,data_max,0.0,1.0);
+        APPLY_DESCALING_NORM(float,temp_buffer,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max,data_min,data_max,0.0f,1.0f);
         break;
       case MI_TYPE_DOUBLE:
         APPLY_DESCALING_NORM(double,temp_buffer,buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max,data_min,data_max,0.0,1.0);
@@ -1336,7 +1334,7 @@ static int mirw_hyperslab_normalized(int opcode,
         APPLY_SCALING_NORM(double,temp_buffer2,temp_buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max,data_min,data_max,0.0,1.0);
         break;
       case MI_TYPE_INT:
-        APPLY_SCALING_NORM(int,temp_buffer2,temp_buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max,data_min,data_max,INT_MIN,INT_MAX);
+        APPLY_SCALING_NORM(int,temp_buffer2,temp_buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max,data_min,data_max,(double)INT_MIN,(double)INT_MAX);
         break;
       case MI_TYPE_UINT:
         APPLY_SCALING_NORM(unsigned int,temp_buffer2,temp_buffer,image_slice_length,total_number_of_slices,image_slice_min_buffer,image_slice_max_buffer,volume_valid_min,volume_valid_max,data_min,data_max,0,UINT_MAX);
