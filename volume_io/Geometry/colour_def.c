@@ -21,7 +21,7 @@
               b
               a
 @OUTPUT     : 
-@RETURNS    : Colour
+@RETURNS    : VIO_Colour
 @DESCRIPTION: Packs the four components into a colour.  Each component must
               be in the range 0 to 255.  Depending on what graphics library
               is being linked with, if any, for instance, GL or OpenGL,
@@ -36,13 +36,13 @@
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Colour  make_rgba_Colour(
+VIOAPI  VIO_Colour  make_rgba_Colour(
     int    r,
     int    g,
     int    b,
     int    a )
 {
-    Colour          c;
+    VIO_Colour          c;
     unsigned  char  *byte_ptr;
 
     c = 0;    /* to avoid used-before-set compiler messages */
@@ -70,7 +70,7 @@ VIOAPI  Colour  make_rgba_Colour(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  int  get_Colour_r(
-    Colour   colour )
+    VIO_Colour   colour )
 {
     unsigned  char  *b;
 
@@ -93,7 +93,7 @@ VIOAPI  int  get_Colour_r(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  int  get_Colour_g(
-    Colour   colour )
+    VIO_Colour   colour )
 {
     unsigned  char  *b;
 
@@ -116,7 +116,7 @@ VIOAPI  int  get_Colour_g(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  int  get_Colour_b(
-    Colour   colour )
+    VIO_Colour   colour )
 {
     unsigned  char  *b;
 
@@ -140,7 +140,7 @@ VIOAPI  int  get_Colour_b(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  int  get_Colour_a(
-    Colour   colour )
+    VIO_Colour   colour )
 {
     unsigned  char  *b;
 

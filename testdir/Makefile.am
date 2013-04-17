@@ -49,8 +49,6 @@ icv_fillvalue.out: ;
 icv_range.out: ;
 minc_types.out: ;
 
-if MINC2
-	
 INCLUDES += -I$(top_srcdir)/libsrc2
 
 minc2_script_tests = \
@@ -92,4 +90,3 @@ check_PROGRAMS += $(ALL_TESTS)
 
 CLEANFILES += *.mnc
 
-endif # MINC2
