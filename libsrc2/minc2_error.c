@@ -279,23 +279,6 @@ static int mi2read_cfg(const char *name, char *buffer, int maxlen)
     return (result);
 }
 
-
-static int mi2get_cfg_bool(const char *name)
-{
-    char buffer[128];
-    char *var_ptr;
-
-    if ((var_ptr = getenv(name)) != NULL) {
-        strncpy(buffer, var_ptr, sizeof (buffer));
-    }
-    else {
-        if (!mi2read_cfg(name, buffer, sizeof (buffer))) {
-            return (0);
-        }
-    }
-    return (atoi(buffer) != 0);
-}
-
 static int mi2get_cfg_int(const char *name)
 {
     char buffer[128];

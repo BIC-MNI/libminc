@@ -1438,7 +1438,7 @@ int minc_create_thumbnail ( mihandle_t volume, int grp )
 static void midownsample_slice ( double *in_ptr, double *out_ptr, hsize_t isize[],
                                  hsize_t osize[], int scale )
 {
-  int j, k;
+  hsize_t j, k;
   int x, y, z;
   double d;
   hsize_t total;
@@ -1640,7 +1640,7 @@ minc_update_thumbnail ( mihandle_t volume, hid_t loc_id, int igrp, int ogrp )
   int i;                      /* Generic loop counter */
   double *in_ptr;
   double *out_ptr;
-  int slice;
+  hsize_t slice;
   int in_bytes;
   int out_bytes;
   double smax, smin;          /* Slice minimum and maximum */
