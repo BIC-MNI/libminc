@@ -52,7 +52,7 @@ int miget_volume_from_dimension ( midimhandle_t dimension, mihandle_t *volume )
  */
 int micopy_dimension ( midimhandle_t dim_ptr, midimhandle_t *new_dim_ptr )
 {
-  int i;
+  misize_t i;
   midimhandle_t handle;
 
   if ( dim_ptr == NULL ) {
@@ -183,7 +183,7 @@ int micreate_dimension(const char *name, midimclass_t dimclass, midimattr_t attr
 {
 
   midimhandle_t handle;
-  int i;
+  misize_t i;
   /* Allocate space for the new dimension
    */
   handle = ( midimhandle_t ) malloc ( sizeof ( struct midimension ) );
@@ -399,7 +399,7 @@ int miget_volume_dimensions ( mihandle_t volume, midimclass_t class, midimattr_t
 
   number_of_dims = volume->number_of_dims;
 
-  if ( array_length > number_of_dims ) {
+  if ( (hsize_t)( array_length ) > number_of_dims ) {
     max_dims = number_of_dims;
   } else {
     max_dims = array_length;
@@ -1217,7 +1217,7 @@ int miget_dimension_separations ( const midimhandle_t dimensions[],
                               misize_t array_length,
                               double separations[] )
 {
-  int i;
+  misize_t i;
 
   for ( i = 0; i < array_length; i++ ) {
     miget_dimension_separation ( dimensions[i], voxel_order,
@@ -1303,7 +1303,7 @@ int miset_dimension_size ( midimhandle_t dimension, misize_t size )
 int miget_dimension_sizes ( const midimhandle_t dimensions[], misize_t array_length,
                         misize_t sizes[] )
 {
-  int i;
+  misize_t i;
 
   for ( i = 0; i < array_length; i++ ) {
     miget_dimension_size ( dimensions[i], &sizes[i] );

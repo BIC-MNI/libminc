@@ -584,8 +584,8 @@ static int mirw_hyperslab_icv(int opcode,
   hsize_t hdf_start[MI2_MAX_VAR_DIMS];
   hsize_t hdf_count[MI2_MAX_VAR_DIMS];
   int dir[MI2_MAX_VAR_DIMS];  /* Direction vector in file order */
-  int ndims;
-  int slice_ndims;
+  hsize_t ndims;
+  hsize_t slice_ndims;
   int n_different = 0;
   double volume_valid_min, volume_valid_max;
   misize_t buffer_size;
@@ -1057,8 +1057,8 @@ static int mirw_hyperslab_normalized(int opcode,
   hsize_t hdf_start[MI2_MAX_VAR_DIMS];
   hsize_t hdf_count[MI2_MAX_VAR_DIMS];
   int dir[MI2_MAX_VAR_DIMS];  /* Direction vector in file order */
-  int ndims;
-  int slice_ndims;
+  hsize_t ndims;
+  hsize_t slice_ndims;
   int n_different = 0;
   double volume_valid_min, volume_valid_max;
   misize_t buffer_size;

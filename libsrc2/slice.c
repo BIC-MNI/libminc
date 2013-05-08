@@ -46,7 +46,7 @@ static int mirw_slice_minmax ( int opcode, mihandle_t volume,
   hsize_t hdf_count[MI2_MAX_VAR_DIMS];
   misize_t count[MI2_MAX_VAR_DIMS];
   int dir[MI2_MAX_VAR_DIMS];
-  int ndims;
+  misize_t ndims;
   int i;
   int result;
 

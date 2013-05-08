@@ -26,7 +26,7 @@ double calculate_mean_f(float *array,misize_t length)
 double calculate_mean_s(short *array,misize_t length)
 {
   double avg=0.0;
-  int i;
+  misize_t i;
   for(i=0;i<length;i++)
     avg+=(double)(array[i]);
   

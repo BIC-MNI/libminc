@@ -77,7 +77,7 @@ int print_metadata(mihandle_t vol, const char * path,int ident)
             float *tmp=(float*)malloc(att_length*sizeof(float));
             if(miget_attr_values(vol,att_data_type,int_path,attribute,att_length,tmp) == MI_NOERROR )
             {
-              int i;
+              size_t i;
               printf("%*s ",ident,"");
               for(i=0;i<att_length;i++)
                 printf("%f ",(double)tmp[i]);
@@ -91,7 +91,7 @@ int print_metadata(mihandle_t vol, const char * path,int ident)
             double *tmp=(double*)malloc(att_length*sizeof(double));
             if(miget_attr_values(vol,att_data_type,int_path,attribute,att_length,tmp) == MI_NOERROR )
             {
-              int i;
+              size_t i;
               printf("%*s ",ident,"");
               for(i=0;i<att_length;i++)
                 printf("%f ",tmp[i]);
@@ -105,7 +105,7 @@ int print_metadata(mihandle_t vol, const char * path,int ident)
             int *tmp=(int*)malloc(att_length*sizeof(int));
             if(miget_attr_values(vol,att_data_type,int_path,attribute,att_length,tmp) == MI_NOERROR )
             {
-              int i;
+              size_t i;
               printf("%*s ",ident,"");
               for(i=0;i<att_length;i++)
                 printf("%d ",tmp[i]);
