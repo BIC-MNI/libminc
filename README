@@ -1,4 +1,4 @@
-MINC - Medical Image NetCDF
+libminc - Medical Image NetCDF or MINC isn't netCDF
 
 INTRODUCTION
 ------------
@@ -30,7 +30,7 @@ SUPPORT FOR HDF5 "MINC 2.0" FORMAT FILES
 ----------------------------------------
 
 This change requires that HDF5 must be installed before MINC can be
-built.  The latest version of HDF5 is 1.6.2.  You can obtain HDF5 from:
+built. You can obtain HDF5 from:
 
    http://www.hdfgroup.org/
 
@@ -56,12 +56,6 @@ format of the netCDF "ncdump" and "ncgen" utility.  I'm open to
 suggestions for the best way to handle this.  We have an unfinished
 "mincdump" tool which replaces "ncdump", but we do not yet have a
 replacement for "ncgen".
-
-1.4 Conversion
-
-There is a new conversion utility called "mincconvert".  This is just
-a trivial library wrapper that can copy a file from the input to the
-output while performing a conversion.
 
 2. REVISED ERROR MESSAGE HANDLING.
 
@@ -150,10 +144,7 @@ library for accessing data structures in a file at a low-level.
 2) The low-level MINC library is used to do medical-image specific 
 things. It provides some enhancements to NetCDF and HDF5
 as well as image conversion routines for dealing with image pixel
-value issues as well as image size and orientation. Documentation
-consists of a programmer's guide and reference (minc_user.tex and
-minc_reference.tex in the doc directory).  Example C programs exist
-in progs/mincexample.
+value issues as well as image size and orientation.
 
 3) A high-level C library called volume_io provides a Volume data
 type, with functions like input_volume to give simple access to data
@@ -162,19 +153,9 @@ coordinate conversion. Documentation consists of a programmer's
 reference volume_io/Documentation/volume_io.tex.  Example programs
 exist in volume_io/Testing.
 
-The LaTeX documentation is not built by default.  You can build these
-documents using
-
-    cd doc; make docs
-    cd volume_io/Documentation; make docs
-
-latex and dvips are required.
-
-
 Applications that use MINC alone need to #include <minc.h> and
 link with "-lminc2 -lnetcdf -lhdf5 -lz -lm".
 
 Applications built with VolumeIO need to #include <volume_io.h>
 and link with "-lvolume_io2 -lminc2 -lnetcdf -lhdf5 -lz -lm".
-
 

@@ -1035,7 +1035,6 @@ cleanup:
 
 
 
-
 /** Read/write a hyperslab of data, performing dimension remapping
  * and data rescaling as needed. Data in the range (min-max) will map to the appropriate full range of buffer_data_type
  */
