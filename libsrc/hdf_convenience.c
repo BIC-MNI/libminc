@@ -1105,7 +1105,7 @@ hdf_attput(int fd, int varid, const char *attnm, nc_type val_typ,
 
             /* Iterate over all attributes, copying from old to new. */
             i = 0;
-            H5Aiterate1(var->dset_id, &i, hdf_copy_attr, (void *) new_dset_id);
+            H5Aiterate1(var->dset_id, &i, hdf_copy_attr, (void *) &new_dset_id);
 
             H5Dclose(var->dset_id);
             H5Tclose(var->ftyp_id);
@@ -2046,10 +2046,9 @@ hdf_varsize(int fd, int varid, long *size_ptr)
     return (MI_NOERROR);
 }
 
-herr_t
-hdf_copy_attr(hid_t in_id, const char *attr_name, void *op_data)
+herr_t hdf_copy_attr(hid_t in_id, const char *attr_name, void *op_data)
 {
-   hid_t out_id = (hid_t) op_data;
+   hid_t out_id = *((hid_t*) op_data);
    hid_t inatt_id = -1;
    hid_t outatt_id = -1;
    hid_t spc_id = -1;
