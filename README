@@ -154,8 +154,8 @@ reference volume_io/Documentation/volume_io.tex.  Example programs
 exist in volume_io/Testing.
 
 Applications that use MINC alone need to #include <minc.h> and
-link with "-lminc2 -lnetcdf -lhdf5 -lz -lm".
+link with "-lminc2 -lnetcdf -lhdf5 -lz -lm -ldl".
 
 Applications built with VolumeIO need to #include <volume_io.h>
-and link with "-lvolume_io2 -lminc2 -lnetcdf -lhdf5 -lz -lm".
+and link with "-lvolume_io2 -lminc2 -lnetcdf -lhdf5 -lz -lm -ldl".
 
