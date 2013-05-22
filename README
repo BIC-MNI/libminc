@@ -30,7 +30,7 @@ SUPPORT FOR HDF5 "MINC 2.0" FORMAT FILES
 ----------------------------------------
 
 This change requires that HDF5 must be installed before MINC can be
-built. You can obtain HDF5 from:
+built. You can obtain HDF5 from, current version is 1.8.11:
 
    http://www.hdfgroup.org/
 

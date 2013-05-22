@@ -23,23 +23,23 @@ int main(int argc, char **argv)
   double dblarr[TESTARRAYSIZE];
   float fltarr[TESTARRAYSIZE];
   int intarr[TESTARRAYSIZE];
-  char valstr[128];
+  char valstr[128]="";
   float val1=12.5;
   float val2=34.5;
   milisthandle_t hlist, h1list;
-  char pathbuf[256];
-  char namebuf[256];
-  char pathbuf1[1024];
+  char pathbuf[256]="";
+  char namebuf[256]="";
+  char pathbuf1[1024]="";
   int count=0;
   
   r = micreate_volume("tst-grpa.mnc", 0, NULL, MI_TYPE_UINT,
-                      MI_CLASS_INT, NULL, &hvol);
+                      MI_CLASS_REAL, NULL, &hvol);
   if (r < 0) {
     TESTRPT("Unable to create test file", r);
     return (-1);
   }
   r = micreate_volume("tst-grpb.mnc", 0, NULL, MI_TYPE_UINT,
-                      MI_CLASS_INT, NULL, &hvol1);
+                      MI_CLASS_REAL, NULL, &hvol1);
   if (r < 0) {
     TESTRPT("Unable to create test file", r);
     return (-1);
@@ -125,6 +125,9 @@ int main(int argc, char **argv)
   if (r < 0) {
     TESTRPT("miget_attr_type failed", r);
   }
+  if (data_type != MI_TYPE_STRING) {
+    TESTRPT("miget_attr_type failed", data_type);
+  }
   
   r = miget_attr_length(hvol, "/test1/stuff/hello", "animal",
                         &length);
@@ -132,9 +135,6 @@ int main(int argc, char **argv)
     TESTRPT("miget_attr_length failed", r);
   }
   
-  if (data_type != MI_TYPE_STRING) {
-    TESTRPT("miget_attr_type failed", data_type);
-  }
   if (length != 8) {
     TESTRPT("miget_attr_length failed", (int)length);
   }
@@ -156,7 +156,7 @@ int main(int argc, char **argv)
   /* This should fail since we deleted the group.
    */
   if (r >= 0) {
-    TESTRPT("miget_attr_length failed", r);
+    TESTRPT("miget_attr_length not failed", r);
   }
   
   r = miget_attr_values(hvol, MI_TYPE_DOUBLE, "/test2", "maxvals",
@@ -233,20 +233,22 @@ int main(int argc, char **argv)
                         "zoom",1, &val1);
   
   if (r < 0) {
-    TESTRPT("micreate_group failed", r);
+    TESTRPT("miset_attr_values failed", r);
   }
   
   r = miset_attr_values(hvol, MI_TYPE_FLOAT, "/OPT",
                         "binning",1, &val2);
+  if (r < 0) {
+    TESTRPT("miset_attr_values failed", r);
+  }
   
   r = miset_attr_values(hvol, MI_TYPE_FLOAT, "/OPT",
                         "gain",1, &val1);
-  
   if (r < 0) {
-    TESTRPT("micreate_group failed", r);
+    TESTRPT("miset_attr_values failed", r);
   }
-  
-  r = milist_start(hvol, "/", 1, &hlist);
+
+  r = milist_start(hvol, "/", 0, &hlist);
   if (r == MI_NOERROR) {
     count++;
     while (milist_attr_next(hvol, hlist, pathbuf, sizeof(pathbuf),
@@ -258,15 +260,12 @@ int main(int argc, char **argv)
   }
   milist_finish(hlist);
   
-  
   printf("copy all attributes in the provided path in the new volume\n");
-  
   if((r = micopy_attr(hvol,"/OPT",hvol1))<0) 
     TESTRPT("micopy_attr failed", r);
-     
   printf("***************** \n");
-  
-  r = milist_start(hvol, "/", 1, &h1list);
+
+  r = milist_start(hvol1, "/", 1, &h1list);
   if (r == MI_NOERROR) {
     while( milist_grp_next(h1list, pathbuf1, sizeof(pathbuf1)-1) == MI_NOERROR) {
       printf("%s \n", pathbuf1);
@@ -274,19 +273,32 @@ int main(int argc, char **argv)
   } else {
     TESTRPT("milist_start failed", r);  
   }
-  miclose_volume(hvol);
   
+  r = milist_finish(h1list);
+  if(r<0)
+  {
+    TESTRPT("milist_finish failed", r);  
+  }
+
+  r = miclose_volume(hvol1);
+  if(r<0)
+  {
+    TESTRPT("miclose_volume failed", r);  
+  }
   
-  milist_finish(h1list);
-	
-  miclose_volume(hvol1);
+  r = miclose_volume(hvol);
+  if(r<0)
+  {
+    TESTRPT("miclose_volume failed", r);  
+  }
+  
   if (error_cnt != 0) {
     fprintf(stderr, "%d error%s reported\n",
             error_cnt, (error_cnt == 1) ? "" : "s");
-  }
-  else {
+  } else {
     fprintf(stderr, "No errors\n");
   }
+  
   return (error_cnt);
 }
 
