@@ -549,8 +549,11 @@ MNCAPI int miopen(char *path, int mode)
 #endif /* MINC2 defined */
 
    if (created_tempfile) {
-      (void) remove(tempfile);
+      remove(tempfile);
    }
+   
+   free(tempfile);/*free memory allocated in miexpand_file*/
+   
    if (status < 0) {
        milog_message(MI_MSG_OPENFILE, tempfile);
    }
@@ -1774,7 +1777,7 @@ MNCAPI int micopy_all_var_values(int incdfid, int outcdfid, int nexclude,
 MNCAPI char *
 micreate_tempfile(void)
 {
-  int tmp_fd;
+  int tmp_fd=0;
   char *tmpfile_ptr;
 
 #if defined (HAVE_MKSTEMP)
