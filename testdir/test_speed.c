@@ -81,6 +81,7 @@ test_icv_read(char *filename, int xsize, int ysize, double image_min,
    (void) ncvarinq(cdfid, img, NULL, NULL, &ndims, dim, NULL);
    if (ndims!=3) {
       (void) fprintf(stderr, "File must have 3 dimensions\n");
+      free(image);
       return ERROR_STATUS;
    }
    (void) ncdiminq(cdfid, dim[0], NULL, &dim_size);
