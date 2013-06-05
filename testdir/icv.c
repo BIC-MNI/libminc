@@ -3,6 +3,7 @@
 #endif
 
 #include <stdio.h>
+#include <string.h>
 #include <minc.h>
 
 #define TRUE 1

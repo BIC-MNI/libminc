@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <minc.h>
 #include <float.h>
 
@@ -80,6 +81,7 @@ test_icv_read(char *filename, int xsize, int ysize, double image_min,
    (void) ncvarinq(cdfid, img, NULL, NULL, &ndims, dim, NULL);
    if (ndims!=3) {
       (void) fprintf(stderr, "File must have 3 dimensions\n");
+      free(image);
       return ERROR_STATUS;
    }
    (void) ncdiminq(cdfid, dim[0], NULL, &dim_size);
@@ -201,7 +203,7 @@ test_icv_read(char *filename, int xsize, int ysize, double image_min,
    return (NORMAL_STATUS);
 }
 
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
    int xsize, ysize;
    double image_max, image_min;

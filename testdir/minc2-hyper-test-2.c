@@ -150,8 +150,8 @@ int main(int argc, char **argv)
     /* Get real value hyperslab*/
     printf("\n");
     printf("Getting a real value hyperslab \n");
-    printf("Starting at %d, %d, %d \n", start[0], start[1], start[2]);
-    printf("Extending to %d, %d, %d \n", howfar[0], howfar[1], howfar[2]);
+    printf("Starting at %lu, %lu, %lu \n", start[0], start[1], start[2]);
+    printf("Extending to %lu, %lu, %lu \n", howfar[0], howfar[1], howfar[2]);
     printf("\n");
     if (miget_real_value_hyperslab(vol,MI_TYPE_DOUBLE, start, count, buffer)
 	< 0) {
@@ -160,7 +160,7 @@ int main(int argc, char **argv)
     }
     /* set an arbitrary location to print values from */
     location[0] = 70; location[1] = 100; location[2] = 104;
-    printf("Test arbitrary location %d, %d, %d \n", 
+    printf("Test arbitrary location %lu, %lu, %lu \n", 
 	   location[0], location[1], location[2]);
     miget_real_value(vol, location, 3, &value);
     printf("Test from hyperslab: %f \n", 
@@ -174,7 +174,7 @@ int main(int argc, char **argv)
     printf("\n");
     /* set another arbitrary location to print values from */
     location[0] = 104; location[1] = 100; location[2] = 70;
-    printf("Test arbitrary location %d, %d, %d \n", 
+    printf("Test arbitrary location %lu, %lu, %lu \n", 
 	   location[0], location[1], location[2]);
     miget_real_value(vol, location, 3, &value);
     printf("Test from hyperslab: %f \n", 

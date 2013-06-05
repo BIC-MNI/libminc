@@ -16,6 +16,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <float.h>
 #include <limits.h>
 #include <minc.h>
