@@ -3,12 +3,13 @@
 #endif
 
 #include <stdio.h>
+#include <string.h>
 #include <minc.h>
 
 #define TRUE 1
 #define FALSE 0
 
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
    int icv, cdfid, img, max, min, dimvar;
    static int dim[MAX_VAR_DIMS];

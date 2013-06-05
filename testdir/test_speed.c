@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <minc.h>
 #include <float.h>
 
@@ -201,7 +202,7 @@ test_icv_read(char *filename, int xsize, int ysize, double image_min,
    return (NORMAL_STATUS);
 }
 
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
    int xsize, ysize;
    double image_max, image_min;

@@ -47,10 +47,16 @@ VIOAPI Status  mni_get_nonwhite_character(
     {
         status = input_character( file, ch );
         if( status == OK )
+        {
             if( *ch == COMMENT_CHAR1 || *ch == COMMENT_CHAR2 )
+            {
                 in_comment = TRUE;
+            }
             else if( *ch == '\n' )
+            {
                 in_comment = FALSE;
+            }
+        }
     }
     while( status == OK &&
            (in_comment || *ch == ' ' || *ch == '\t' || *ch == '\n' || 
