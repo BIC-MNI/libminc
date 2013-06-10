@@ -899,6 +899,7 @@ int micreate_volume(const char *filename, int number_of_dimensions,
       props_handle->compression_type = MI_COMPRESS_ZLIB;
       break;
     default:
+      free(props_handle);
       return MI_LOG_ERROR(MI2_MSG_BADTYPE,create_props->compression_type);
     }
     /* Note that setting compression on (i.e., MI_COMPRESS_ZLIB)
