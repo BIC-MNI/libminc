@@ -11,7 +11,7 @@
 #include <volume_io.h>
 
  
-VIO_Real tolerance = 1e-8;
+static VIO_Real tolerance = 1e-8;
 
 /*Windows compatibility hack*/
 #ifndef HAVE_SRAND48
@@ -30,7 +30,7 @@ double drand48(void)
 
 
 
-int is_equal_real( VIO_Real e, VIO_Real a )
+static int is_equal_real( VIO_Real e, VIO_Real a )
 {
     return fabs(e-a) < tolerance;
 }
@@ -39,7 +39,7 @@ int is_equal_real( VIO_Real e, VIO_Real a )
 
 /* Args: expected, actual.
  */
-void assert_equal_point( VIO_Real ex, VIO_Real ey, VIO_Real ez,
+static void assert_equal_point( VIO_Real ex, VIO_Real ey, VIO_Real ez,
 			 VIO_Real ax, VIO_Real ay, VIO_Real az,
 			 const char* msg )
 {

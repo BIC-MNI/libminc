@@ -22,7 +22,7 @@ static int error_cnt = 0;
 #define ZSTART (22)
 #define ZSTEP (-1.5)
 
-int 
+static int
 check_dims(mihandle_t vol, midimhandle_t dim[])
 {
     int i;

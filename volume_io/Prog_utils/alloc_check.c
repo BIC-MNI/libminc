@@ -902,7 +902,7 @@ VIOAPI  void  output_alloc_to_file(
             else
                 file = stdout;
 
-            if( file != (FILE *) 0 )
+            if( file != NULL )
             {
                 date_str = get_date();
 
