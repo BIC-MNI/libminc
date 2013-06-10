@@ -11,7 +11,7 @@
 static int error_cnt = 0;
 
 
-const char * get_type_name(mitype_t volume_type)
+static const char * get_type_name(mitype_t volume_type)
 {
   return volume_type==MI_TYPE_BYTE?"Byte":
          volume_type==MI_TYPE_SHORT?"Short":
@@ -24,7 +24,7 @@ const char * get_type_name(mitype_t volume_type)
          volume_type==MI_TYPE_UINT?"Unsigned Int":"Other";
 }
 
-int print_metadata(mihandle_t vol, const char * path,int ident)
+static int print_metadata(mihandle_t vol, const char * path,int ident)
 {
   milisthandle_t grplist;
   char group_name[256];

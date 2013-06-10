@@ -13,7 +13,7 @@ static int error_cnt = 0;
 #define CX 530
 #define NDIMS 4
 
-void create_test_file ( void )
+static void create_test_file ( void )
 {
   int r;
   midimhandle_t hdim[NDIMS];
