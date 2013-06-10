@@ -53,6 +53,7 @@ char **read_file_names(char *filelist, int *num_files)
    files = malloc(sizeof(*files) * array_size);
    if (files == NULL) {
       (void) fprintf(stderr, "Error allocating memory\n");
+      (void) fclose(fp);
       return NULL;
    }
    nfiles = 0;
@@ -75,6 +76,7 @@ char **read_file_names(char *filelist, int *num_files)
          files = realloc(files, sizeof(*files) * array_size);
          if (files == NULL) {
             (void) fprintf(stderr, "Error allocating memory\n");
+            (void) fclose(fp);
             return NULL;
          }
       }

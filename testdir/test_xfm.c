@@ -13,7 +13,7 @@
 Real tolerance = 1e-8;
 
 
-int is_equal_real( Real e, Real a )
+static int is_equal_real( Real e, Real a )
 {
     return fabs(e-a) < tolerance;
 }
@@ -22,7 +22,7 @@ int is_equal_real( Real e, Real a )
 
 /* Args: expected, actual.
  */
-void assert_equal_point( Real ex, Real ey, Real ez,
+static void assert_equal_point( Real ex, Real ey, Real ez,
 			 Real ax, Real ay, Real az,
 			 const char* msg )
 {

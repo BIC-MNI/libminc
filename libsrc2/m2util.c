@@ -1898,6 +1898,7 @@ alloc2d ( int n, int m )
     mat[i] = ( double * ) malloc ( m * sizeof ( double ) );
 
     if ( mat[i] == NULL ) {
+      free(mat);
       return NULL;
     }
   }

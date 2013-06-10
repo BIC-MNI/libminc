@@ -1114,6 +1114,7 @@ restructure_array(int ndims,    /* Dimension count */
      **/
     bitmap = calloc((total + 8 - 1) / 8, 1); /* bit array */
     if (bitmap == NULL) {
+        free(temp);
         return;
     }
 

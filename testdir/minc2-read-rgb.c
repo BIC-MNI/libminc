@@ -11,7 +11,7 @@
 static int error_cnt = 0;
 
 
-double calculate_mean_f(float *array,misize_t length)
+static double calculate_mean_f(float *array,misize_t length)
 {
   double avg=0.0;
   misize_t i;
@@ -23,7 +23,7 @@ double calculate_mean_f(float *array,misize_t length)
   return avg/length;
 }
 
-double calculate_mean_s(short *array,misize_t length)
+static double calculate_mean_s(short *array,misize_t length)
 {
   double avg=0.0;
   misize_t i;
@@ -33,7 +33,7 @@ double calculate_mean_s(short *array,misize_t length)
   return avg/length;
 }
 
-double calculate_mean_d(double *array,misize_t length)
+static double calculate_mean_d(double *array,misize_t length)
 {
   double avg=0.0;
   misize_t i;

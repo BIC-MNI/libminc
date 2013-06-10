@@ -124,6 +124,7 @@ void restructure_array(int ndims,    /* Dimension count */
   bitmap = calloc((total + 8 - 1) / 8, 1); /* bit array */
   if (bitmap == NULL) {
     MI_LOG_ERROR(MI2_MSG_OUTOFMEM,(total + 8 - 1) / 8);
+    free(temp);
     return;
   }
 
