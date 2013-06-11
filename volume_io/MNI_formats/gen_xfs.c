@@ -512,12 +512,13 @@ VIOAPI  VIO_Transform  *get_inverse_linear_transform_ptr(
 }
 
 /* ----------------------------- MNI Header -----------------------------------
-@NAME       : transform_or_invert_point
+@NAME       : transform_or_invert_point_with_input_steps
 @INPUT      : transform
               inverse_flag
               x
               y
               z
+              input_volume_steps
 @OUTPUT     : x_transformed
               y_transformed
               z_transformed
@@ -529,14 +530,20 @@ VIOAPI  VIO_Transform  *get_inverse_linear_transform_ptr(
 @CALLS      : 
 @CREATED    : 1993            David MacDonald
 @MODIFIED   : Feb. 27, 1995   D. MacDonald  - added grid transforms
+@MODIFIED   : 2013, June 10,  Matthijs van Eede, added the possibility to pass
+                              along the step sizes of the input file which is 
+                              being resampled to determine the appropriate error
+                              margin (ftol) in 
+                              grid_inverse_transform_point_with_input_steps
 ---------------------------------------------------------------------------- */
 
-static  VIO_Status  transform_or_invert_point(
+static  VIO_Status  transform_or_invert_point_with_input_steps(
     VIO_General_transform   *transform,
     VIO_BOOL             inverse_flag,
     VIO_Real                x,
     VIO_Real                y,
     VIO_Real                z,
+    VIO_Real                *input_volume_steps,
     VIO_Real                *x_transformed,
     VIO_Real                *y_transformed,
     VIO_Real                *z_transformed )
@@ -587,8 +594,8 @@ static  VIO_Status  transform_or_invert_point(
         }
         if( inverse_flag )
         {
-            return grid_inverse_transform_point( transform,
-                                          x, y, z,
+            return grid_inverse_transform_point_with_input_steps( transform,
+                                          x, y, z, input_volume_steps,
                                           x_transformed, y_transformed,
                                           z_transformed );
         }
@@ -627,8 +634,8 @@ static  VIO_Status  transform_or_invert_point(
         {
             for( trans = transform->n_transforms-1;  trans >= 0;  --trans )
             {
-                if( (status=general_inverse_transform_point( &transform->transforms[trans],
-                             *x_transformed, *y_transformed, *z_transformed,
+                if( (status=general_inverse_transform_point_with_input_steps( &transform->transforms[trans],
+                             *x_transformed, *y_transformed, *z_transformed, input_volume_steps,
                              x_transformed, y_transformed, z_transformed )) != VIO_OK)
                   return status;
             }
@@ -637,8 +644,8 @@ static  VIO_Status  transform_or_invert_point(
         {
             for_less( trans, 0, transform->n_transforms )
             {
-                if((status=general_transform_point( &transform->transforms[trans],
-                             *x_transformed, *y_transformed, *z_transformed,
+                if((status=general_transform_point_with_input_steps( &transform->transforms[trans],
+                             *x_transformed, *y_transformed, *z_transformed, input_volume_steps,
                              x_transformed, y_transformed, z_transformed )) != VIO_OK)
                   return status;
             }
@@ -651,6 +658,116 @@ static  VIO_Status  transform_or_invert_point(
         break;
     }
     return status;
+}
+
+
+/* ----------------------------- MNI Header -----------------------------------
+@NAME       : general_transform_point_with_input_steps
+@INPUT      : transform
+              x
+              y
+              z
+              input_volume_steps
+@OUTPUT     : x_transformed
+              y_transformed
+              z_transformed
+@RETURNS    : 
+@DESCRIPTION: Transforms a point by the general transform.
+@METHOD     : 
+@GLOBALS    : 
+@CALLS      : 
+@CREATED    : 1993            David MacDonald
+@MODIFIED   : 
+@MODIFIED   : 2013, June 10,  Matthijs van Eede, added the possibility to pass
+                              along the step sizes of the input file which is 
+                              being resampled to determine the appropriate error
+                              margin (ftol) in grid_inverse_transform_point_with_input_steps
+---------------------------------------------------------------------------- */
+
+VIOAPI  VIO_Status  general_transform_point_with_input_steps(
+    VIO_General_transform   *transform,
+    VIO_Real                x,
+    VIO_Real                y,
+    VIO_Real                z,
+    VIO_Real                *input_volume_steps,
+    VIO_Real                *x_transformed,
+    VIO_Real                *y_transformed,
+    VIO_Real                *z_transformed )
+{
+
+    return transform_or_invert_point_with_input_steps( transform, transform->inverse_flag, x, y, z,
+                               input_volume_steps,
+                               x_transformed, y_transformed, z_transformed );
+}
+
+/* ----------------------------- MNI Header -----------------------------------
+@NAME       : general_inverse_transform_point_with_input_steps
+@INPUT      : transform
+              x
+              y
+              z
+              input_volume_steps
+@OUTPUT     : x_transformed
+              y_transformed
+              z_transformed
+@RETURNS    : 
+@DESCRIPTION: Transforms a point by the inverse of the general transform.
+@METHOD     : 
+@GLOBALS    : 
+@CALLS      : 
+@CREATED    : 1993            David MacDonald
+@MODIFIED   : 
+---------------------------------------------------------------------------- */
+
+VIOAPI  VIO_Status  general_inverse_transform_point_with_input_steps(
+    VIO_General_transform   *transform,
+    VIO_Real                x,
+    VIO_Real                y,
+    VIO_Real                z,
+    VIO_Real                *input_volume_steps,
+    VIO_Real                *x_transformed,
+    VIO_Real                *y_transformed,
+    VIO_Real                *z_transformed )
+{
+
+    return transform_or_invert_point_with_input_steps( transform, !transform->inverse_flag, x, y, z,
+                               input_volume_steps,
+                               x_transformed, y_transformed, z_transformed );
+}
+
+/* ----------------------------- MNI Header -----------------------------------
+@NAME       : transform_or_invert_point
+@INPUT      : transform
+              inverse_flag
+              x
+              y
+              z
+@OUTPUT     : x_transformed
+              y_transformed
+              z_transformed
+@RETURNS    : 
+@DESCRIPTION: Transforms a point by the general transform or its inverse,
+              depending on inverse_flag.
+@METHOD     : 
+@GLOBALS    : 
+@CALLS      : 
+@CREATED    : 1993            David MacDonald
+@MODIFIED   : Feb. 27, 1995   D. MacDonald  - added grid transforms
+---------------------------------------------------------------------------- */
+
+static  VIO_Status  transform_or_invert_point(
+    VIO_General_transform   *transform,
+    VIO_BOOL             inverse_flag,
+    VIO_Real                x,
+    VIO_Real                y,
+    VIO_Real                z,
+    VIO_Real                *x_transformed,
+    VIO_Real                *y_transformed,
+    VIO_Real                *z_transformed )
+{
+    return transform_or_invert_point_with_input_steps(transform, inverse_flag, x, y, z,
+                                                      NULL,
+                                                      x_transformed, y_transformed, z_transformed);
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -681,7 +798,8 @@ VIOAPI  VIO_Status  general_transform_point(
     VIO_Real                *z_transformed )
 {
 
-    return transform_or_invert_point( transform, transform->inverse_flag, x, y, z,
+    return general_transform_point_with_input_steps( transform, x, y, z,
+                               NULL,
                                x_transformed, y_transformed, z_transformed );
 }
 
@@ -713,7 +831,8 @@ VIOAPI  VIO_Status  general_inverse_transform_point(
     VIO_Real                *z_transformed )
 {
 
-    return transform_or_invert_point( transform, !transform->inverse_flag, x, y, z,
+    return general_inverse_transform_point_with_input_steps( transform, x, y, z,
+                               NULL,
                                x_transformed, y_transformed, z_transformed );
 }
 
