@@ -18,7 +18,7 @@ static int error_cnt=0;
 #define CU 5
 #define NDIMS 3
 
-int create_2D_image ( void )
+static int create_2D_image ( void )
 {
   int r, i;
   midimhandle_t hdim[NDIMS - 1];
@@ -73,7 +73,7 @@ int create_2D_image ( void )
   return r;
 }
 
-int create_3D_image ( void )
+static int create_3D_image ( void )
 {
   int r;
   double start_values[NDIMS] = { -6.96, -12.453,  -9.48};
@@ -144,7 +144,7 @@ int create_3D_image ( void )
   return r;
 }
 
-int create_4D_image ( void )
+static int create_4D_image ( void )
 {
   int r;
   double start_values[NDIMS + 1] = { -6.96, -12.453,  -9.48, 20.002};

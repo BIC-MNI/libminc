@@ -1367,15 +1367,15 @@ void miinit ( void )
 * an arbitrary enumerated type.  The beauty part of this is that it is
 * not necessary to actually perform any real conversion!
 */
-herr_t mi2_null_conv ( hid_t src_id,
-                       hid_t dst_id,
-                       H5T_cdata_t *cdata,
-                       H5_NELEMENTS_T nelements,
-                       size_t buf_stride,
-                       size_t bkg_stride,
-                       void *buf_ptr,
-                       void *bkg_ptr,
-                       hid_t dset_xfer_plist )
+static herr_t mi2_null_conv ( hid_t src_id,
+                              hid_t dst_id,
+                              H5T_cdata_t *cdata,
+                              H5_NELEMENTS_T nelements,
+                              size_t buf_stride,
+                              size_t bkg_stride,
+                              void *buf_ptr,
+                              void *bkg_ptr,
+                              hid_t dset_xfer_plist )
 {
   switch ( cdata->command ) {
   case H5T_CONV_INIT:

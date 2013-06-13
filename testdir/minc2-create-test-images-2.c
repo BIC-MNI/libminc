@@ -16,7 +16,7 @@ __LINE__, msg, val))
 #define NDIMS 3
 
 
-int create_real_as_int_image(void)
+static int create_real_as_int_image(void)
 {
   int r;
   int error_cnt=0;
@@ -92,7 +92,7 @@ int create_real_as_int_image(void)
 }
 
 
-int create_real_as_float_image(void)
+static int create_real_as_float_image(void)
 {
   int r;
   int error_cnt=0;
@@ -139,7 +139,7 @@ int create_real_as_float_image(void)
   if( r!= MI_NOERROR )    TESTRPT("micreate_volume_image",r);
   
   for (i = 0; i < CY*CX*CZ; i++) {
-    buf[i] =  i * 0.001;
+    buf[i] =  i * 0.001f;
   }
   
   start[0] = start[1] = start[2] = 0;

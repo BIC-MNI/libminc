@@ -19,7 +19,7 @@
 
 #define MI_LABEL_MAX 128
 
-int miswap2(unsigned short tmp)
+static int miswap2(unsigned short tmp)
 {
     unsigned char *x = (unsigned char *) &tmp;
     unsigned char t = x[0];
@@ -28,7 +28,7 @@ int miswap2(unsigned short tmp)
     return (tmp);
 }
 
-int miswap4(unsigned int tmp)
+static int miswap4(unsigned int tmp)
 {
     unsigned char *x = (unsigned char *) &tmp;
     unsigned char t = x[0];

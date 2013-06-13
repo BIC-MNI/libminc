@@ -2442,7 +2442,7 @@ VIOAPI  VIO_Volume  copy_volume(
     VIO_Volume   volume )
 {
     VIO_Volume   copy;
-    void     *src, *dest;
+    void     *src = NULL, *dest = NULL;
     int      d, n_voxels, sizes[VIO_MAX_DIMENSIONS];
 
     if( volume->is_cached_volume )
