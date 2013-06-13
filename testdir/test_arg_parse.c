@@ -11,7 +11,7 @@ static long long_a = 0;
 static long long_b = 0;
 
 
-ArgvInfo argTable[] = 
+static ArgvInfo argTable[] = 
 {
     {"-const_a", ARGV_CONSTANT, (char *)1, (char *)&const_a, "const_a option"},
     {"-const_b", ARGV_CONSTANT, (char *)1, (char *)&const_b, "const_b option"},

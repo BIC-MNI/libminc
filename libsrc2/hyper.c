@@ -78,12 +78,12 @@ offset_to_index(int ndims,
 
 /** The main restructuring code.
  */
-void restructure_array(int ndims,    /* Dimension count */
-                  unsigned char *array, /* Raw data */
-                  const misize_t *lengths_perm, /* Permuted lengths */
-                  int el_size,  /* Element size, in bytes */
-                  const int *map, /* Mapping array */
-                  const int *dir) /* Direction array, in permuted order */
+static void restructure_array(int ndims,    /* Dimension count */
+                              unsigned char *array, /* Raw data */
+                              const misize_t *lengths_perm, /* Permuted lengths */
+                              int el_size,  /* Element size, in bytes */
+                              const int *map, /* Mapping array */
+                              const int *dir) /* Direction array, in permuted order */
 {
   misize_t index[MI2_MAX_VAR_DIMS]; /* Raw indices */
   misize_t index_perm[MI2_MAX_VAR_DIMS]; /* Permuted indices */

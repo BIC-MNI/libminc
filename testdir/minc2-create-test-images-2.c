@@ -16,7 +16,7 @@ __LINE__, msg, val))
 #define NDIMS 3
 
 
-int create_real_as_int_image(void)
+static int create_real_as_int_image(void)
 {
   int r;
   int error_cnt=0;
@@ -92,7 +92,7 @@ int create_real_as_int_image(void)
 }
 
 
-int create_real_as_float_image(void)
+static int create_real_as_float_image(void)
 {
   int r;
   int error_cnt=0;
