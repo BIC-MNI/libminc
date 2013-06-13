@@ -24,10 +24,11 @@
 
 #define   FOUR_DIMS      4
 
+#ifdef USE_NEWTONS_METHOD
 #define   INVERSE_FUNCTION_TOLERANCE     0.01
 #define   INVERSE_DELTA_TOLERANCE        1.0e-5
-
 #define   MAX_INVERSE_ITERATIONS         20
+#endif
 
 static void   evaluate_grid_volume(
     VIO_Volume         volume,
