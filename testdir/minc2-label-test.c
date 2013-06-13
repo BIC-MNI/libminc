@@ -14,7 +14,7 @@ static int error_cnt = 0;
 #define NDIMS 3
 
 
-int create_label_image ( void )
+static int create_label_image ( void )
 {
 
   mihandle_t hvol;

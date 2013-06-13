@@ -309,7 +309,6 @@ VIOAPI  VIO_Status  thin_plate_spline_inverse_transform(
         *z_transformed = x_in[2];
         return VIO_ERROR;
     }
-    return VIO_ERROR;
 }
 
 /* ----------------------------- MNI Header -----------------------------------
