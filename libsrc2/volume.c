@@ -1413,7 +1413,7 @@ int miopen_volume(const char *filename, int mode, mihandle_t *volume)
 /** Writes any changes associated with the volume to disk.
     \ingroup mi2Vol
 */
-int miflush_volume(mihandle_t volume)
+static int miflush_volume(mihandle_t volume)
 {
   if ((volume->mode & MI2_OPEN_RDWR) != 0) {
     H5Fflush(volume->hdf_id, H5F_SCOPE_GLOBAL);

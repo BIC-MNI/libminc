@@ -1,14 +1,14 @@
 #include <ParseArgv.h>
 #include <stdio.h>
 
-int const_a = 0;
-int const_b = 0;
+static int const_a = 0;
+static int const_b = 0;
 
-int int_a = 0;
-int int_b = 0;
+static int int_a = 0;
+static int int_b = 0;
 
-long long_a = 0;
-long long_b = 0;
+static long long_a = 0;
+static long long_b = 0;
 
 
 ArgvInfo argTable[] = 
