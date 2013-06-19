@@ -552,11 +552,13 @@ MNCAPI int miopen(char *path, int mode)
       remove(tempfile);
    }
    
-   free(tempfile);/*free memory allocated in miexpand_file*/
    
    if (status < 0) {
        milog_message(MI_MSG_OPENFILE, tempfile);
    }
+   
+   free(tempfile);/*free memory allocated in miexpand_file*/
+   
    MI_RETURN(status);
 
 }
