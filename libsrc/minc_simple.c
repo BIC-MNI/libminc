@@ -60,7 +60,7 @@ static char *minc_dimnames[] = {
  rework them into a more rational and easily described form. 
 */
 
-MNCAPI void restructure_array(int ndims,
+void restructure_array(int ndims,
                               unsigned char *array,
                               const unsigned long *lengths_perm,
                               int el_size,
@@ -1068,7 +1068,7 @@ offset_to_index(int ndims,
 
 /** The main restructuring code.
  */
-MNCAPI void
+void
 restructure_array(int ndims,    /* Dimension count */
                   unsigned char *array, /* Raw data */
                   const unsigned long *lengths_perm, /* Permuted lengths */

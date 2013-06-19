@@ -78,7 +78,7 @@ offset_to_index(int ndims,
 
 /** The main restructuring code.
  */
-static void restructure_array(int ndims,    /* Dimension count */
+void restructure_array(int ndims,    /* Dimension count */
                               unsigned char *array, /* Raw data */
                               const misize_t *lengths_perm, /* Permuted lengths */
                               int el_size,  /* Element size, in bytes */
