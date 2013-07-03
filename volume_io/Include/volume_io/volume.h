@@ -71,10 +71,11 @@ typedef int nc_type;
 
 /*TODO: use minc2 definitions here?*/
 #define NC_BYTE   1
-#define NC_SHORT  2
-#define NC_INT    3
-#define NC_FLOAT  4
-#define NC_DOUBLE 5
+#define NC_CHAR   2
+#define NC_SHORT  3
+#define NC_INT    4
+#define NC_FLOAT  5
+#define NC_DOUBLE 6
 
 #endif /*HAVE_MINC1*/
 
