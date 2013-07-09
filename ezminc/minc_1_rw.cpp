@@ -976,7 +976,6 @@ namespace minc
     ncendef(_mincid);
     miicv_setint(_icvid, MI_ICV_TYPE, NC_SHORT);
     miicv_setstr(_icvid, MI_ICV_SIGN, (char*)MI_UNSIGNED);
-    miicv_setstr(_icvid, MI_ICV_SIGN, false); 
     
     /* Set range of values */ //TODO: set this to something sensible?
     miicv_setint(_icvid, MI_ICV_VALID_MIN, 0);
