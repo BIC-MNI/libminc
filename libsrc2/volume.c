@@ -38,27 +38,6 @@ static void miread_valid_range(mihandle_t volume, double *valid_max,
 static int _miset_volume_class(mihandle_t volume, miclass_t volclass);
 static int _miget_volume_class(mihandle_t volume, miclass_t *volclass);
 
-/* ported from hdf_convinience.c*/
-/**
- * Supposedly declare new variable 
- */
-static int _hdf_var_declare(hid_t fd,const char *varnm,const char *varpath, int ndims, hsize_t *sizes)
-{
-  hid_t dset_id,ftyp_id,mtyp_id,fspc_id;
-  dset_id = H5Dopen1(fd, varpath);
-  MI_CHECK_HDF_CALL(dset_id,H5Dopen1)
-  ftyp_id = H5Dget_type(dset_id);
-  MI_CHECK_HDF_CALL(ftyp_id,H5Dget_type)
-  mtyp_id = H5Tget_native_type(ftyp_id, H5T_DIR_ASCEND);
-  MI_CHECK_HDF_CALL(mtyp_id,H5Tget_native_type)
-  fspc_id = H5Dget_space(dset_id);
-  MI_CHECK_HDF_CALL(fspc_id,H5Dget_space)
-  
-  //TODO: figure out how to actually declare variable in HDF5
-  return MI_NOERROR;
-}
-
-
 /**
  * Creates a (hopefully) unique identifier to associate with a
  *              MINC file, by concatenating various information about the
@@ -299,13 +278,14 @@ int micreate_volume_image(mihandle_t volume)
   }
 
   MI_CHECK_HDF_CALL_RET(dset_id = H5Dcreate1(volume->hdf_id, MI_ROOT_PATH "/image/0/image",
-                       volume->ftype_id,
-                       dataspace_id, volume->plist_id),"H5Dcreate1")
+                                             volume->ftype_id,
+                                             dataspace_id, 
+                                             volume->plist_id),"H5Dcreate1")
 
   volume->image_id = dset_id;
 
-  _hdf_var_declare(volume->hdf_id, "image", MI_ROOT_PATH "/image/0/image",
-                  volume->number_of_dims, hdf_size);
+  add_standard_minc_attributes(volume->hdf_id,volume->image_id);
+  
   /* Create the dimorder attribute, ordered comma-separated
     list of dimension names.
   */
@@ -358,8 +338,7 @@ int micreate_volume_image(mihandle_t volume)
                         strlen(dimorder), dimorder);
     }
     volume->imin_id = dset_id;
-    _hdf_var_declare(volume->hdf_id, "image-min", MI_ROOT_PATH "/image/0/image-min", ndims, hdf_size);
-
+    add_standard_minc_attributes(volume->hdf_id,volume->imin_id);
 
     /* Create the image maximum dataset for FULL-RESOLUTION storage of data
     */
@@ -373,7 +352,7 @@ int micreate_volume_image(mihandle_t volume)
                         strlen(dimorder), dimorder);
     }
     volume->imax_id = dset_id;
-    _hdf_var_declare(volume->hdf_id, "image-max", MI_ROOT_PATH "/image/0/image-max", ndims, hdf_size);
+    add_standard_minc_attributes(volume->hdf_id,volume->imax_id);
     H5Sclose(dataspace_id);
     H5Pclose(dcpl_id);
   }
@@ -681,10 +660,11 @@ int micreate_volume(const char *filename, int number_of_dimensions,
       write the dimension->widths.
     */
 
+    add_standard_minc_attributes(file_id,dataset_id);
+    
     /* Check for irregular dimension and make sure
       offset values are provided for this dimension
     */
-
     if (dimensions[i]->attr & MI_DIMATTR_NOT_REGULARLY_SAMPLED) {
       if (dimensions[i]->offsets == NULL) {
         return (MI_ERROR);

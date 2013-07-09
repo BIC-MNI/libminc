@@ -1949,17 +1949,13 @@ create_dataset ( hid_t hdf_file, const char *name )
     return ( MI_ERROR );
   }
 
-  result = miset_attr_at_loc ( dataset_info, MIvartype, MI_TYPE_STRING, strlen ( MI_GROUP ), MI_GROUP );
-
-  if ( result < 0 ) {
-    return ( MI_ERROR );
-  }
-
+  result=add_minimal_minc_attributes(hdf_file,dataset_info);
+  
   H5Dclose ( dataset_info );
   H5Sclose ( dataspace_info );
   H5Gclose ( grp_info );
 
-  return ( MI_NOERROR );
+  return ( result );
 }
 
 /** Function for create a dataset (acquisition, patient, study)
@@ -1992,29 +1988,53 @@ create_standard_dataset ( hid_t hdf_file, const char *name )
     return ( MI_ERROR );
   }
 
-  result = miset_attr_at_loc ( dataset_info, MIvarid, MI_TYPE_STRING, strlen ( MI_STDVAR ), MI_STDVAR );
-
-  if ( result < 0 ) {
-    return ( MI_ERROR );
-  }
-
-  result = miset_attr_at_loc ( dataset_info, MIvartype, MI_TYPE_STRING, strlen ( MI_GROUP ), MI_GROUP );
-
-  if ( result < 0 ) {
-    return ( MI_ERROR );
-  }
-
-  result = miset_attr_at_loc ( dataset_info, MIversion, MI_TYPE_STRING, strlen ( MI_VERSION_2_0 ), MI_VERSION_2_0 );
-
-  if ( result < 0 ) {
-    return ( MI_ERROR );
-  }
+  result = add_standard_minc_attributes(hdf_file,dataset_info);
 
   H5Dclose ( dataset_info );
   H5Sclose ( dataspace_info );
   H5Gclose ( grp_info );
 
-  return ( MI_NOERROR );
+  return ( result );
+}
+
+
+int 
+add_minimal_minc_attributes(hid_t hdf_file, hid_t dset_id)
+{
+  int result;
+  
+  result = miset_attr_at_loc ( dset_id, MIvartype, MI_TYPE_STRING, strlen ( MI_GROUP ), MI_GROUP );
+
+  if ( result < 0 ) {
+    return ( MI_ERROR );
+  }
+  
+  return result;
+}
+
+int 
+add_standard_minc_attributes(hid_t hdf_file, hid_t dset_id)
+{
+  int result;
+  result = miset_attr_at_loc ( dset_id, MIvarid, MI_TYPE_STRING, strlen ( MI_STDVAR ), MI_STDVAR );
+
+  if ( result < 0 ) {
+    return ( MI_ERROR );
+  }
+
+  result = miset_attr_at_loc ( dset_id, MIvartype, MI_TYPE_STRING, strlen ( MI_GROUP ), MI_GROUP );
+
+  if ( result < 0 ) {
+    return ( MI_ERROR );
+  }
+
+  result = miset_attr_at_loc ( dset_id, MIversion, MI_TYPE_STRING, strlen ( MI_VERSION_2_0 ), MI_VERSION_2_0 );
+
+  if ( result < 0 ) {
+    return ( MI_ERROR );
+  }
+
+  return result;
 }
 
 

@@ -181,8 +181,14 @@ int scaled_maximal_pivoting_gaussian_elimination_real(int n,
 double *alloc1d(int);
 double **alloc2d(int, int);
 void free2d(int, double **);
+
+/* m2util : creation of minc2 comformant datasets*/
 int create_dataset(hid_t hdf_file, const char *path);
 int create_standard_dataset(hid_t hdf_file, const char *path);
+
+int add_minimal_minc_attributes(hid_t hdf_file, hid_t dset_id);
+int add_standard_minc_attributes(hid_t hdf_file, hid_t dset_id);
+
 
 /* From hyper.c */
 int mitranslate_hyperslab_origin(mihandle_t volume, 
