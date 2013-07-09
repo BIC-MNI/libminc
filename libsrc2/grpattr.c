@@ -943,7 +943,7 @@ int miadd_history_attr ( mihandle_t vol, size_t length, const void *values )
     return MI_LOG_ERROR(MI2_MSG_GENERIC,"HDF file is not open");
   }
 
-  hdf_grp = midescend_path ( hdf_file, "/minc-2.0" );
+  hdf_grp = midescend_path ( hdf_file, MI_ROOT_PATH );
 
   if ( hdf_grp < 0 ) {
     return MI_LOG_ERROR(MI2_MSG_GENERIC,"midescend_path fail");
