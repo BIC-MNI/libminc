@@ -1,4 +1,5 @@
 INCLUDES = -I$(top_srcdir)/libsrc \
+	-I$(top_srcdir)/libsrc2 \
 	-I$(top_srcdir)/volume_io/Include \
 	-I$(top_builddir)/volume_io/Include
 
@@ -6,25 +7,48 @@ script_tests = \
 	run_test_arg_parse.sh \
 	run_tests.sh \
 	run_test2.sh \
-	xfmconcat_01.sh \
-	xfmconcat_02.sh \
 	run_test_progs.sh
+#	xfmconcat_01.sh 
+#	xfmconcat_02.sh 
 
 all-local:
 	cd $(srcdir) && chmod +x $(script_tests)
 
-LDADD = ../libvolume_io2.la ../libminc2.la
+LDADD = ../libminc2.la
+
+AM_CFLAGS = -DAPPARENTORDER
+
+
+
 TESTS = run_test_arg_parse.sh \
 	run_tests.sh \
 	run_test2.sh \
-	xfmconcat_01.sh \
-	xfmconcat_02.sh \
-	mincapi \
-	run_test_progs.sh
+	mincapi 
 
+#	run_test_progs.sh
+#	xfmconcat_01.sh 
+#	xfmconcat_02.sh 
+	
+	
 check_PROGRAMS = minc test_mconv minc_types icv icv_range \
 	icv_dim test_speed icv_dim1 icv_fillvalue \
-	test_xfm create_grid_xfm mincapi test_speed test_arg_parse
+	test_xfm create_grid_xfm mincapi test_speed test_arg_parse \
+	minc2-create-test-images \
+	minc2-create-test-images-2 \
+	minc2-datatype-test \
+	minc2-dimension-test \
+	minc2-full-test \
+	minc2-grpattr-test \
+	minc2-hyper-test \
+        minc2-hyper-test-2 \
+	minc2-label-test \
+	minc2-record-test \
+	minc2-slice-test \
+	minc2-valid-test \
+	minc2-volprops-test \
+	minc2-multires-test \
+	minc2-convert-test \
+	minc2-vector_dimension-test 
 
 EXTRA_DIST = $(script_tests) $(expect_files) t1.xfm icv.mnc
 
@@ -49,36 +73,14 @@ icv_fillvalue.out: ;
 icv_range.out: ;
 minc_types.out: ;
 
-INCLUDES += -I$(top_srcdir)/libsrc2
 
-minc2_script_tests = \
-	minc2-testminctools.sh
+#minc2_script_tests = \
+#	minc2-testminctools.sh
 
 minc2-all-local: # CHECK!
 	cd $(srcdir) && chmod +x $(script_tests)
 
 
-LDADD += ../../libminc2.la
-
-AM_CFLAGS = -DAPPARENTORDER
-
-MINC2_TESTS =	\
-	minc2-create-test-images \
-	minc2-create-test-images-2 \
-	minc2-datatype-test \
-	minc2-dimension-test \
-	minc2-full-test \
-	minc2-grpattr-test \
-	minc2-hyper-test \
-        minc2-hyper-test-2 \
-	minc2-label-test \
-	minc2-record-test \
-	minc2-slice-test \
-	minc2-valid-test \
-	minc2-volprops-test \
-	minc2-multires-test \
-	minc2-convert-test \
-	minc2-vector_dimension-test 
 
 TESTS += \
 	$(MINC2_TESTS) \

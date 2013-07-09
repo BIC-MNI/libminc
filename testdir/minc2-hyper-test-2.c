@@ -91,6 +91,8 @@ int main ( int argc, char **argv )
   misize_t count[NDIMS];
   misize_t howfar[NDIMS];
   misize_t location[NDIMS];
+  char *dimorder[] = {MIxspace,MIyspace,MIzspace};
+
   double *buffer, value;
   int r = 0;
 

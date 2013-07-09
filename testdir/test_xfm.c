@@ -10,10 +10,10 @@
 #include <volume_io.h>
 
 
-Real tolerance = 1e-8;
+VIO_Real tolerance = 1e-8;
 
 
-static int is_equal_real( Real e, Real a )
+static int is_equal_real( VIO_Real e, VIO_Real a )
 {
     return fabs(e-a) < tolerance;
 }
@@ -22,8 +22,8 @@ static int is_equal_real( Real e, Real a )
 
 /* Args: expected, actual.
  */
-static void assert_equal_point( Real ex, Real ey, Real ez,
-			 Real ax, Real ay, Real az,
+static void assert_equal_point( VIO_Real ex, VIO_Real ey, VIO_Real ez,
+			 VIO_Real ax, VIO_Real ay, VIO_Real az,
 			 const char* msg )
 {
     if ( is_equal_real(ex,ax) && 
@@ -44,7 +44,7 @@ static void assert_equal_point( Real ex, Real ey, Real ez,
 int main( int ac, char* av[] )
 {
     int N;
-    General_transform xfm;
+    VIO_General_transform xfm;
 
 
     if ( ac != 3 && ac != 4 ) {
@@ -53,7 +53,7 @@ int main( int ac, char* av[] )
     }
 
     N = atoi( av[1] );
-    if ( input_transform_file( av[2], &xfm ) != OK ) {
+    if ( input_transform_file( av[2], &xfm ) != VIO_OK ) {
 	fprintf( stderr, "Failed to load transform '%s'\n", av[2] );
 	return 2;
     }
@@ -64,12 +64,12 @@ int main( int ac, char* av[] )
     }
 
     while (N-- > 0) {
-	Real x = 500.0 * ( drand48() - 0.5 );
-	Real y = 500.0 * ( drand48() - 0.5 );
-	Real z = 500.0 * ( drand48() - 0.5 );
+	VIO_Real x = 500.0 * ( drand48() - 0.5 );
+	VIO_Real y = 500.0 * ( drand48() - 0.5 );
+	VIO_Real z = 500.0 * ( drand48() - 0.5 );
 
-	Real tx,ty,tz;
-	Real a,b,c;
+	VIO_Real tx,ty,tz;
+	VIO_Real a,b,c;
 
 	general_transform_point( &xfm,  x,y,z,  &tx,&ty,&tz );
 

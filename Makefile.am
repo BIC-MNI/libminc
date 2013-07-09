@@ -24,11 +24,7 @@ include_HEADERS = \
 	libsrc/minc_compat.h \
 	volume_io/Include/volume_io.h \
 	libsrc2/minc2.h \
-	libsrc/minc_simple.h
-
-include_volume_iodir = $(includedir)/volume_io
-
-include_volume_io_HEADERS = \
+	libsrc/minc_simple.h \
 	volume_io/Include/volume_io/alloc.h \
 	volume_io/Include/volume_io/arrays.h \
 	volume_io/Include/volume_io/basic.h \
@@ -46,6 +42,8 @@ include_volume_io_HEADERS = \
 	volume_io/Include/volume_io/volume.h \
 	volume_io/Include/volume_io/volume_cache.h
 
+include_volume_iodir = $(includedir)/volume_io
+
 # Header files which must be included in the distribution but which are 
 # not part of the installation.
 noinst_HEADERS = \
@@ -60,12 +58,12 @@ noinst_HEADERS = \
 	libsrc/minc_varlists.h \
 	libsrc/type_limits.h \
 	libsrc/hdf_convenience.h \
-	libsrc2/minc2_private.h 
+	libsrc2/minc2_private.h
 
 # Libraries which must be built and installed.
-lib_LTLIBRARIES = libminc2.la libvolume_io2.la
+lib_LTLIBRARIES = libminc2.la
 
-LDADD = libvolume_io2.la libminc2.la
+LDADD = libminc2.la
 
 EXTRA_DIST = \
 	$(m4_files) \
@@ -124,25 +122,7 @@ libminc2_la_SOURCES = \
 	libsrc/voxel_loop.c \
 	libsrc/hdf_convenience.c \
 	libsrc/minc_compat.c \
-	libsrc/minc_simple.c
-
-libminc2_la_SOURCES += \
-	libsrc2/convert.c \
-	libsrc2/datatype.c \
-	libsrc2/dimension.c \
-	libsrc2/free.c \
-	libsrc2/grpattr.c \
-	libsrc2/hyper.c \
-	libsrc2/label.c \
-	libsrc2/m2util.c \
-	libsrc2/record.c \
-	libsrc2/slice.c \
-	libsrc2/valid.c \
-	libsrc2/volprops.c \
-	libsrc2/volume.c
-
-libvolume_io2_la_LDFLAGS = -version-info 3:0:0
-libvolume_io2_la_SOURCES = \
+	libsrc/minc_simple.c \
 	volume_io/Geometry/colour.c \
 	volume_io/Geometry/colour_def.c \
 	volume_io/Geometry/gaussian.c \
@@ -177,5 +157,23 @@ libvolume_io2_la_SOURCES = \
 	volume_io/Volumes/set_hyperslab.c \
 	volume_io/Volumes/volume_cache.c \
 	volume_io/Volumes/volumes.c
+	
+
+libminc2_la_SOURCES += \
+	libsrc2/convert.c \
+	libsrc2/datatype.c \
+	libsrc2/dimension.c \
+	libsrc2/free.c \
+	libsrc2/grpattr.c \
+	libsrc2/hyper.c \
+	libsrc2/label.c \
+	libsrc2/m2util.c \
+	libsrc2/record.c \
+	libsrc2/slice.c \
+	libsrc2/valid.c \
+	libsrc2/volprops.c \
+	libsrc2/volume.c \
+	libsrc2/minc2_error.c
+
 
 dist_man3_MANS = libsrc/ParseArgv.man3
