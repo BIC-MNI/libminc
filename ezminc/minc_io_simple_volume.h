@@ -29,7 +29,8 @@ namespace minc
     public:
     
       enum    {ndims=3};
-      typedef fixed_vec<ndims,int> idx;
+      typedef fixed_vec<ndims,size_t> idx;
+      typedef fixed_vec<ndims,int>    idx_i;
       typedef fixed_vec<ndims,double> vect;
       
     protected:
@@ -47,8 +48,8 @@ namespace minc
       void _allocate(T* data=NULL)
       {
         _stride[0]=1;
-        int total=_size[0];
-        for(int i=1;i<ndims;i++)
+        size_t total=_size[0];
+        for(size_t i=1;i<ndims;i++)
         {
           _stride[i]=_size[i-1]*_stride[i-1];
           total*=_size[i];
@@ -124,14 +125,22 @@ namespace minc
         return _count;
       }
 
-      explicit simple_volume(const int* dims):_vol(0),_size(dims)
+      explicit simple_volume(const size_t* dims):_vol(0),_size(dims)
       {
+        _allocate();
+      }
+      
+      explicit simple_volume(const int* dims):_vol(0)
+      {
+        _size[0]=static_cast<size_t>(dims[0]);
+        _size[1]=static_cast<size_t>(dims[1]);
+        _size[2]=static_cast<size_t>(dims[2]);
         _allocate();
       }
       
       simple_volume(const simple_volume<T>& a,bool copy_data=true):_vol(0)
       {
-        for(int i=0;i<ndims;i++) 
+        for(size_t i=0;i<ndims;i++) 
           _size[i]=a._size[i];
         _allocate();
         
@@ -142,25 +151,37 @@ namespace minc
         
         _step=a._step;
         _start=a._start;
-        for(int i=0;i<ndims;i++)
+        for(size_t i=0;i<ndims;i++)
           _direction_cosines[i]=a._direction_cosines[i];
       }
       
-      simple_volume(int sx,int sy,int sz):_vol(0)
+      simple_volume(size_t sx,size_t sy,size_t sz):_vol(0)
       {
         _size=IDX(sx,sy,sz);
         _allocate();
       }
+      
+      simple_volume(int sx,int sy,int sz):_vol(0)
+      {
+        _size=IDX<size_t>(sx,sy,sz);
+        _allocate();
+      }      
       
       explicit simple_volume(const idx& s):_vol(0)
       {
         _size=s;
         _allocate();
       }
+      
+      explicit simple_volume(const idx_i& s):_vol(0)
+      {
+        _size=IDX<size_t>(s[0],s[1],s[2]);
+        _allocate();
+      }
 
       simple_volume():_vol(0)
       {
-        for(int i=0;i<ndims;i++)
+        for(size_t i=0;i<ndims;i++)
         {
           _size[i]=0;
           _step[i]=0.0;
@@ -176,7 +197,7 @@ namespace minc
         return !_size[0]||!_vol;
       }
       
-      void resize(int sx,int sy,int sz)
+      void resize(size_t sx,size_t sy,size_t sz)
       {
         if( _size[0]==sx && _size[1]==sy && _size[2]==sz )
           return;
@@ -197,15 +218,25 @@ namespace minc
         _allocate();
       }
       
+      void resize(const idx_i& s)
+      {
+        resize(IDX<size_t>(s[0],s[1],s[2]));
+      }
+      
       virtual ~simple_volume()
       {
         if(_vol && _free_memory)
           delete [] _vol;
       }
       
-      T& operator()(int x,int y,int z)
+      T& operator()(size_t x,size_t y,size_t z)
       {
         return _vol[x+y*_stride[1]+z*_stride[2]];
+      }
+      
+      T& operator()(int x,int y,int z)
+      {
+        return _vol[(size_t)x+(size_t)y*_stride[1]+(size_t)z*_stride[2]];;
       }
       
       T& operator()(const idx& i)
@@ -213,6 +244,16 @@ namespace minc
         return _vol[dot(i,_stride)];
       }
       
+      T& operator()(const idx_i& i)
+      {
+        return _vol[dot(IDX<size_t>(i[0],i[1],i[2]),_stride)];
+      }
+      
+      const T& operator()(size_t x,size_t y,size_t z) const
+      {
+        return get(x,y,z);
+      }
+
       const T& operator()(int x,int y,int z) const
       {
         return get(x,y,z);
@@ -222,21 +263,45 @@ namespace minc
       {
         return get(i);
       }
+
+      const T& operator()(const idx_i& i) const
+      {
+        return get(i);
+      }
       
-      const T& get(int x,int y,int z) const
+      const T& get(size_t x,size_t y,size_t z) const
       {
         return _vol[x+y*_stride[1]+z*_stride[2]];
+      }
+
+      const T& get(int x,int y,int z) const
+      {
+        return get(static_cast<size_t>(x),static_cast<size_t>(y),static_cast<size_t>(z));
       }
       
       const T& get(const idx& i) const
       {
         return _vol[dot(i,_stride)];
       }
+
+      const T& get(const idx_i& i) const
+      {
+        return _vol[dot(IDX<size_t>(i[0],i[1],i[2]),_stride)];
+      }
       
-      const T& safe_get(int x,int y,int z) const
+      const T& safe_get(size_t x,size_t y,size_t z) const
       {
         check_index(x,y,z);
         return _vol[x+y*_stride[1]+z*_stride[2]];
+      }
+
+      const T& safe_get(int x,int y,int z) const
+      {
+        size_t xx=x<0?-x:x;
+        size_t yy=y<0?-y:y;
+        size_t zz=z<0?-z:z;
+        check_index(xx,yy,zz);
+        return _vol[xx+yy*_stride[1]+zz*_stride[2]];
       }
      
       const T& safe_get(idx i) const
@@ -244,21 +309,30 @@ namespace minc
         check_index(i);
         return get(i);
       }
+      
+      const T& safe_get(idx_i i) const
+      {
+        idx ii=IDX<size_t>(i[0]<0?-i[0]:i[1],i[1]<0?-i[1]:i[1],i[2]<0?-i[2]:i[2]);
+        
+        check_index(ii);
+        return get(ii);
+      }
 
       //trilinear intrpolation
       double interpolate(float _x,float _y,float _z) const
       {
-        int x=floor(_x);
-        int y=floor(_y);
-        int z=floor(_z);
+        if(_x<0) _x=-_x;
+        if(_y<0) _y=-_y;
+        if(_z<0) _z=-_z;
+
+        size_t x=floor(_x);
+        size_t y=floor(_y);
+        size_t z=floor(_z);
         
         float dx=_x-x;
         float dy=_y-y;
         float dz=_z-z;
         
-        if(x<0) x=-x;
-        if(y<0) y=-y;
-        if(z<0) z=-z;
         
         if(x>=(_size[0]-1)) x=_size[0]*2-3-x;
         if(y>=(_size[1]-1)) y=_size[1]*2-3-y;
@@ -278,7 +352,7 @@ namespace minc
                    dx*dy*dz*get(x+1,y+1,z+1);
       }
       
-      T set(int x,int y,int z, const T&v)
+      T set(size_t x,size_t y,size_t z, const T&v)
       {
         return _vol[x+y*_stride[1]+z*_stride[2]]=v;
       }
@@ -288,12 +362,12 @@ namespace minc
         return _vol[dot(i,_stride)]=v;
       }
       
-      int dim(int i) const
+      size_t dim(size_t i) const
       {
         return _size[i];
       }
       
-      const int* dims() const
+      const size_t* dims() const
       {
         return _size.c_buf();
       }
@@ -305,18 +379,14 @@ namespace minc
       
       void extract_subvolume(simple_volume<T>& dst,const idx& s, const idx& f) const
       {
-        for(int k=s[2];k<f[2];k++)
-         for(int j=s[1];j<f[1];j++)
-          for(int i=s[0];i<f[0];i++)
+        for(size_t k=s[2];k<f[2];k++)
+         for(size_t j=s[1];j<f[1];j++)
+          for(size_t i=s[0];i<f[0];i++)
             dst(i,j,k)=get(i,j,k);
       }
       
-      void check_index(int &ii,int &jj,int &kk) const
+      void check_index(size_t &ii,size_t &jj,size_t &kk) const
       {
-        if(ii<0) ii=-ii;
-        if(jj<0) jj=-jj;
-        if(kk<0) kk=-kk;
-
         if(ii>=dim(0)) ii=2*dim(0)-ii-1;
         if(jj>=dim(1)) jj=2*dim(1)-jj-1;
         if(kk>=dim(2)) kk=2*dim(2)-kk-1;
@@ -324,7 +394,7 @@ namespace minc
       
       void check_index(idx& iii)
       {
-        for(int i=0;i<3;i++)
+        for(size_t i=0;i<3;i++)
         {
           if(iii[i]<0) 
             iii[i]=-iii[i];
@@ -335,6 +405,14 @@ namespace minc
         }
       }
 
+      bool hit(size_t ii,size_t jj,size_t kk) const
+      {
+        if(ii>=dim(0)) return false;
+        if(jj>=dim(1)) return false;
+        if(kk>=dim(2)) return false;
+        return true;
+      }
+      
       bool hit(int ii,int jj,int kk) const
       {
         if(ii<0) return false;
@@ -345,11 +423,11 @@ namespace minc
         if(jj>=dim(1)) return false;
         if(kk>=dim(2)) return false;
         return true;
-      }
+      }      
       
       bool hit(const idx iii) const
       {
-        for(int i=0;i<3;i++)
+        for(size_t i=0;i<3;i++)
         {
           if(iii[i]<0) return false;
           if(iii[i]>=dim(i)) return false;
@@ -359,18 +437,18 @@ namespace minc
           
       simple_volume<T>& operator+=(const simple_volume<T>& a)
       {
-        for(int i=0;i<ndims;i++) 
+        for(size_t i=0;i<ndims;i++) 
           if(_size[i]!=a._size[i])
             REPORT_ERROR("Dimensions are different");
         
-        for(int i=0;i<_count;i++)
+        for(size_t i=0;i<_count;i++)
           _vol[i]+=a._vol[i];
         return *this;
       }
       
       simple_volume<T>& operator+=(const T& a)
       {
-        for(int i=0;i<_count;i++)
+        for(size_t i=0;i<_count;i++)
           _vol[i]+=a;
         return *this;
       }
@@ -380,32 +458,32 @@ namespace minc
          if(_size!=a._size)
             REPORT_ERROR("Dimensions are different");
         
-        for(int i=0;i<_count;i++)
+        for(size_t i=0;i<_count;i++)
           _vol[i]-=a._vol[i];
         return *this;
       }
       
       simple_volume<T>& operator-=(const T& a)
       {
-        for(int i=0;i<_count;i++)
+        for(size_t i=0;i<_count;i++)
           _vol[i]-=a;
         return *this;
       }
       
       simple_volume<T>& operator*=(const simple_volume<T>& a)
       {
-        for(int i=0;i<ndims;i++) 
+        for(size_t i=0;i<ndims;i++) 
           if(_size[i]!=a._size[i])
             REPORT_ERROR("Dimensions are different");
         
-        for(int i=0;i<_count;i++)
+        for(size_t i=0;i<_count;i++)
           _vol[i]*=a._vol[i];
         return *this;
       }
       
       simple_volume<T>& operator*=(const T& a)
       {
-        for(int i=0;i<_count;i++)
+        for(size_t i=0;i<_count;i++)
           _vol[i]*=a;
         return *this;
       }
@@ -415,14 +493,14 @@ namespace minc
         if(_size!=a._size())
           REPORT_ERROR("Dimensions are different");
         
-        for(int i=0;i<_count;i++)
+        for(size_t i=0;i<_count;i++)
           _vol[i]/=a._vol[i];
         return *this;
       }
       
       simple_volume<T>& operator/=(const T& a)
       {
-        for(int i=0;i<_count;i++)
+        for(size_t i=0;i<_count;i++)
           _vol[i]/=a;
         return *this;
       }
@@ -436,7 +514,7 @@ namespace minc
         _step=a._step;
         _start=a._start;
         
-        for(int i=0;i<ndims;i++)
+        for(size_t i=0;i<ndims;i++)
           _direction_cosines[i]=a._direction_cosines[i];
         
         return *this;
@@ -444,7 +522,7 @@ namespace minc
       
       simple_volume& operator=(const T&a)
       {
-        for(int i=0;i<_count;i++)
+        for(size_t i=0;i<_count;i++)
           _vol[i]=a;
         return *this;
       }
@@ -454,16 +532,16 @@ namespace minc
         if(_size!=a._size)
           REPORT_ERROR("Dimensions are different");
         
-        for(int i=0;i<_count;i++)
+        for(size_t i=0;i<_count;i++)
           _vol[i]+=a._vol[i]*w;
       }
       
       vect voxel_to_world(const idx& iii) const
       {
         vect ret=IDX<double>(0.0,0.0,0.0);
-        for(int i=0;i<ndims;i++)
+        for(size_t i=0;i<ndims;i++)
         {
-          for(int j=0;j<ndims;j++)
+          for(size_t j=0;j<ndims;j++)
             ret[i]+=(_step[j]*iii[j]+_start[j])*_direction_cosines[j][i];
         }
         return ret;
@@ -472,21 +550,33 @@ namespace minc
       vect world_to_voxel_c(const vect& iii) const
       {
         vect ret=IDX<double>(0.0,0.0,0.0);
-        for(int i=0;i<ndims;i++)
+        for(size_t i=0;i<ndims;i++)
         {
-          for(int j=0;j<ndims;j++)
+          for(size_t j=0;j<ndims;j++)
             ret[i]+=((iii[j]-_start[j])/_step[j])*_direction_cosines[i][j]; //transpose!
         }
         return ret;
       }
 
-      idx world_to_voxel(const vect& iii) const
+      idx_i world_to_voxel(const vect& iii) const
+      {
+        vect ret=world_to_voxel_c(iii);
+        
+        idx_i r;
+        
+        for(size_t i=0;i<ndims;i++)
+          r[i]=floor(ret[i]+0.5);
+        
+        return r;
+      }
+      
+      idx world_to_voxel_s(const vect& iii) const
       {
         vect ret=world_to_voxel_c(iii);
         
         idx r;
         
-        for(int i=0;i<ndims;i++)
+        for(size_t i=0;i<ndims;i++)
           r[i]=floor(ret[i]+0.5);
         
         return r;
@@ -499,15 +589,21 @@ namespace minc
         allocate(array);
       }
       
+      //!use provided buffer for storage
+      void assign(const idx_i& s,T* array) 
+      {
+        _size=IDX<size_t>(s[0],s[1],s[2]);
+        allocate(array);
+      }
   };
   
   //! remove (unpad) or add padding as needed, volume will be centered
   template<class T>void pad_volume(const simple_volume<T> &src,simple_volume<T> &dst, const T& fill)
   {
-    fixed_vec<3,int> sz1=src.size();
-    fixed_vec<3,int> sz2=dst.size();
-    fixed_vec<3,int> d=sz2-sz1;
-    fixed_vec<3,int> i;
+    fixed_vec<3,size_t> sz1=src.size();
+    fixed_vec<3,size_t> sz2=dst.size();
+    fixed_vec<3,size_t> d=sz2-sz1;
+    fixed_vec<3,size_t> i;
     
     d/=2;//offset
   
@@ -515,7 +611,7 @@ namespace minc
       for( i[1]=0;i[1]<sz2[1];i[1]++)
         for( i[0]=0;i[0]<sz2[0];i[0]++)
     {
-      fixed_vec<3,int> j= i-d;
+      fixed_vec<3,size_t> j= i-d;
       
       if( src.hit(j)) 
         dst.set(i,src.get(j));
@@ -528,7 +624,7 @@ namespace minc
   {
     _min=_max=v.c_buf()[0];
     
-    for(int i=0;i<v.c_buf_size();i++)
+    for(size_t i=0;i<v.c_buf_size();i++)
     {
 			if(isnan(v.c_buf()[i]) || isinf(v.c_buf()[i])) 
 				continue;
@@ -546,7 +642,7 @@ namespace minc
     _min=1e10;
     _max=-1e10;
     
-    for(int i=0;i<v.c_buf_size();i++)
+    for(size_t i=0;i<v.c_buf_size();i++)
     {
       if(mask.c_buf()[i])
       {
