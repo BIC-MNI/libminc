@@ -900,11 +900,9 @@ static  void  copy_and_invert_transform(
         break;
 
     case GRID_TRANSFORM:
-#ifdef HAVE_MINC1
         if( transform->displacement_volume )
           copy->displacement_volume = (void *) copy_volume(
                                       (VIO_Volume) transform->displacement_volume );
-#endif /*HAVE_MINC1*/
         if( transform->displacement_volume_file )
           copy->displacement_volume_file = 
             create_string( transform->displacement_volume_file );
@@ -1190,10 +1188,8 @@ VIOAPI  void  delete_general_transform(
         break;
 
     case GRID_TRANSFORM:
-#ifdef HAVE_MINC1
         if( transform->displacement_volume ) 
           delete_volume( (VIO_Volume) transform->displacement_volume );
-#endif /*HAVE_MINC1*/
         if( transform->displacement_volume_file )
           delete_string(transform->displacement_volume_file);
         

@@ -1,5 +1,5 @@
-#ifndef  DEF_BASIC
-#define  DEF_BASIC
+#ifndef  __BASIC_H_
+#define  __BASIC_H_ 1 
 
 /* ----------------------------------------------------------------------------
 @COPYRIGHT  :
@@ -132,90 +132,6 @@ typedef enum { VIO_OK=0,
 #define  VIO_RAD_TO_DEG   (180.0 / M_PI)
 
 
-#if !VIO_PREFIX_NAMES           /* Play nice with others */
-
-#warning "Using old-style Volume IO names!"
-
-#ifndef __cplusplus
-#ifndef private
-#define private static
-#endif /* private */
-#ifndef public
-#define public
-#endif /* public */
-#ifndef semiprivate
-#define semiprivate
-#endif /* semiprivate */
-#endif /* __cplusplus */
-
-#define  OFF     FALSE
-#define  ON      TRUE
-
-/* --------- macro to determine the size of a static array,
-             e.g.,   int  array[] = { 1, 3, 9, 5 };           ------------ */
-
-#define  SIZEOF_STATIC_ARRAY( array ) \
-         (int) ( sizeof(array) / sizeof((array)[0]))
-
-/* --------- interpolate between a and b ------------------- */
-
-#define  INTERPOLATE( alpha, a, b ) ((a) + (alpha) * ((b) - (a)))
-
-/* --------- PI, and angles -------------------------------- */
-
-#define  PI           M_PI                  /* from math.h */
-#define  DEG_TO_RAD   VIO_DEG_TO_RAD
-#define  RAD_TO_DEG   VIO_RAD_TO_DEG
-
-
-/* --------- environment variables -------------------------- */
-
-#define  ENV_EXISTS( env ) ( getenv(env) != (char *) 0 )
-
-/* --------- C and LINT stuff -------------------------- */
-
-
-#ifdef __STDC__
-#define GLUE(x,y) x##y
-#define GLUE3(x,y,z) x##y##z
-#define CREATE_STRING(x) #x
-#else
-#define GLUE(x,y) x/**/y
-#define GLUE3(x,y,z) x/**/y/**/z
-#define CREATE_STRING(x) "x"
-#endif
-
-/* Basic types */
-
-typedef VIO_SCHAR Smallest_int;
-typedef VIO_UCHAR unsigned_byte;
-typedef VIO_BOOL BOOLEAN;
-typedef VIO_Real Real;
-typedef VIO_STR  STRING;
-typedef VIO_Status Status;
-
-#define  REAL_MAX        DBL_MAX
-
-
-/* --------------- */
-
-#define  IS_INT( x )    ((double) (x) == (double) ((int) (x)))
-
-#define  FLOOR( x )     ((int) floor(x))
-
-#define  ROUND( x )     FLOOR( (double) (x) + 0.5 )
-
-#define  CEILING( x )   ((int) ceil(x))
-
-#define  FRACTION( x )  ((double) (x) - (double) FLOOR(x))
-
-#define IJ( i, j, nj ) VIO_IJ( i, j, nj )
-
-#define IJK( i, j,  nj, nk )  VIO_IJK( i, j, k, nj, nk )
-
-#endif /* !VIO_PREFIX_NAMES */
-
-
 /* for loops */
 
 #define  for_less( i, start, end )  for( (i) = (start);  (i) < (end);  ++(i) )
@@ -235,4 +151,4 @@ typedef VIO_Status Status;
 #define  HANDLE_INTERNAL_ERROR( X )                                           \
          handle_internal_error( X )
 
-#endif /* DEF_BASIC */
+#endif /* __BASIC_H_ */

@@ -202,13 +202,11 @@ static  void  output_one_transform(
 
         /*--- write the volume file */
 
-#ifdef HAVE_MINC1
         if( transform->displacement_volume )
           output_volume( transform->displacement_volume_file, 
                               MI_ORIGINAL_TYPE, FALSE, 0.0, 0.0,
                               (VIO_Volume) transform->displacement_volume,
                               NULL, NULL );
-#endif //HAVE_MINC1
 
         delete_string( prefix_filename );
         /*delete_string( volume_filename );*/
@@ -582,7 +580,6 @@ static VIO_Status input_one_transform(
         set_default_minc_input_options( &options );
         set_minc_input_vector_to_scalar_flag( &options, FALSE );
 
-#ifdef HAVE_MINC1
         if( input_volume( volume_filename, 4, NULL, 
                           MI_ORIGINAL_TYPE, FALSE, 0.0, 0.0, 
                           TRUE, &volume, &options ) != VIO_OK )
@@ -590,10 +587,6 @@ static VIO_Status input_one_transform(
             delete_string( volume_filename );
             return( VIO_ERROR );
         }
-#else
-        /*TODO: read volume with minc2 here?*/
-        volume=NULL;
-#endif /*HAVE_MINC1*/
         create_grid_transform_no_copy( transform, volume, volume_filename );
         delete_string( volume_filename );
 

@@ -22,7 +22,6 @@
 #ifdef HAVE_MINC1
 #include  <minc_basic.h>
 
-
 #define  INVALID_AXIS   -1
 
 static  VIO_BOOL  match_dimension_names(

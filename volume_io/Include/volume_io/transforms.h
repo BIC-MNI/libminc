@@ -87,10 +87,4 @@ typedef struct VIO_General_transform
 
 } VIO_General_transform;
 
-#if !VIO_PREFIX_NAMES
-typedef VIO_Transform_types Transform_types;
-typedef VIO_General_transform General_transform;
-typedef VIO_User_transform_function User_transform_function;
-#endif /* !VIO_PREFIX_NAMES */
-
 #endif

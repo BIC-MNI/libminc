@@ -1189,5 +1189,3 @@ VIOAPI  void   evaluate_volume_in_world(
         VIO_FREE3D( second_deriv );
     }
 }
-#ifdef HAVE_MINC1
-#endif /*HAVE_MINC1*/

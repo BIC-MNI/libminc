@@ -1555,4 +1555,35 @@ void misave_valid_range(mihandle_t volume)
                   MI_TYPE_DOUBLE, 2, range);
 }
 
+
+int miget_slice_dimension_count(mihandle_t volume, midimclass_t dimclass,
+                                midimattr_t attr, int *number_of_dimensions)
+{
+  int number_of_volume_dimensions=-1;
+  hid_t image_max_fspc_id;
+  int slice_ndims;
+  int result=-1;
+  if( miget_volume_dimension_count(volume,dimclass,attr, &number_of_volume_dimensions) <0 )
+  {
+    return -1;
+  }
+
+  if(!volume->has_slice_scaling)
+  {
+    *number_of_dimensions=number_of_volume_dimensions;
+    return MI_NOERROR;
+  }
+  
+  image_max_fspc_id=H5Dget_space(volume->imax_id);
+  slice_ndims = H5Sget_simple_extent_ndims ( image_max_fspc_id );
+  if(slice_ndims>=0)
+  {
+    result=MI_NOERROR;
+    *number_of_dimensions=number_of_volume_dimensions-slice_ndims;
+  }
+  H5Sclose(image_max_fspc_id);
+  return result;
+}
+
+
 // kate: indent-mode cstyle; indent-width 2; replace-tabs on; 

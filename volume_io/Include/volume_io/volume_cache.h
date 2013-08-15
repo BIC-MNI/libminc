@@ -98,11 +98,4 @@ typedef struct
     int                         n_prev_hits;
 } VIO_volume_cache_struct;
 
-#if !VIO_PREFIX_NAMES
-typedef VIO_Cache_block_size_hints Cache_block_size_hints;
-typedef VIO_cache_block_struct cache_block_struct;
-typedef VIO_cache_lookup_struct cache_lookup_struct;
-typedef VIO_volume_cache_struct volume_cache_struct;
-#endif /* !VIO_PREFIX_NAMES */
-
 #endif /* __VOLUME_CACHE_H__ */

@@ -14,11 +14,6 @@ IF(LIBMINC_MINC1_SUPPORT)
   ADD_EXECUTABLE(test_mconv test_mconv.c)
 
   #ADD_EXECUTABLE(test_speed test_speed.c)
-
-
-  ADD_EXECUTABLE(create_grid_xfm create_grid_xfm.c)
-  TARGET_LINK_LIBRARIES(create_grid_xfm ${VOLUME_IO_LIBRARY} ${LIBMINC_LIBRARIES} m)
-  
 MACRO(minc_test cmd)
   # minc 1 version
   IF(HAVE_MINC1)
@@ -41,8 +36,6 @@ ENDMACRO(minc_test)
 
   ADD_TEST(mincapi mincapi)
   ADD_TEST(test_mconv test_mconv)
-
-
 ENDIF(LIBMINC_MINC1_SUPPORT)
 
 
@@ -50,22 +43,24 @@ ENDIF(LIBMINC_MINC1_SUPPORT)
 ADD_EXECUTABLE(test_xfm   vio_xfm_test/test-xfm.c)
 TARGET_LINK_LIBRARIES(test_xfm ${VOLUME_IO_LIBRARY} ${LIBMINC_LIBRARIES})
 
+ADD_EXECUTABLE(copy_xfm   vio_xfm_test/copy-xfm.c)
+TARGET_LINK_LIBRARIES(copy_xfm ${VOLUME_IO_LIBRARY} ${LIBMINC_LIBRARIES})
 
-# TODO port these test to cmake
+ADD_EXECUTABLE(create_grid_xfm create_grid_xfm.c)
+TARGET_LINK_LIBRARIES(create_grid_xfm ${VOLUME_IO_LIBRARY} ${LIBMINC_LIBRARIES})
+
 #ADD_TEST(create_grid_xfm create_grid_xfm)
 #ADD_TEST(test_speed test_speed)
-#ADD_TEST(test_xfm test_xfm)
 
 ADD_TEST(test_xfm_1 test_xfm 10000 ${CMAKE_CURRENT_SOURCE_DIR}/vio_xfm_test/t1.xfm)
 ADD_TEST(test_xfm_2 test_xfm 10000 ${CMAKE_CURRENT_SOURCE_DIR}/vio_xfm_test/t2.xfm)
 
-IF(HAVE_MINC1)
+#IF(HAVE_MINC1)
   # nonlnear transform test will fail without MINC1 
-  ADD_TEST(test_xfm_3 test_xfm 10000 ${CMAKE_CURRENT_SOURCE_DIR}/vio_xfm_test/t3.xfm 0.9)
-ENDIF(HAVE_MINC1)
+ADD_TEST(test_xfm_3 test_xfm 10000 ${CMAKE_CURRENT_SOURCE_DIR}/vio_xfm_test/t3.xfm 0.9)
+#ENDIF(HAVE_MINC1)
 
 
-#IF(LIBMINC_BUILD_V2)
 #common tests
 ADD_EXECUTABLE(test_arg_parse test_arg_parse.c)
 ADD_TEST(test_arg_parse test_arg_parse)
@@ -110,4 +105,3 @@ ADD_TEST(minc2-valid-test minc2-valid-test)
 ADD_TEST(minc2-vector_dimension-test minc2-vector_dimension-test)
 ADD_TEST(minc2-volprops-test minc2-volprops-test)
 
-#ENDIF(LIBMINC_BUILD_V2)

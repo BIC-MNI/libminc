@@ -1,5 +1,5 @@
 #ifndef  __VOLUME_H__
-#define  __VOLUME_H__
+#define  __VOLUME_H__ 1
 
 /* ----------------------------------------------------------------------------
 @COPYRIGHT  :
@@ -33,6 +33,10 @@
 #ifdef HAVE_MINC1
 #include  <minc.h>
 #endif /*HAVE_MINC1*/
+
+#ifdef HAVE_MINC2
+#include <minc2.h>
+#endif
 
 #include  <volume_io/transforms.h>
 #include  <volume_io/multidim.h>
@@ -115,10 +119,6 @@ typedef  struct
 } volume_struct;
 
 typedef  volume_struct  *VIO_Volume;
-
-#if !VIO_PREFIX_NAMES
-typedef VIO_Volume Volume;
-#endif /* !VIO_PREFIX_NAMES */
 
 /* ---- macro for stepping through entire volume */
 
@@ -439,6 +439,12 @@ typedef  struct
     int                image_dims[MAX_VAR_DIMS];
     int                src_cdfid;
     int                src_img_var;
+
+#ifdef HAVE_MINC2
+    mihandle_t         minc2id;
+#else
+    void*              minc2id; /*just in case*/
+#endif /*HAVE_MINC2*/
 } minc_file_struct;
 
 typedef  minc_file_struct  *Minc_file;
@@ -447,7 +453,7 @@ typedef  minc_file_struct  *Minc_file;
 
 /* --- recognized file formats */
 
-typedef  enum  { MNC_FORMAT, FREE_FORMAT }       Volume_file_formats;
+typedef  enum  { MNC_FORMAT, FREE_FORMAT, MNC2_FORMAT }       Volume_file_formats;
 
 typedef struct
 {
@@ -473,11 +479,12 @@ typedef struct
 
 /* --------------------- filter types -------------------------------- */
 
+/*
 typedef enum {
                NEAREST_NEIGHBOUR,
                LINEAR_INTERPOLATION,
                BOX_FILTER,
                TRIANGLE_FILTER,
-               GAUSSIAN_FILTER } Filter_types;
+               GAUSSIAN_FILTER } Filter_types; */
 
 #endif /* __VOLUME_H__ */

@@ -20,8 +20,10 @@
 #include  <internal_volume_io.h>
 
 #ifdef HAVE_MINC1
-
 #include  <minc.h>
+#elif defined HAVE_MINC2
+#include <minc2.h>
+#endif /*HAVE_MINC1*/
 
 #define   FREE_ENDING   "fre"
 
@@ -44,29 +46,36 @@
 ---------------------------------------------------------------------------- */
 
 VIOAPI  VIO_Status  start_volume_input(
-    VIO_STR               filename,
-    int                  n_dimensions,
-    VIO_STR               dim_names[],
-    nc_type              volume_nc_data_type,
-    VIO_BOOL              volume_signed_flag,
-    VIO_Real                 volume_voxel_min,
-    VIO_Real                 volume_voxel_max,
-    VIO_BOOL              create_volume_flag,
-    VIO_Volume           *volume,
-    minc_input_options   *options,
-    volume_input_struct  *input_info )
+    VIO_STR             filename,
+    int                 n_dimensions,
+    VIO_STR             dim_names[],
+    nc_type             volume_nc_data_type,
+    VIO_BOOL            volume_signed_flag,
+    VIO_Real            volume_voxel_min,
+    VIO_Real            volume_voxel_max,
+    VIO_BOOL            create_volume_flag,
+    VIO_Volume          *volume,
+    minc_input_options  *options,
+    volume_input_struct *input_info )
 {
     VIO_Status          status;
-    int             d;
-    VIO_STR          expanded_filename;
+    int                 d;
+    VIO_STR             expanded_filename;
 
     status = VIO_OK;
+    
+    printf("start_volume_input filename=%s\n",filename);
 
     if( create_volume_flag || *volume == (VIO_Volume) NULL )
     {
         if( n_dimensions < 1 || n_dimensions > VIO_MAX_DIMENSIONS )
+#ifdef HAVE_MINC1
             n_dimensions = get_minc_file_n_dimensions( filename );
-
+#elif defined HAVE_MINC2
+            n_dimensions = get_minc2_file_n_dimensions( filename );
+#else
+            n_dimensions = 0;
+#endif
         if( n_dimensions < 1 )
             return( VIO_ERROR );
 
@@ -83,17 +92,24 @@ VIOAPI  VIO_Status  start_volume_input(
 
     expanded_filename = expand_filename( filename );
 
-    if( !filename_extension_matches( expanded_filename, FREE_ENDING ) )
+#ifdef HAVE_MINC1
+  if( !filename_extension_matches( expanded_filename, FREE_ENDING ) )
         input_info->file_format = MNC_FORMAT;
-    else
-        input_info->file_format = FREE_FORMAT;
+  else
+#elif defined HAVE_MINC2
+  if( !filename_extension_matches( expanded_filename, FREE_ENDING ) )
+        input_info->file_format = MNC2_FORMAT;
+  else
+#endif
+      input_info->file_format = FREE_FORMAT;
 
     switch( input_info->file_format )
     {
+#ifdef HAVE_MINC1
     case  MNC_FORMAT:
         if( !file_exists( expanded_filename ) )
         {
-            (void) file_exists_as_compressed( expanded_filename,
+            file_exists_as_compressed( expanded_filename,
                                               &expanded_filename );
         }
 
@@ -108,10 +124,27 @@ VIOAPI  VIO_Status  start_volume_input(
         }
 
         break;
-
+#endif /*HAVE_MINC1*/        
+#ifdef HAVE_MINC2
+      case  MNC2_FORMAT:
+        input_info->minc_file = initialize_minc2_input( expanded_filename,
+                                                       *volume, options );
+        if( input_info->minc_file == (Minc_file) NULL )
+          status = VIO_ERROR;
+        else
+        {
+          for_less( d, 0, VIO_MAX_DIMENSIONS )
+          input_info->axis_index_from_file[d] = d;
+        }
+        break;
+#endif /*HAVE_MINC2*/
     case  FREE_FORMAT:
         status = initialize_free_format_input( expanded_filename,
                                                *volume, input_info );
+        break;
+      default:
+        /*Unsupported file format*/
+        status = VIO_ERROR;
         break;
     }
 
@@ -139,10 +172,16 @@ VIOAPI  void  delete_volume_input(
 {
     switch( input_info->file_format )
     {
+#ifdef HAVE_MINC1
     case  MNC_FORMAT:
-        (void) close_minc_input( input_info->minc_file );
+        close_minc_input( input_info->minc_file );
         break;
-
+#endif /*HAVE_MINC1*/
+#ifdef HAVE_MINC2
+      case  MNC2_FORMAT:
+        close_minc2_input( input_info->minc_file );
+        break;
+#endif /*HAVE_MINC2*/
     case  FREE_FORMAT:
         delete_free_format_input( input_info );
         break;
@@ -171,11 +210,20 @@ VIOAPI  VIO_BOOL  input_more_of_volume(
 
     switch( input_info->file_format )
     {
-    case  MNC_FORMAT:
+#ifdef HAVE_MINC1
+      case  MNC_FORMAT:
         more_to_do = input_more_minc_file( input_info->minc_file,
                                            fraction_done );
         break;
-
+#endif
+        
+#ifdef HAVE_MINC2
+      case  MNC2_FORMAT:
+        more_to_do = input_more_minc2_file( input_info->minc_file,
+                                          fraction_done );
+        break;
+#endif /*HAVE_MINC2*/
+        
     case  FREE_FORMAT:
         more_to_do = input_more_free_format_file( volume, input_info,
                                                   fraction_done );
@@ -202,7 +250,6 @@ VIOAPI  void  cancel_volume_input(
     volume_input_struct   *input_info )
 {
     delete_volume( volume );
-
     delete_volume_input( input_info );
 }
 
@@ -230,11 +277,12 @@ VIOAPI  VIO_Status  input_volume(
     VIO_Volume           *volume,
     minc_input_options   *options )
 {
-    VIO_Status               status;
-    VIO_Real                 amount_done;
+    VIO_Status           status;
+    VIO_Real             amount_done;
     volume_input_struct  input_info;
     VIO_progress_struct  progress;
     static const int     FACTOR = 1000;
+    VIO_Real             volume_min=0.0,volume_max=0.0;
 
     status = start_volume_input( filename, n_dimensions, dim_names,
                                  volume_nc_data_type, volume_signed_flag,
@@ -262,6 +310,8 @@ VIOAPI  VIO_Status  input_volume(
           status = VIO_ERROR;
         }
     }
+    get_volume_voxel_range( *volume, &volume_min, &volume_max );
+    printf("Read volume %s min=%g max=%g\n",filename,volume_min, volume_max);
 
     return( status );
 }
@@ -285,5 +335,3 @@ VIOAPI  Minc_file   get_volume_input_minc_file(
 {
     return( volume_input->minc_file );
 }
-
-#endif /*HAVE_MINC1*/

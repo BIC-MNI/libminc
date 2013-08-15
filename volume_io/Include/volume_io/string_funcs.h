@@ -39,10 +39,4 @@
          (void) memcpy( (void *) (dest), (void *) (src),                    \
                         (size_t) (n_items) * sizeof((src)[0]) )
 
-#if !VIO_PREFIX_NAMES
-#define EXTREMELY_LARGE_STRING_SIZE VIO_EXTREMELY_LARGE_STRING_SIZE 
-#define END_OF_STRING VIO_END_OF_STRING 
-#define COPY_MEMORY VIO_COPY_MEMORY
-#endif 
-
 #endif /* DEF_STRING */

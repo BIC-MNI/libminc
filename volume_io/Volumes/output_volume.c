@@ -35,7 +35,6 @@
 @CREATED    : 1993            David MacDonald
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
-#ifdef HAVE_MINC1
 
 VIOAPI  VIO_Status   get_file_dimension_names(
     VIO_STR   filename,
@@ -261,13 +260,25 @@ VIOAPI  VIO_Status   copy_volume_auxiliary_and_history(
 
     if( copy_original_file_data )
     {
-        status = copy_auxiliary_data_from_minc_file( minc_file,
-                                                     original_filename,
-                                                     history );
+#ifdef HAVE_MINC1
+      status = copy_auxiliary_data_from_minc_file( minc_file,
+                                                  original_filename,
+                                                  history );
+#elif defined HAVE_MINC2
+      status = copy_auxiliary_data_from_minc2_file( minc_file,
+                                                  original_filename,
+                                                  history );
+#endif       
     }
     else if( history != NULL )
-        status = add_minc_history( minc_file, history );
-
+    {
+#ifdef HAVE_MINC1
+      status = add_minc_history( minc_file, history );
+#elif defined HAVE_MINC2
+      status = add_minc2_history( minc_file, history );
+#endif       
+    }
+    
     return( status );
 }
 
@@ -327,7 +338,7 @@ VIOAPI  VIO_Status  output_modified_volume(
 
     if( options == NULL )
         set_default_minc_output_options( &used_options );
-    else
+    else 
         used_options = *options;
 
     if( used_options.global_image_range[0] >=
@@ -336,6 +347,8 @@ VIOAPI  VIO_Status  output_modified_volume(
         get_volume_real_range( volume, &real_min, &real_max );
         set_minc_output_real_range( &used_options, real_min, real_max );
     }
+    printf("Options3: %g %g\n",used_options.global_image_range[0],used_options.global_image_range[1]);        
+
 
     /*--- if the user has not explicitly set the use_volume_starts_and_steps
           flag, let's set it if the transform is linear, to output the
@@ -348,12 +361,21 @@ VIOAPI  VIO_Status  output_modified_volume(
         set_minc_output_use_volume_starts_and_steps_flag( &used_options, TRUE );
     }
 
+#ifdef HAVE_MINC1
     minc_file = initialize_minc_output( filename,
                                         n_dims, dim_names, sizes,
                                         file_nc_data_type, file_signed_flag,
                                         file_voxel_min, file_voxel_max,
                                         get_voxel_to_world_transform(volume),
                                         volume, &used_options );
+#elif defined HAVE_MINC2
+    minc_file = initialize_minc2_output( filename,
+                                        n_dims, dim_names, sizes,
+                                        file_nc_data_type, file_signed_flag,
+                                        file_voxel_min, file_voxel_max,
+                                        get_voxel_to_world_transform(volume),
+                                        volume, &used_options );
+#endif
 
     if( minc_file == NULL )
         return( VIO_ERROR );
@@ -362,10 +384,22 @@ VIOAPI  VIO_Status  output_modified_volume(
                                                 original_filename, history );
 
     if( status == VIO_OK )
+#ifdef HAVE_MINC1
         status = output_minc_volume( minc_file );
+#elif defined HAVE_MINC2
+        status = output_minc2_volume( minc_file );
+#else
+        print_error("Can't output file!");
+#endif
 
     if( status == VIO_OK )
+#ifdef HAVE_MINC1
         status = close_minc_output( minc_file );
+#elif defined HAVE_MINC2
+        status = close_minc2_output( minc_file );
+#else
+        print_error("Can't output file!");
+#endif
 
     delete_dimension_names( volume, dim_names );
 
@@ -408,4 +442,3 @@ VIOAPI  VIO_Status  output_volume(
                                     file_voxel_min, file_voxel_max,
                                     volume, NULL, history, options ) );
 }
-#endif /*HAVE_MINC1*/

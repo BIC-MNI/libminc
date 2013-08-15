@@ -1,5 +1,5 @@
-#ifndef  DEF_GEOM_STRUCTS
-#define  DEF_GEOM_STRUCTS
+#ifndef  __GEOM_STRUCTS_H_
+#define  __GEOM_STRUCTS_H_ 1
 
 /* ----------------------------------------------------------------------------
 @COPYRIGHT  :
@@ -34,16 +34,6 @@
 #define VIO_X 0
 #define VIO_Y 1
 #define VIO_Z 2
-
-#if !VIO_PREFIX_NAMES         /* Don't define commonly used symbols */
-
-#define  N_DIMENSIONS  VIO_N_DIMENSIONS
-
-#define  X             VIO_X
-#define  Y             VIO_Y
-#define  Z             VIO_Z
-
-#endif /* !VIO_PREFIX_NAMES */
 
 /* ----------------------------- MNI Header -----------------------------------
 @NAME       : Point   type
@@ -262,23 +252,4 @@ typedef  struct
 
 #define  Transform_elem( t, i, j ) ((t).m[j][i])
 
-#if !VIO_PREFIX_NAMES
-typedef VIO_Transform Transform;
-typedef VIO_Vector Vector;
-typedef VIO_Colour Colour;
-typedef VIO_Transform_2d Transform_2d;
-typedef VIO_Transform_elem_type Transform_elem_type;
-typedef VIO_Spr_type Spr_type;
-typedef VIO_Surfprop Surfprop;
-/* Th 'Point' typedef is annoying to Mac OS users, since Point has been 
- * a basic type on Macs since the beginning.  Testing __MACTYPES__ should
- * work at least with the OS X codebase, I don't know if it existed in
- * earlier versions of the MacTypes.h header.
- */
-#ifndef __MACTYPES__
-typedef VIO_Point Point;
-#endif /* __MACTYPES__ not defined */
-typedef VIO_Point_coord_type Point_coord_type;
-#endif /* !VIO_PREFIX_NAMES */
-
-#endif /* DEF_GEOM_STRUCTS */
+#endif /* __GEOM_STRUCTS_H_ */

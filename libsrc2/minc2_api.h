@@ -723,6 +723,12 @@ int micreate_volume_image(mihandle_t volume);
 int miget_volume_dimension_count(mihandle_t volume, midimclass_t dimclass,
                                         midimattr_t attr, int *number_of_dimensions);
 
+/** Return the number of dimensions associated with this volume.
+  * \ingroup mi2Vol
+*/
+int miget_slice_dimension_count(mihandle_t volume, midimclass_t dimclass,
+                                        midimattr_t attr, int *number_of_dimensions);
+
 /** Returns the number of voxels in the volume.
   * \ingroup mi2Vol
 */

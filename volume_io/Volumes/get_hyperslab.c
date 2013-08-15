@@ -1506,6 +1506,3 @@ VIOAPI  void  get_volume_voxel_hyperslab(
     }
 }
 
-#ifdef HAVE_MINC1
-
-#endif /*HAVE_MINC1*/
