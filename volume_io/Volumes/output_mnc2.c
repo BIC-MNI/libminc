@@ -260,9 +260,6 @@ VIOAPI  Minc_file  initialize_minc2_output(
     {
         set_default_minc_output_options( &default_options );
         options = &default_options;
-        printf("Using default options\n");
-    } else {
-      printf("Options: %g %g\n",options->global_image_range[0],options->global_image_range[1]);
     }
     
     /*TODO: provide some other compression ? */
@@ -390,7 +387,6 @@ VIOAPI  Minc_file  initialize_minc2_output(
         }
     }
 
-    printf("Creating MINC2 dimensions: %d\n",n_dimensions);
     for_less( d, 0, n_dimensions )
     {
         file->sizes_in_file[d] = (long) sizes[d];
@@ -417,7 +413,6 @@ VIOAPI  Minc_file  initialize_minc2_output(
                            (misize_t)file->sizes_in_file[d],
                            &minc_dimensions[d] );
         }
-        printf("\tDim %d: %s\n",d,dim_names[d]);
     }
 
     if( output_world_transform( file, volume_to_attach->coordinate_system_name,
@@ -469,13 +464,11 @@ VIOAPI  Minc_file  initialize_minc2_output(
     {
       miset_slice_scaling_flag(file->minc2id, 0 );
       miset_volume_range(file->minc2id,file->image_range[1],file->image_range[0]);
-      printf("File range: %g %g \n",file->image_range[1],file->image_range[0]);
     } else {
       get_volume_real_range( volume_to_attach, &file->image_range[0], &file->image_range[1] );
       /*miset_slice_scaling_flag(file->minc2id, 1 );*/
       miset_slice_scaling_flag(file->minc2id, 0 );
       miset_volume_range(file->minc2id,file->image_range[1],file->image_range[0]);
-      printf("File range: %f %f \n",file->image_range[1],file->image_range[0]);
     }
 
     file->variables_written = FALSE;
