@@ -13,81 +13,74 @@
  
 static VIO_Real tolerance = 1e-8;
 
-/*Windows compatibility hack*/
-#ifndef HAVE_SRAND48
-void srand48(long seed)
-{
-  srand((unsigned int)seed);
-}
-#endif /*HAVE_SRAND48*/
-
-#ifndef HAVE_DRAND48
-double drand48(void)
-{
-  return (double)rand() / ( + 1);
-}
-#endif /*HAVE_DRAND48*/
-
-
 
 static int is_equal_real( VIO_Real e, VIO_Real a )
 {
     return fabs(e-a) < tolerance;
 }
 
-
-
 /* Args: expected, actual.
  */
-static void assert_equal_point( VIO_Real ex, VIO_Real ey, VIO_Real ez,
-			 VIO_Real ax, VIO_Real ay, VIO_Real az,
-			 const char* msg )
+static void assert_equal_point( 
+       VIO_Real ex, VIO_Real ey, VIO_Real ez,
+       VIO_Real ax, VIO_Real ay, VIO_Real az,
+       const char* msg )
 {
     if ( is_equal_real(ex,ax) && 
-	 is_equal_real(ey,ay) &&
-	 is_equal_real(ez,az) )
-	return;
+      is_equal_real(ey,ay) &&
+      is_equal_real(ez,az) )
+    return;
 
     printf( "%s failure.\n"
-	    "Expected: %f %f %f\n"
-	    "  Actual: %f %f %f\n", 
-	    msg, ex,ey,ez,  ax,ay,az ); 
+      "Expected: %f %f %f\n"
+      "  Actual: %f %f %f\n", 
+      msg, ex,ey,ez,  ax,ay,az ); 
 
     exit(3);
 }
-
-
 
 int main( int ac, char* av[] )
 {
     int N;
     VIO_General_transform xfm;
+    FILE *in;
+    int line=1;
 
 
-    if ( ac != 3 && ac != 4 ) {
-      fprintf( stderr, "usage: %s N transform.xfm [tolerance]\n", av[0] );
+    if ( ac != 4 ) {
+      fprintf( stderr, "usage: %s transform.xfm control_table.txt tolerance\n", av[0] );
       return 1;
     }
 
-    N = atoi( av[1] );
-    if ( input_transform_file( av[2], &xfm ) != VIO_OK ) {
-      fprintf( stderr, "Failed to load transform '%s'\n", av[2] );
+    if ( input_transform_file( av[1], &xfm ) != VIO_OK ) {
+      fprintf( stderr, "Failed to load transform '%s'\n", av[1] );
       return 2;
     }
 
-    if ( ac == 4 ) {
-      tolerance = atof( av[3] );
-      printf( "Setting tolerance to %f.\n", tolerance );
-    }
-    /*Set the same seed number*/
-    srand48(1);
-    while (N-- > 0) {
-      VIO_Real x = 500.0 * ( drand48() - 0.5 );
-      VIO_Real y = 500.0 * ( drand48() - 0.5 );
-      VIO_Real z = 500.0 * ( drand48() - 0.5 );
+    tolerance = atof( av[3] );
 
+    if(!(in=fopen(av[2],"r")))
+    {
+      fprintf( stderr, "Failed to load table '%s'\n", av[2] );
+      return 2;
+    }
+      
+    /*Set the same seed number*/
+    while (!feof(in)) {
+      VIO_Real x,y,z;
       VIO_Real tx,ty,tz;
       VIO_Real a,b,c;
+      int check=1;
+      char line_c[1024];
+      
+      check=fscanf(in,"%lg,%lg,%lg,%lg,%lg,%lg",&x,&y,&z,&a,&b,&c);
+      if(check<=0) break;
+      
+      if(check!=3 && check!=6)
+      {
+        fprintf( stderr,"Unexpected input file format at line %d , read %d values!\n",line,check);
+        return 3;
+      }
 
       if(general_transform_point( &xfm,  x,y,z,  &tx,&ty,&tz ) != VIO_OK)
       {
@@ -95,37 +88,21 @@ int main( int ac, char* av[] )
         return 3;
       }
 
-      /* Check that general_inverse_transform_point() and
-        invert_general_transform() behave sensibly.
-      */
-      if(general_inverse_transform_point( &xfm,  tx,ty,tz,  &a,&b,&c ) != VIO_OK)
+      if(check==3)
       {
-        fprintf( stderr, "Failed to invert transform point %f,%f,%f \n", tx,ty,tz );
-        return 3;
-      }
-      assert_equal_point( x,y,z, a,b,c,
-              "general_inverse_transform_point()" );
+        fprintf( stdout,"%.20lg,%.20lg,%.20lg,%.20lg,%.20lg,%.20lg\n",x,y,z,tx,ty,tz);
 
-      invert_general_transform( &xfm );
-
-      if(general_transform_point( &xfm, tx,ty,tz,  &a,&b,&c ) != VIO_OK)
-      {
-        fprintf( stderr, "Failed to transform point %f,%f,%f \n", x,y,z );
-        return 3;
+      } else {
+        sprintf(line_c,"Line:%d",line);
+        assert_equal_point( tx,ty,tz, a,b,c,
+              line_c );
       }
-        
-      assert_equal_point( x,y,z, a,b,c,
-              "general_transform_point() / inverted xfm" );
 
-      if(general_inverse_transform_point( &xfm,  x,y,z,  &a,&b,&c ) != VIO_OK)
-      {
-        fprintf( stderr, "Failed to invert transform point %f,%f,%f \n", x,y,z );
-        return 3;
-      }
-        
-      assert_equal_point( tx,ty,tz, a,b,c,
-              "general_inverse_transform_point() / inverted xfm" );
+      line++;
+      fgetc(in);
     }
+
+    fclose(in);
 
     return 0;
 }

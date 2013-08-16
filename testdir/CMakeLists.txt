@@ -49,16 +49,30 @@ TARGET_LINK_LIBRARIES(copy_xfm ${VOLUME_IO_LIBRARY} ${LIBMINC_LIBRARIES})
 ADD_EXECUTABLE(create_grid_xfm create_grid_xfm.c)
 TARGET_LINK_LIBRARIES(create_grid_xfm ${VOLUME_IO_LIBRARY} ${LIBMINC_LIBRARIES})
 
+ADD_EXECUTABLE(check_xfm   vio_xfm_test/check-xfm.c)
+TARGET_LINK_LIBRARIES(check_xfm ${VOLUME_IO_LIBRARY} ${LIBMINC_LIBRARIES})
+
 #ADD_TEST(create_grid_xfm create_grid_xfm)
 #ADD_TEST(test_speed test_speed)
 
 ADD_TEST(test_xfm_1 test_xfm 10000 ${CMAKE_CURRENT_SOURCE_DIR}/vio_xfm_test/t1.xfm)
 ADD_TEST(test_xfm_2 test_xfm 10000 ${CMAKE_CURRENT_SOURCE_DIR}/vio_xfm_test/t2.xfm)
-
-#IF(HAVE_MINC1)
-  # nonlnear transform test will fail without MINC1 
 ADD_TEST(test_xfm_3 test_xfm 10000 ${CMAKE_CURRENT_SOURCE_DIR}/vio_xfm_test/t3.xfm 0.9)
-#ENDIF(HAVE_MINC1)
+
+ADD_TEST(copy_xfm copy_xfm ${CMAKE_CURRENT_SOURCE_DIR}/vio_xfm_test/t3.xfm ${CMAKE_CURRENT_BINARY_DIR}/t3_copy.xfm)
+
+#TODO: check_xfm_1 and check_xfm_2 will fail if tolerance set below 1e-3 without MINC1
+ADD_TEST(check_xfm_1 check_xfm
+ ${CMAKE_CURRENT_SOURCE_DIR}/vio_xfm_test/t3.xfm
+ ${CMAKE_CURRENT_SOURCE_DIR}/vio_xfm_test/random2 
+ 1e-3)
+
+ADD_TEST(check_xfm_2 check_xfm 
+ ${CMAKE_CURRENT_BINARY_DIR}/t3_copy.xfm
+ ${CMAKE_CURRENT_SOURCE_DIR}/vio_xfm_test/random2 
+ 1e-3)
+
+set_property(TEST check_xfm_2 APPEND PROPERTY DEPENDS copy_xfm)
 
 
 #common tests
