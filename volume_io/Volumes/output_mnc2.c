@@ -60,8 +60,8 @@ static  VIO_BOOL  is_default_direction_cosine(
     is_default = TRUE;
     for_less( i, 0, VIO_N_DIMENSIONS )
     {
-        if( i == axis && dir_cosines[i] != 1.0 ||
-            i != axis && dir_cosines[i] != 0.0 )
+        if( (i == axis && dir_cosines[i] != 1.0) ||
+            (i != axis && dir_cosines[i] != 0.0) )
         {
             is_default = FALSE;
             break;
@@ -643,7 +643,6 @@ VIOAPI  VIO_Status  add_minc2_history(
 {
     VIO_STR   new_history;
     size_t    minc_history_length=0;
-    size_t    minc_new_history_lenght=0;
 
     if( file->end_def_done )
     {
@@ -746,12 +745,9 @@ static  VIO_Status  get_dimension_ordering(
 static  VIO_Status  check_minc2_output_variables(
     Minc_file   file )
 {
-    int               d, axis;
-    misize_t          start_index;
-    VIO_Real          voxel_min, voxel_max, real_min, real_max;
+    VIO_Real          voxel_min, voxel_max;
     double            dim_value;
     VIO_Volume        volume;
-    VIO_Status        status;
 
     if( !file->variables_written )
     {
@@ -769,13 +765,6 @@ static  VIO_Status  check_minc2_output_variables(
         else
           print_error( "Volume has invalid min and max voxel value\n" );
 
-        start_index = 0;
-
-        if( file->image_range[0] < file->image_range[1] )
-        {
-          /*TODO: check if this is needed here!*/
-          /*miset_slice_range(file->minc2id,&start_index,1,file->image_range[1],file->image_range[0]);*/
-        }
     }
 
     return( VIO_OK );
@@ -1206,8 +1195,8 @@ static  VIO_Status  output_the_volume2(
     }
 
     if( file->n_slab_dims == 0 ) {
-      fprintf( stderr, "Error: You seem to be processing a minc file\n" );
-      fprintf( stderr, "with no valid axes. Please check your volume.\n" );
+      print_error( "Error: You seem to be processing a minc file\n" );
+      print_error( "with no valid axes. Please check your volume.\n" );
       exit(1);
     }
 
@@ -1233,7 +1222,7 @@ static  VIO_Status  output_the_volume2(
         }
         
         if( file->image_range[0] >= file->image_range[1] )
-          miset_slice_range(file->minc2id,file_indices,file->n_file_dimensions,real_max,real_min);
+          miset_slice_range(file->minc2id,(const misize_t*)file_indices,file->n_file_dimensions,real_max,real_min);
         
         output_slab2( file, volume, to_volume_index, file_indices, local_count );
 
@@ -1271,8 +1260,8 @@ static  VIO_Status  output_the_volume2(
     terminate_progress_report( &progress );
 
     if( step != n_steps ) {
-      fprintf( stderr, "Error: Your output minc file may be incomplete\n" );
-      fprintf( stderr, "(wrote only %d out of %d buffers)\n", step, n_steps );
+      print_error( "Error: Your output minc file may be incomplete\n" );
+      print_error( "(wrote only %d out of %d buffers)\n", step, n_steps );
       exit(1);
     }
 

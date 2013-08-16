@@ -1561,6 +1561,9 @@ VIOAPI  VIO_Status  add_minc2_history(
 VIOAPI  VIO_Status  set_minc_output_random_order(
     Minc_file   file );
 
+VIOAPI  VIO_Status  set_minc2_output_random_order(
+    Minc_file   file );
+
 VIOAPI  VIO_Status  output_minc_hyperslab(
     Minc_file           file,
     VIO_Data_types      data_type,
@@ -1581,6 +1584,12 @@ VIOAPI  VIO_Status  output_minc_volume(
     Minc_file   file );
 
 VIOAPI  VIO_Status  close_minc_output(
+    Minc_file   file );
+
+VIOAPI  VIO_Status  output_minc2_volume(
+    Minc_file   file );
+
+VIOAPI  VIO_Status  close_minc2_output(
     Minc_file   file );
 
 VIOAPI  void  set_default_minc_output_options(

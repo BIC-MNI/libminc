@@ -322,9 +322,9 @@ VIOAPI  VIO_Status  initialize_free_format_input(
             for_less( i, 0, n_voxels_in_slice )
             {
                 value = (int) volume_input->short_slice_buffer[i];
-                if( slice == 0 && i == 0 || value < min_value )
+                if( ( slice == 0 && i == 0 ) || value < min_value )
                     min_value = value;
-                if( slice == 0 && i == 0 || value > max_value )
+                if( ( slice == 0 && i == 0 ) || value > max_value )
                     max_value = value;
             }
         }
