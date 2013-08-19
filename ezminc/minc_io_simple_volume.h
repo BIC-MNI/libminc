@@ -38,7 +38,7 @@ namespace minc
       T * _vol;    //! the volume itself
       idx _size;   //! dimension sizes
       idx _stride; //! used internally 
-      int _count;  //! total number of voxels
+      size_t _count;  //! total number of voxels
       bool _free_memory; //! should the array be freed
       
       vect _step,_start;    //! conversion to wold coordinates
@@ -120,7 +120,7 @@ namespace minc
         return _vol;
       }
       
-      int c_buf_size() const
+      size_t c_buf_size() const
       {
         return _count;
       }
