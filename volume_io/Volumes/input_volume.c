@@ -170,6 +170,7 @@ VIOAPI  void  delete_volume_input(
 {
     switch( input_info->file_format )
     {
+    default:
 #ifdef HAVE_MINC1
     case  MNC_FORMAT:
         close_minc_input( input_info->minc_file );
@@ -202,12 +203,13 @@ VIOAPI  void  delete_volume_input(
 VIOAPI  VIO_BOOL  input_more_of_volume(
     VIO_Volume            volume,
     volume_input_struct   *input_info,
-    VIO_Real                  *fraction_done )
+    VIO_Real              *fraction_done )
 {
     VIO_BOOL       more_to_do;
 
     switch( input_info->file_format )
     {
+      default:
 #ifdef HAVE_MINC1
       case  MNC_FORMAT:
         more_to_do = input_more_minc_file( input_info->minc_file,
@@ -218,7 +220,7 @@ VIOAPI  VIO_BOOL  input_more_of_volume(
 #ifdef HAVE_MINC2
       case  MNC2_FORMAT:
         more_to_do = input_more_minc2_file( input_info->minc_file,
-                                          fraction_done );
+                                            fraction_done );
         break;
 #endif /*HAVE_MINC2*/
         

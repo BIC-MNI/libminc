@@ -69,14 +69,16 @@ int main( int ac, char* av[] )
     while (!feof(in)) {
       VIO_Real x,y,z;
       VIO_Real tx,ty,tz;
+      VIO_Real ttx,tty,ttz;
       VIO_Real a,b,c;
+      VIO_Real ta,tb,tc;
       int check=1;
       char line_c[1024];
       
-      check=fscanf(in,"%lg,%lg,%lg,%lg,%lg,%lg",&x,&y,&z,&a,&b,&c);
+      check=fscanf(in,"%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg",&x,&y,&z,&a,&b,&c,&ta,&tb,&tc);
       if(check<=0) break;
       
-      if(check!=3 && check!=6)
+      if(check!=3 && check!=9)
       {
         fprintf( stderr,"Unexpected input file format at line %d , read %d values!\n",line,check);
         return 3;
@@ -87,15 +89,22 @@ int main( int ac, char* av[] )
         fprintf( stderr, "Failed to transform point %f,%f,%f \n", x,y,z );
         return 3;
       }
+      
+      if(general_inverse_transform_point( &xfm,  x,y,z,  &ttx,&tty,&ttz ) != VIO_OK)
+      {
+        fprintf( stderr, "Failed to invert transform point %f,%f,%f \n", tx,ty,tz );
+        return 3;
+      }
 
       if(check==3)
       {
-        fprintf( stdout,"%.20lg,%.20lg,%.20lg,%.20lg,%.20lg,%.20lg\n",x,y,z,tx,ty,tz);
-
+        fprintf( stdout,"%.20lg,%.20lg,%.20lg,%.20lg,%.20lg,%.20lg,%.20lg,%.20lg,%.20lg\n",x,y,z,tx,ty,tz,ttx,tty,ttz);
       } else {
-        sprintf(line_c,"Line:%d",line);
-        assert_equal_point( tx,ty,tz, a,b,c,
-              line_c );
+        sprintf(line_c,"Line:%d Fwd ",line);
+        assert_equal_point( tx,ty,tz, a,b,c, line_c );
+
+        sprintf(line_c,"Line:%d Inv ",line);
+        assert_equal_point( ttx,tty,ttz, ta,tb,tc, line_c );
       }
 
       line++;
@@ -103,7 +112,6 @@ int main( int ac, char* av[] )
     }
 
     fclose(in);
-
     return 0;
 }
 

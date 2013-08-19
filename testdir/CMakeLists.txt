@@ -49,8 +49,8 @@ TARGET_LINK_LIBRARIES(copy_xfm ${VOLUME_IO_LIBRARY} ${LIBMINC_LIBRARIES})
 ADD_EXECUTABLE(create_grid_xfm create_grid_xfm.c)
 TARGET_LINK_LIBRARIES(create_grid_xfm ${VOLUME_IO_LIBRARY} ${LIBMINC_LIBRARIES})
 
-ADD_EXECUTABLE(check_xfm   vio_xfm_test/check-xfm.c)
-TARGET_LINK_LIBRARIES(check_xfm ${VOLUME_IO_LIBRARY} ${LIBMINC_LIBRARIES})
+ADD_EXECUTABLE(verify_xfm   vio_xfm_test/verify_xfm.c)
+TARGET_LINK_LIBRARIES(verify_xfm ${VOLUME_IO_LIBRARY} ${LIBMINC_LIBRARIES})
 
 #ADD_TEST(create_grid_xfm create_grid_xfm)
 #ADD_TEST(test_speed test_speed)
@@ -61,18 +61,32 @@ ADD_TEST(test_xfm_3 test_xfm 10000 ${CMAKE_CURRENT_SOURCE_DIR}/vio_xfm_test/t3.x
 
 ADD_TEST(copy_xfm copy_xfm ${CMAKE_CURRENT_SOURCE_DIR}/vio_xfm_test/t3.xfm ${CMAKE_CURRENT_BINARY_DIR}/t3_copy.xfm)
 
-#TODO: check_xfm_1 and check_xfm_2 will fail if tolerance set below 1e-3 without MINC1
-ADD_TEST(check_xfm_1 check_xfm
+ADD_TEST(verify_xfm_1 verify_xfm
  ${CMAKE_CURRENT_SOURCE_DIR}/vio_xfm_test/t3.xfm
  ${CMAKE_CURRENT_SOURCE_DIR}/vio_xfm_test/random2 
- 1e-3)
+ 1e-6)
 
-ADD_TEST(check_xfm_2 check_xfm 
+ADD_TEST(verify_xfm_float verify_xfm
+ ${CMAKE_CURRENT_SOURCE_DIR}/vio_xfm_test/test_float.xfm
+ ${CMAKE_CURRENT_SOURCE_DIR}/vio_xfm_test/verify_xfm_table.txt
+ 1e-9)
+
+ADD_TEST(verify_xfm_short verify_xfm
+  ${CMAKE_CURRENT_SOURCE_DIR}/vio_xfm_test/test_short.xfm
+  ${CMAKE_CURRENT_SOURCE_DIR}/vio_xfm_test/verify_xfm_table.txt
+  1e-4)
+  
+ADD_TEST(verify_xfm_byte verify_xfm
+  ${CMAKE_CURRENT_SOURCE_DIR}/vio_xfm_test/test_byte.xfm
+  ${CMAKE_CURRENT_SOURCE_DIR}/vio_xfm_test/verify_xfm_table.txt
+  1e-1) 
+
+ADD_TEST(verify_xfm_2 verify_xfm 
  ${CMAKE_CURRENT_BINARY_DIR}/t3_copy.xfm
- ${CMAKE_CURRENT_SOURCE_DIR}/vio_xfm_test/random2 
+ ${CMAKE_CURRENT_SOURCE_DIR}/vio_xfm_test/random2
  1e-3)
 
-set_property(TEST check_xfm_2 APPEND PROPERTY DEPENDS copy_xfm)
+set_property(TEST verify_xfm_2 APPEND PROPERTY DEPENDS copy_xfm)
 
 
 #common tests
