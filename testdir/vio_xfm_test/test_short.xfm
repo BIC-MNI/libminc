@@ -1,0 +1,3 @@
+MNI Transform File
+Transform_Type = Grid_Transform;
+Displacement_Volume = test_short_grid_0.mnc;
