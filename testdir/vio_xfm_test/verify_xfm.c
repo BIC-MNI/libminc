@@ -110,8 +110,10 @@ int main( int ac, char* av[] )
       line++;
       fgetc(in);
     }
-
     fclose(in);
+    
+    delete_general_transform(&xfm);
+    
     return 0;
 }
 

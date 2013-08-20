@@ -147,6 +147,7 @@ VIOAPI  Minc_file  initialize_minc_input_from_minc2_id(
     {
       miget_dimension_name(file_dims[d], &dim_name);
       file->dim_names[d] = create_string( dim_name );
+      free(dim_name);
       file->sizes_in_file[d] = dimension_size[d];
     }
     
