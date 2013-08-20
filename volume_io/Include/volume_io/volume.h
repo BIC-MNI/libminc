@@ -479,12 +479,12 @@ typedef struct
 
 /* --------------------- filter types -------------------------------- */
 
-/*
+
 typedef enum {
                NEAREST_NEIGHBOUR,
                LINEAR_INTERPOLATION,
                BOX_FILTER,
                TRIANGLE_FILTER,
-               GAUSSIAN_FILTER } Filter_types; */
+               GAUSSIAN_FILTER } VIO_Filter_types;
 
 #endif /* __VOLUME_H__ */
