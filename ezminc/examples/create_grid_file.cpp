@@ -109,7 +109,7 @@ void show_usage(const char *name)
       for(size_t y=0;y<ny;y++)
         for(size_t z=0;z<nz;z++)
     {
-      fixed_vec<3,double> pos=grid.voxel_to_world(IDX<int>(x,y,z));
+      fixed_vec<3,double> pos=grid.voxel_to_world(IDX<size_t>(x,y,z));
       fixed_vec<3,float> def;
       
       def[0]=amp*sin(M_PI*pos[0]/100.0);
