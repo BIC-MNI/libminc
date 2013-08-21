@@ -7,6 +7,7 @@
 #include <string.h>
 // for get_opt_long
 #include <getopt.h>
+#include <unistd.h>
 #include <minc_1_simple_rw.h>
 
 
