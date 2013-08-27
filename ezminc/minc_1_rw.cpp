@@ -645,7 +645,7 @@ namespace minc
   
   minc_1_reader::~minc_1_reader()
   {
-    close();
+    minc_1_reader::close();
   }
 
   minc_1_writer::minc_1_writer():
@@ -1369,7 +1369,7 @@ namespace minc
 
   minc_1_writer::~minc_1_writer()
   {
-    close();
+    minc_1_writer::close();
   }
   
   void minc_1_writer::copy_headers(const minc_1_base& src)
