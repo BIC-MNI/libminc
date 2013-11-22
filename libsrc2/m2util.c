@@ -354,7 +354,7 @@ int miset_attr_at_loc ( hid_t hdf_loc, const char *name, mitype_t data_type,
       goto cleanup;
   }
 
-  if((hdf_attr = H5Acreate1 ( hdf_loc, name, ftyp_id, spc_id, H5P_DEFAULT ))<0)
+  if((hdf_attr = H5Acreate2 ( hdf_loc, name, ftyp_id, spc_id, H5P_DEFAULT, H5P_DEFAULT  ))<0)
     goto cleanup;
   
   
@@ -1413,7 +1413,7 @@ int minc_create_thumbnail ( mihandle_t volume, int grp )
 {
   char path[MI2_MAX_PATH];
   hid_t grp_id;
-
+  
   /* Don't handle negative or overly large numbers!
   */
   if ( grp <= 0 || grp > MI2_MAX_RESOLUTION_GROUP ) {
@@ -1421,7 +1421,7 @@ int minc_create_thumbnail ( mihandle_t volume, int grp )
   }
 
   sprintf ( path, MI_ROOT_PATH "/image/%d", grp );
-  grp_id = H5Gcreate1 ( volume->hdf_id, path, 0 );
+  grp_id = H5Gcreate2 ( volume->hdf_id, path, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
 
   if ( grp_id < 0 ) {
     return ( MI_ERROR );

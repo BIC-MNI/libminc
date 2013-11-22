@@ -309,6 +309,7 @@ int micreate_group ( mihandle_t vol, const char *path, const char *name )
   hid_t hdf_file;
   hid_t hdf_grp;
   hid_t hdf_new_grp;
+  hid_t hdf_gpid;
   char fullpath[256];
 
   /* Get a handle to the actual HDF file
@@ -347,7 +348,10 @@ int micreate_group ( mihandle_t vol, const char *path, const char *name )
 
     /* Actually create the requested group.
      */
-    hdf_new_grp = H5Gcreate1 ( hdf_grp, name, 0 );
+    hdf_gpid = H5Pcreate (H5P_GROUP_CREATE);
+    H5Pset_attr_phase_change (hdf_gpid, 0, 0);
+
+    hdf_new_grp = H5Gcreate2 ( hdf_grp, name, H5P_DEFAULT, hdf_gpid, H5P_DEFAULT );
 
     if ( hdf_new_grp < 0 ) {
       return ( MI_ERROR );
@@ -356,6 +360,7 @@ int micreate_group ( mihandle_t vol, const char *path, const char *name )
 
   /* Close the handles we created.
    */
+  H5Pclose ( hdf_gpid );
   H5Gclose ( hdf_new_grp );
   H5Gclose ( hdf_grp );
 

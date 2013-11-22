@@ -298,15 +298,15 @@ static hid_t
 hdf_path_from_name(struct m2_file *file, const char *varnm, char *varpath)
 {
     if (!strcmp(varnm, MIimage) ||
-	!strcmp(varnm, MIimagemax) ||
-	!strcmp(varnm, MIimagemin)) {
-	sprintf(varpath, "/minc-2.0/image/%d/", file->resolution);
+      !strcmp(varnm, MIimagemax) ||
+      !strcmp(varnm, MIimagemin)) {
+      sprintf(varpath, "/minc-2.0/image/%d/", file->resolution);
     }
     else if (hdf_is_dimension_name(file, varnm)) {
-	strcpy(varpath, "/minc-2.0/dimensions/");
+      strcpy(varpath, "/minc-2.0/dimensions/");
     }
     else {
-	strcpy(varpath, "/minc-2.0/info/");
+      strcpy(varpath, "/minc-2.0/info/");
     }
     strcat(varpath, varnm);
     return (MI_NOERROR);
@@ -318,17 +318,17 @@ nc_to_hdf5_type(nc_type dtype, int is_signed)
 {
     switch (dtype) {
     case NC_CHAR:
-	return (is_signed ? H5T_STD_I8LE : H5T_STD_U8LE);
+      return (is_signed ? H5T_STD_I8LE : H5T_STD_U8LE);
     case NC_BYTE:
-	return (is_signed ? H5T_STD_I8LE : H5T_STD_U8LE);
+      return (is_signed ? H5T_STD_I8LE : H5T_STD_U8LE);
     case NC_SHORT:
-	return (is_signed ? H5T_STD_I16LE : H5T_STD_U16LE);
+      return (is_signed ? H5T_STD_I16LE : H5T_STD_U16LE);
     case NC_INT:
-	return (is_signed ? H5T_STD_I32LE : H5T_STD_U32LE);
+      return (is_signed ? H5T_STD_I32LE : H5T_STD_U32LE);
     case NC_FLOAT:
-	return (H5T_IEEE_F32LE);
+      return (H5T_IEEE_F32LE);
     case NC_DOUBLE:
-	return (H5T_IEEE_F64LE);
+      return (H5T_IEEE_F64LE);
     case NC_NAT:
        return (H5T_NO_CLASS);
     }
@@ -405,10 +405,10 @@ hdf_varid(int fd, const char *varnm)
 
     file = hdf_id_check(fd);
     if (file != NULL) {
-	var = hdf_var_byname(file, varnm);
-	if (var != NULL) {
-	    return (var->id);
-	}
+      var = hdf_var_byname(file, varnm);
+      if (var != NULL) {
+        return (var->id);
+      }
     }
     return (MI_ERROR);
 }
@@ -474,7 +474,7 @@ hdf_attinq(int fd, int varid, const char *attnm, nc_type *type_ptr,
   hid_t att_id = -1;
   hid_t typ_id = -1;
   hid_t spc_id = -1;
-  hid_t loc_id;
+  hid_t loc_id = -1;
   int status = MI_ERROR;
   size_t typ_size;
   H5T_class_t typ_class;
@@ -520,55 +520,55 @@ hdf_attinq(int fd, int varid, const char *attnm, nc_type *type_ptr,
       } H5E_END_TRY;
 
       if (att_id < 0)
-	  goto cleanup;
+        goto cleanup;
   
       if ((spc_id = H5Aget_space(att_id)) < 0)
-	  goto cleanup;
+        goto cleanup;
 
       if ((typ_id = H5Aget_type(att_id)) < 0)
-	  goto cleanup;
+        goto cleanup;
  
       typ_class = H5Tget_class(typ_id);
       typ_size = H5Tget_size(typ_id);
 
       if (type_ptr != NULL) {
-	  if (typ_class == H5T_INTEGER) {
-	      if (typ_size == 1)
-		  *type_ptr = NC_BYTE;
-	      else if (typ_size == 2)
-		  *type_ptr = NC_SHORT;
-	      else if (typ_size == 4) 
-		  *type_ptr = NC_INT;
-	      else {
-		  milog_message(MI_MSG_INTSIZE, typ_size);
-	      }
-	  }
-	  else if (typ_class == H5T_FLOAT) {
-	      if (typ_size == 4) {
-		  *type_ptr = NC_FLOAT;
-	      }
-	      else if (typ_size == 8) {
-		  *type_ptr = NC_DOUBLE;
-	      }
-	      else {
-		  milog_message(MI_MSG_FLTSIZE, typ_size);
-	      }
-	  }
-	  else if (typ_class == H5T_STRING) {
-	      *type_ptr = NC_CHAR;
-	  }
-	  else {
-	      milog_message(MI_MSG_TYPECLASS, typ_class);
-	  }
+        if (typ_class == H5T_INTEGER) {
+          if (typ_size == 1)
+          *type_ptr = NC_BYTE;
+          else if (typ_size == 2)
+            *type_ptr = NC_SHORT;
+          else if (typ_size == 4) 
+            *type_ptr = NC_INT;
+          else {
+            milog_message(MI_MSG_INTSIZE, typ_size);
+          }
+        }
+        else if (typ_class == H5T_FLOAT) {
+          if (typ_size == 4) {
+            *type_ptr = NC_FLOAT;
+          }
+          else if (typ_size == 8) {
+            *type_ptr = NC_DOUBLE;
+          }
+          else {
+            milog_message(MI_MSG_FLTSIZE, typ_size);
+          }
+        }
+        else if (typ_class == H5T_STRING) {
+          *type_ptr = NC_CHAR;
+        }
+        else {
+          milog_message(MI_MSG_TYPECLASS, typ_class);
+        }
       }
 
       if (length_ptr != NULL) {
-	  if (typ_class == H5T_STRING) {
-	      *length_ptr = typ_size;
-	  }
-	  else {
-	      *length_ptr = H5Sget_simple_extent_npoints(spc_id);
-	  }
+        if (typ_class == H5T_STRING) {
+          *length_ptr = typ_size;
+        }
+        else {
+          *length_ptr = H5Sget_simple_extent_npoints(spc_id);
+        }
       }
 
       status = 1;               /* 1 -> success here */
@@ -616,7 +616,7 @@ hdf_put_dimorder(struct m2_file *file, int dst_id, int ndims,
 
     spc_id = H5Screate(H5S_SCALAR);
 
-    att_id = H5Acreate(dst_id, MI2_DIMORDER, typ_id, spc_id, H5P_DEFAULT, H5P_DEFAULT);
+    att_id = H5Acreate2(dst_id, MI2_DIMORDER, typ_id, spc_id, H5P_DEFAULT, H5P_DEFAULT);
 
     if (att_id >= 0) {
 	H5Awrite(att_id, typ_id, str_buf);
@@ -922,7 +922,7 @@ hdf_set_length(hid_t dst_id, const char *dimnm, unsigned long length)
         H5Adelete(dst_id, MI2_LENGTH);
         /* Create the attribute anew.
 	 */
-        att_id = H5Acreate(dst_id, MI2_LENGTH, H5T_STD_U32LE, aspc_id, 
+        att_id = H5Acreate2(dst_id, MI2_LENGTH, H5T_STD_U32LE, aspc_id, 
                            H5P_DEFAULT, H5P_DEFAULT);
       }  H5E_END_TRY;
         if (att_id >= 0) {
@@ -1099,9 +1099,10 @@ hdf_attput(int fd, int varid, const char *attnm, nc_type val_typ,
             }
 
             new_plst_id = H5Dget_create_plist(var->dset_id);
+            H5Pset_attr_phase_change( new_plst_id , 0 , 0);
 
-            new_dset_id = H5Dcreate1(file->grp_id, temp, new_type_id, 
-                                    var->fspc_id, new_plst_id);
+            new_dset_id = H5Dcreate2(file->grp_id, temp, new_type_id, 
+                                    var->fspc_id, H5P_DEFAULT, new_plst_id, H5P_DEFAULT);
 
             /* Iterate over all attributes, copying from old to new. */
             i = 0;
@@ -1172,6 +1173,7 @@ hdf_attput(int fd, int varid, const char *attnm, nc_type val_typ,
         else {
             hsize_t temp_size = val_len;
             spc_id = H5Screate_simple(1, &temp_size, NULL);
+            
         }
 
     }
@@ -1184,20 +1186,59 @@ hdf_attput(int fd, int varid, const char *attnm, nc_type val_typ,
 
         /* Create the attribute anew.
          */
-        att_id = H5Acreate(loc_id, attnm, ftyp_id, spc_id, H5P_DEFAULT, H5P_DEFAULT);
     } H5E_END_TRY;
+    
+    
+    if(val_len>10000)
+    {
+      hid_t hdf_dset;
+      char *dset_name;
+      hid_t spc_id2 = H5Screate(H5S_SCALAR);
+      hid_t tid_r = H5Tcopy(H5T_STD_REF_OBJ);
+      hobj_ref_t wbuf;
+      hid_t fspid;
+      
+      dset_name=malloc(strlen(attnm)+7);
+      *dset_name=0;
+      strcat(dset_name,"dset_");
+      strcat(dset_name,attnm);
+      
+      fprintf(stderr,"Creating dataset:%s\n",dset_name);
+      
+      hdf_dset=H5Dcreate2(file->grp_id, dset_name, ftyp_id, spc_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+      fspid=H5Dget_space(hdf_dset);
+      
+      H5Dwrite(hdf_dset, mtyp_id, spc_id, fspid, H5P_DEFAULT, val_ptr);
+      H5Dclose(hdf_dset);
+      H5Sclose(fspid);
+      
+      att_id = H5Acreate2(loc_id, attnm, tid_r, spc_id2, H5P_DEFAULT, H5P_DEFAULT);
+      
+      H5Rcreate(&wbuf, file->grp_id, dset_name, H5R_OBJECT, -1);
+      
+      status = H5Awrite(att_id, tid_r, &wbuf);
+      if (status >= 0) {
+          status = MI_NOERROR;
+      }
+      H5Tclose(tid_r);
+      H5Sclose(spc_id2);
+      free(dset_name);
+    } else {
+      att_id = H5Acreate2(loc_id, attnm, ftyp_id, spc_id, H5P_DEFAULT, H5P_DEFAULT);
+      
+      if (att_id < 0)
+          goto cleanup;
 
-    if (att_id < 0)
-        goto cleanup;
-
-    /* Save the value.
-     */
-    status = H5Awrite(att_id, mtyp_id, val_ptr);
-    if (status >= 0) {
-        status = MI_NOERROR;
+      /* Save the value.
+      */
+      status = H5Awrite(att_id, mtyp_id, val_ptr);
+      if (status >= 0) {
+          status = MI_NOERROR;
+      }
     }
+    
 
- cleanup:
+cleanup:
     if (spc_id >= 0) 
         H5Sclose(spc_id);
     if (ftyp_id >= 0)
@@ -1270,40 +1311,44 @@ hdf_vardef(int fd, const char *varnm, nc_type vartype, int ndims,
 
     /* Ignore deprecated variables */
     if (!strcmp(varnm, MIrootvariable)) {
-	return (MI_ROOTVARIABLE_ID);
+      return (MI_ROOTVARIABLE_ID);
     }
 
     if ((file = hdf_id_check(fd)) == NULL) {
-	return (MI_ERROR);
+      return (MI_ERROR);
     }
 
     if (hdf_path_from_name(file, varnm, varpath) < 0) {
-	return (MI_ERROR);
+      return (MI_ERROR);
     }
 
     prp_id = H5Pcreate(H5P_DATASET_CREATE);
+    H5Pset_attr_phase_change (prp_id, 0, 0);
+    
     if (prp_id < 0) {
         goto cleanup;
     }
 
     if (ndims == 0) {
-	spc_id = H5Screate(H5S_SCALAR);
+      spc_id = H5Screate(H5S_SCALAR);
 
         /* For any scalar datasets, use compact dataset layout to 
          * minimize file overhead.
          */
-        H5Pset_layout(prp_id, H5D_COMPACT);
+        /*VF: unfortunately this limits attribute size!*/
+      H5Pset_layout( prp_id, H5D_CONTIGUOUS );
+      
     }
     else {
-	for (i = 0; i < ndims; i++) {
-	    status = hdf_diminq(fd, dimids[i], NULL, &length);
-	    if (status < 0) {
-		return (status);
-	    }
-            dims[i] = length;
-	}
+      for (i = 0; i < ndims; i++) {
+        status = hdf_diminq(fd, dimids[i], NULL, &length);
+        if (status < 0) {
+          return (status);
+        }
+        dims[i] = length;
+      }
 
-	spc_id = H5Screate_simple(ndims, dims, NULL);
+    spc_id = H5Screate_simple(ndims, dims, NULL);
 
         if (file->comp_type == MI2_COMP_UNKNOWN) {
             comp_level = miget_cfg_int(MICFG_COMPRESS);
@@ -1356,7 +1401,7 @@ hdf_vardef(int fd, const char *varnm, nc_type vartype, int ndims,
                 val *= chkdims[i];
             }
 
-	    for (i = 0; i < ndims; i++) {
+            for (i = 0; i < ndims; i++) {
                 if( chunk_length >= MI2_CHUNK_MIN_SIZE ) {
                     if( chkdims[i] > chunk_length ) {
                         chkdims[i] = chunk_length;
@@ -1370,21 +1415,21 @@ hdf_vardef(int fd, const char *varnm, nc_type vartype, int ndims,
     }
 
     if (spc_id < 0) {
-	goto cleanup;
+      goto cleanup;
     }
 
     typ_id = H5Tcopy(nc_to_hdf5_type(vartype, TRUE));
     if (typ_id < 0) {
-	goto cleanup;
+      goto cleanup;
     }
     
     H5E_BEGIN_TRY {
-        dst_id = H5Dcreate1(fd, varpath, typ_id, spc_id, prp_id);
+        dst_id = H5Dcreate2(fd, varpath, typ_id, spc_id, H5P_DEFAULT, prp_id, H5P_DEFAULT);
     } H5E_END_TRY;
 
     if (dst_id < 0) {
         milog_message(MI_MSG_OPENDSET, varnm);
-	goto cleanup;
+        goto cleanup;
     }
 
     /* If this is a dimension variable, we have to define the length
@@ -1398,6 +1443,7 @@ hdf_vardef(int fd, const char *varnm, nc_type vartype, int ndims,
      */
     hdf_put_dimorder(file, dst_id, ndims, dimids);
 
+
     /* bert - Closing the dataset here is necessary for HDF5 1.6.5. 
      * Without this we get nasty errors caused by re-opening the 
      * dataset in hdf_var_add(). The conclusion seems to be that
@@ -1410,23 +1456,23 @@ hdf_vardef(int fd, const char *varnm, nc_type vartype, int ndims,
      */
     var = hdf_var_add(file, varnm, varpath, ndims, dims);
     if (var == NULL) {
-	goto cleanup;
+      goto cleanup;
     }
 
     status = var->id;
 
  cleanup:
     if (prp_id >= 0) {
-	H5Pclose(prp_id);
+      H5Pclose(prp_id);
     }
     if (dst_id >= 0) {
-	H5Dclose(dst_id);
+      H5Dclose(dst_id);
     }
     if (typ_id >= 0) {
-	H5Tclose(typ_id);
+      H5Tclose(typ_id);
     }
     if (spc_id >= 0) {
-	H5Sclose(spc_id);
+      H5Sclose(spc_id);
     }
     return (status);
 }
@@ -2065,7 +2111,7 @@ herr_t hdf_copy_attr(hid_t in_id, const char *attr_name, void *op_data)
    if ((typ_id = H5Aget_type(inatt_id)) < 0)
      goto cleanup;
 
-   outatt_id = H5Acreate(out_id, attr_name, typ_id, spc_id, H5P_DEFAULT, H5P_DEFAULT);
+   outatt_id = H5Acreate2(out_id, attr_name, typ_id, spc_id, H5P_DEFAULT, H5P_DEFAULT);
    if (outatt_id < 0) {
      /* This can happen if the attribute already exists.  If it does, we
       * don't overwrite the existing value.
@@ -2286,50 +2332,54 @@ hdf_create(const char *path, int cmode, struct mi2opts *opts_ptr)
     hid_t fd;
     hid_t tmp_id;
     struct m2_file *file;
-
+    hid_t hdf_gpid;
+  
     /* Convert the MINC (NetCDF) mode to a HDF5 mode.
      */
     if (cmode & NC_NOCLOBBER) {
-	cmode = H5F_ACC_EXCL;
+      cmode = H5F_ACC_EXCL;
     }
     else {
-	cmode = H5F_ACC_TRUNC;
+      cmode = H5F_ACC_TRUNC;
     }
 
     H5E_BEGIN_TRY {
         fd = H5Fcreate(path, cmode, H5P_DEFAULT, H5P_DEFAULT);
     } H5E_END_TRY;
     if (fd < 0) {
-	return (MI_ERROR);
+      return (MI_ERROR);
     }
 
+    hdf_gpid = H5Pcreate (H5P_GROUP_CREATE);
+    H5Pset_attr_phase_change (hdf_gpid, 0, 0);
     /* Create the default groups.
      * Should we use a non-zero value for size_hint (parameter 3)???
      */
-    if ((grp_id = H5Gcreate1(fd, MI2_GRPNAME, 0)) < 0) {
-	return (MI_ERROR);
+    if ((grp_id = H5Gcreate2(fd, MI2_GRPNAME, H5P_DEFAULT, hdf_gpid, H5P_DEFAULT)) < 0) {
+      return (MI_ERROR);
     }
 
-    if ((tmp_id = H5Gcreate1(grp_id, "dimensions", 0)) < 0) {
-	return (MI_ERROR);
-    }
-    H5Gclose(tmp_id);
-
-    if ((tmp_id = H5Gcreate1(grp_id, "info", 0)) < 0) {
-	return (MI_ERROR);
+    if ((tmp_id = H5Gcreate2(grp_id, "dimensions", H5P_DEFAULT, hdf_gpid, H5P_DEFAULT)) < 0) {
+      return (MI_ERROR);
     }
     H5Gclose(tmp_id);
 
-    if ((tmp_id = H5Gcreate1(grp_id, "image", 0)) < 0) {
-	return (MI_ERROR);
+    if ((tmp_id = H5Gcreate2(grp_id, "info", H5P_DEFAULT, hdf_gpid, H5P_DEFAULT)) < 0) {
+      return (MI_ERROR);
     }
     H5Gclose(tmp_id);
 
-    if ((tmp_id = H5Gcreate1(grp_id, "image/0", 0)) < 0) {
-	return (MI_ERROR);
+    if ((tmp_id = H5Gcreate2(grp_id, "image", H5P_DEFAULT, hdf_gpid, H5P_DEFAULT)) < 0) {
+      return (MI_ERROR);
     }
     H5Gclose(tmp_id);
 
+    if ((tmp_id = H5Gcreate2(grp_id, "image/0", H5P_DEFAULT, hdf_gpid, H5P_DEFAULT)) < 0) {
+      return (MI_ERROR);
+    }
+    
+    H5Pclose( hdf_gpid );
+    H5Gclose(tmp_id);
     H5Gclose(grp_id);
 
     file = hdf_id_add(fd);      /* Add it to the list */

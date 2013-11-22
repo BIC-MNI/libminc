@@ -198,7 +198,8 @@ static hid_t _hdf_create(const char *path, int cmode)
   hid_t grp_id;
   hid_t fd;
   hid_t tmp_id;
-    
+  hid_t hdf_gpid;
+  
   H5E_BEGIN_TRY {
     fd = H5Fcreate(path, cmode, H5P_DEFAULT, H5P_DEFAULT);
   } H5E_END_TRY;
@@ -211,20 +212,24 @@ static hid_t _hdf_create(const char *path, int cmode)
   /* Create the default groups.
    * Should we use a non-zero value for size_hint (parameter 3)???
    */
-  MI_CHECK_HDF_CALL_RET(grp_id = H5Gcreate1(fd, MI_ROOT_PATH , 0),"H5Gcreate1")
+
+  hdf_gpid = H5Pcreate (H5P_GROUP_CREATE);
+  H5Pset_attr_phase_change (hdf_gpid, 0, 0);
   
-  MI_CHECK_HDF_CALL_RET(tmp_id = H5Gcreate1(grp_id, "dimensions", 0),"H5Gcreate1")
+  MI_CHECK_HDF_CALL_RET(grp_id = H5Gcreate2(fd, MI_ROOT_PATH , H5P_DEFAULT, hdf_gpid, H5P_DEFAULT),"H5Gcreate2")
+
+  MI_CHECK_HDF_CALL_RET(tmp_id = H5Gcreate2(grp_id, "dimensions", H5P_DEFAULT, hdf_gpid, H5P_DEFAULT),"H5Gcreate2")
   H5Gclose(tmp_id);
   
-  MI_CHECK_HDF_CALL_RET(tmp_id = H5Gcreate1(grp_id, "info", 0),"H5Gcreate1")
+  MI_CHECK_HDF_CALL_RET(tmp_id = H5Gcreate2(grp_id, "info", H5P_DEFAULT, hdf_gpid, H5P_DEFAULT),"H5Gcreate2")
   H5Gclose(tmp_id);
   
-  MI_CHECK_HDF_CALL_RET(tmp_id = H5Gcreate1(grp_id, "image", 0),"H5Gcreate1")
+  MI_CHECK_HDF_CALL_RET(tmp_id = H5Gcreate2(grp_id, "image", H5P_DEFAULT, hdf_gpid, H5P_DEFAULT),"H5Gcreate2")
   
   H5Gclose(tmp_id);
+  MI_CHECK_HDF_CALL_RET(tmp_id = H5Gcreate2(grp_id, "image/0", H5P_DEFAULT, hdf_gpid, H5P_DEFAULT),"H5Gcreate2")
   
-  MI_CHECK_HDF_CALL_RET(tmp_id = H5Gcreate1(grp_id, "image/0", 0),"H5Gcreate1")
-  
+  H5Pclose ( hdf_gpid );
   H5Gclose(tmp_id);
   H5Gclose(grp_id);
   
