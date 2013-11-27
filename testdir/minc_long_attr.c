@@ -46,6 +46,7 @@ struct testinfo {
   int test_group;
   int test_attribute;
   char *large_attribute;
+  int attribute_size;
 };
 
 /* Test case 1 - file creation & definition. 
@@ -122,10 +123,10 @@ int test1(struct testinfo *ip, struct dimdef *dims, int ndims)
     FUNC_ERROR("micreate_group_variable");
   }
   
-  ip->large_attribute=calloc(100000,sizeof(char));
-  memset(ip->large_attribute,'X',100000-1);
+  ip->large_attribute=calloc(ip->attribute_size,sizeof(char));
+  memset(ip->large_attribute,'X',ip->attribute_size-1);
   
-  ip->test_attribute = ncattput(ip->fd, ip->test_group, "test", NC_CHAR, 100000, ip->large_attribute);
+  ip->test_attribute = ncattput(ip->fd, ip->test_group, "test", NC_CHAR, ip->attribute_size, ip->large_attribute);
   
   return (0);
 }
@@ -251,7 +252,7 @@ test3(struct testinfo *ip, struct dimdef *dims, int ndims)
         (att_datatype != NC_CHAR))
     FUNC_ERROR("ncattinq");
 
-  if(att_length!=100000)
+  if(att_length!=ip->attribute_size)
     FUNC_ERROR("Wrong attribute length!");
 
   att=malloc(att_length);
@@ -274,6 +275,12 @@ int main(int argc, char **argv)
 {
   int stat;
   struct testinfo info;
+  if(argc>1)
+    info.attribute_size=atoi(argv[1]);
+  else
+    info.attribute_size=100000;
+
+  printf("Running test with attribute size=%d\n",info.attribute_size);
 
   test1(&info, dimtab1, 3);
 

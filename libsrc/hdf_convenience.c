@@ -1188,56 +1188,16 @@ hdf_attput(int fd, int varid, const char *attnm, nc_type val_typ,
          */
     } H5E_END_TRY;
     
-#if 0    
-    if(val_len>10000)
-    {
-      hid_t hdf_dset;
-      char *dset_name;
-      hid_t spc_id2 = H5Screate(H5S_SCALAR);
-      hid_t tid_r = H5Tcopy(H5T_STD_REF_OBJ);
-      hobj_ref_t wbuf;
-      hid_t fspid;
-      
-      dset_name=malloc(strlen(attnm)+7);
-      *dset_name=0;
-      strcat(dset_name,"dset_");
-      strcat(dset_name,attnm);
-      
-      fprintf(stderr,"Creating dataset:%s\n",dset_name);
-      
-      hdf_dset=H5Dcreate2(file->grp_id, dset_name, ftyp_id, spc_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-      fspid=H5Dget_space(hdf_dset);
-      
-      H5Dwrite(hdf_dset, mtyp_id, spc_id, fspid, H5P_DEFAULT, val_ptr);
-      H5Dclose(hdf_dset);
-      H5Sclose(fspid);
-      
-      att_id = H5Acreate2(loc_id, attnm, tid_r, spc_id2, H5P_DEFAULT, H5P_DEFAULT);
-      
-      H5Rcreate(&wbuf, file->grp_id, dset_name, H5R_OBJECT, -1);
-      
-      status = H5Awrite(att_id, tid_r, &wbuf);
-      if (status >= 0) {
-          status = MI_NOERROR;
-      }
-      H5Tclose(tid_r);
-      H5Sclose(spc_id2);
-      free(dset_name);
-    } 
-    else 
-#endif
-    {
-      att_id = H5Acreate2(loc_id, attnm, ftyp_id, spc_id, H5P_DEFAULT, H5P_DEFAULT);
-      
-      if (att_id < 0)
-          goto cleanup;
+    att_id = H5Acreate2(loc_id, attnm, ftyp_id, spc_id, H5P_DEFAULT, H5P_DEFAULT);
+    
+    if (att_id < 0)
+        goto cleanup;
 
-      /* Save the value.
-      */
-      status = H5Awrite(att_id, mtyp_id, val_ptr);
-      if (status >= 0) {
-          status = MI_NOERROR;
-      }
+    /* Save the value.
+    */
+    status = H5Awrite(att_id, mtyp_id, val_ptr);
+    if (status >= 0) {
+        status = MI_NOERROR;
     }
     
 
@@ -2336,6 +2296,9 @@ hdf_create(const char *path, int cmode, struct mi2opts *opts_ptr)
     hid_t tmp_id;
     struct m2_file *file;
     hid_t hdf_gpid;
+    hid_t fpid;
+  
+    fpid = H5Pcreate (H5P_FILE_ACCESS);
   
     /* Convert the MINC (NetCDF) mode to a HDF5 mode.
      */
@@ -2346,8 +2309,11 @@ hdf_create(const char *path, int cmode, struct mi2opts *opts_ptr)
       cmode = H5F_ACC_TRUNC;
     }
 
+    /*VF use all the features of new HDF5 1.8*/
+    H5Pset_libver_bounds (fpid, H5F_LIBVER_18, H5F_LIBVER_18);
+
     H5E_BEGIN_TRY {
-        fd = H5Fcreate(path, cmode, H5P_DEFAULT, H5P_DEFAULT);
+        fd = H5Fcreate(path, cmode, H5P_DEFAULT, fpid);
     } H5E_END_TRY;
     if (fd < 0) {
       return (MI_ERROR);

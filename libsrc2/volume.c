@@ -199,9 +199,15 @@ static hid_t _hdf_create(const char *path, int cmode)
   hid_t fd;
   hid_t tmp_id;
   hid_t hdf_gpid;
+  hid_t fpid;
+  
+  fpid = H5Pcreate (H5P_FILE_ACCESS);
+  
+  /*VF use all the features of new HDF5 1.8*/
+  H5Pset_libver_bounds (fpid, H5F_LIBVER_18, H5F_LIBVER_18);
   
   H5E_BEGIN_TRY {
-    fd = H5Fcreate(path, cmode, H5P_DEFAULT, H5P_DEFAULT);
+    fd = H5Fcreate(path, cmode, H5P_DEFAULT, fpid);
   } H5E_END_TRY;
   
   if (fd < 0) {
