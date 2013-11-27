@@ -9,7 +9,7 @@ SET(LIBMINC_PACKAGE_VERSION_MAJOR 2)
 SET(LIBMINC_PACKAGE_VERSION_MINOR 3)
 SET(LIBMINC_PACKAGE_VERSION_PATCH 00)
 
-SET(LIBMINC_SOVERSION "4.0.0")
+SET(LIBMINC_SOVERSION "3.0.0")
 
 SET(LIBMINC_PACKAGE "libminc")
 SET(LIBMINC_PACKAGE_BUGREPORT "a.janke@gmail.com")
@@ -186,6 +186,7 @@ SET(minc1_LIB_SRCS
    libsrc/hdf_convenience.c
    libsrc/minc_compat.c
    libsrc/minc_simple.c
+   libsrc/minc_format_convert.c
    )
 
 SET(minc1_HEADERS
@@ -194,6 +195,7 @@ SET(minc1_HEADERS
   libsrc/nd_loop.h
   libsrc/minc_compat.h
   libsrc/minc_simple.h
+  libsrc/minc_format_convert.h
 )
 
 SET(minc2_LIB_SRCS
