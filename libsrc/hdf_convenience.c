@@ -1188,7 +1188,7 @@ hdf_attput(int fd, int varid, const char *attnm, nc_type val_typ,
          */
     } H5E_END_TRY;
     
-    
+#if 0    
     if(val_len>10000)
     {
       hid_t hdf_dset;
@@ -1223,7 +1223,10 @@ hdf_attput(int fd, int varid, const char *attnm, nc_type val_typ,
       H5Tclose(tid_r);
       H5Sclose(spc_id2);
       free(dset_name);
-    } else {
+    } 
+    else 
+#endif
+    {
       att_id = H5Acreate2(loc_id, attnm, ftyp_id, spc_id, H5P_DEFAULT, H5P_DEFAULT);
       
       if (att_id < 0)
@@ -2163,7 +2166,7 @@ hdf_open_dsets(struct m2_file *file, hid_t grp_id, char *cpath, int is_dim)
 
     result = H5Gget_num_objs(grp_id, &nobjs);
     if (result < 0) {
-	return (MI_ERROR);
+      return (MI_ERROR);
     }
 
     for (idx = 0; idx < nobjs; idx++) {
@@ -2253,7 +2256,7 @@ hdf_open(const char *path, int mode)
     } H5E_END_TRY;
 
     if (fd < 0) {
-	return (MI_ERROR);
+      return (MI_ERROR);
     }
 
     file = hdf_id_add(fd);	/* Add it to the list */

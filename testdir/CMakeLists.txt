@@ -12,6 +12,7 @@ IF(LIBMINC_MINC1_SUPPORT)
   ADD_EXECUTABLE(mincapi mincapi.c)
   ADD_EXECUTABLE(minc_types minc_types.c)
   ADD_EXECUTABLE(test_mconv test_mconv.c)
+  ADD_EXECUTABLE(minc_long_attr minc_long_attr.c)
 
   #ADD_EXECUTABLE(test_speed test_speed.c)
 MACRO(minc_test cmd)
@@ -36,8 +37,8 @@ ENDMACRO(minc_test)
 
   ADD_TEST(mincapi mincapi)
   ADD_TEST(test_mconv test_mconv)
+  ADD_TEST(minc_long_attr minc_long_attr)
 ENDIF(LIBMINC_MINC1_SUPPORT)
-
 
 # Volume IO tests
 ADD_EXECUTABLE(test_xfm   vio_xfm_test/test-xfm.c)
