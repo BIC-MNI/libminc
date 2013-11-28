@@ -1509,7 +1509,8 @@ int miclose_volume(mihandle_t volume)
   }
   if(volume->temp_file)
   {
-    unlink(volume->temp_file);
+    /*unlink(volume->temp_file);*/
+    printf("MINC2 file: %s\n",volume->temp_file);
     free(volume->temp_file);
   }
   

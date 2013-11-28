@@ -111,18 +111,11 @@ int test1(struct testinfo *ip, struct dimdef *dims, int ndims)
     FUNC_ERROR("micreate_std_variable");
   }
 
-  ip->imgid = micreate_std_variable(ip->fd, MIimage, NC_INT, ndims, ip->dim);
+  ip->imgid = micreate_std_variable(ip->fd, MIimage, NC_FLOAT, ndims, ip->dim);
   if (ip->imgid < 0) {
     FUNC_ERROR("micreate_std_variable");
   }
   
-  ip->test_group = ncvardef(ip->fd,(char*)"test",NC_INT,0,0);/* micreate_group_variable(ip->fd,(char*)"test");*/
-  if(ip->test_group<0)
-  {
-    FUNC_ERROR("micreate_group_variable");
-  }
-  
- 
   return (0);
 }
 
@@ -159,16 +152,16 @@ int test2(struct testinfo *ip, struct dimdef *dims, int ndims)
     FUNC_ERROR("mivarput1");
   }
 
-  for (i = 0; i < dims[TST_X].length; i++) {
+  for (i = 0; i < dims[TST_Z].length; i++) {
     for (j = 0; j < dims[TST_Y].length; j++) {
-      for (k = 0; k < dims[TST_Z].length; k++) {
-        int tmp = (i * 10000) + (j * 100) + k;
+      for (k = 0; k < dims[TST_X].length; k++) {
+        float tmp = (i * 10000) + (j * 100) + k;
 
-        coords[TST_X] = i;
+        coords[TST_X] = k;
         coords[TST_Y] = j;
-        coords[TST_Z] = k;
+        coords[TST_Z] = i;
 
-        stat = mivarput1(ip->fd, ip->imgid, coords, NC_INT, MI_SIGNED, &tmp);
+        stat = mivarput1(ip->fd, ip->imgid, coords, NC_FLOAT, MI_SIGNED, &tmp);
         if (stat < 0) {
           fprintf(stderr, "At (%d,%d,%d), status %d: ", i,j,k,stat);
           FUNC_ERROR("mivarput1");
@@ -262,13 +255,12 @@ test3(struct testinfo *ip, struct dimdef *dims, int ndims)
   }
   
   flt_ptr = (float *) buf_ptr;
-  for (i = 0; i < dims[TST_X].length; i++) {
+  for (i = 0; i < dims[TST_Z].length; i++) {
     for (j = 0; j < dims[TST_Y].length; j++) {
-      for (k = 0; k < dims[TST_Z].length; k++) {
+      for (k = 0; k < dims[TST_X].length; k++) {
         float tmp = (i * 10000) + (j * 100) + k;
         if (*flt_ptr != (float) tmp ) {
-          fprintf(stderr, "2. Data error at (%d,%d,%d) %f != %f\n", 
-                  i,j,k, *flt_ptr, tmp);
+          fprintf(stderr, "1. Data error at (%d,%d,%d) %f != %f\n", i,j,k, *flt_ptr, tmp);
           errors++;
         }
         flt_ptr++;
@@ -302,7 +294,7 @@ test4(struct testinfo *ip, struct dimdef *dims, int ndims)
   int r;
   /*Now we are going to work with the volume using apparent dimension order*/
   midimhandle_t my_dim[3];
-  static char *my_dimorder[] = {MIzspace,MIyspace,MIxspace};
+  static char *my_dimorder[] = {MIxspace,MIyspace,MIzspace};
   misize_t my_sizes[3];
   misize_t my_start[3];
   misize_t my_count[3];
@@ -311,6 +303,7 @@ test4(struct testinfo *ip, struct dimdef *dims, int ndims)
   
   int i,j,k;
   
+  float *buffer;
   float *flt_ptr;
   /**/
   if( miopen_volume ( ip->name, MI2_OPEN_READ, &vol )<0)
@@ -354,7 +347,7 @@ test4(struct testinfo *ip, struct dimdef *dims, int ndims)
   }
   
   
-  flt_ptr=malloc(sizeof(float)*my_sizes[0]*my_sizes[1]*my_sizes[2]);
+  buffer=flt_ptr=malloc(sizeof(float)*my_sizes[0]*my_sizes[1]*my_sizes[2]);
   my_start[0]=my_start[1]=my_start[2]=0;
   
   my_count[0]=my_sizes[0];
@@ -374,7 +367,7 @@ test4(struct testinfo *ip, struct dimdef *dims, int ndims)
         float tmp = (i * 10000) + (j * 100) + k;
         
         if (*flt_ptr != (float) tmp ) {
-          /*fprintf(stderr, "2. Data error at (%d,%d,%d) %f != %f\n", i,j,k, *flt_ptr, tmp);*/
+          fprintf(stderr, "2. Data error at (%d,%d,%d) %f != %f\n", i,j,k, *flt_ptr, tmp);
           errors++;
         }
         flt_ptr++;
@@ -382,7 +375,7 @@ test4(struct testinfo *ip, struct dimdef *dims, int ndims)
     }
   }
   
-  free(flt_ptr);
+  free(buffer);
   
   /* close volume*/
   miclose_volume ( vol );
