@@ -1,5 +1,5 @@
 #ifndef __MINC_FORMAT_CONVERT_H__
-#define __MINC_FORMAT_CONVERT_H__
+#define __MINC_FORMAT_CONVERT_H__ 1
 
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -14,8 +14,8 @@
               make no representations about the suitability of this
               software for any purpose.  It is provided "as is" without
               express or implied warranty.
-@RCSID      : $Header: /private-cvsroot/minc/libsrc/minc.h,v 6.21 2010-05-19 03:44:25 stever Exp $ MINC (MNI)
 ---------------------------------------------------------------------------- */
+
 
 
 
