@@ -28,11 +28,8 @@ static int micopy(int old_fd, int new_fd)
     /* Copy all variable definitions (and global attributes).
      */
     micopy_all_var_defs(old_fd, new_fd, 0, NULL);
-
-
     ncendef(new_fd);
     micopy_all_var_values(old_fd, new_fd, 0, NULL);
-    
     return MI_NOERROR;
 }
 
@@ -51,6 +48,7 @@ MNCAPI int minc_format_convert(const char *input,const char *output)
 
     flags = NC_CLOBBER|MI2_CREATE_V2;
 
+    memset(&opts,0,sizeof(struct mi2opts));
     opts.struct_version = MI2_OPTS_V1;
 
     new_fd = micreatex((char *)output, flags, &opts);

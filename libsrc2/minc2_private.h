@@ -116,7 +116,6 @@ struct mivolume {
   double scale_min;             /*< Global minimum */
   double scale_max;             /*< Global maximum */
   miboolean_t is_dirty;         /*< TRUE if data has been modified. */
-  const char *temp_file;        /*< Temp file was created to access the data, and should be unlinked*/
 };
 
 /**

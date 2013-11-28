@@ -1,8 +1,16 @@
-2013-07-09  Vladimir Fonov 
+2013-11-28 Vladimir S Fonov
+   * Removed autoconf/automake files
+   * MINC2 file format now can store long attributes, but uses HDF5 1.8 features
+   * MINC2 API can now read MINC1 files, by creating a temporary MINC2 file first, beware of huge files
+   * This is a pre-release of minc 2.3.00
+   * volume_io can now read and write files in MINC2 format using MINC2 API
+   * MINC2 library can be compiled without netcdf library
+
+2013-07-09  Vladimir S Fonov 
    * Lots of bug fixes in minc2
    * Joining of volume_io into main library
 
-2012-09-25  Andrew L Janke <a.janke@gmail.com> + Vladimir Fonov
+2012-09-25  Andrew L Janke <a.janke@gmail.com> + Vladimir S Fonov
    * split libminc from minc-tools
    * started build of minc2 only for ITK
 

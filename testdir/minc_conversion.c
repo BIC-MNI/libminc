@@ -82,8 +82,7 @@ int test1(struct testinfo *ip, struct dimdef *dims, int ndims)
 
     /* Create the dimension variable.
      */
-    varid = micreate_std_variable(ip->fd, dims[i].name, NC_DOUBLE, 0, 
-				  &ip->dim[i]);
+    varid = micreate_std_variable(ip->fd, dims[i].name, NC_DOUBLE, 0, &ip->dim[i]);
     if (varid < 0) {
       FUNC_ERROR("micreate_std_variable");
     }
@@ -99,19 +98,19 @@ int test1(struct testinfo *ip, struct dimdef *dims, int ndims)
 
   /* Create the image-max variable.
    */
-  ip->maxid = micreate_std_variable(ip->fd, MIimagemax, NC_FLOAT, 0, NULL);
+  ip->maxid = micreate_std_variable(ip->fd, (char*)MIimagemax, NC_DOUBLE, 0, NULL);
   if (ip->maxid < 0) {
     FUNC_ERROR("micreate_std_variable");
   }
 
   /* Create the image-min variable.
    */
-  ip->minid = micreate_std_variable(ip->fd, MIimagemin, NC_FLOAT, 0, NULL);
+  ip->minid = micreate_std_variable(ip->fd, (char*)MIimagemin, NC_DOUBLE, 0, NULL);
   if (ip->minid < 0) {
     FUNC_ERROR("micreate_std_variable");
   }
 
-  ip->imgid = micreate_std_variable(ip->fd, MIimage, NC_FLOAT, ndims, ip->dim);
+  ip->imgid = micreate_std_variable(ip->fd, (char*)MIimage, NC_FLOAT, ndims, ip->dim);
   if (ip->imgid < 0) {
     FUNC_ERROR("micreate_std_variable");
   }
@@ -124,14 +123,14 @@ int test2(struct testinfo *ip, struct dimdef *dims, int ndims)
   int i, j, k;
   int stat;
   long coords[3];
-  float flt;
+  double flt;
 
   stat = miattputdbl(ip->fd, ip->imgid, MIvalid_max, (XSIZE * 10000.0));
   if (stat < 0) {
     FUNC_ERROR("miattputdbl");
   }
 
-  stat = miattputdbl(ip->fd, ip->imgid, MIvalid_min, -(XSIZE * 10000.0));
+  stat = miattputdbl(ip->fd, ip->imgid, MIvalid_min, 0.0);
   if (stat < 0) {
     FUNC_ERROR("miattputdbl");
   }
@@ -140,26 +139,26 @@ int test2(struct testinfo *ip, struct dimdef *dims, int ndims)
 
   coords[0] = 0;
 
-  flt = -(XSIZE * 10000.0);
-  stat = mivarput1(ip->fd, ip->minid, coords, NC_FLOAT, MI_SIGNED, &flt);
+  flt = 0.0;
+  stat = mivarput1(ip->fd, ip->minid, coords, NC_DOUBLE, MI_SIGNED, &flt);
   if (stat < 0) {
     FUNC_ERROR("mivarput1");
   }
     
   flt = XSIZE * 10000.0;
-  stat = mivarput1(ip->fd, ip->maxid, coords, NC_FLOAT, MI_SIGNED, &flt);
+  stat = mivarput1(ip->fd, ip->maxid, coords, NC_DOUBLE, MI_SIGNED, &flt);
   if (stat < 0) {
     FUNC_ERROR("mivarput1");
   }
 
-  for (i = 0; i < dims[TST_Z].length; i++) {
+  for (i = 0; i < dims[TST_X].length; i++) {
     for (j = 0; j < dims[TST_Y].length; j++) {
-      for (k = 0; k < dims[TST_X].length; k++) {
-        float tmp = (i * 10000) + (j * 100) + k;
+      for (k = 0; k < dims[TST_Z].length; k++) {
+        float tmp = (i * 10000.0f) + (j * 100.0f) + k;
 
-        coords[TST_X] = k;
+        coords[TST_X] = i;
         coords[TST_Y] = j;
-        coords[TST_Z] = i;
+        coords[TST_Z] = k;
 
         stat = mivarput1(ip->fd, ip->imgid, coords, NC_FLOAT, MI_SIGNED, &tmp);
         if (stat < 0) {
@@ -218,8 +217,13 @@ test3(struct testinfo *ip, struct dimdef *dims, int ndims)
   if (stat < 0) {
     FUNC_ERROR("miicv_setint");
   }
+
+  stat = miicv_setint(icv, MI_ICV_DO_NORM, 1);
+  if (stat < 0) {
+    FUNC_ERROR("miicv_setint");
+  }
   
-  stat = miicv_setint(icv, MI_ICV_DO_NORM, 0);
+  stat = miicv_setint(icv, MI_ICV_USER_NORM, 1);
   if (stat < 0) {
     FUNC_ERROR("miicv_setint");
   }
@@ -239,7 +243,7 @@ test3(struct testinfo *ip, struct dimdef *dims, int ndims)
     FUNC_ERROR("miget_image_range");
   }
   
-  if (range[0] != -(XSIZE * 10000.0) || range[1] != (XSIZE * 10000.00)) {
+  if (range[0] != 0 || range[1] != (XSIZE * 10000.0)) {
     fprintf(stderr, "miget_image_range: bad result\n");
     errors++;
   }
@@ -249,17 +253,17 @@ test3(struct testinfo *ip, struct dimdef *dims, int ndims)
     FUNC_ERROR("miget_valid_range");
   }
   
-  if (range[0] != -(XSIZE * 10000.0) || range[1] != (XSIZE * 10000.0)) {
+  if (range[0] != 0 || range[1] != (XSIZE * 10000.0)) {
     fprintf(stderr, "miget_valid_range: bad result\n");
     errors++;
   }
   
   flt_ptr = (float *) buf_ptr;
-  for (i = 0; i < dims[TST_Z].length; i++) {
+  for (i = 0; i < dims[TST_X].length; i++) {
     for (j = 0; j < dims[TST_Y].length; j++) {
-      for (k = 0; k < dims[TST_X].length; k++) {
-        float tmp = (i * 10000) + (j * 100) + k;
-        if (*flt_ptr != (float) tmp ) {
+      for (k = 0; k < dims[TST_Z].length; k++) {
+        float tmp = (i * 10000.0f) + (j * 100.0f) + k;
+        if (*flt_ptr != tmp ) {
           fprintf(stderr, "1. Data error at (%d,%d,%d) %f != %f\n", i,j,k, *flt_ptr, tmp);
           errors++;
         }
@@ -390,7 +394,6 @@ int main(int argc, char **argv)
   struct testinfo info;
 
   test1(&info, dimtab1, 3);
-  printf("File:%s\n",info.name);
   
   test2(&info, dimtab1, 3);
 
@@ -406,7 +409,12 @@ int main(int argc, char **argv)
   /*unlink(info.name);*/		/* Delete the temporary file. */
 
   free(info.name);		/* Free the temporary filename */
-
+  
+  if(!errors)
+    printf("No errors detected!\n");
+  else
+    printf("Errors: %ld!\n",errors);
+  
   return (errors);
 }
 

@@ -424,7 +424,6 @@ static mihandle_t mialloc_volume_handle(void)
     handle->is_dirty = FALSE;
     handle->dim_indices = NULL;
     handle->selected_resolution = 0;
-    handle->temp_file = NULL;
   }
   return (handle);
 }
@@ -1221,15 +1220,17 @@ int miopen_volume(const char *filename, int mode, mihandle_t *volume)
     /*try to convert MINC1 file*/
 #ifdef HAVE_MINC1
     char * temp_file=NULL;
+
     if ( mode == MI2_OPEN_READ )
     {
       if( temp_file=micreate_tempfile())
       {
-         if( minc_format_convert(filename,temp_file)==MI_NOERROR )
+         if( minc_format_convert(filename,temp_file) == MI_NOERROR )
          {
-           if( (file_id = _hdf_open(temp_file, hdf_mode))>0)
+           if( (file_id = _hdf_open(temp_file, hdf_mode) ) >0)
            {
-            handle->temp_file=temp_file;
+            unlink( temp_file ); /*file will be deleted immedeately after closing...*/
+            free( temp_file );
            } else {
             unlink( temp_file );
             free( temp_file );
@@ -1252,7 +1253,7 @@ int miopen_volume(const char *filename, int mode, mihandle_t *volume)
     }
 #else
     free( handle );
-    return MI_ERROR;
+    return MI_LOG_ERROR(MI2_MSG_OPENFILE,filename);
 #endif    
   }
   /* Set some varibales associated with the volume handle */
@@ -1506,12 +1507,6 @@ int miclose_volume(mihandle_t volume)
   }
   if (volume->create_props != NULL) {
     mifree_volume_props(volume->create_props);
-  }
-  if(volume->temp_file)
-  {
-    /*unlink(volume->temp_file);*/
-    printf("MINC2 file: %s\n",volume->temp_file);
-    free(volume->temp_file);
   }
   
   free(volume);
