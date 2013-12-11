@@ -86,9 +86,9 @@ typedef enum { VIO_OK=0,
              i.e, ABS( ++x );                          ------------------ */
 
 #define  VIO_ABS( x )   ( ((x) > 0) ? (x) : (-(x)) )
-#define  VIO_FABS( x )   fabs( (double) x )
+#define  VIO_FABS( x )  fabs( (double) x )
 #define  VIO_SIGN( x )  ( ((x) > 0) ? 1 : (((x) < 0) ? -1 : 0) )
-#define  VIO_FSIGN( x )  ( ((x) > 0.0) ? 1.0 : (((x) < 0.0) ? -1.0 : 0.0) )
+#define  VIO_FSIGN( x ) ( ((x) > 0.0) ? 1.0 : (((x) < 0.0) ? -1.0 : 0.0) )
 
 #ifdef   MAX
 #undef   MAX
@@ -107,11 +107,11 @@ typedef enum { VIO_OK=0,
 
 #define  VIO_IS_INT( x )    ((double) (x) == (double) ((int) (x)))
 
-#define  VIO_FLOOR( x )     ((int) floor(x))
+#define  VIO_FLOOR( x )     ((long) floor(x))
 
 #define  VIO_ROUND( x )     VIO_FLOOR( (double) (x) + 0.5 )
 
-#define  VIO_CEILING( x )   ((int) ceil(x))
+#define  VIO_CEILING( x )   ((long) ceil(x))
 
 #define  VIO_FRACTION( x )  ((double) (x) - (double) VIO_FLOOR(x))
 
