@@ -545,9 +545,9 @@ VIOAPI  VIO_Status  copy_auxiliary_data_from_open_minc2_file(
     mihandle_t   minc_id,
     VIO_STR      history_string )
 {
-    int     src_img_var, varid, n_excluded, excluded_vars[10];
-    int     i, src_min_id, src_max_id, src_root_id;
     VIO_Status  status;
+/*    int     src_img_var, varid, n_excluded, excluded_vars[10];
+    int     i, src_min_id, src_max_id, src_root_id;
     VIO_STR  excluded_list[] = {
                                   MIxspace,
                                   MIyspace,
@@ -558,7 +558,7 @@ VIOAPI  VIO_Status  copy_auxiliary_data_from_open_minc2_file(
                                   MIyfrequency,
                                   MIzfrequency,
                                   MIvector_dimension
-                               };
+                               };*/
 
     if( file->end_def_done )
     {
@@ -566,15 +566,15 @@ VIOAPI  VIO_Status  copy_auxiliary_data_from_open_minc2_file(
         return( VIO_ERROR );
     }
 
+/*
     n_excluded = 0;
 
     for_less( i, 0, VIO_SIZEOF_STATIC_ARRAY( excluded_list ) )
     {
-      /*
         if( (varid = ncvarid(src_cdfid, excluded_list[i] )) != MI_ERROR )
-            excluded_vars[n_excluded++] = varid;*/
+            excluded_vars[n_excluded++] = varid;
     }
-/*
+
     if( (src_img_var = ncvarid(src_cdfid, MIimage )) != MI_ERROR )
         excluded_vars[n_excluded++] = src_img_var;
     if( (src_max_id = ncvarid(src_cdfid, MIimagemax )) != MI_ERROR )
@@ -1092,7 +1092,7 @@ static  VIO_Status  output_the_volume2(
     VIO_Status        status;
     int               d, n_volume_dims, sizes[VIO_MAX_DIMENSIONS];
     int               slab_size, n_slab, this_count;
-    int               vol_index, step, n_steps, n_range_dims;
+    int               vol_index, step, n_steps;
     int               to_volume_index[MAX_VAR_DIMS];
     int               to_file_index[VIO_MAX_DIMENSIONS];
     long              file_indices[MAX_VAR_DIMS];
