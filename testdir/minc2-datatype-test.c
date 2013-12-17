@@ -21,7 +21,7 @@ main(int argc, char **argv)
 	
 	++argv;
 
-	if (micreate_volume(*argv, 0, NULL, 0, 0, NULL, &volume) < 0) {
+	if (micreate_volume(*argv, 0, NULL, MI_TYPE_UNKNOWN, 0, NULL, &volume) < 0) {
 	    fprintf(stderr, "Error opening %s\n", *argv);
 	}
 	else {
