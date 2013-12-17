@@ -91,7 +91,9 @@ int main ( int argc, char **argv )
   misize_t count[NDIMS];
   misize_t howfar[NDIMS];
   misize_t location[NDIMS];
+#ifdef APPARENTORDER
   char *dimorder[] = {MIxspace,MIyspace,MIzspace};
+#endif
 
   double *buffer, value;
   int r = 0;
