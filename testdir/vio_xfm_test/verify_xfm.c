@@ -41,7 +41,6 @@ static void assert_equal_point(
 
 int main( int ac, char* av[] )
 {
-    int N;
     VIO_General_transform xfm;
     FILE *in;
     int line=1;
