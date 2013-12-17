@@ -88,7 +88,8 @@ VIOAPI  Minc_file  initialize_minc_input_from_minc2_id(
     char                spacing_type[MI_MAX_ATTSTR_LEN+1];
     double              *irr_starts[MAX_VAR_DIMS];
     double              *irr_widths[MAX_VAR_DIMS];
-    
+    int                 unit_size;
+
     double              volume_min=0.0,volume_max=0.0;
     double              valid_min=0.0,valid_max=0.0;
     
@@ -156,7 +157,8 @@ VIOAPI  Minc_file  initialize_minc_input_from_minc2_id(
     {
       int n_slice_dimensions=file->n_file_dimensions;
       int slices_count=1;
-      
+      misize_t *slice_start; 
+
       if(miget_slice_dimension_count(file->minc2id, 
                                  MI_DIMCLASS_ANY, MI_DIMATTR_ALL, 
                                  &n_slice_dimensions)<0)
@@ -175,13 +177,14 @@ VIOAPI  Minc_file  initialize_minc_input_from_minc2_id(
       {
         slices_count*=dimension_size[d];
       }
-      misize_t *slice_start=calloc(n_slice_dimensions,sizeof(misize_t));
+      slice_start=(misize_t *)calloc(n_slice_dimensions,sizeof(misize_t));
       miget_slice_range(file->minc2id,slice_start,n_slice_dimensions,&volume_max,&volume_min);
       
       do
       {
-          d=0;
           double slice_min,slice_max;
+
+          d=0;
           /*iteration trough dimensions*/
           while(d<n_slice_dimensions)
           {
@@ -489,7 +492,7 @@ VIOAPI  Minc_file  initialize_minc_input_from_minc2_id(
 
     file->n_slab_dims = 0;
     slab_size = 1;
-    int unit_size = get_type_size( get_volume_data_type(volume) );
+    unit_size = get_type_size( get_volume_data_type(volume) );
 
     for( d = file->n_file_dimensions-1; d >= 0; d-- ) {
       if( file->to_volume_index[d] != INVALID_AXIS ) {

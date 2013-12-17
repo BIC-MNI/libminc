@@ -1099,6 +1099,7 @@ static  VIO_Status  output_the_volume2(
     long              count[MAX_VAR_DIMS];
     VIO_Real          real_min, real_max;
     VIO_STR           *vol_dimension_names;
+    int               unit_size;
     VIO_BOOL          increment;
     VIO_progress_struct   progress;
 
@@ -1175,7 +1176,7 @@ static  VIO_Status  output_the_volume2(
     file->n_slab_dims = 0;
     slab_size = 1;
     n_steps = 1;
-    int unit_size = get_type_size( get_volume_data_type(volume) );
+    unit_size = get_type_size( get_volume_data_type(volume) );
 
     for( d = file->n_file_dimensions-1; d >= 0; d-- ) {
       count[d] = 1;
