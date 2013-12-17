@@ -366,7 +366,7 @@ VIOAPI  Minc_file  initialize_minc_input_from_minc2_id(
         miget_dimension_sampling_flag(file_dims[d],&sampling_flag);
         if (!sampling_flag) 
         {
-          int i;
+          int j;
 
           irr_starts[d] = malloc(sizeof(VIO_Real) * file->sizes_in_file[d]);
           irr_widths[d] = malloc(sizeof(VIO_Real) * file->sizes_in_file[d]);
@@ -375,9 +375,9 @@ VIOAPI  Minc_file  initialize_minc_input_from_minc2_id(
           
           /*TODO: figure out how to do it in MINC2 API, right now it is not obvious*/
           irr_starts[d][0] = file_start[d];
-          for (i = 1; i < file->sizes_in_file[d]; i++) 
+          for (j = 1; j < file->sizes_in_file[d]; j++) 
           {
-              irr_starts[d][i] = irr_starts[d][i-1]+irr_widths[d][i-1];
+              irr_starts[d][j] = irr_starts[d][j-1]+irr_widths[d][j-1];
           }
         } else {
             start_position[d]=file_start[d];
