@@ -2453,7 +2453,7 @@ VIOAPI  VIO_Status  io_quoted_string(
                                      sizeof((*str)[0]), length );
         }
 
-        str[length] = VIO_END_OF_STRING;
+        str[length] = NULL;
     }
 
     if( status != VIO_OK )
