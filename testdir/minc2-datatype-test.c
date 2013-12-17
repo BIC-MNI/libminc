@@ -5,11 +5,11 @@
 int
 main(int argc, char **argv)
 {
-    miclass_t myclass;
-    mitype_t mytype;
-    misize_t mysize;
-    char *myname;
-    mihandle_t volume;
+    miclass_t myclass = MI_CLASS_REAL;
+    mitype_t mytype = MI_TYPE_UNKNOWN;
+    misize_t mysize = 0;
+    char *myname = NULL;
+    mihandle_t volume = NULL;
 
     /* Turn off automatic error reporting.
      */

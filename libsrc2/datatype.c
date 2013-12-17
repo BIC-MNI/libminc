@@ -63,8 +63,8 @@ int miget_data_type_size ( mihandle_t volume, misize_t *voxel_size )
  */
 int miget_space_name ( mihandle_t volume, char **name )
 {
-  size_t length;
-  int result;
+  size_t length = 0;
+  int result = MI_ERROR;
   int i;
   /* This is the order of the search for candidates for the space type.
      The reason for this is complication is to permit support for older-style
