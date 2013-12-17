@@ -513,7 +513,7 @@ VIOAPI  VIO_Status  copy_auxiliary_data_from_minc2_file(
 
         delete_string( expanded );
 
-        return -1 ;
+        return VIO_ERROR;
     }
 
     
