@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "minc2.h"
 
 /* This test will attempt to create a few different test images
