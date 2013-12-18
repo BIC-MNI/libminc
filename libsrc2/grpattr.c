@@ -798,7 +798,7 @@ int miget_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
   status = MI_NOERROR;
   /*make sure string is zero terminated*/
   if( data_type == MI_TYPE_STRING )
-    ( ( char * ) values ) [length] = '\0';
+    ( ( char * ) values ) [length-1] = '\0';
 cleanup:
 
   if( hdf_attr  >= 0  ) H5Aclose ( hdf_attr );
