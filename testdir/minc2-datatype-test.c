@@ -21,7 +21,7 @@ main(int argc, char **argv)
 	
 	++argv;
 
-	if (micreate_volume(*argv, 0, NULL, 0, 0, NULL, &volume) < 0) {
+	if (micreate_volume(*argv, 0, NULL, MI_TYPE_INT, 0, NULL, &volume) < 0) { /*type 0 is equivalent to H5T_INTEGER */
 	    fprintf(stderr, "Error opening %s\n", *argv);
 	}
 	else {
