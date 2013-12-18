@@ -211,6 +211,7 @@ int main(int argc, char **argv)
   
   if (strcmp(valstr, "automobile") != 0) {
     TESTRPT("miget_attr_values failed", 0);
+    fprintf(stderr,"Expected :\"%s\" read \"%s\"\n","automobile",valstr);
   }
   
   r = miset_attr_values(hvol, MI_TYPE_STRING, "/test1/stuff",

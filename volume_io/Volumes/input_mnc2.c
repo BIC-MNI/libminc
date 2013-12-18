@@ -51,25 +51,21 @@ VIOAPI  Minc_file  initialize_minc_input_from_minc2_id(
     minc_input_options   *options )
 {
     minc_file_struct    *file;
-    int                 dim_vars[MAX_VAR_DIMS], n_vol_dims;
+    int                 n_vol_dims;
     int                 i, slab_size, prev_sizes[MAX_VAR_DIMS];
     mitype_t            prev_minc_type;
     VIO_BOOL            different;
     VIO_BOOL            range_specified;
     double              valid_range[2];
-    long                long_size;
-    VIO_BOOL            converted_sign, space_type_consensus;
+    VIO_BOOL            space_type_consensus;
     mitype_t            converted_minc_type;
-    char                signed_flag[MI_MAX_ATTSTR_LEN+1], *ptr;
     char                *dim_name;
     char                prev_space_type[MI_MAX_ATTSTR_LEN+1];
-    char                space_type[MI_MAX_ATTSTR_LEN+1];
     mitype_t            file_datatype;
     int                 sizes[MAX_VAR_DIMS];
     double              file_separations[MAX_VAR_DIMS];
     VIO_Real            volume_separations[MAX_VAR_DIMS];
     VIO_Real            volume_starts[MAX_VAR_DIMS];
-    VIO_Real            voxel_zero;
     double              start_position[MAX_VAR_DIMS];
     double              dir_cosines[MAX_VAR_DIMS][MI_NUM_SPACE_DIMS];
     double              tmp_cosines[MI_NUM_SPACE_DIMS];
@@ -80,12 +76,10 @@ VIOAPI  Minc_file  initialize_minc_input_from_minc2_id(
     double              file_step[MAX_VAR_DIMS];
     double              file_start[MAX_VAR_DIMS];
     
-    double              real_min, real_max;
-    int                 d, dimvar, which_valid_axis, axis;
+    int                 d, which_valid_axis, axis;
     int                 spatial_axis_indices[MAX_VAR_DIMS];
     minc_input_options  default_options;
     VIO_BOOL            no_volume_data_type;
-    char                spacing_type[MI_MAX_ATTSTR_LEN+1];
     double              *irr_starts[MAX_VAR_DIMS];
     double              *irr_widths[MAX_VAR_DIMS];
     int                 unit_size;

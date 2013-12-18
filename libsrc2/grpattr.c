@@ -672,31 +672,74 @@ int micopy_attr ( mihandle_t vol, const char *path, mihandle_t new_vol )
   char namebuf[256];
   char pathbuf[256];
   char valstr[128];
-  float valflt;
-  long  vallng;
   int r;
   size_t length;
 
+  /*TODO: make sure path size does not exceed 256 somehow*/
   r = milist_start ( vol, path, 1, &hlist );
 
   if ( r == MI_NOERROR ) {
     while ( milist_attr_next ( vol, hlist, pathbuf, sizeof ( pathbuf ),
                                namebuf, sizeof ( namebuf ) ) == MI_NOERROR ) {
+      /*TODO: Add error checking here*/
       miget_attr_type ( vol, pathbuf, namebuf, &data_type );
-
+      miget_attr_length ( vol, pathbuf, namebuf, &length );
+    
       switch ( data_type ) {
+
       case MI_TYPE_STRING:
-        miget_attr_length ( vol, pathbuf, namebuf, &length );
-        miget_attr_values ( vol, MI_TYPE_STRING, pathbuf, namebuf, length, valstr );
-        miset_attr_values ( new_vol, MI_TYPE_STRING, pathbuf, namebuf, length, valstr );
+        if(length<sizeof(valstr))
+        {
+          miget_attr_values ( vol, MI_TYPE_STRING, pathbuf, namebuf, length, valstr );
+          miset_attr_values ( new_vol, MI_TYPE_STRING, pathbuf, namebuf, length, valstr );
+        } else {
+          char *tmp_str=malloc(length+1); /*make sure we have space for terminating zero*/
+          miget_attr_values ( vol, MI_TYPE_STRING, pathbuf, namebuf, length+1, tmp_str );
+          miset_attr_values ( new_vol, MI_TYPE_STRING, pathbuf, namebuf, length+1, tmp_str );
+          free(tmp_str);
+        }
         break;
+
       case MI_TYPE_FLOAT:
-        miget_attr_values ( vol, MI_TYPE_FLOAT, pathbuf, namebuf, 1, &valflt );
-        miset_attr_values ( new_vol, MI_TYPE_FLOAT, pathbuf, namebuf, 1, &valflt );
+        if(length==1)
+        {
+          float valflt;
+          miget_attr_values ( vol, MI_TYPE_FLOAT, pathbuf, namebuf, 1, &valflt );
+          miset_attr_values ( new_vol, MI_TYPE_FLOAT, pathbuf, namebuf, 1, &valflt );
+        } else {
+          float *tmp=malloc(length*sizeof(float)); /*make sure we have space for terminating zero*/
+          miget_attr_values ( vol, MI_TYPE_FLOAT, pathbuf, namebuf, length, tmp );
+          miset_attr_values ( new_vol, MI_TYPE_FLOAT, pathbuf, namebuf, length, tmp );
+          free(tmp);
+        }
         break;
+        
+      case MI_TYPE_DOUBLE:
+        if(length==1)
+        {
+          float valdbl;
+          miget_attr_values ( vol, MI_TYPE_DOUBLE, pathbuf, namebuf, 1, &valdbl );
+          miset_attr_values ( new_vol, MI_TYPE_DOUBLE, pathbuf, namebuf, 1, &valdbl );
+        } else {
+          double *tmp=malloc(length*sizeof(double)); /*make sure we have space for terminating zero*/
+          miget_attr_values ( vol, MI_TYPE_DOUBLE, pathbuf, namebuf, length, tmp );
+          miset_attr_values ( new_vol, MI_TYPE_DOUBLE, pathbuf, namebuf, length, tmp );
+          free(tmp);
+        }
+        break;
+
       case MI_TYPE_INT:
-        miget_attr_values ( vol, MI_TYPE_INT, pathbuf, namebuf, 1, &vallng );
-        miset_attr_values ( new_vol, MI_TYPE_INT, pathbuf, namebuf, 1, &vallng );
+        if(length==1)
+        {
+          long  vallng;
+          miget_attr_values ( vol, MI_TYPE_INT, pathbuf, namebuf, 1, &vallng );
+          miset_attr_values ( new_vol, MI_TYPE_INT, pathbuf, namebuf, 1, &vallng );
+        } else {
+          long *tmp=malloc(length*sizeof(long)); /*make sure we have space for terminating zero*/
+          miget_attr_values ( vol, MI_TYPE_INT, pathbuf, namebuf, length, tmp );
+          miset_attr_values ( new_vol, MI_TYPE_INT, pathbuf, namebuf, length, tmp );
+          free(tmp);
+        }
         break;
       default:
         return MI_LOG_ERROR(MI2_MSG_GENERIC,"Unsupported attribute type");
@@ -716,13 +759,16 @@ int micopy_attr ( mihandle_t vol, const char *path, mihandle_t new_vol )
 int miget_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
                     const char *name, size_t length, void *values )
 {
-  hid_t hdf_file = -1;
-  hid_t hdf_grp = -1;
-  hid_t mtyp_id = -1;
+  hid_t hdf_file  = -1;
+  hid_t hdf_grp   = -1;
+  hid_t mtyp_id   = -1;
   hid_t hdf_space = -1;
-  hid_t hdf_attr = -1;
+  hid_t hdf_attr  = -1;
   char fullpath[256];
   int status = MI_ERROR;      /* Guilty until proven innocent */
+  
+  hsize_t hdf_dim_extent = 0;
+  hsize_t hdf_attr_size = 0;
 
   /* Get a handle to the actual HDF file
    */
@@ -777,34 +823,49 @@ int miget_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
     goto cleanup;
   }
 
-  if( (hdf_space = H5Aget_space ( hdf_attr ))<0 ) goto cleanup;
+  if( (hdf_space = H5Aget_space ( hdf_attr )) < 0 ) goto cleanup;
 
   /* If we're retrieving a vector, make certain the length passed into this
    * function is sufficient.
    */
-  if ( H5Sget_simple_extent_ndims ( hdf_space ) == 1 ) {
-    hsize_t hdf_dims[1];
+  /*TODO: figure out why H5Sget_simple_extent_dims was used */
+  
+  if( data_type!=MI_TYPE_STRING)
+  {
+    if ( H5Sget_simple_extent_ndims ( hdf_space ) == 1 ) {
+      H5Sget_simple_extent_dims ( hdf_space, &hdf_attr_size, NULL );
+    } else
+      goto cleanup; /*can't handle multidimensional attributes*/
+    
+  } else {
+    hid_t atype=H5Aget_type( hdf_attr );
 
-    H5Sget_simple_extent_dims ( hdf_space, hdf_dims, NULL );
+    hdf_attr_size=H5Tget_size(atype);
 
-    if ( length < hdf_dims[0] ) {
-      goto cleanup;
-    }
+    H5Tclose(atype);
   }
+ 
+  if ( length < hdf_attr_size ) {
+    /* Not enough space in the output vector */
+    goto cleanup;
+  }
+  
 
-  if ( H5Aread ( hdf_attr, mtyp_id, values )<0 ) 
+  if ( H5Aread ( hdf_attr, mtyp_id, values ) <0 ) 
     goto cleanup;
 
+  /* make sure string is zero terminated if there is enough space in the input buffer */
+  if( data_type == MI_TYPE_STRING && length > hdf_attr_size )
+    ( ( char * ) values ) [hdf_attr_size+1] = '\0';
+
   status = MI_NOERROR;
-  /*make sure string is zero terminated*/
-  if( data_type == MI_TYPE_STRING )
-    ( ( char * ) values ) [length] = '\0';
+
 cleanup:
 
-  if( hdf_attr  >= 0  ) H5Aclose ( hdf_attr );
-  if( mtyp_id   >= 0   ) H5Tclose ( mtyp_id );
+  if( hdf_attr  >= 0 ) H5Aclose ( hdf_attr );
+  if( mtyp_id   >= 0 ) H5Tclose ( mtyp_id );
   if( hdf_space >= 0 ) H5Sclose ( hdf_space );
-  
+
   if ( hdf_grp  >= 0 ) {
     /* The hdf_loc identifier could be a group or a dataset.
     */
