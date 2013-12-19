@@ -604,6 +604,7 @@ static int mirw_hyperslab_icv(int opcode,
   hsize_t image_slice_length=0;
   hsize_t total_number_of_slices=0;
   hsize_t i;
+  int j;
 
 
   /* Disallow write operations to anything but the highest resolution.
@@ -695,16 +696,16 @@ static int mirw_hyperslab_icv(int opcode,
       goto cleanup;
     }
 
-    if ( slice_ndims > ndims ) { /*Can this really happen?*/
+    if ( (hsize_t)slice_ndims > ndims ) { /*Can this really happen?*/
       slice_ndims = ndims;
     }
 
-    for ( i = 0; i < slice_ndims; i++ ) {
-      image_slice_count[i] = hdf_count[i];
-      image_slice_start[i] = hdf_start[i];
+    for ( j = 0; j < slice_ndims; j++ ) {
+      image_slice_count[j] = hdf_count[j];
+      image_slice_start[j] = hdf_start[j];
       
-      if(hdf_count[i]>1) /*avoid zero sized dimensions?*/
-        total_number_of_slices*=hdf_count[i];
+      if(hdf_count[j]>1) /*avoid zero sized dimensions?*/
+        total_number_of_slices*=hdf_count[j];
     }
     
     for (i = slice_ndims; i < ndims; i++ ) {
@@ -1077,6 +1078,7 @@ static int mirw_hyperslab_normalized(int opcode,
   hsize_t image_slice_length=0;
   hsize_t total_number_of_slices=0;
   hsize_t i;
+  int j;
 
 
   /* Disallow write operations to anything but the highest resolution.
@@ -1170,16 +1172,16 @@ static int mirw_hyperslab_normalized(int opcode,
       goto cleanup;
     }
 
-    if ( slice_ndims > ndims ) { /*Can this really happen?*/
+    if ( (hsize_t)slice_ndims > ndims ) { /*Can this really happen?*/
       slice_ndims = ndims;
     }
 
-    for ( i = 0; i < slice_ndims; i++ ) {
-      image_slice_count[i] = hdf_count[i];
-      image_slice_start[i] = hdf_start[i];
+    for ( j = 0; j < slice_ndims; j++ ) {
+      image_slice_count[j] = hdf_count[j];
+      image_slice_start[j] = hdf_start[j];
       
-      if(hdf_count[i]>1) /*avoid zero sized dimensions?*/
-        total_number_of_slices*=hdf_count[i];
+      if(hdf_count[j]>1) /*avoid zero sized dimensions?*/
+        total_number_of_slices*=hdf_count[j];
     }
     
     for (i = slice_ndims; i < ndims; i++ ) {
