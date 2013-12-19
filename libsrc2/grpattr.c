@@ -707,7 +707,7 @@ int micopy_attr ( mihandle_t vol, const char *path, mihandle_t new_vol )
           miget_attr_values ( vol, MI_TYPE_FLOAT, pathbuf, namebuf, 1, &valflt );
           miset_attr_values ( new_vol, MI_TYPE_FLOAT, pathbuf, namebuf, 1, &valflt );
         } else {
-          float *tmp=malloc(length*sizeof(float)); /*make sure we have space for terminating zero*/
+          float *tmp=malloc(length*sizeof(float));
           miget_attr_values ( vol, MI_TYPE_FLOAT, pathbuf, namebuf, length, tmp );
           miset_attr_values ( new_vol, MI_TYPE_FLOAT, pathbuf, namebuf, length, tmp );
           free(tmp);
@@ -721,7 +721,7 @@ int micopy_attr ( mihandle_t vol, const char *path, mihandle_t new_vol )
           miget_attr_values ( vol, MI_TYPE_DOUBLE, pathbuf, namebuf, 1, &valdbl );
           miset_attr_values ( new_vol, MI_TYPE_DOUBLE, pathbuf, namebuf, 1, &valdbl );
         } else {
-          double *tmp=malloc(length*sizeof(double)); /*make sure we have space for terminating zero*/
+          double *tmp=malloc(length*sizeof(double));
           miget_attr_values ( vol, MI_TYPE_DOUBLE, pathbuf, namebuf, length, tmp );
           miset_attr_values ( new_vol, MI_TYPE_DOUBLE, pathbuf, namebuf, length, tmp );
           free(tmp);
@@ -735,7 +735,7 @@ int micopy_attr ( mihandle_t vol, const char *path, mihandle_t new_vol )
           miget_attr_values ( vol, MI_TYPE_INT, pathbuf, namebuf, 1, &vallng );
           miset_attr_values ( new_vol, MI_TYPE_INT, pathbuf, namebuf, 1, &vallng );
         } else {
-          long *tmp=malloc(length*sizeof(long)); /*make sure we have space for terminating zero*/
+          long *tmp=malloc(length*sizeof(long));
           miget_attr_values ( vol, MI_TYPE_INT, pathbuf, namebuf, length, tmp );
           miset_attr_values ( new_vol, MI_TYPE_INT, pathbuf, namebuf, length, tmp );
           free(tmp);
