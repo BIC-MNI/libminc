@@ -768,7 +768,6 @@ int miget_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
   char fullpath[256];
   int status = MI_ERROR;      /* Guilty until proven innocent */
   
-  hsize_t hdf_dim_extent = 0;
   hsize_t hdf_attr_size = 0;
 
   /* Get a handle to the actual HDF file
