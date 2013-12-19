@@ -135,6 +135,9 @@ check_dims(mihandle_t vol, midimhandle_t dim[])
 
 int main(int argc, char **argv)
 {
+    (void)argc;
+    (void)argv;
+
     mihandle_t vol;
     int r;
     midimhandle_t dim[NDIMS];

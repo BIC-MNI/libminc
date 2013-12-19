@@ -32,6 +32,9 @@ static int error_cnt = 0;
 int 
 main(int argc, char **argv)
 {
+    (void)argc;
+    (void)argv;
+
     mihandle_t hvol;
     int result;
     misize_t start[NDIMS];

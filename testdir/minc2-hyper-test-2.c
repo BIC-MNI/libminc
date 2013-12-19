@@ -82,6 +82,9 @@ static void create_test_file ( void )
 
 int main ( int argc, char **argv )
 {
+  (void)argc;
+  (void)argv;
+
   mihandle_t vol;
 
   midimhandle_t dim[NDIMS];

@@ -220,6 +220,9 @@ static int create_4D_image ( void )
 
 int main ( int argc, char **argv )
 {
+  (void)argc;
+  (void)argv;
+
   printf ( "Creating 2D image with IRREGULAR sample dimension!! (2D_image.mnc)\n" );
   if(create_2D_image()<0) 
     TESTRPT("create_2D_image",0);
