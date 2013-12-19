@@ -764,6 +764,7 @@ int miget_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
   hid_t mtyp_id   = -1;
   hid_t hdf_space = -1;
   hid_t hdf_attr  = -1;
+  hid_t hdf_type  = -1;
   char fullpath[256];
   int status = MI_ERROR;      /* Guilty until proven innocent */
   
@@ -824,29 +825,39 @@ int miget_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
   }
 
   if( (hdf_space = H5Aget_space ( hdf_attr )) < 0 ) goto cleanup;
-
+  if( (hdf_type  = H5Aget_type ( hdf_attr )) <0 )   goto cleanup;
   /* If we're retrieving a vector, make certain the length passed into this
    * function is sufficient.
    */
-  /*TODO: figure out why H5Sget_simple_extent_dims was used */
-  
-  if( data_type!=MI_TYPE_STRING)
+  switch ( H5Sget_simple_extent_ndims ( hdf_space ) ) 
   {
-    if ( H5Sget_simple_extent_ndims ( hdf_space ) == 1 ) {
-      H5Sget_simple_extent_dims ( hdf_space, &hdf_attr_size, NULL );
-    } else
-      goto cleanup; /*can't handle multidimensional attributes*/
-    
-  } else {
-    hid_t atype=H5Aget_type( hdf_attr );
-
-    hdf_attr_size=H5Tget_size(atype);
-
-    H5Tclose(atype);
+    case 0:     /* Scalar */
+   
+    /* String types need to return the length of the string.
+          */
+       if ( H5Tget_class ( hdf_type ) == H5T_STRING ) {
+        hdf_attr_size=H5Tget_size ( hdf_type );
+       } else {
+         hdf_attr_size = 1;
+       }
+                                     
+       break;
+                                        
+     case 1:
+       H5Sget_simple_extent_dims ( hdf_space, &hdf_attr_size, NULL );
+       break;
+                                         
+     default:
+       /* For now, we allow only scalars and vectors.  No multidimensional
+        * arrays for MINC 2.0 attributes.
+        */
+       MI_LOG_ERROR(MI2_MSG_GENERIC,"Only scalars and vectors are supported");
+       goto cleanup;
   }
  
   if ( length < hdf_attr_size ) {
     /* Not enough space in the output vector */
+    fprintf(stderr,"Requested size:%d needed size:%d\n",(int)length,(int)hdf_attr_size);
     goto cleanup;
   }
   
@@ -862,9 +873,10 @@ int miget_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
 
 cleanup:
 
+  if( hdf_space >= 0 ) H5Sclose ( hdf_space );
+  if( hdf_type  >= 0 ) H5Tclose ( hdf_type );
   if( hdf_attr  >= 0 ) H5Aclose ( hdf_attr );
   if( mtyp_id   >= 0 ) H5Tclose ( mtyp_id );
-  if( hdf_space >= 0 ) H5Sclose ( hdf_space );
 
   if ( hdf_grp  >= 0 ) {
     /* The hdf_loc identifier could be a group or a dataset.
