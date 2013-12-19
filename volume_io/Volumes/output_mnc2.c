@@ -546,8 +546,10 @@ VIOAPI  VIO_Status  copy_auxiliary_data_from_open_minc2_file(
     VIO_STR      history_string )
 {
     VIO_Status  status;
-/*    int     src_img_var, varid, n_excluded, excluded_vars[10];
-    int     i, src_min_id, src_max_id, src_root_id;
+    
+    /*TODO: convert this to MINC2*/
+
+#if 0    
     VIO_STR  excluded_list[] = {
                                   MIxspace,
                                   MIyspace,
@@ -558,8 +560,7 @@ VIOAPI  VIO_Status  copy_auxiliary_data_from_open_minc2_file(
                                   MIyfrequency,
                                   MIzfrequency,
                                   MIvector_dimension
-                               };*/
-
+                               };
     if( file->end_def_done )
     {
         print_error( "Cannot call copy_auxiliary_data_from_open_minc_file when not in define mode\n" );
@@ -569,6 +570,7 @@ VIOAPI  VIO_Status  copy_auxiliary_data_from_open_minc2_file(
 /*
     n_excluded = 0;
 
+    /*TODO: convert this to MINC2*/
     for_less( i, 0, VIO_SIZEOF_STATIC_ARRAY( excluded_list ) )
     {
         if( (varid = ncvarid(src_cdfid, excluded_list[i] )) != MI_ERROR )
@@ -606,6 +608,8 @@ VIOAPI  VIO_Status  copy_auxiliary_data_from_open_minc2_file(
                                 ncvarid( file->cdfid, MIrootvariable) );
     }
 */
+#endif /*0*/
+
     status = VIO_OK;
 
     if( history_string != NULL )

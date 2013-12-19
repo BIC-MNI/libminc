@@ -212,6 +212,7 @@ int main(int argc, char **argv)
   
   if (strcmp(valstr, "automobile") != 0) {
     TESTRPT("miget_attr_values failed", 0);
+    fprintf(stderr,"Expected :\"%s\" read \"%s\"\n","automobile",valstr);
   }
 
   /* Get the values again but in a small buffer where null
