@@ -24,7 +24,6 @@ int main(int argc, char **argv)
   float fltarr[TESTARRAYSIZE];
   int intarr[TESTARRAYSIZE];
   char valstr[128]="";
-  char valsmallstr[10]="";
   float val1=12.5;
   float val2=34.5;
   milisthandle_t hlist, h1list;
@@ -215,16 +214,32 @@ int main(int argc, char **argv)
     fprintf(stderr,"Expected :\"%s\" read \"%s\"\n","automobile",valstr);
   }
 
-  /* Get the values again but in a small buffer where null
-     termination forces a truncation of one character.
+  /* Get the values again but this time with only enough space
+     for the result with null termination.
    */
+  memset(valstr, 0x55, sizeof(valstr));
   r = miget_attr_values(hvol, MI_TYPE_STRING, "/test1/stuff",
-                        "objtype", 10, valsmallstr);
+                        "objtype", 11, valstr);
   if (r < 0) {
     TESTRPT("miget_attr_values failed", r);
   }
-  
-  if (strcmp(valsmallstr, "automobil") != 0) {
+  if (strcmp(valstr, "automobile") != 0) {
+    TESTRPT("miget_attr_values failed", 0);
+  }
+
+  /* Get the values again but this time with only enough space
+     for the result and without null termination.
+   */
+  memset(valstr, 0x55, sizeof(valstr));
+  r = miget_attr_values(hvol, MI_TYPE_STRING, "/test1/stuff",
+                        "objtype", 10, valstr);
+  if (r < 0) {
+    TESTRPT("miget_attr_values failed", r);
+  }
+  if (valstr[9] != 'e') {
+    TESTRPT("miget_attr_values failed", 0);
+  }
+  if (valstr[10] != 0x55) {
     TESTRPT("miget_attr_values failed", 0);
   }
 
