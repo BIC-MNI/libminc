@@ -549,7 +549,10 @@ VIOAPI  VIO_Status  copy_auxiliary_data_from_open_minc2_file(
     
     /*TODO: convert this to MINC2*/
 
-#if 0    
+#if 0
+    int     src_img_var, varid, n_excluded, excluded_vars[10];
+    int     i, src_min_id, src_max_id, src_root_id;
+
     VIO_STR  excluded_list[] = {
                                   MIxspace,
                                   MIyspace,
@@ -567,7 +570,6 @@ VIOAPI  VIO_Status  copy_auxiliary_data_from_open_minc2_file(
         return( VIO_ERROR );
     }
 
-/*
     n_excluded = 0;
 
     /*TODO: convert this to MINC2*/
@@ -607,7 +609,6 @@ VIOAPI  VIO_Status  copy_auxiliary_data_from_open_minc2_file(
                                 file->cdfid,
                                 ncvarid( file->cdfid, MIrootvariable) );
     }
-*/
 #endif /*0*/
 
     status = VIO_OK;
