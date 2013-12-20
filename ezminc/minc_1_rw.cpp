@@ -269,7 +269,7 @@ namespace minc
     }
     char* str = new char[att_length+1];
     str[0] = '\0';
-    miattgetstr(_mincid, varid, (char *)att_name, att_length, str);
+    miattgetstr(_mincid, varid, (char *)att_name, att_length+1, str);
     //ncopts=op;
     std::string r(str);
     delete [] str;
