@@ -90,7 +90,7 @@ namespace minc
     }
     char* str = new char[att_length+1];
     str[0] = '\0';
-    miattgetstr(_mincid, NC_GLOBAL, (char*)MIhistory, att_length,str);
+    miattgetstr(_mincid, NC_GLOBAL, (char*)MIhistory, att_length+1,str);
     //ncopts=op;
     std::string r(str);
     delete [] str;
@@ -1420,7 +1420,7 @@ namespace minc
     att_length += strlen(append_history) + 1;
     char* str = new char[att_length];
     str[0] = '\0';
-    miattgetstr(_mincid, NC_GLOBAL, (char*)MIhistory, att_length,str);
+    miattgetstr(_mincid, NC_GLOBAL, (char*)MIhistory, att_length+1,str);
     //ncopts=NC_VERBOSE | NC_FATAL;
     strcat(str, append_history);
     miattputstr(_mincid, NC_GLOBAL, (char*)MIhistory, str);
