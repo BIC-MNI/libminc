@@ -54,7 +54,7 @@ static void create_test_file ( void )
   miclose_volume ( hvol );
 }
 
-int main ( int argc, char **argv )
+int main ( void )
 {
   mihandle_t vol;
   int r = 0;

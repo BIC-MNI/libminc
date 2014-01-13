@@ -13,7 +13,7 @@ static int error_cnt = 0;
 
 #define NDIMS 3
 
-int main(int argc, char **argv)
+int main(void)
 {
     mihandle_t vol;
     int r;

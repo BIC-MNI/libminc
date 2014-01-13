@@ -133,7 +133,7 @@ check_dims(mihandle_t vol, midimhandle_t dim[])
     return (error_cnt);
 }
 
-int main(int argc, char **argv)
+int main(void)
 {
     mihandle_t vol;
     int r;

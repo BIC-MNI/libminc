@@ -30,7 +30,7 @@ static int error_cnt = 0;
 #define NORM_MAX (1.0)
 #define NORM_MIN (-1.0)
 int 
-main(int argc, char **argv)
+main(void)
 {
     mihandle_t hvol;
     int result;

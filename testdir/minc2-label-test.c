@@ -139,7 +139,7 @@ static int create_label_image ( void )
 }
 
 int
-main ( int argc, char **argv )
+main ( void )
 {
   int i, j, k;
   mihandle_t vol;

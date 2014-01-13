@@ -218,7 +218,7 @@ static int create_4D_image ( void )
   return r;
 }
 
-int main ( int argc, char **argv )
+int main ( void )
 {
   printf ( "Creating 2D image with IRREGULAR sample dimension!! (2D_image.mnc)\n" );
   if(create_2D_image()<0) 

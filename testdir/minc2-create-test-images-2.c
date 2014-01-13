@@ -163,7 +163,7 @@ static int create_real_as_float_image(void)
   return error_cnt;
 }
 
-int main(int argc, char **argv)
+int main(void)
 {
   int r = 0;
   printf("Creating 3D image REAL stored as INT w/ slice scaling!! (real_as_int_image.mnc)\n");

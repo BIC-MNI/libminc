@@ -80,7 +80,7 @@ static void create_test_file ( void )
   free(buf);
 }
 
-int main ( int argc, char **argv )
+int main ( void )
 {
   mihandle_t vol;
 

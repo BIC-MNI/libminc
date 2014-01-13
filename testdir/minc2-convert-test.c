@@ -26,7 +26,7 @@ static int error_cnt = 0;
 #define REAL_MAX 2.0
 
 int
-main(int argc, char **argv)
+main(void)
 {
     int result;
     double voxel[NDIMS];

@@ -10,7 +10,7 @@ __LINE__, msg, val))
 
 static int error_cnt = 0;
 
-int main(int argc, char **argv)
+int main(void)
 {
   mihandle_t hvol;
   mihandle_t hvol1;
