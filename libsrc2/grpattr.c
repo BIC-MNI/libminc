@@ -163,6 +163,8 @@ static herr_t
 milist_attr_op ( hid_t loc_id, const char *attr_name, void *op_data )
 {
   struct milistdata *data = ( struct milistdata * ) op_data;
+  (void)loc_id;/*to remove unused variable warning*/
+
   strncpy ( data->name_ptr, attr_name, data->name_len );
   return ( 1 );
 }
