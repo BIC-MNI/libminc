@@ -16,7 +16,6 @@ static int error_cnt = 0;
 
 static int create_label_image ( void )
 {
-
   mihandle_t hvol;
   char *name;
   int result;
@@ -142,9 +141,6 @@ static int create_label_image ( void )
 int
 main ( int argc, char **argv )
 {
-  (void)argc;
-  (void)argv;
-
   int i, j, k;
   mihandle_t vol;
   midimhandle_t hdims[NDIMS], cp_hdims[NDIMS];

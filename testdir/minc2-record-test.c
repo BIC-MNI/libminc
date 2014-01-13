@@ -16,9 +16,6 @@ static int error_cnt = 0;
 int
 main(int argc, char **argv)
 {
-    (void)argc;
-    (void)argv;
-
     mihandle_t hvol;
     char *name;
     int result;
