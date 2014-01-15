@@ -1087,7 +1087,7 @@ VIOAPI  VIO_Status  open_file_with_default_suffix(
 {
     VIO_Status   status;
     VIO_BOOL  suffix_added;
-    VIO_STR   used_filename, expanded;
+    VIO_STR   used_filename = NULL, expanded;
 
     expanded = expand_filename( filename );
 

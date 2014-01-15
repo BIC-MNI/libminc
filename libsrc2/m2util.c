@@ -1644,10 +1644,10 @@ minc_update_thumbnail ( mihandle_t volume, hid_t loc_id, int igrp, int ogrp )
   int in_bytes;
   int out_bytes;
   double smax, smin;          /* Slice minimum and maximum */
-  hid_t omax_id=-1;              /* Output image-max dataset */
-  hid_t omin_id;              /* Output image-min dataset */
-  hid_t tfspc_id;             /* Dimensionality of image-max/image-min */
-  hid_t tmspc_id;
+  hid_t omax_id=-1;           /* Output image-max dataset */
+  hid_t omin_id=-1;           /* Output image-min dataset */
+  hid_t tfspc_id=-1;          /* Dimensionality of image-max/image-min */
+  hid_t tmspc_id=-1;
   hid_t dcpl_id;              /* Dataset creation property list */
 
   miinit();
