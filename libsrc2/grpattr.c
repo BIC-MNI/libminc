@@ -164,6 +164,8 @@ milist_attr_op ( hid_t loc_id, const char *attr_name, void *op_data )
 {
   struct milistdata *data = ( struct milistdata * ) op_data;
   strncpy ( data->name_ptr, attr_name, data->name_len );
+  (void)loc_id; /* deliberately unused */
+
   return ( 1 );
 }
 
