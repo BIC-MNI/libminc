@@ -244,7 +244,7 @@ VIOAPI  void  *alloc_memory_in_bytes(
 
     if( private_alloc_memory( &ptr, n_bytes ) != VIO_OK )
     {
-        print_error( "Cannot alloc 1D array of %d bytes.\n", n_bytes );
+        print_error( "Cannot alloc 1D array of %lu bytes.\n", n_bytes );
         PRINT_ALLOC_SOURCE_LINE
         abort_if_allowed();
     }
@@ -281,7 +281,7 @@ VIOAPI  void  *alloc_memory_1d(
 
     if( private_alloc_memory( &ptr, n_elements * type_size ) != VIO_OK )
     {
-        print_error( "Cannot alloc 1D array of %d elements of %d bytes.\n",
+        print_error( "Cannot alloc 1D array of %lu elements of %lu bytes.\n",
                      n_elements, type_size );
         PRINT_ALLOC_SOURCE_LINE
         abort_if_allowed();
@@ -322,7 +322,7 @@ VIOAPI  void  *alloc_memory_2d(
 
     if( private_alloc_memory_2d( &ptr, n1, n2, type_size ) != VIO_OK )
     {
-        print_error( "Cannot alloc 2D array of %d by %d elements of %d bytes.\n",
+        print_error( "Cannot alloc 2D array of %lu by %lu elements of %lu bytes.\n",
                      n1, n2, type_size );
         PRINT_ALLOC_SOURCE_LINE
         abort_if_allowed();
@@ -369,7 +369,7 @@ VIOAPI  void  *alloc_memory_3d(
 
     if( private_alloc_memory_3d( &ptr, n1, n2, n3, type_size ) != VIO_OK )
     {
-        print_error( "Cannot alloc 3D array of %d by %d by %d elements of %d bytes.\n",
+        print_error( "Cannot alloc 3D array of %lu by %lu by %lu elements of %lu bytes.\n",
                      n1, n2, n3, type_size );
         PRINT_ALLOC_SOURCE_LINE
         abort_if_allowed();
@@ -420,7 +420,7 @@ VIOAPI  void  *alloc_memory_4d(
 
     if( private_alloc_memory_4d( &ptr, n1, n2, n3, n4, type_size ) != VIO_OK )
     {
-        print_error( "Cannot alloc 4D array of %d by %d by %d by %d elements of %d bytes.\n",
+        print_error( "Cannot alloc 4D array of %lu by %lu by %lu by %lu elements of %lu bytes.\n",
                      n1, n2, n3, n4, type_size );
         PRINT_ALLOC_SOURCE_LINE
         abort_if_allowed();
@@ -475,7 +475,7 @@ VIOAPI  void  *alloc_memory_5d(
 
     if( private_alloc_memory_5d( &ptr, n1, n2, n3, n4, n5, type_size ) != VIO_OK )
     {
-        print_error( "Cannot alloc 4D array of %d by %d by %d by %d by %d elements of %d bytes.\n",
+        print_error( "Cannot alloc 4D array of %lu by %lu by %lu by %lu by %lu elements of %lu bytes.\n",
                      n1, n2, n3, n4, n5, type_size );
         PRINT_ALLOC_SOURCE_LINE
         abort_if_allowed();
@@ -532,7 +532,7 @@ VIOAPI  void  realloc_memory(
 
         if( *ptr == NULL )
         {
-            print_error( "Error reallocing %d elements of size %d.\n",
+            print_error( "Error reallocing %lu elements of size %lu.\n",
                          n_elements, type_size );
             PRINT_ALLOC_SOURCE_LINE
             abort_if_allowed();
@@ -545,7 +545,7 @@ VIOAPI  void  realloc_memory(
     }
     else
     {
-        print_error("Error: tried to realloc invalid number of elements, %d.\n",
+        print_error("Error: tried to realloc invalid number of elements, %lu.\n",
                      n_elements );
         PRINT_ALLOC_SOURCE_LINE
     }

@@ -1168,7 +1168,7 @@ static  VIO_Status  output_the_volume2(
             file->sizes_in_file[d] )
         {
             print_error( "output_the_volume2:  invalid minc file position.\n" );
-            print_error( "    start[%d] = %d     count[%d] = %d\n", d, file_start[d],
+            print_error( "    start[%d] = %ld     count[%d] = %d\n", d, file_start[d],
                       d, this_count );
             return( VIO_ERROR );
         }
