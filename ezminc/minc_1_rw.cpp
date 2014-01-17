@@ -40,19 +40,23 @@ namespace minc
   }
   
   minc_1_base::minc_1_base():
-    _dims(3,0),
-    _map_to_std(5,-1),
-    _mincid(MI_ERROR),
-    _imgid(MI_ERROR),
+    _slab_len(0),
     _icvid(MI_ERROR),
     _cur(MAX_VAR_DIMS,0),
     _slab(MAX_VAR_DIMS,1),
     _last(false),
+    _positive_directions(true),
     _datatype(MI_ORIGINAL_TYPE),
     _io_datatype(MI_ORIGINAL_TYPE),
-    _slab_len(0),
-    _positive_directions(true),
-    _minc2(false)
+    _mincid(MI_ERROR),
+    _imgid(MI_ERROR),
+    _dims(3,0),
+    _map_to_std(5,-1),
+    _minc2(false),
+    _slice_dimensions(0),
+    _ndims(0),
+    _is_signed(false),
+    _icmax(-1),_icmin(-1)
   {
     _icvid=miicv_create();
   }
@@ -78,20 +82,14 @@ namespace minc
   {
     nc_type datatype;
     int att_length;
-#ifndef WIN32
-    int op=ncopts;
-#endif //WIN32
-    //ncopts=0;
     if ((ncattinq(_mincid, NC_GLOBAL, MIhistory, &datatype,&att_length) == MI_ERROR) ||
         (datatype != NC_CHAR))
     {
-      //ncopts=op;
       return "";
     }
     char* str = new char[att_length+1];
     str[0] = '\0';
     miattgetstr(_mincid, NC_GLOBAL, (char*)MIhistory, att_length+1,str);
-    //ncopts=op;
     std::string r(str);
     delete [] str;
     return r;
@@ -111,6 +109,7 @@ namespace minc
     char name[MAX_NC_NAME];
     if(ncvarinq(_mincid, no, name, NULL, NULL, NULL, NULL)!=MI_ERROR)
       return name;
+    return "";
   }
 
   std::vector<double> minc_1_base::var_value_double(int varid) const
