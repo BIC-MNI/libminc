@@ -1627,13 +1627,13 @@ minc_update_thumbnail ( mihandle_t volume, hid_t loc_id, int igrp, int ogrp )
   hsize_t osize[MI2_MAX_VAR_DIMS];
   hsize_t count[MI2_MAX_VAR_DIMS];
   H5_START_T start[MI2_MAX_VAR_DIMS];
-  hid_t idst_id;              /* Input dataset */
-  hid_t odst_id;              /* Output dataset */
-  hid_t ifspc_id;             /* Input "file" dataspace */
-  hid_t ofspc_id;             /* Output "file" dataspace */
-  hid_t typ_id;               /* Type ID */
-  hid_t imspc_id;             /* Input memory dataspace */
-  hid_t omspc_id;             /* Output memory dataspace */
+  hid_t idst_id=-1;              /* Input dataset */
+  hid_t odst_id=-1;              /* Output dataset */
+  hid_t ifspc_id=-1;             /* Input "file" dataspace */
+  hid_t ofspc_id=-1;             /* Output "file" dataspace */
+  hid_t typ_id=-1;               /* Type ID */
+  hid_t imspc_id=-1;             /* Input memory dataspace */
+  hid_t omspc_id=-1;             /* Output memory dataspace */
   char path[MI2_MAX_PATH];
   int ndims;                  /* Number of dimensions in the image */
   int scale;
@@ -1645,10 +1645,11 @@ minc_update_thumbnail ( mihandle_t volume, hid_t loc_id, int igrp, int ogrp )
   int out_bytes;
   double smax, smin;          /* Slice minimum and maximum */
   hid_t omax_id=-1;              /* Output image-max dataset */
-  hid_t omin_id;              /* Output image-min dataset */
-  hid_t tfspc_id;             /* Dimensionality of image-max/image-min */
-  hid_t tmspc_id;
-  hid_t dcpl_id;              /* Dataset creation property list */
+  hid_t omin_id=-1;              /* Output image-min dataset */
+  hid_t tfspc_id=-1;             /* Dimensionality of image-max/image-min */
+  hid_t tmspc_id=-1;
+  hid_t dcpl_id=-1;              /* Dataset creation property list */
+  herr_t result=0;               /* return value for various functions*/
 
   miinit();
 
@@ -1776,33 +1777,38 @@ minc_update_thumbnail ( mihandle_t volume, hid_t loc_id, int igrp, int ogrp )
     count[1] = isize[1];
     count[2] = isize[2];
 
-    H5Sselect_hyperslab ( ifspc_id, H5S_SELECT_SET, start, NULL, count,
-                          NULL );
+    MI_CHECK_HDF_CALL(result=H5Sselect_hyperslab ( ifspc_id, H5S_SELECT_SET, start, NULL, count,
+                          NULL ),"H5Sselect_hyperslab");
+    if(result>=0)
+    {
+      MI_CHECK_HDF_CALL(H5Dread ( idst_id, H5T_NATIVE_DOUBLE, imspc_id, ifspc_id, H5P_DEFAULT,
+                in_ptr ),"H5Dread");
 
-    H5Dread ( idst_id, H5T_NATIVE_DOUBLE, imspc_id, ifspc_id, H5P_DEFAULT,
-              in_ptr );
+      /* Scale slice from voxel to real values. */
 
-    /* Scale slice from voxel to real values. */
+      miconvert_hyperslab_to_real ( volume, start, count, in_ptr );
 
-    miconvert_hyperslab_to_real ( volume, start, count, in_ptr );
-
-    midownsample_slice ( in_ptr, out_ptr, isize, osize, scale );
-
+      midownsample_slice ( in_ptr, out_ptr, isize, osize, scale );
+    }
+    
     start[0] = slice;
     start[1] = 0;
     start[2] = 0;
     count[0] = 1;
     count[1] = osize[1];
     count[2] = osize[2];
-    H5Sselect_hyperslab ( ofspc_id, H5S_SELECT_SET, start, NULL, count,
-                          NULL );
+    
+    MI_CHECK_HDF_CALL(result=H5Sselect_hyperslab ( ofspc_id, H5S_SELECT_SET, start, NULL, count,
+                                           NULL ),"H5Sselect_hyperslab");
+    if(result>=0)
+    {
+      miconvert_hyperslab_to_voxel ( volume, start, count, out_ptr,
+                                     &smax, &smin );
 
-    miconvert_hyperslab_to_voxel ( volume, start, count, out_ptr,
-                                   &smax, &smin );
-
-    H5Dwrite ( odst_id, H5T_NATIVE_DOUBLE, omspc_id, ofspc_id, H5P_DEFAULT,
-               out_ptr );
-
+      MI_CHECK_HDF_CALL(H5Dwrite ( odst_id, H5T_NATIVE_DOUBLE, omspc_id, ofspc_id, H5P_DEFAULT,
+                                  out_ptr ),"H5Dwrite");
+    }
+    
     if ( volume->volume_class == MI_CLASS_REAL ) {
       /* Select the right point in tfspc_id */
       H5Sselect_elements ( tfspc_id, H5S_SELECT_SET, 1,
@@ -1819,15 +1825,15 @@ minc_update_thumbnail ( mihandle_t volume, hid_t loc_id, int igrp, int ogrp )
   free ( in_ptr );
   free ( out_ptr );
 
-  if(omax_id>0) H5Dclose ( omax_id );
-  H5Dclose ( omin_id );
-  H5Sclose ( tfspc_id );
-  H5Sclose ( tmspc_id );
+  if(omax_id>0)  H5Dclose ( omax_id );
+  if(omin_id>0)  H5Dclose ( omin_id );
+  if(tfspc_id>0) H5Sclose ( tfspc_id );
+  if(tmspc_id>0) H5Sclose ( tmspc_id );
 
-  H5Sclose ( omspc_id );
-  H5Sclose ( imspc_id );
-  H5Dclose ( odst_id );
-  H5Tclose ( typ_id );
+  if(omspc_id>0) H5Sclose ( omspc_id );
+  if(imspc_id>0) H5Sclose ( imspc_id );
+  if(odst_id>0)  H5Dclose ( odst_id );
+  if(typ_id>0)   H5Tclose ( typ_id );
   H5Sclose ( ofspc_id );
   H5Sclose ( ifspc_id );
 
