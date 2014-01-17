@@ -45,4 +45,11 @@
 #define  ASSIGN_PTR( ptr )  (ptr)
 #endif
 
+/* To allow gcc and clang to warn upon mismatch of format string and parameters. */
+#if defined(__GNUC__) && (__GNUC__ >= 4)
+#define VIO_FORMAT_FUNCTION(func, p1, p2) __attribute__((format(func, p1, p2)))
+#else
+#define VIO_FORMAT_FUNCTION(func, p1, p2)
+#endif
+
 #endif
