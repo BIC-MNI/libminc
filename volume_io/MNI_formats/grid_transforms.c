@@ -325,7 +325,6 @@ VIOAPI  VIO_Status  grid_inverse_transform_point_with_input_steps(
     
     ftol = -1.0;
     if( input_volume_steps != NULL){
-      i = 0;
       for_less( i, 0, 3 ) {
         if( ftol < 0 ) ftol = input_volume_steps[i];
         if( input_volume_steps[i] < ftol ) ftol = input_volume_steps[i];
@@ -526,7 +525,6 @@ static  void   evaluate_grid_volume(
     for_less( d, 0, FOUR_DIMS ) {
         if( d == vector_dim ) continue;
         if( d == is_2dslice ) {
-            pos = 0.0;
             start[d] = 0;
             end[d] = 1;
         } else {
