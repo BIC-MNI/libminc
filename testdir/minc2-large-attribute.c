@@ -27,7 +27,7 @@ static int create_3D_image ( int attribute_size )
   double separations[NDIMS] = {0.09, 0.09, 0.09};
   midimhandle_t hdim[NDIMS];
   mihandle_t hvol;
-  unsigned short *buf = ( unsigned short * ) malloc ( CX * CY * CZ * sizeof ( unsigned short ) );
+  unsigned short *buf = NULL;
   int i;
   misize_t count[NDIMS];
   misize_t start[NDIMS];
@@ -67,6 +67,7 @@ static int create_3D_image ( int attribute_size )
   if(r<0) return r;
   
 
+  buf = ( unsigned short * ) malloc ( CX * CY * CZ * sizeof ( unsigned short ) );
   for ( i = 0; i < CY * CX * CZ; i++ ) {
     buf[i] = ( unsigned short ) i * 0.001;
   }
