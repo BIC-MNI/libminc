@@ -948,7 +948,7 @@ VIOAPI  void  push_print_error_function( void );
 
 VIOAPI  void  pop_print_error_function( void );
 
-VIOAPI  void  print_error( char format[], ... );
+VIOAPI  void  print_error( char format[], ... ) VIO_FORMAT_FUNCTION(printf, 1, 2);
 
 VIOAPI  void   handle_internal_error( char  str[] );
 
