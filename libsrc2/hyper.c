@@ -642,6 +642,7 @@ static int mirw_hyperslab_icv(int opcode,
      * mention useless!
      */
     mspc_id = H5Screate(H5S_SCALAR);
+    hdf_count[0]=1; 
   } else {
 
     n_different = mitranslate_hyperslab_origin(volume, start, count, hdf_start, hdf_count, dir);
