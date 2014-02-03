@@ -42,6 +42,7 @@ typedef void *milisthandle_t;
  * stored</b> by MINC 2.0. 
  */
 typedef enum {
+  MI_TYPE_ORIGINAL = 0,     /**< MI_ORIGINAL_TYPE */
   MI_TYPE_BYTE = 1,         /**< 8-bit signed integer */
   MI_TYPE_SHORT = 3,        /**< 16-bit signed integer */
   MI_TYPE_INT = 4,          /**< 32-bit signed integer */
