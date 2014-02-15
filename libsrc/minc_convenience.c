@@ -860,14 +860,14 @@ MNCAPI int micreate_std_variable(int cdfid, char *name, nc_type datatype,
       else if (STRINGS_EQUAL(name, MIacquisition))
          MI_CHK_ERR(varid=MI_create_simple_variable(cdfid, name))
       else {
-	  milog_message(MI_MSG_VARNOTSTD, name);
+         /*milog_message(MI_MSG_VARNOTSTD, name);*/
          MI_RETURN(MI_ERROR);
       }
    }
 
    /* If not in any list, then return an error */
    else {
-       milog_message(MI_MSG_VARNOTSTD, name);
+       /*milog_message(MI_MSG_VARNOTSTD, name);*/
        MI_RETURN(MI_ERROR);
    }
 
@@ -902,7 +902,7 @@ PRIVATE int MI_create_dim_variable(int cdfid, char *name,
 
    /* Check for MIvector_dimension - no associated variable */
    if (STRINGS_EQUAL(name, MIvector_dimension)) {
-       milog_message(MI_MSG_VARNOTSTD, name);
+       /*milog_message(MI_MSG_VARNOTSTD, name);*/
        MI_RETURN(MI_ERROR);
    }
 
