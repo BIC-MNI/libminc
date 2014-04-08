@@ -63,7 +63,7 @@ VIOAPI  VIO_Status  start_volume_input(
     VIO_STR             expanded_filename;
 
     status = VIO_OK;
-  
+
     if( create_volume_flag || *volume == (VIO_Volume) NULL )
     {
         if( n_dimensions < 1 || n_dimensions > VIO_MAX_DIMENSIONS )
@@ -78,7 +78,7 @@ VIOAPI  VIO_Status  start_volume_input(
             return( VIO_ERROR );
 
         if( dim_names == (VIO_STR *) NULL )
-           dim_names = get_default_dim_names( n_dimensions );
+            dim_names = get_default_dim_names( n_dimensions );
 
         *volume = create_volume( n_dimensions, dim_names, volume_nc_data_type,
                                  volume_signed_flag,
@@ -91,15 +91,15 @@ VIOAPI  VIO_Status  start_volume_input(
     expanded_filename = expand_filename( filename );
 
 #ifdef HAVE_MINC1
-  if( !filename_extension_matches( expanded_filename, FREE_ENDING ) )
+    if( !filename_extension_matches( expanded_filename, FREE_ENDING ) )
         input_info->file_format = MNC_FORMAT;
-  else
+    else
 #elif defined HAVE_MINC2
-  if( !filename_extension_matches( expanded_filename, FREE_ENDING ) )
+    if( !filename_extension_matches( expanded_filename, FREE_ENDING ) )
         input_info->file_format = MNC2_FORMAT;
-  else
+    else
 #endif
-      input_info->file_format = FREE_FORMAT;
+        input_info->file_format = FREE_FORMAT;
 
     switch( input_info->file_format )
     {
@@ -122,17 +122,17 @@ VIOAPI  VIO_Status  start_volume_input(
         }
 
         break;
-#endif /*HAVE_MINC1*/        
+#endif /*HAVE_MINC1*/
 #ifdef HAVE_MINC2
       case  MNC2_FORMAT:
         input_info->minc_file = initialize_minc2_input( expanded_filename,
                                                        *volume, options );
         if( input_info->minc_file == (Minc_file) NULL )
-          status = VIO_ERROR;
+            status = VIO_ERROR;
         else
         {
-          for_less( d, 0, VIO_MAX_DIMENSIONS )
-          input_info->axis_index_from_file[d] = d;
+            for_less( d, 0, VIO_MAX_DIMENSIONS )
+            input_info->axis_index_from_file[d] = d;
         }
         break;
 #endif /*HAVE_MINC2*/
@@ -216,14 +216,14 @@ VIOAPI  VIO_BOOL  input_more_of_volume(
                                            fraction_done );
         break;
 #endif
-        
+
 #ifdef HAVE_MINC2
       case  MNC2_FORMAT:
         more_to_do = input_more_minc2_file( input_info->minc_file,
                                             fraction_done );
         break;
 #endif /*HAVE_MINC2*/
-        
+
     case  FREE_FORMAT:
         more_to_do = input_more_free_format_file( volume, input_info,
                                                   fraction_done );
