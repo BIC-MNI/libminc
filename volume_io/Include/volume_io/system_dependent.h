@@ -1,4 +1,4 @@
-#ifndef  _DEF_SYSTEM_DEPENDENT_H
+#ifndef  DEF_SYSTEM_DEPENDENT_H
 
 /* ----------------------------------------------------------------------------
 @COPYRIGHT  :

@@ -506,7 +506,7 @@ static VIO_Status read_one_tag(
     VIO_STR  line;
     VIO_BOOL last_was_blank, in_quotes;
     int     n_strings, pos, i;
-    VIO_Real    x1, y1, z1, x2, y2, z2;
+    VIO_Real    x1 = 0.0, y1 = 0.0, z1 = 0.0, x2 = 0.0, y2 = 0.0, z2 = 0.0;
     int     structure_id, patient_id;
     VIO_Real    weight;
     VIO_STR  label;

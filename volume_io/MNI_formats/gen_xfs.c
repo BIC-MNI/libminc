@@ -205,7 +205,7 @@ static  void  internal_create_grid_transform(
     VIO_STR              displacement_volume_file
                                             )
 {
-    int       dim, sizes[VIO_MAX_DIMENSIONS], vector_dim;
+    int       dim, sizes[VIO_MAX_DIMENSIONS], vector_dim = -1;
     VIO_STR    *dim_names;
     VIO_Volume    copy;
     VIO_BOOL   volume_ok, dim_found[VIO_N_DIMENSIONS];
