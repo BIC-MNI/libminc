@@ -1,3 +1,7 @@
+2014-04-09 Vladimir S Fonov
+   * Incorporated multiple bug fixes from Sean McBride
+   * Added some info in NEWS 
+
 2013-11-28 Vladimir S Fonov
    * Removed autoconf/automake files
    * MINC2 file format now can store long attributes, but uses HDF5 1.8 features
