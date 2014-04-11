@@ -1,3 +1,7 @@
+2014-04-12  Andrew L Janke <a.janke@gmail.com>
+   * Updated README.release for CMake build instructions
+   * Release handover to Matthijs van Eede <matthijs@mouseimaging.ca>
+
 2013-11-28 Vladimir S Fonov
    * Removed autoconf/automake files
    * MINC2 file format now can store long attributes, but uses HDF5 1.8 features
