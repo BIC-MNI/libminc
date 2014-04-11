@@ -7,9 +7,7 @@ http://nvie.com/posts/a-successful-git-branching-model/
 # libtool and libraries
 
 We are using libtool to (possibly) generate a shared library
-for libminc and libvolume_io.
-
-Each library has a three-component version string, in Makefile.am
+for libminc with a three-component version string.
 
 	CURRENT[:REVISION[:AGE]]
 
@@ -37,6 +35,9 @@ Each library has a three-component version string, in Makefile.am
      then set AGE to 0.
 
 * ccmake, build, and install.
+
+* Update Documentation (AUTHORS, COPYING, NEWS, README)
+   Authors should be sourced from recent commits
 
 * Commit.
 
