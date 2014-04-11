@@ -16,9 +16,9 @@ Each library has a three-component version string, in Makefile.am
 
 # Release procedure
 
-* Update NEWS.
+* Update NEWS from Changelog, add break mark in Changelog
 
-* Update the -version-info argument in Makefile.am according to the
+* Update the LIBMINC_SOVERSION in CMakeLists.txt according to the
   following rules:
 
   0. Each library's version should be updated according to these
@@ -36,18 +36,20 @@ Each library has a three-component version string, in Makefile.am
   4. If any interfaces have been removed since the last public release,
      then set AGE to 0.
 
-* Configure, build, and install.
+* ccmake, build, and install.
 
 * Commit.
 
-* Run "make distcheck".
+* Run CPack to make .tar.gz
 
-* Test build from tarball on another system.
+* Test build from .tar.gz on another system.
 
 * Copy tar file to distribution site.
 
-* Run "cvs tag minc-x-y-z" (MINC x.y.z).
+* Tag the release branch as "libminc-x-y-z" (MINC x.y.z).
 
-* Update version number in configure.in.
+* Update the version number in CMakeLists.txt for the next release in
+   order to avoid the problem of multiple releases with the same
+   version number
 
 * Commit.
