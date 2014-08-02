@@ -1,21 +1,5 @@
 LINK_LIBRARIES(${LIBMINC_LIBRARIES})
 
-IF(LIBMINC_MINC1_SUPPORT)
-
-  ADD_EXECUTABLE(minc_tst minc.c)
-  ADD_EXECUTABLE(icv icv.c)
-
-  ADD_EXECUTABLE(icv_dim1 icv_dim1.c)
-  ADD_EXECUTABLE(icv_dim icv_dim.c)
-  ADD_EXECUTABLE(icv_fillvalue icv_fillvalue.c)
-  ADD_EXECUTABLE(icv_range icv_range.c)
-  ADD_EXECUTABLE(mincapi mincapi.c)
-  ADD_EXECUTABLE(minc_types minc_types.c)
-  ADD_EXECUTABLE(test_mconv test_mconv.c)
-  ADD_EXECUTABLE(minc_long_attr minc_long_attr.c)
-  ADD_EXECUTABLE(minc_conversion minc_conversion.c)
-
-  #ADD_EXECUTABLE(test_speed test_speed.c)
 MACRO(minc_test cmd)
   # minc 1 version
   IF(HAVE_MINC1)
@@ -33,9 +17,6 @@ MACRO(minc_test cmd)
   ENDIF(MINC_TEST_ENVIRONMENT)
 ENDMACRO(minc_test)
 
-
-
-
 MACRO(add_minc_test name cmd)
 
   ADD_TEST( ${name}
@@ -49,6 +30,24 @@ MACRO(add_minc_test name cmd)
    ENDIF(MINC_TEST_ENVIRONMENT)
    
 ENDMACRO(add_minc_test)
+
+
+IF(LIBMINC_MINC1_SUPPORT)
+
+  ADD_EXECUTABLE(minc_tst minc.c)
+  ADD_EXECUTABLE(icv icv.c)
+
+  ADD_EXECUTABLE(icv_dim1 icv_dim1.c)
+  ADD_EXECUTABLE(icv_dim icv_dim.c)
+  ADD_EXECUTABLE(icv_fillvalue icv_fillvalue.c)
+  ADD_EXECUTABLE(icv_range icv_range.c)
+  ADD_EXECUTABLE(mincapi mincapi.c)
+  ADD_EXECUTABLE(minc_types minc_types.c)
+  ADD_EXECUTABLE(test_mconv test_mconv.c)
+  ADD_EXECUTABLE(minc_long_attr minc_long_attr.c)
+  ADD_EXECUTABLE(minc_conversion minc_conversion.c)
+
+  #ADD_EXECUTABLE(test_speed test_speed.c)
 
   # running tests
   minc_test(minc_types)
