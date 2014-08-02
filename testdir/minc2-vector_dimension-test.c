@@ -15,7 +15,6 @@ static int error_cnt = 0;
 
 static void create_test_file ( void )
 {
-  int r;
   midimhandle_t hdim[NDIMS];
   mihandle_t hvol;
   unsigned char *buf = malloc ( CZ * CX * CY * 3 );
@@ -23,16 +22,16 @@ static void create_test_file ( void )
   misize_t count[NDIMS];
   misize_t start[NDIMS];
 
-  r = micreate_dimension ( "zspace", MI_DIMCLASS_SPATIAL,
+  micreate_dimension ( "zspace", MI_DIMCLASS_SPATIAL,
                            MI_DIMATTR_REGULARLY_SAMPLED, CZ, &hdim[0] );
 
-  r = micreate_dimension ( "yspace", MI_DIMCLASS_SPATIAL,
+  micreate_dimension ( "yspace", MI_DIMCLASS_SPATIAL,
                            MI_DIMATTR_REGULARLY_SAMPLED, CY, &hdim[1] );
 
-  r = micreate_dimension ( "xspace", MI_DIMCLASS_SPATIAL,
+  micreate_dimension ( "xspace", MI_DIMCLASS_SPATIAL,
                            MI_DIMATTR_REGULARLY_SAMPLED, CX, &hdim[2] );
 
-  r = micreate_dimension ( "vector_dimension", MI_DIMCLASS_RECORD,
+  micreate_dimension ( "vector_dimension", MI_DIMCLASS_RECORD,
                            MI_DIMATTR_REGULARLY_SAMPLED, 3, &hdim[3] );
 
   micreate_volume ( "example_vector2.mnc", NDIMS, hdim, MI_TYPE_BYTE,

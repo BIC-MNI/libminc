@@ -60,8 +60,8 @@ static  VIO_BOOL  is_default_direction_cosine(
     is_default = TRUE;
     for_less( i, 0, VIO_N_DIMENSIONS )
     {
-        if( i == axis && dir_cosines[i] != 1.0 ||
-            i != axis && dir_cosines[i] != 0.0 )
+        if( (i == axis && dir_cosines[i] != 1.0) ||
+            (i != axis && dir_cosines[i] != 0.0) )
         {
             is_default = FALSE;
             break;
@@ -1372,7 +1372,7 @@ static  VIO_Status  output_the_volume(
             file->sizes_in_file[d] )
         {
             print_error( "output_the_volume:  invalid minc file position.\n" );
-            print_error( "    start[%d] = %d     count[%d] = %d\n", d, file_start[d],
+            print_error( "    start[%d] = %ld     count[%d] = %d\n", d, file_start[d],
                       d, this_count );
             return( VIO_ERROR );
         }

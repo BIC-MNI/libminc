@@ -52,7 +52,6 @@ struct testinfo {
  */
 int test1(struct testinfo *ip, struct dimdef *dims, int ndims)
 {
-  int fd2;
   int varid;
   int stat;
   int i;
@@ -187,7 +186,6 @@ test3(struct testinfo *ip, struct dimdef *dims, int ndims)
   int i, j, k;
   int stat;
   int icv;
-  double dbl;
   
   total = 1;
   for (i = 0; i < ndims; i++) {
@@ -288,8 +286,7 @@ test3(struct testinfo *ip, struct dimdef *dims, int ndims)
 }
 
 
-int
-test4(struct testinfo *ip, struct dimdef *dims, int ndims)
+void test4(struct testinfo *ip, struct dimdef *dims, int ndims)
 {
   mihandle_t vol;  
   
@@ -390,7 +387,6 @@ test4(struct testinfo *ip, struct dimdef *dims, int ndims)
  */
 int main(int argc, char **argv)
 {
-  int stat;
   struct testinfo info;
 
   test1(&info, dimtab1, 3);
