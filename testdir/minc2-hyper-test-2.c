@@ -25,7 +25,6 @@ static int error_cnt = 0;
 
 static void create_test_file ( void )
 {
-  int r;
   double start_values[3] = { -6.96, -12.453,  -9.48};
   double separations[3] = {0.09, 0.09, 0.09};
   midimhandle_t hdim[NDIMS];
@@ -38,24 +37,24 @@ static void create_test_file ( void )
 
   double min = -1.0;
   double max =  1.0;
-  r = micreate_dimension ( "zspace", MI_DIMCLASS_SPATIAL,
+  micreate_dimension ( "zspace", MI_DIMCLASS_SPATIAL,
                            MI_DIMATTR_REGULARLY_SAMPLED, CZ, &hdim[0] );
 
-  r = micreate_dimension ( "yspace", MI_DIMCLASS_SPATIAL,
+  micreate_dimension ( "yspace", MI_DIMCLASS_SPATIAL,
                            MI_DIMATTR_REGULARLY_SAMPLED, CY, &hdim[1] );
 
-  r = micreate_dimension ( "xspace", MI_DIMCLASS_SPATIAL,
+  micreate_dimension ( "xspace", MI_DIMCLASS_SPATIAL,
                            MI_DIMATTR_REGULARLY_SAMPLED, CX, &hdim[2] );
 
-  r = miset_dimension_starts ( hdim, NDIMS, start_values );
-  r = miset_dimension_separations ( hdim, NDIMS, separations );
+  miset_dimension_starts ( hdim, NDIMS, start_values );
+  miset_dimension_separations ( hdim, NDIMS, separations );
 
-  r = micreate_volume ( "hyperslab-test2.mnc", NDIMS, hdim, MI_TYPE_USHORT,
+  micreate_volume ( "hyperslab-test2.mnc", NDIMS, hdim, MI_TYPE_USHORT,
                         MI_CLASS_REAL, NULL, &hvol );
   /* set slice scaling flag to true */
-  r = miset_slice_scaling_flag ( hvol, flag );
+  miset_slice_scaling_flag ( hvol, flag );
 
-  r = micreate_volume_image ( hvol );
+  micreate_volume_image ( hvol );
 
   for ( i = 0; i < CZ * CY * CX; i++ ) {
     buf[i] = ( unsigned short ) i * 0.01;
@@ -66,17 +65,17 @@ static void create_test_file ( void )
   count[1] = CY;
   count[2] = CX;
 
-  r = miset_voxel_value_hyperslab ( hvol, MI_TYPE_USHORT, start, count, buf );
+  miset_voxel_value_hyperslab ( hvol, MI_TYPE_USHORT, start, count, buf );
   /* Set random values to slice min and max for slice scaling*/
   start[0] = start[1] = start[2] = 0;
   for ( i = 0; i < CZ; i++ ) {
     start[0] = i;
     min += 0.1;
     max += 0.1;
-    r = miset_slice_range ( hvol, start, 3, max, min );
+    miset_slice_range ( hvol, start, 3, max, min );
   }
   
-  r = miclose_volume ( hvol );
+  miclose_volume ( hvol );
   free(buf);
 }
 

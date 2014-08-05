@@ -615,6 +615,8 @@ struct mi2opts {
 
 #define MI2_ISH5OBJ(x) (H5Iget_type(x) > 0)
 
+MNCAPI int micreatex(char *path, int cmode, struct mi2opts *opts_ptr);
+
 #else
 #define MI2_ISH5OBJ(x) (0)
 #endif /* MINC2 */

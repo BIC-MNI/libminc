@@ -607,10 +607,8 @@ VIOAPI  VIO_BOOL  volume_is_alloced(
     VIO_Volume   volume )
 {
 #ifdef HAVE_MINC1
-    return  volume->is_cached_volume &&
-            volume_cache_is_alloced( &volume->cache ) ||
-            !volume->is_cached_volume &&
-            multidim_array_is_alloced( &volume->array ) ;
+    return  ( volume->is_cached_volume && volume_cache_is_alloced( &volume->cache )) ||
+            (!volume->is_cached_volume && multidim_array_is_alloced( &volume->array )) ;
 #else
     return  multidim_array_is_alloced( &volume->array ) ;
 #endif    

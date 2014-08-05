@@ -1,6 +1,13 @@
+2014-08-05  Vladimir S. FONOV <vladimir.fonov@gmail.com>
+   * Merged changes from Steven M. Robbins 
+
 2014-04-12  Andrew L Janke <a.janke@gmail.com>
    * Updated README.release for CMake build instructions
    * Release handover to Matthijs van Eede <matthijs@mouseimaging.ca>
+
+2014-04-09 Vladimir S Fonov
+   * Incorporated multiple bug fixes from Sean McBride
+   * Added some info in NEWS 
 
 2013-11-28 Vladimir S Fonov
    * Removed autoconf/automake files

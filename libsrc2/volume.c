@@ -1223,7 +1223,7 @@ int miopen_volume(const char *filename, int mode, mihandle_t *volume)
 
     if ( mode == MI2_OPEN_READ )
     {
-      if( temp_file=micreate_tempfile())
+      if( (temp_file=micreate_tempfile()))
       {
          if( minc_format_convert(filename,temp_file) == MI_NOERROR )
          {

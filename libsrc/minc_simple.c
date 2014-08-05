@@ -551,6 +551,9 @@ minc_save_start(char *path,     /* Path to the file */
     ncopts = 0;
 
     fd = micreate(path, NC_CLOBBER);
+
+    ncopts = old_ncopts;
+    
     if (fd < 0) {
         return (MINC_STATUS_ERROR);
     }
@@ -650,6 +653,8 @@ minc_save_start(char *path,     /* Path to the file */
                          p_att->att_len, p_att->att_val);
             }
         }
+        
+        ncopts = old_ncopts;
     }
 
     miattputstr(fd, ncvarid(fd, MIimage), MIcomplete, MI_FALSE);
@@ -815,6 +820,8 @@ minc_save_data(int fd, void *dataptr, int datatype,
 
     ncvarinq(fd, var_id, NULL, NULL, &var_ndims, var_dims, NULL);
 
+    ncopts = old_ncopts;
+    
     if (var_ndims < 2 || var_ndims > 4) {
         return (MINC_STATUS_ERROR);
     }
@@ -966,6 +973,7 @@ minc_get_world_transform(char *path, double transform[MINC_3D][MINC_3D+1])
 
     fd = miopen(path, NC_NOWRITE);
     if (fd < 0) {
+	ncopts = old_ncopts;
         return (MINC_STATUS_ERROR);
     }
 

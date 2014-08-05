@@ -53,7 +53,6 @@ struct testinfo {
  */
 int test1(struct testinfo *ip, struct dimdef *dims, int ndims)
 {
-  int fd2;
   int varid;
   int stat;
   int i;
@@ -196,7 +195,6 @@ test3(struct testinfo *ip, struct dimdef *dims, int ndims)
   int *int_ptr;
   int i, j, k;
   int stat;
-  char *read_attribute;
   
   int varid;
   int att_length;
@@ -273,7 +271,6 @@ test3(struct testinfo *ip, struct dimdef *dims, int ndims)
  */
 int main(int argc, char **argv)
 {
-  int stat;
   struct testinfo info;
   if(argc>1)
     info.attribute_size=atoi(argv[1]);
