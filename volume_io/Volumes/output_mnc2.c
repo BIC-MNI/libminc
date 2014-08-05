@@ -744,7 +744,6 @@ static  VIO_Status  check_minc2_output_variables(
     Minc_file   file )
 {
     VIO_Real          voxel_min, voxel_max;
-    double            dim_value;
     VIO_Volume        volume;
 
     if( !file->variables_written )
@@ -752,8 +751,6 @@ static  VIO_Status  check_minc2_output_variables(
         volume = file->volume;
 
         file->variables_written = TRUE;
-
-        dim_value = 0.0;
 
         get_volume_voxel_range( volume, &voxel_min, &voxel_max );
         if( voxel_min < voxel_max )

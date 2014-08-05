@@ -55,13 +55,11 @@ int main ( int argc, char **argv )
   misize_t *start;
   misize_t *count;
   misize_t *howfar;
-  misize_t *location;
   double        *origin;
   double        *step;
   miclass_t      volume_class;
   mitype_t       volume_type;
   int            vector_dimension_id=-1;
-  int            vector_size=-1;
   
   int r = 0;
   int i;
@@ -123,7 +121,6 @@ int main ( int argc, char **argv )
   start=malloc(sizeof(misize_t)*ndim);
   count=malloc(sizeof(misize_t)*ndim);
   howfar=malloc(sizeof(misize_t)*ndim);
-  location=malloc(sizeof(misize_t)*ndim);
   origin=malloc(sizeof(double)*ndim);
   step=malloc(sizeof(double)*ndim);
   
@@ -163,7 +160,6 @@ int main ( int argc, char **argv )
     if(!strcmp(dname,MIvector_dimension))
     {
       vector_dimension_id=i;
-      vector_size=sizes[i];
     }
     free(dname);
   }
