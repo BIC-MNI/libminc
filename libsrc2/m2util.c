@@ -1924,85 +1924,77 @@ free2d ( int n, double **mat )
   free ( mat );
 }
 
-/** Function for create a NON-STANDARD dataset other than --> (acquisition, patient, study)
-*/
+/** Common code to create either standard or non-standard MINC datasets
+ * as required. Used by create_dataset and create_standard_dataset.
+ * Note that in the normal course of operations, it is possible for 
+ * the dataset creation to fail (perhaps it already exists). As a 
+ * result we can't take the return value too seriously.
+ * \param hdf_file An open HDF5 file handle.
+ * \param name The dataset (variable) name to create.
+ * \param is_std Non-zero if this is a MINC-standard dataset, to be decorated
+ * with the full set of standard MINC attributes.
+ */
+static int create_new_dataset(hid_t hdf_file, const char *name, int is_std)
+{
+  hid_t dataset_info;
+  hid_t dataspace_info;
+  hid_t grp_info;
+  int result;
+
+  grp_info = H5Gopen1 ( hdf_file, MI_ROOT_PATH "/" MI_INFO_NAME );
+
+  if ( grp_info < 0 ) {
+    return ( MI_ERROR );
+  }
+
+  dataspace_info = H5Screate ( H5S_SCALAR );
+
+  if ( dataspace_info < 0 ) {
+    H5Gclose(grp_info);
+    return ( MI_ERROR );
+  }
+
+  dataset_info = H5Dcreate1 ( grp_info, name,
+                              H5T_STD_I32LE, dataspace_info, H5P_DEFAULT );
+
+  if ( dataset_info < 0 ) {
+    H5Sclose(dataspace_info);
+    H5Gclose(grp_info);
+    return ( MI_ERROR );
+  }
+
+  if (is_std) {
+    result = add_standard_minc_attributes(hdf_file,dataset_info);
+  }
+  else {
+    result = add_minimal_minc_attributes(hdf_file,dataset_info);
+  }
+
+  H5Dclose ( dataset_info );
+  H5Sclose ( dataspace_info );
+  H5Gclose ( grp_info );
+
+  return ( result );
+}
+
+/** Function to create a NON-STANDARD dataset (e.g. other than 
+ * "acquisition", "patient", or "study"). For internal use only.
+ */
 
 int
 create_dataset ( hid_t hdf_file, const char *name )
 {
-
-  hid_t dataset_info;
-  hid_t dataspace_info;
-  hid_t grp_info;
-  int result;
-
-  grp_info = H5Gopen1 ( hdf_file, MI_ROOT_PATH "/" MI_INFO_NAME );
-
-  if ( grp_info < 0 ) {
-    return ( MI_ERROR );
-  }
-
-  dataspace_info = H5Screate ( H5S_SCALAR );
-
-  if ( dataspace_info < 0 ) {
-    return ( MI_ERROR );
-  }
-
-  dataset_info = H5Dcreate1 ( grp_info, name,
-                              H5T_STD_I32LE, dataspace_info, H5P_DEFAULT );
-
-  if ( dataset_info < 0 ) {
-    return ( MI_ERROR );
-  }
-
-  result=add_minimal_minc_attributes(hdf_file,dataset_info);
-  
-  H5Dclose ( dataset_info );
-  H5Sclose ( dataspace_info );
-  H5Gclose ( grp_info );
-
-  return ( result );
+  return create_new_dataset(hdf_file, name, FALSE);
 }
 
-/** Function for create a dataset (acquisition, patient, study)
-*/
-
+/** Function to create a standard MINC dataset (acquisition, patient, study).
+ * For internal use only.
+ */
 int
 create_standard_dataset ( hid_t hdf_file, const char *name )
 {
-  hid_t dataset_info;
-  hid_t dataspace_info;
-  hid_t grp_info;
-  int result;
-
-  grp_info = H5Gopen1 ( hdf_file, MI_ROOT_PATH "/" MI_INFO_NAME );
-
-  if ( grp_info < 0 ) {
-    return ( MI_ERROR );
-  }
-
-  dataspace_info = H5Screate ( H5S_SCALAR );
-
-  if ( dataspace_info < 0 ) {
-    return ( MI_ERROR );
-  }
-
-  dataset_info = H5Dcreate1 ( grp_info, name,
-                              H5T_STD_I32LE, dataspace_info, H5P_DEFAULT );
-
-  if ( dataset_info < 0 ) {
-    return ( MI_ERROR );
-  }
-
-  result = add_standard_minc_attributes(hdf_file,dataset_info);
-
-  H5Dclose ( dataset_info );
-  H5Sclose ( dataspace_info );
-  H5Gclose ( grp_info );
-
-  return ( result );
+  return create_new_dataset(hdf_file, name, TRUE);
 }
-
 
 int 
 add_minimal_minc_attributes(hid_t hdf_file, hid_t dset_id)
