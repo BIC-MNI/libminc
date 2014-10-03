@@ -2354,6 +2354,10 @@ PRIVATE int get_input_mincid(Loopfile_Info *loopfile_info,
       filename = miexpand_file(loopfile_info->input_files[file_num], NULL,
                                loopfile_info->headers_only,
                                &created_tempfile);
+      if (!filename) {
+         fprintf(stderr, "Could not expand file \"%s\"!\n", loopfile_info->input_files[file_num]);
+         exit(EXIT_FAILURE);
+      }
       loopfile_info->input_mincid[index] = miopen(filename, NC_NOWRITE);
       if (created_tempfile) {
          (void) remove(filename);
