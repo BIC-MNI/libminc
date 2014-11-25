@@ -1077,6 +1077,7 @@ static int _miget_file_dimension(mihandle_t volume, const char *dimname,
   char path[MI2_CHAR_LENGTH];
   char temp[MI2_CHAR_LENGTH];
   midimhandle_t hdim;
+  unsigned int len;
 
   /* Create a path with the dimension name */
   sprintf(path, MI_ROOT_PATH "/dimensions/%s", dimname);
@@ -1128,11 +1129,18 @@ static int _miget_file_dimension(mihandle_t volume, const char *dimname,
         MI_LOG_ERROR(MI2_MSG_GENERIC,"Unknown dimension type");
       }
     }
-    /* Get the attribute (length) from a minc file */
-    r = miget_attribute(volume, path, "length", MI_TYPE_UINT, 1, &hdim->length);
+    /* Get the attribute (length) from a minc file. We have to do this in
+     * two steps, as MI_TYPE_UINT is not necessarily the same size as 
+     * hsize_t/misize_t, so we have to read the value into a variable of
+     * the right type, then assign it to the structure member, to guarantee 
+     * proper promotion.
+     */
+    r = miget_attribute(volume, path, "length", MI_TYPE_UINT, 1, &len);
     if (r < 0) {
       MI_LOG_ERROR(MI2_MSG_GENERIC,"Can't determine dimension length");
     }
+    hdim->length = len;         /* Will promote unsigned int to misize_t. */
+
     /* Get the attribute (start) from a minc file for NON vector_dimension only */
     if (strcmp(dimname, "vector_dimension")) {
       r = miget_attribute(volume, path, MIstart, MI_TYPE_DOUBLE, 1, &hdim->start);
