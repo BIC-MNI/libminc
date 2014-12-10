@@ -456,6 +456,7 @@ int micreate_volume(const char *filename, int number_of_dimensions,
   mivolumeprops_t props_handle;
   char ident_str[128];
   hid_t tmp_type;
+  int   dimension_is_vector = 0;
 
   /* Initialization.
     For the actual body of this function look at m2utils.c
@@ -645,7 +646,7 @@ int micreate_volume(const char *filename, int number_of_dimensions,
   */
 
   for (i=0; i < number_of_dimensions ; i++) {
-
+    dimension_is_vector = 0;
     /* First create the dataspace required to create a
       dimension variable (dataset)
     */
@@ -659,7 +660,10 @@ int micreate_volume(const char *filename, int number_of_dimensions,
     if (dataspace_id < 0) {
       return (MI_ERROR);
     }
-
+    
+    dimension_is_vector= (strcmp ( dimensions[i]->name, MIvector_dimension ) == 0 );
+    
+    
     /* Create a dataset(dimension variable name) in DIMENSIONS GROUP */
     MI_CHECK_HDF_CALL_RET(dataset_id = H5Dcreate1(grp_id, dimensions[i]->name,
                             H5T_IEEE_F64LE, dataspace_id, H5P_DEFAULT),"H5Dcreate1")
@@ -672,7 +676,9 @@ int micreate_volume(const char *filename, int number_of_dimensions,
       write the dimension->widths.
     */
 
-    add_standard_minc_attributes(file_id,dataset_id);
+    if(!dimension_is_vector )
+      add_standard_minc_attributes(file_id,dataset_id);
+    /*vector dimension is a record*/
     
     /* Check for irregular dimension and make sure
       offset values are provided for this dimension
@@ -730,7 +736,9 @@ int micreate_volume(const char *filename, int number_of_dimensions,
     /* Create attribute "spacing" and set its value to
       "regular__" or "irregular"
     */
-    miset_attr_at_loc(dataset_id, "spacing", MI_TYPE_STRING,
+    
+    if(!dimension_is_vector)
+      miset_attr_at_loc(dataset_id, "spacing", MI_TYPE_STRING,
                       strlen(name), name);
 
     switch (dimensions[i]->dim_class) {
@@ -759,11 +767,13 @@ int micreate_volume(const char *filename, int number_of_dimensions,
       return (MI_ERROR);
     }
 
-    miset_attr_at_loc(dataset_id, "class", MI_TYPE_STRING, strlen(name),
+    if(!dimension_is_vector)
+      miset_attr_at_loc(dataset_id, "class", MI_TYPE_STRING, strlen(name),
                       name);
 
     /* Create Dimension attribute "direction_cosines"  */
-    miset_attr_at_loc(dataset_id, "direction_cosines", MI_TYPE_DOUBLE,
+    if(!dimension_is_vector)
+      miset_attr_at_loc(dataset_id, "direction_cosines", MI_TYPE_DOUBLE,
                       3, dimensions[i]->direction_cosines);
 
     /* Save dimension length */
@@ -771,19 +781,23 @@ int micreate_volume(const char *filename, int number_of_dimensions,
                       1, &dimensions[i]->length);
 
     /* Save step value. */
-    miset_attr_at_loc(dataset_id, "step", MI_TYPE_DOUBLE,
+    if(!dimension_is_vector)
+      miset_attr_at_loc(dataset_id, "step", MI_TYPE_DOUBLE,
                       1, &dimensions[i]->step);
 
     /* Save start value. */
-    miset_attr_at_loc(dataset_id, "start", MI_TYPE_DOUBLE,
+    if(!dimension_is_vector)
+      miset_attr_at_loc(dataset_id, "start", MI_TYPE_DOUBLE,
                       1, &dimensions[i]->start);
 
     /* Save units. */
-    miset_attr_at_loc(dataset_id, "units", MI_TYPE_STRING,
+    if(!dimension_is_vector)
+      miset_attr_at_loc(dataset_id, "units", MI_TYPE_STRING,
                       strlen(dimensions[i]->units), dimensions[i]->units);
 
     /* Save sample width. */
-    miset_attr_at_loc(dataset_id, "width", MI_TYPE_DOUBLE,
+    if(!dimension_is_vector)
+      miset_attr_at_loc(dataset_id, "width", MI_TYPE_DOUBLE,
                       1,  &dimensions[i]->width);
 
     /* Save comments. If user has not specified

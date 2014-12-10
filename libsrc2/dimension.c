@@ -286,7 +286,7 @@ int micreate_dimension(const char *name, midimclass_t dimclass, midimattr_t attr
   }
 
   // do not set start and step if vector_dimension present
-  if ( strcmp ( name, "vector_dimension" ) ) {
+  if ( strcmp ( name, MIvector_dimension ) ) {
     handle->start = 0.0;
     handle->step = 1.0;
   } else {
