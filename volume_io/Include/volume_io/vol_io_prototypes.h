@@ -996,8 +996,8 @@ VIOAPI  int  string_length(
     VIO_STR   string );
 
 VIOAPI  VIO_BOOL equal_strings(
-    VIO_STR   str1,
-    VIO_STR   str2 );
+    const char   *str1,
+    const char   *str2 );
 
 VIOAPI  VIO_BOOL is_lower_case(
     char  ch );
