@@ -18,9 +18,9 @@
 
 #include  <internal_volume_io.h>
 
-static   const char      *TAG_FILE_HEADER = "MNI Tag Point File";
-static   const char      *VOLUMES_STRING = "Volumes";
-static   const char      *TAG_POINTS_STRING = "Points";
+static   const char      * const TAG_FILE_HEADER = "MNI Tag Point File";
+static   const char      * const VOLUMES_STRING = "Volumes";
+static   const char      * const TAG_POINTS_STRING = "Points";
 
 /* ----------------------------- MNI Header -----------------------------------
 @NAME       : get_default_tag_file_suffix
@@ -429,7 +429,7 @@ VIOAPI  VIO_Status  initialize_tag_file_input(
     /* okay read the header */
 
     if( mni_input_string( file, &line, (char) 0, (char) 0 ) != VIO_OK ||
-        !equal_strings( line, (VIO_STR) TAG_FILE_HEADER ) )
+        !equal_strings( line, TAG_FILE_HEADER ) )
     {
         print_error( "input_tag_points(): invalid header in file.\n");
         delete_string( line );

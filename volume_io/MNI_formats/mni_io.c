@@ -249,7 +249,7 @@ VIOAPI VIO_Status  mni_input_keyword_and_equal_sign(
     if( status == VIO_END_OF_FILE )
         return( status );
 
-    if( status != VIO_OK || !equal_strings( str, (VIO_STR) keyword ) ||
+    if( status != VIO_OK || !equal_strings( str, keyword ) ||
         mni_skip_expected_character( file, (char) '=' ) != VIO_OK )
     {
         if( print_error_message )

@@ -116,15 +116,13 @@ VIOAPI  int  string_length(
 }
 
 VIOAPI  VIO_BOOL  equal_strings(
-    VIO_STR   str1,
-    VIO_STR   str2 )
+    const char   *str1,
+    const char   *str2 )
 {
-    if( str1 == NULL )
-        str1 = empty_string;
-    if( str2 == NULL )
-        str2 = empty_string;
+    const char *strA = str1 ? str1 : empty_string;
+    const char *strB = str2 ? str2 : empty_string;
 
-    return( strcmp( str1, str2 ) == 0 );
+    return( strcmp( strA, strB ) == 0 );
 }
 
 VIOAPI  VIO_BOOL  is_lower_case(

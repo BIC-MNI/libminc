@@ -25,8 +25,6 @@
 
 #define  INVALID_AXIS   -1
 
-#define  UNITS           "mm"
-
 static  VIO_Status  get_dimension_ordering(
     int          n_vol_dims,
     VIO_STR      vol_dim_names[],
