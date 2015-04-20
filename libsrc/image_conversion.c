@@ -543,7 +543,7 @@ MNCAPI int miicv_setlong(int icvid, int icv_property, long value)
 @CREATED    : January 22, 1993 (Peter Neelin)
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
-MNCAPI int miicv_setstr(int icvid, int icv_property, char *value)
+MNCAPI int miicv_setstr(int icvid, int icv_property, const char *value)
 {
    mi_icv_type *icvp;
 
@@ -1581,6 +1581,9 @@ PRIVATE int MI_icv_coords_tovar(mi_icv_type *icvp,
          if (var_start[i]<0) var_start[i] = 0;
          if (last_coord>=icvp->var_dim_size[j]) 
             last_coord = icvp->var_dim_size[j] - 1;
+         /* Enforce similar bounds on var_start (bert) */
+         if (var_start[i] >= icvp->var_dim_size[j])
+            var_start[i] = icvp->var_dim_size[j] - 1;
          var_count[i] = last_coord - var_start[i] + 1;
       }
    }

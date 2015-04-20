@@ -480,7 +480,7 @@ PrintUsage(argTable, flags)
 
 static void PrintVersion(ArgvInfo *argTable)
 {
-    char *versionStr = MINC_VERSION;
+    const char *versionStr = MINC_VERSION;
 
     for ( ; argTable->type != ARGV_END; argTable++) {
         if (argTable->type == ARGV_VERINFO) {

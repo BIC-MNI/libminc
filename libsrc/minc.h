@@ -560,7 +560,7 @@ MNCAPI int miicv_free(int icvid);
 MNCAPI int miicv_setdbl(int icvid, int icv_property, double value);
 MNCAPI int miicv_setint(int icvid, int icv_property, int value);
 MNCAPI int miicv_setlong(int icvid, int icv_property, long value);
-MNCAPI int miicv_setstr(int icvid, int icv_property, char *value);
+MNCAPI int miicv_setstr(int icvid, int icv_property, const char *value);
 MNCAPI int miicv_inqdbl(int icvid, int icv_property, double *value);
 MNCAPI int miicv_inqint(int icvid, int icv_property, int *value);
 MNCAPI int miicv_inqlong(int icvid, int icv_property, long *value);
@@ -587,6 +587,8 @@ MNCAPI int minc_format_convert(const char *input,const char *output);
 
 /* New functions, not directly part of compatibility layer. */
 extern int MI2varsize(int fd, int varid, long *size_ptr);
+
+extern int miget_file_type(const char *filename);
 
 #define MI2_GRPNAME "/minc-2.0"
 /* These must not interfere with any NC_ flags we might have to support. */
