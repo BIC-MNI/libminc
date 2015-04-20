@@ -60,3 +60,5 @@
 #cmakedefine HAVE_SRAND48 1 
 #cmakedefine HAVE_DRAND48 1 
 #cmakedefine HAVE_SLEEP 1 
+#cmakedefine HAVE_CLOCK_GETTIME 1
+#cmakedefine HAVE_GETTIMEOFDAY 1

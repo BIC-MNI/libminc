@@ -129,24 +129,40 @@ VIOAPI VIO_Real  current_cpu_seconds( void )
 
 VIOAPI  VIO_Real  current_realtime_seconds( void )
 {
-    static VIO_BOOL first_call = TRUE;
-    static time_t first;
-    time_t current;
-    VIO_Real secs;
-
-    if( first_call )
-    {
-        first_call = FALSE;
-        first = time(NULL);
-        secs = 0.0;
+    static VIO_Real first_seconds = -1.0;
+    VIO_Real current_seconds;
+#if HAVE_CLOCK_GETTIME
+    struct timespec ts;
+    if (clock_gettime(CLOCK_REALTIME, &ts) < 0) {
+      fprintf(stderr, "ERROR: clock_gettime failed.\n");
+      current_seconds = first_seconds;
     }
-    else
-    {
-        current = time(NULL);
-        secs = (double) (current - first);
+    else {
+      current_seconds = ts.tv_sec + (ts.tv_nsec / 1.0e9);
     }
-
-    return( secs );
+#elif HAVE_GETTIMEOFDAY
+    struct timeval tv;
+    if (gettimeofday(&tv, NULL) < 0) {
+      fprintf(stderr, "ERROR: gettimeofday failed.\n");
+      current_seconds = first_seconds;
+    }
+    else {
+      current_seconds = tv.tv_sec + (tv.tv_usec / 1.0e6);
+    }
+#else
+    /* This case is actually INCORRECT, in that users of the function
+     * assume a fractional number of seconds is returned, but this
+     * method can only return a whole number. This means that tests
+     * that assume less than a second's precision will be unreliable.
+     */
+    current_seconds = (VIO_Real) time(NULL);
+#endif
+    
+    if( first_seconds < 0.0 )
+    {
+        first_seconds = current_seconds;
+    }
+    return ( current_seconds - first_seconds );
 }
 
 /* ----------------------------- MNI Header -----------------------------------
