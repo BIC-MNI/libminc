@@ -166,6 +166,7 @@ INCLUDE_DIRECTORIES(
    ${CMAKE_CURRENT_SOURCE_DIR}/libsrc
    ${CMAKE_CURRENT_SOURCE_DIR}/volume_io/Include
    ${CMAKE_CURRENT_SOURCE_DIR}/ezminc
+   ${CMAKE_CURRENT_SOURCE_DIR}/nifti
    ${HDF5_INCLUDE_DIR}
    )
 
@@ -179,6 +180,8 @@ SET(minc_common_HEADERS
   libsrc/time_stamp.h
   libsrc/ParseArgv.h 
   volume_io/Include/volume_io.h
+  nifti/nifti1.h
+  nifti/nifti1_io.h
 )
 
 # some variables
@@ -269,6 +272,10 @@ SET(volume_io_LIB_SRCS
    volume_io/Volumes/volumes.c
    volume_io/Volumes/input_mnc2.c
    volume_io/Volumes/output_mnc2.c
+   volume_io/Volumes/input_mgh.c
+   volume_io/Volumes/input_nifti.c
+   nifti/nifti1_io.c
+   nifti/znzlib.c
 )
 
 SET(volume_io_HEADERS
@@ -376,6 +383,7 @@ SET(LIBMINC_INCLUDE_DIRS_CONFIG
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/libsrc2
   ${CMAKE_CURRENT_SOURCE_DIR}/volume_io/Include
+  ${CMAKE_CURRENT_SOURCE_DIR}/nifti
 )
 
 IF(LIBMINC_MINC1_SUPPORT)

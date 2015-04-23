@@ -679,6 +679,30 @@ VIOAPI  void  delete_volume(
 }
 
 /* ----------------------------- MNI Header -----------------------------------
+@NAME       : set_volume_n_dimensions
+@INPUT      : volume
+@OUTPUT     : 
+@RETURNS    : TRUE if successful
+@DESCRIPTION: Returns the number of dimensions of the volume
+@METHOD     : 
+@GLOBALS    : 
+@CALLS      : 
+@CREATED    : June, 1993           David MacDonald
+@MODIFIED   : 
+---------------------------------------------------------------------------- */
+
+VIOAPI  VIO_BOOL  set_volume_n_dimensions(
+    VIO_Volume volume,
+    int        n_dimensions)
+{
+  if ( volume != NULL )
+  {
+    return set_multidim_n_dimensions( &volume->array, n_dimensions );
+  }
+  return FALSE;
+}
+
+/* ----------------------------- MNI Header -----------------------------------
 @NAME       : get_volume_n_dimensions
 @INPUT      : volume
 @OUTPUT     : 
@@ -2503,7 +2527,7 @@ VIOAPI  VIO_Volume   copy_volume_definition_no_alloc(
     nc_type  nc_data_type,
     VIO_BOOL  signed_flag,
     VIO_Real     voxel_min,
-    VIO_Real     voxel_max )
+    VIO_Real     voxel_max)
 {
     int                c, sizes[VIO_MAX_DIMENSIONS];
     VIO_Real               separations[VIO_MAX_DIMENSIONS];

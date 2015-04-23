@@ -165,6 +165,39 @@ VIOAPI  void  get_type_range(
 }
 
 /* ----------------------------- MNI Header -----------------------------------
+@NAME       : set_multidim_n_dimensions
+@INPUT      : array
+              n_dimensions
+@OUTPUT     : 
+@RETURNS    : TRUE if successful.
+@DESCRIPTION: Sets the number of dimensions in the array. The array should
+              not already be allocated.
+@METHOD     : 
+@GLOBALS    : 
+@CALLS      : 
+@CREATED    : Sep. 1, 1995    David MacDonald
+@MODIFIED   : 
+---------------------------------------------------------------------------- */
+VIOAPI VIO_BOOL set_multidim_n_dimensions(
+    VIO_multidim_array *array,
+    int n_dimensions )
+{
+    if (array->data != NULL)
+    {
+        print_error("set_multidim_n_dimensions: memory already allocated.\n");
+        return FALSE;
+    }
+
+    if (n_dimensions < 1 || n_dimensions > VIO_MAX_DIMENSIONS)
+    {
+        return FALSE;
+    }
+
+    array->n_dimensions = n_dimensions;
+    return TRUE;
+}
+
+/* ----------------------------- MNI Header -----------------------------------
 @NAME       : set_multidim_sizes
 @INPUT      : array
               sizes
@@ -183,6 +216,11 @@ VIOAPI  void  set_multidim_sizes(
     int              sizes[] )
 {
     int    dim;
+
+    if (array->data != NULL)
+    {
+        print_error("set_multidim_sizes: memory already allocated.\n");
+    }
 
     for_less( dim, 0, array->n_dimensions )
         array->sizes[dim] = sizes[dim];

@@ -453,7 +453,7 @@ typedef  minc_file_struct  *Minc_file;
 
 /* --- recognized file formats */
 
-typedef  enum  { MNC_FORMAT, FREE_FORMAT, MNC2_FORMAT }       Volume_file_formats;
+typedef  enum  { MNC_FORMAT, FREE_FORMAT, MNC2_FORMAT, MGH_FORMAT, NII_FORMAT }       Volume_file_formats;
 
 typedef struct
 {
@@ -461,7 +461,7 @@ typedef struct
 
     Minc_file            minc_file;
 
-    /* for free format files only */
+    /* for non-minc format files only */
 
     FILE                 *volume_file;
     int                  slice_index;
@@ -474,7 +474,8 @@ typedef struct
     int                  *slice_byte_offsets;
     unsigned char        *byte_slice_buffer;
     unsigned short       *short_slice_buffer;
-
+    VIO_Real             min_value, max_value;
+    void                 *header_info;
 } volume_input_struct;
 
 /* --------------------- filter types -------------------------------- */

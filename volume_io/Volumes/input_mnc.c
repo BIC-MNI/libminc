@@ -160,6 +160,8 @@ VIOAPI  Minc_file  initialize_minc_input_from_minc_id(
     ncvarinq( file->cdfid, file->img_var, (char *) NULL, &file_datatype,
               &file->n_file_dimensions, dim_vars, (int *) NULL );
 
+    set_volume_n_dimensions( volume, file->n_file_dimensions );
+
     for_less( d, 0, file->n_file_dimensions )
     {
         (void) ncdiminq( file->cdfid, dim_vars[d], dim_name, &long_size );

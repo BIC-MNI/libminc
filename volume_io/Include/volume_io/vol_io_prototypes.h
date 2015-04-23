@@ -1458,6 +1458,10 @@ VIOAPI  void  get_type_range(
     VIO_Real         *min_value,
     VIO_Real         *max_value );
 
+VIOAPI VIO_BOOL set_multidim_n_dimensions(
+    VIO_multidim_array *array,
+    int                n_dimensions);
+
 VIOAPI  void  set_multidim_sizes(
     VIO_multidim_array   *array,
     int              sizes[] );
@@ -1952,6 +1956,9 @@ VIOAPI  void  delete_volume(
 
 VIOAPI  int  get_volume_n_dimensions(
     VIO_Volume volume );
+
+VIOAPI  VIO_BOOL  set_volume_n_dimensions(
+    VIO_Volume volume, int n_dimensions);
 
 VIOAPI  void  get_volume_sizes(
     VIO_Volume volume,

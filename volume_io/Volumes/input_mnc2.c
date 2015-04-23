@@ -130,6 +130,8 @@ VIOAPI  Minc_file  initialize_minc_input_from_minc2_id(
     miget_volume_dimension_count(file->minc2id, MI_DIMCLASS_ANY, MI_DIMATTR_ALL, 
                                  &file->n_file_dimensions);
 
+    set_volume_n_dimensions( volume, file->n_file_dimensions );
+
     miget_volume_dimensions(file->minc2id, MI_DIMCLASS_ANY, MI_DIMATTR_ALL, 
                             MI_DIMORDER_FILE, file->n_file_dimensions,
                             file_dims);
