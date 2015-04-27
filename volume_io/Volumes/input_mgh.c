@@ -10,6 +10,7 @@
 
 #include <arpa/inet.h> /* for ntohl and ntohs */
 #include "znzlib.h"
+#include "errno.h"
 
 #define NUM_BYTE_VALUES      (UCHAR_MAX + 1)
 
