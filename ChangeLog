@@ -1,5 +1,25 @@
+2015-04-23  Robert D. Vincent <robert.d.vincent@mcgill.ca>
+   * Support for loading FreeSurfer and NIfTI-1 format files in volume_io.
+	(volume_io/Volumes/{input_mgh.c, input_nifti.c, input_volume.c})
+   * Added set_volume_n_dimensions() function.
+	(volume_io/Volumes/volumes.c)
+	(volume_io/Volumes/Include/volume_io/vol_io_prototypes.h)
+   * Incorporated public NIfTI-1 library code in new "nifti" subdirectory.
+	(nifti/*)
+
+2015-04-20  Robert D. Vincent <robert.d.vincent@mcgill.ca>
+   * Allow the current_realtime_seconds() function to return fractional seconds.
+	(volume_io/Prog_utils/time.c)
+
+2015-04-20  Robert D. Vincent <robert.d.vincent@mcgill.ca>
+   * Fix some warnings through use of "const" where appropriate.
+	(libsrc/ParseArgv.c, libsrc/ParseArgv.h, libsrc/image_conversion.c)
+	(libsrc/minc.h)
+   * Added range checks to catch edge cases in ICV code.
+	(libsrc/image_conversion.c, libsrc/dim_conversion.c)
+
 2014-08-05  Vladimir S. FONOV <vladimir.fonov@gmail.com>
-   * Merged changes from Steven M. Robbins 
+   * Merged changes from Steven M. Robbins
 
 2014-04-12  Andrew L Janke <a.janke@gmail.com>
    * Updated README.release for CMake build instructions
