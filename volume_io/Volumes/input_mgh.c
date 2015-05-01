@@ -150,6 +150,7 @@ mgh_header_to_linear_transform(const struct mgh_header *hdr_ptr,
     mgh_xform[i][MGH_N_COMPONENTS - 1] = hdr_ptr->dircos[MGH_N_COMPONENTS - 1][i] - temp;
   }
 
+#if DEBUG
   printf("mgh_xform:\n");       /* DEBUG */
   for (i = 0; i < MGH_N_SPATIAL; i++) {
     for (j = 0; j < MGH_N_COMPONENTS; j++) {
@@ -157,6 +158,7 @@ mgh_header_to_linear_transform(const struct mgh_header *hdr_ptr,
     }
     printf("\n");
   }
+#endif // DEBUG
 
   /* Convert MGH transform to our format. The only difference is that
    * our transform is always written in XYZ (RAS) order, so we have to
@@ -165,7 +167,7 @@ mgh_header_to_linear_transform(const struct mgh_header *hdr_ptr,
   for (i = 0; i < MGH_N_SPATIAL; i++) {
     int volume_axis = in_ptr->axis_index_from_file[i];
     for (j = 0; j < MGH_N_COMPONENTS; j++) {
-      Transform_elem(mnc_xform, i, j) = mgh_xform[volume_axis][j];
+      Transform_elem(mnc_xform, volume_axis, j) = mgh_xform[i][j];
     }
   }
   create_linear_transform(linear_xform_ptr, &mnc_xform);
@@ -306,8 +308,6 @@ mgh_scan_for_voxel_range(volume_input_struct *in_ptr,
         max_value = value;
     }
   }
-
-  printf("global min %f max %f\n", min_value, max_value); /* DEBUG */
 
   *min_value_ptr = min_value;
   *max_value_ptr = max_value;
@@ -454,24 +454,27 @@ initialize_mgh_format_input(VIO_STR             filename,
                                         mnc_dircos);
   for_less( axis, 0, VIO_N_DIMENSIONS)
   {
-    int volume_axis = in_ptr->axis_index_from_file[axis];
+    int volume_axis = volume->spatial_axes[axis];
+    int file_axis = in_ptr->axis_index_from_file[volume_axis];
+    sizes[file_axis] = in_ptr->sizes_in_file[volume_axis];
+    set_volume_direction_cosine(volume, volume_axis, mnc_dircos[volume_axis]);
+  }
+#if DEBUG
+  for_less( axis, 0, VIO_N_DIMENSIONS)
+  {
+    int volume_axis = volume->spatial_axes[axis];
 
-    sizes[volume_axis] = in_ptr->sizes_in_file[axis];
-
-    /* DEBUG */
     printf("%d %d size:%4d step:%6.3f start:%9.4f dc:[%7.4f %7.4f %7.4f]\n", 
            axis,
-           volume_axis,
+           in_ptr->axis_index_from_file[volume_axis],
            sizes[volume_axis],
            mnc_steps[volume_axis],
            mnc_starts[volume_axis],
            mnc_dircos[volume_axis][0], 
            mnc_dircos[volume_axis][1], 
            mnc_dircos[volume_axis][2]);
-
-    set_volume_direction_cosine(volume, volume_axis, mnc_dircos[axis]);
   }
-
+#endif // DEBUG
   set_volume_separations( volume, mnc_steps );
   set_volume_starts( volume, mnc_starts );
 
