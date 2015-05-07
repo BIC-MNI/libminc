@@ -31,6 +31,25 @@
 #define MGH_TYPE_BITMAP 5 /**< Unsupported here. */
 #define MGH_TYPE_TENSOR 6 /**< Unsupported here. */
 
+/* MGH tag types, at least the ones that are minimally documented.
+ */
+#define TAG_OLD_COLORTABLE          1
+#define TAG_OLD_USEREALRAS          2
+#define TAG_CMDLINE                 3
+#define TAG_USEREALRAS              4
+#define TAG_COLORTABLE              5
+
+#define TAG_GCAMORPH_GEOM           10
+#define TAG_GCAMORPH_TYPE           11
+#define TAG_GCAMORPH_LABELS         12
+ 
+#define TAG_OLD_SURF_GEOM           20
+#define TAG_SURF_GEOM               21
+ 
+#define TAG_OLD_MGH_XFORM           30
+#define TAG_MGH_XFORM               31
+#define TAG_GROUP_AVG_SURFACE_AREA  32
+
 /**
  * Information in the MGH/MGZ file header.
  */
@@ -115,16 +134,25 @@ input_next_slice(
 
 /**
  * Converts a MGH file header into a general linear transform for the
- * Volume IO library.
+ * Volume IO library. There are two different ways of defining the
+ " "centre" of the volume in the MGH world. One uses the values in 
+ * c_r, c_a, and c_s (the last row of the dircos field) to offset
+ * the origin. The other, more common case ignores these fields and
+ * just uses the voxel size and spacing to determine a value for
+ * the centre.
+ * Note that the geometric structures produced by MGH tools use
+ * the latter case.
  *
  * \param hdr_ptr A pointer to the MGH header structure.
  * \param in_ptr A pointer to the input information for this volume.
+ * \param ignore_offsets TRUE if we should use grid centres.
  * \param linear_xform_ptr A pointer to the output transform
  * \returns void
  */
 static void
 mgh_header_to_linear_transform(const struct mgh_header *hdr_ptr,
                                const volume_input_struct *in_ptr,
+                               VIO_BOOL ignore_offsets,
                                struct VIO_General_transform *linear_xform_ptr)
 {
   int           i, j;
@@ -133,44 +161,84 @@ mgh_header_to_linear_transform(const struct mgh_header *hdr_ptr,
   
   make_identity_transform(&mnc_xform);
 
-  /*
-   * Use the MGH header to generate a linear transform.
+#if DEBUG
+  /* Print out the raw MGH transform information.
    */
-  for (i = 0; i < MGH_N_SPATIAL; i++) {
-    for (j = 0; j < MGH_N_SPATIAL; j++) {
-      mgh_xform[i][j] = hdr_ptr->dircos[i][j] * hdr_ptr->spacing[i];
+  for (i = 0; i < MGH_N_SPATIAL; i++)
+  {
+    for (j = 0; j < MGH_N_COMPONENTS; j++)
+    {
+      printf("%c_%c %8.4f ", "xyzc"[j], "ras"[i], hdr_ptr->dircos[j][i]);
+    }
+    printf("\n");
+  }
+#endif // DEBUG
+
+  /* Multiply the direction cosines by the spacings.
+   */
+  for (i = 0; i < MGH_N_SPATIAL; i++)
+  {
+    for (j = 0; j < MGH_N_SPATIAL; j++)
+    {
+      mgh_xform[i][j] = hdr_ptr->dircos[j][i] * hdr_ptr->spacing[i];
     }
   }
 
-  for (i = 0; i < MGH_N_SPATIAL; i++) {
+  /* Work out the final MGH transform. This requires that we figure out
+   * the origin values to fill in the final column of the transform.
+   */
+  for (i = 0; i < MGH_N_SPATIAL; i++)
+  {
     double temp = 0.0;
-    for (j = 0; j < MGH_N_SPATIAL; j++) {
-      temp += mgh_xform[i][j] * (hdr_ptr->sizes[j] / 2.0);
+    for (j = 0; j < MGH_N_SPATIAL; j++)
+    {
+      temp += hdr_ptr->dircos[j][i] * (hdr_ptr->sizes[j] / 2.0);
     }
-    mgh_xform[i][MGH_N_COMPONENTS - 1] = hdr_ptr->dircos[MGH_N_COMPONENTS - 1][i] - temp;
+
+    /* Set the origin for the voxel-to-world transform .
+     */
+    if (ignore_offsets)
+    {
+      mgh_xform[i][MGH_N_COMPONENTS - 1] = -temp;
+    }
+    else
+    {
+      mgh_xform[i][MGH_N_COMPONENTS - 1] = hdr_ptr->dircos[MGH_N_COMPONENTS - 1][i] - temp;
+    }
   }
 
 #if DEBUG
   printf("mgh_xform:\n");       /* DEBUG */
-  for (i = 0; i < MGH_N_SPATIAL; i++) {
-    for (j = 0; j < MGH_N_COMPONENTS; j++) {
+  for (i = 0; i < MGH_N_SPATIAL; i++)
+  {
+    for (j = 0; j < MGH_N_COMPONENTS; j++)
+    {
       printf("%.4f ", mgh_xform[i][j]);
     }
     printf("\n");
   }
 #endif // DEBUG
 
-  /* Convert MGH transform to our format. The only difference is that
-   * our transform is always written in XYZ (RAS) order, so we have to
-   * swap the axes as needed.
+  /* Convert MGH transform to the MINC format. The only difference is
+   * that our transform is always written in XYZ (RAS) order, so we
+   * have to swap the _columns_ as needed.
    */
-  for (i = 0; i < MGH_N_SPATIAL; i++) {
-    int volume_axis = in_ptr->axis_index_from_file[i];
-    for (j = 0; j < MGH_N_COMPONENTS; j++) {
-      Transform_elem(mnc_xform, volume_axis, j) = mgh_xform[i][j];
+  for (i = 0; i < MGH_N_SPATIAL; i++)
+  {
+    for (j = 0; j < MGH_N_COMPONENTS; j++)
+    {
+      int volume_axis = j;
+      if (j < VIO_N_DIMENSIONS)
+      {
+        volume_axis = in_ptr->axis_index_from_file[j];
+      }
+      Transform_elem(mnc_xform, i, volume_axis) = mgh_xform[i][j];
     }
   }
   create_linear_transform(linear_xform_ptr, &mnc_xform);
+#if DEBUG
+  output_transform(stdout, "debug", NULL, NULL, linear_xform_ptr);
+#endif // DEBUG
 }
 
 /**
@@ -247,7 +315,8 @@ mgh_header_from_file(znzFile fp, struct mgh_header *hdr_ptr)
 
       /* Assume coronal orientation.
        */
-      for (j = 0; j < MGH_N_COMPONENTS; j++) {
+      for (j = 0; j < MGH_N_COMPONENTS; j++)
+      {
         hdr_ptr->dircos[j][i] = 0.0;
       }
       hdr_ptr->dircos[0][0] = -1.0;
@@ -339,7 +408,9 @@ initialize_mgh_format_input(VIO_STR             filename,
   znzFile           fp;
   int               axis;
   struct mgh_header hdr;
-  VIO_General_transform mnc_linear_xform;
+  VIO_General_transform mnc_native_xform;
+  VIO_General_transform mnc_talair_xform;
+
   VIO_Real          mnc_dircos[VIO_N_DIMENSIONS][VIO_N_DIMENSIONS];
   VIO_Real          mnc_steps[VIO_MAX_DIMENSIONS];
   VIO_Real          mnc_starts[VIO_MAX_DIMENSIONS];
@@ -408,6 +479,8 @@ initialize_mgh_format_input(VIO_STR             filename,
     volume->spatial_axes[VIO_Z] = 2;
   }
 
+  /* Calculate the number of non-trivial dimensions in the file.
+   */
   n_dimensions = 0;
   for_less( axis, 0, MGH_MAX_DIMS )
   {
@@ -423,29 +496,35 @@ initialize_mgh_format_input(VIO_STR             filename,
     printf("Problem setting number of dimensions to %d\n", n_dimensions);
   }
 
-  /* Figure out which of the logical axes corresponds to the typical
-   * world spatial dimensions.
+  /* Set up the correspondence between the file axes and the MINC 
+   * spatial axes. Each row contains the 'x', 'y', and 'z' components
+   * along the right/left, anterior/posterior, or superior/inferior
+   * axes (RAS). The "xspace" axis will be the one that has the largest
+   * component in the RL direction, "yspace" refers to AP, and "zspace" 
+   * to SI. This tells us both how to convert the transform and how the
+   * file data is arranged.
    */
-  for_less( axis, 0, VIO_N_DIMENSIONS )
+  for_less( axis, 0, MGH_N_SPATIAL )
   {
-    int major_axis = VIO_X;
+    int spatial_axis = VIO_X;
+    float c_x = fabs(hdr.dircos[axis][VIO_X]);
+    float c_y = fabs(hdr.dircos[axis][VIO_Y]);
+    float c_z = fabs(hdr.dircos[axis][VIO_Z]);
 
-    if (fabs(hdr.dircos[axis][1]) > fabs(hdr.dircos[axis][0]) &&
-        fabs(hdr.dircos[axis][1]) > fabs(hdr.dircos[axis][2]))
+    if (c_y > c_x && c_y > c_z)
     {
-      major_axis = VIO_Y;
+      spatial_axis = VIO_Y;
     }
-    if (fabs(hdr.dircos[axis][2]) > fabs(hdr.dircos[axis][0]) &&
-        fabs(hdr.dircos[axis][2]) > fabs(hdr.dircos[axis][1]))
+    if (c_z > c_x && c_z > c_y)
     {
-      major_axis = VIO_Z;
+      spatial_axis = VIO_Z;
     }
-    in_ptr->axis_index_from_file[axis] = major_axis;
+    in_ptr->axis_index_from_file[axis] = spatial_axis;
   }
 
-  mgh_header_to_linear_transform(&hdr, in_ptr, &mnc_linear_xform);
+  mgh_header_to_linear_transform(&hdr, in_ptr, TRUE, &mnc_native_xform);
 
-  convert_transform_to_starts_and_steps(&mnc_linear_xform,
+  convert_transform_to_starts_and_steps(&mnc_native_xform,
                                         VIO_N_DIMENSIONS,
                                         NULL,
                                         volume->spatial_axes,
@@ -512,7 +591,6 @@ initialize_mgh_format_input(VIO_STR             filename,
     mgh_scan_for_voxel_range(in_ptr, n_voxels_in_slice, &min_value, &max_value);
     set_volume_voxel_range(volume, min_value, max_value);
   }
-
   return VIO_OK;
 }
 
