@@ -1547,7 +1547,7 @@ VIOAPI  VIO_Status  input_string(
     VIO_STR  *str,
     char    termination_char )
 {
-    char    ch;
+    char    ch = 0;
     VIO_Status  status;
 
     status = input_nonwhite_character( file, &ch );
