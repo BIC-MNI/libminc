@@ -27,6 +27,48 @@
 
 #define   FREE_ENDING   "fre"
 
+void
+print_volume(FILE *fp, VIO_Volume volume)
+{
+  int n_dimensions = volume->array.n_dimensions;
+  int i;
+
+  if (volume == NULL) {
+    fprintf(fp, "Volume is NULL.\n");
+    return;
+  }
+
+  fprintf(fp, "VIO_Volume at %lx has %d dimensions.\n", 
+          (unsigned long)volume, n_dimensions);
+  fprintf(fp, "  nc_data_type: %d, signed_flag: %d\n", 
+          volume->nc_data_type, volume->signed_flag);
+  fprintf(fp,"  is_cached_volume: %d, is_rgba_data: %d\n", 
+          volume->is_cached_volume,
+          volume->is_rgba_data);
+  fprintf(fp, "  voxel_min: %g, voxel_max: %g\n", 
+          volume->voxel_min, volume->voxel_max);
+  fprintf(fp, "  real_range_set: %d\n", volume->real_range_set);
+  fprintf(fp, "  real_value_scale: %g, real_value_translation: %g\n", 
+          volume->real_value_scale,
+          volume->real_value_translation);
+  fprintf(fp, "  voxel_to_world_transform_uptodate: %d\n", 
+          volume->voxel_to_world_transform_uptodate);
+  fprintf(fp, "  coordinate_system_name: %s\n", volume->coordinate_system_name);
+  for (i = 0; i < n_dimensions; i++) {
+    fprintf(fp, "  %d. %s %d size %d step %g start %g cosines:[%g %g %g]\n",
+            i, 
+            volume->dimension_names[i], 
+            volume->spatial_axes[i], 
+            volume->array.sizes[i],
+            volume->separations[i], 
+            volume->starts[i],
+            volume->direction_cosines[i][VIO_X],
+            volume->direction_cosines[i][VIO_Y],
+            volume->direction_cosines[i][VIO_Z]);
+  }
+  fprintf(fp, "VIO_Volume end.\n");
+}
+
 /* ----------------------------- MNI Header -----------------------------------
 @NAME       : start_volume_input
 @INPUT      : filename               - file to input
