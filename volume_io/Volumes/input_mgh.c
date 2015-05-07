@@ -531,6 +531,9 @@ initialize_mgh_format_input(VIO_STR             filename,
                                         mnc_starts,
                                         mnc_steps,
                                         mnc_dircos);
+
+  delete_general_transform(&mnc_native_xform);
+
   for_less( axis, 0, VIO_N_DIMENSIONS)
   {
     int volume_axis = volume->spatial_axes[axis];
