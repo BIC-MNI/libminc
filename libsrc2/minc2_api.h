@@ -872,8 +872,8 @@ int miget_props_zlib_compression(mivolumeprops_t props, int *zlib_level);
 
 /** Set blocking structure properties for the volume
  * \param props A volume property list handle
- * \param edge_count 
- * \param edge_lengths
+ * \param edge_count The number of edges (dimensions) in a block
+ * \param edge_lengths The lengths of the edges
  * \ingroup mi2VPrp
  */
 int miset_props_blocking(mivolumeprops_t props, int edge_count, const int *edge_lengths);
