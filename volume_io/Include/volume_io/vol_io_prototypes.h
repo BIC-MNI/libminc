@@ -2,6 +2,7 @@
 #define  __VOL_IO_PROTOTYPES_H__ 1
 
 #include "basic.h"
+#include "minc2_structs.h"
 
 /*transforms*/
 
