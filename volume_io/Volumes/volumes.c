@@ -2485,6 +2485,12 @@ VIOAPI  void  set_volume_real_range(
                                        (voxel_max - voxel_min);
             volume->real_value_translation = real_min -
                                        voxel_min * volume->real_value_scale;
+            /* We never really want a scale value of zero.
+             */
+            if (real_max == real_min)
+            {
+                volume->real_value_scale = 1.0;
+            }
         }
         else
         {
