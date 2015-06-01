@@ -1,3 +1,9 @@
+2015-05-28  Robert D. Vincent <robert.d.vincent@mcgill.ca>
+   * libsrc/ParseArgv.c: Added ParseLong() function to handle numeric
+	command-line parameters. This eliminates the questionable support
+	for octal values. We now support only decimal (with optional
+	leading zeros) and hex (with a leading "0x").
+
 2015-04-23  Robert D. Vincent <robert.d.vincent@mcgill.ca>
    * Support for loading FreeSurfer and NIfTI-1 format files in volume_io.
 	(volume_io/Volumes/{input_mgh.c, input_nifti.c, input_volume.c})
