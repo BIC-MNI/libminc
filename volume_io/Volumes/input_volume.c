@@ -380,8 +380,10 @@ VIOAPI  VIO_Status  input_volume(
           status = VIO_ERROR;
         }
     }
-    get_volume_voxel_range( *volume, &volume_min, &volume_max );
-
+    if (status == VIO_OK)
+    {
+      get_volume_voxel_range( *volume, &volume_min, &volume_max );
+    }
     return( status );
 }
 
