@@ -401,10 +401,12 @@ extern "C" {
 #define MIinjection_route       "injection_route"
 
 /* Constants for image conversion variable (icv) properties */
-/* Maximum number of icv's allowed */
-/* changed to 32 as netcdf 4.x no longer defines MAX_NC_OPEN */
-/* #define MI_MAX_NUM_ICV MAX_NC_OPEN */
-#define MI_MAX_NUM_ICV 32
+
+/* This value is not really enforced in the code (see miicv_create() in
+ * image_conversion.c), but this value is used in voxel_loop.c to set the
+ * maximum number of allowable open files.
+ */
+#define MI_MAX_NUM_ICV 1000 /**< Maximum number of icv's allowed */
 
 /* Default max and min for normalization */
 #define MI_DEFAULT_MAX 1.0
