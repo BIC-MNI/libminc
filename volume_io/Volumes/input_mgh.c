@@ -6,7 +6,7 @@
 #include "config.h"
 #endif /*HAVE_CONFIG_H*/
 
-#include  <internal_volume_io.h>
+#include "input_mgh.h"
 
 #include <arpa/inet.h> /* for ntohl and ntohs */
 #include "znzlib.h"
@@ -106,8 +106,8 @@ input_next_slice(
                  volume_input_struct *in_ptr
                  )
 {
-  int n_voxels_in_slice;
-  int n_bytes_per_voxel;
+  size_t n_voxels_in_slice;
+  size_t n_bytes_per_voxel;
   znzFile fp = (znzFile) in_ptr->volume_file;
 
   if (in_ptr->slice_index >= in_ptr->sizes_in_file[2])
@@ -339,7 +339,7 @@ mgh_scan_for_voxel_range(volume_input_struct *in_ptr,
   int slice;
   float value;
   int i;
-  char *data_ptr;
+  unsigned char *data_ptr;
   long int data_offset = znztell((znzFile) fp);
   
   for (slice = 0; slice < in_ptr->sizes_in_file[2]; slice++)
@@ -369,6 +369,14 @@ mgh_scan_for_voxel_range(volume_input_struct *in_ptr,
         value = swapFloat(*(float *)data_ptr);
         data_ptr += sizeof(float);
         break;
+
+      case VIO_NO_DATA_TYPE:
+      case VIO_SIGNED_BYTE:
+      case VIO_UNSIGNED_SHORT:
+      case VIO_UNSIGNED_INT:
+      case VIO_DOUBLE:
+      case VIO_MAX_DATA_TYPE:
+        break;
       }
   
       if (value < min_value )
@@ -385,15 +393,6 @@ mgh_scan_for_voxel_range(volume_input_struct *in_ptr,
   return TRUE;
 }
 
-/**
- * Initializes loading a MGH format file by reading the header.
- * This function assumes that volume->filename has been assigned.
- *
- * \param filename
- * \param volume
- * \param in_ptr
- * \return VIO_OK if successful.
- */
 VIOAPI  VIO_Status
 initialize_mgh_format_input(VIO_STR             filename,
                             VIO_Volume          volume,
@@ -401,7 +400,6 @@ initialize_mgh_format_input(VIO_STR             filename,
 {
   VIO_Status        status;
   int               sizes[VIO_MAX_DIMENSIONS];
-  int               i, j;
   int               n_voxels_in_slice;
   int               n_bytes_per_voxel;
   nc_type           desired_nc_type;
@@ -409,7 +407,6 @@ initialize_mgh_format_input(VIO_STR             filename,
   int               axis;
   struct mgh_header hdr;
   VIO_General_transform mnc_native_xform;
-  VIO_General_transform mnc_talair_xform;
 
   VIO_Real          mnc_dircos[VIO_N_DIMENSIONS][VIO_N_DIMENSIONS];
   VIO_Real          mnc_steps[VIO_MAX_DIMENSIONS];
@@ -597,11 +594,6 @@ initialize_mgh_format_input(VIO_STR             filename,
   return VIO_OK;
 }
 
-/**
- * Dispose of the resources used to read an MGH file.
- * \param in_ptr
- * \return Nothing.
- */
 VIOAPI void
 delete_mgh_format_input(
                         volume_input_struct   *in_ptr
@@ -614,13 +606,6 @@ delete_mgh_format_input(
   znzclose( fp );
 }
 
-/**
- * Read the next slice of an MGH (MGZ) format file.
- * \param volume
- * \param in_ptr
- * \param fraction_done
- * \return TRUE if successful.
- */
 VIOAPI  VIO_BOOL
 input_more_mgh_format_file(
                            VIO_Volume          volume,
@@ -628,13 +613,13 @@ input_more_mgh_format_file(
                            VIO_Real            *fraction_done
                            )
 {
-  int        i;
-  VIO_Real   value;
-  VIO_Status status;
-  VIO_Real   value_translation, value_scale;
-  VIO_Real   original_min_voxel, original_max_voxel;
-  int        *inner_index, indices[VIO_MAX_DIMENSIONS];
-  char       *data_ptr;
+  int            i;
+  VIO_Real       value;
+  VIO_Status     status;
+  VIO_Real       value_translation, value_scale;
+  VIO_Real       original_min_voxel, original_max_voxel;
+  int            *inner_index, indices[VIO_MAX_DIMENSIONS];
+  unsigned char  *data_ptr;
 
   if ( in_ptr->slice_index < in_ptr->sizes_in_file[2] )
   {

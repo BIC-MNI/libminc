@@ -6,7 +6,7 @@
 #include "config.h"
 #endif /*HAVE_CONFIG_H*/
 
-#include  <internal_volume_io.h>
+#include "input_nifti.h"
 
 #include "nifti1.h"
 #include "nifti1_io.h"
@@ -30,7 +30,7 @@ nifti_find_data_range(nifti_image *nii_ptr,
   double inter;
   long int initial_offset = znztell(zfp);
   char data[CHUNK_SIZE];
-  int n_voxels_per_chunk;
+  size_t n_voxels_per_chunk;
 
   *min_value_ptr = FLT_MAX;
   *max_value_ptr = -FLT_MAX;
@@ -51,7 +51,7 @@ nifti_find_data_range(nifti_image *nii_ptr,
   for (i = 0; i < nii_ptr->nvox; i += n_voxels_per_chunk)
   {
     double tmp;
-    int n_bytes_to_read;
+    size_t n_bytes_to_read;
     if (i + n_voxels_per_chunk > nii_ptr->nvox)
     {
       n_bytes_to_read = (nii_ptr->nvox - i) * nii_ptr->nbyper;
@@ -268,17 +268,9 @@ nifti_skip_header(znzFile zfp, nifti_image *nii_ptr)
     ioff = nii_ptr->iname_offset;
   }
   znzseek(zfp, ioff, SEEK_SET);
+  return VIO_OK;
 }
 
-/**
- * Initializes loading a NIfTI format file by reading the header.
- * This function assumes that volume->filename has been assigned.
- *
- * \param filename
- * \param volume
- * \param in_ptr
- * \return VIO_OK if successful.
- */
 VIOAPI  VIO_Status
 initialize_nifti_format_input(VIO_STR             filename,
                               VIO_Volume          volume,
@@ -312,7 +304,7 @@ initialize_nifti_format_input(VIO_STR             filename,
     nifti_skip_header(zfp, nii_ptr);
   }
 
-  /* Translate from MGH to VIO types.
+  /* Translate from NIfTI to VIO types.
    */
   switch (nii_ptr->datatype)
   {
@@ -469,11 +461,6 @@ initialize_nifti_format_input(VIO_STR             filename,
   return VIO_OK;
 }
 
-/**
- * Dispose of the resources used to read an MGH file.
- * \param in_ptr
- * \return Nothing.
- */
 VIOAPI void
 delete_nifti_format_input(
                           volume_input_struct   *in_ptr
@@ -486,13 +473,6 @@ delete_nifti_format_input(
   FREE(in_ptr->byte_slice_buffer);
 }
 
-/**
- * Read the next slice of an NIfTI-1 format file.
- * \param volume
- * \param in_ptr
- * \param fraction_done
- * \return TRUE if successful.
- */
 VIOAPI  VIO_BOOL
 input_more_nifti_format_file(
                              VIO_Volume          volume,
@@ -500,15 +480,15 @@ input_more_nifti_format_file(
                              VIO_Real            *fraction_done
                              )
 {
-  nifti_image *nii_ptr = (nifti_image *) in_ptr->header_info;
-  znzFile     zfp = (znzFile) in_ptr->volume_file;
-  char        *data_ptr = in_ptr->byte_slice_buffer;
-  double      value;
-  double      value_offset, value_scale;
-  int         *inner_index;
-  int         indices[VIO_MAX_DIMENSIONS];
-  VIO_Real    original_min_value, original_max_value;
-  int         i;
+  nifti_image    *nii_ptr = (nifti_image *) in_ptr->header_info;
+  znzFile        zfp = (znzFile) in_ptr->volume_file;
+  unsigned char  *data_ptr = in_ptr->byte_slice_buffer;
+  double         value;
+  double         value_offset, value_scale;
+  int            *inner_index;
+  int            indices[VIO_MAX_DIMENSIONS];
+  VIO_Real       original_min_value, original_max_value;
+  int            i;
 
   if ( in_ptr->slice_index < in_ptr->sizes_in_file[2] )
   {
@@ -640,6 +620,11 @@ input_more_nifti_format_file(
           {
             print_error("clipping int32 value\n");
           }
+          break;
+        case VIO_NO_DATA_TYPE:
+        case VIO_FLOAT:
+        case VIO_DOUBLE:
+        case VIO_MAX_DATA_TYPE:
           break;
         }
         if (value > in_ptr->max_value)
