@@ -338,9 +338,7 @@ image dimensions */
 
 /* Constants for image conversion variable (icv) properties */
 /* Maximum number of icv's allowed */
-/* changed to 32 as netcdf 4.x no longer defines MAX_NC_OPEN */
-/* #define MI_MAX_NUM_ICV MAX_NC_OPEN */
-#define MI2_MAX_NUM_ICV 32
+#define MI2_MAX_NUM_ICV 1000    /**< Currently, this is never used. */
 
 /* Default max and min for normalization */
 #define MI2_DEFAULT_MAX 1.0

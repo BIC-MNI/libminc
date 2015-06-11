@@ -32,6 +32,12 @@ nifti_find_data_range(nifti_image *nii_ptr,
   char data[CHUNK_SIZE];
   size_t n_voxels_per_chunk;
 
+  if (initial_offset < 0)       /* Did znztell() give an error? */
+  {
+    print_error("nifti_find_data_range: Tell failed.\n");
+    return;
+  }
+
   *min_value_ptr = FLT_MAX;
   *max_value_ptr = -FLT_MAX;
 
@@ -50,7 +56,7 @@ nifti_find_data_range(nifti_image *nii_ptr,
 
   for (i = 0; i < nii_ptr->nvox; i += n_voxels_per_chunk)
   {
-    double tmp;
+    double tmp = 0.0;
     size_t n_bytes_to_read;
     if (i + n_voxels_per_chunk > nii_ptr->nvox)
     {
@@ -61,7 +67,12 @@ nifti_find_data_range(nifti_image *nii_ptr,
       n_bytes_to_read = CHUNK_SIZE;
     }
 
-    nifti_read_buffer(zfp, data, n_bytes_to_read, nii_ptr);
+    if (nifti_read_buffer(zfp, data, n_bytes_to_read, nii_ptr) != 
+        n_bytes_to_read)
+    {
+      print_error("nifti_find_data_range: Read error.\n");
+      return;
+    }
 
     for (j = 0; j < n_voxels_per_chunk; j++)
     {
@@ -297,6 +308,7 @@ initialize_nifti_format_input(VIO_STR             filename,
   zfp = nifti_image_open(filename, "rb", &nii_ptr);
   if (znz_isnull(zfp))
   {
+    nifti_image_free(nii_ptr);
     return VIO_ERROR;
   }
   else
@@ -392,6 +404,8 @@ initialize_nifti_format_input(VIO_STR             filename,
   if (!set_volume_n_dimensions(volume, n_dimensions))
   {
     print_error("Problem setting number of dimensions.\n");
+    nifti_image_free(nii_ptr);
+    znzclose(zfp);
     return VIO_ERROR;
   }
 
@@ -483,7 +497,7 @@ input_more_nifti_format_file(
   nifti_image    *nii_ptr = (nifti_image *) in_ptr->header_info;
   znzFile        zfp = (znzFile) in_ptr->volume_file;
   unsigned char  *data_ptr = in_ptr->byte_slice_buffer;
-  double         value;
+  double         value = 0;
   double         value_offset, value_scale;
   int            *inner_index;
   int            indices[VIO_MAX_DIMENSIONS];

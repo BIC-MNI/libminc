@@ -337,10 +337,13 @@ mgh_scan_for_voxel_range(volume_input_struct *in_ptr,
   float min_value = FLT_MAX;
   float max_value = -FLT_MAX;
   int slice;
-  float value;
+  float value = 0;
   int i;
   unsigned char *data_ptr;
   long int data_offset = znztell((znzFile) fp);
+
+  if (data_offset < 0)
+    return FALSE;
   
   for (slice = 0; slice < in_ptr->sizes_in_file[2]; slice++)
   {
@@ -614,7 +617,7 @@ input_more_mgh_format_file(
                            )
 {
   int            i;
-  VIO_Real       value;
+  VIO_Real       value = 0;
   VIO_Status     status;
   VIO_Real       value_translation, value_scale;
   VIO_Real       original_min_voxel, original_max_voxel;

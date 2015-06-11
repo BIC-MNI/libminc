@@ -1928,7 +1928,7 @@ miget_cfg_int(const char *name)
             return (0);
         }
     }
-    return (atoi(buffer));
+    return (ParseLong(buffer, NULL));
 }
 
 char *

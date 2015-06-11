@@ -92,6 +92,8 @@ extern "C" {
 int MNCAPI ParseArgv _ANSI_ARGS_((int *argcPtr, char **argv,
                                   ArgvInfo *argTable, int flags));
 
+long int MNCAPI ParseLong _ANSI_ARGS_((const char *argPtr, char **endPtr));
+
 #if defined(__cplusplus)
 }
 #endif
