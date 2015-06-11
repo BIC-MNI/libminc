@@ -193,9 +193,9 @@ void restructure_array(int ndims,    /* Dimension count */
 #ifdef DEBUG
         if (offset_next >= total) {
           printf("Fatal - offset %ld out of bounds!\n", offset_next);
-          printf("lengths %ld,%ld,%ld\n",
+          printf("lengths %lld,%lld,%lld\n",
                  lengths[0],lengths[1],lengths[2]);
-          printf("index %ld,%ld,%ld\n",
+          printf("index %lld,%lld,%lld\n",
                  index_perm[0], index_perm[0], index_perm[2]);
           //TODO: report MEMORY error somehow
           exit(-1);

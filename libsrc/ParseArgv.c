@@ -135,12 +135,12 @@ ParseArgv(argcPtr, argv, argTable, flags)
     int flags;			/* Or'ed combination of various flag bits,
 				 * such as ARGV_NO_DEFAULTS. */
 {
-   register ArgvInfo *infoPtr;
+   ArgvInfo *infoPtr;
 				/* Pointer to the current entry in the
 				 * table of argument descriptions. */
    ArgvInfo *matchPtr;	/* Descriptor that matches current argument. */
    char *curArg;		/* Current argument */
-   register char c;		/* Second character of current arg (used for
+   char c;		/* Second character of current arg (used for
 				 * quick check for matching;  use 2nd char.
 				 * because first char. will almost always
 				 * be '-'). */
@@ -399,7 +399,7 @@ PrintUsage(argTable, flags)
 				 * in this word, then don't generate
 				 * information for default options. */
 {
-   register ArgvInfo *infoPtr;
+   ArgvInfo *infoPtr;
    int width, i, j, numSpaces;
 #define NUM_SPACES 20
    static char spaces[] = "                    ";

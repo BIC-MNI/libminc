@@ -18,6 +18,8 @@
 
 
 #include  <internal_volume_io.h>
+#include "input_mgh.h"
+#include "input_nifti.h"
 
 #ifdef HAVE_MINC1
 #include  <minc.h>
