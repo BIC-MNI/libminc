@@ -72,7 +72,7 @@ VIOAPI  VIO_STR  get_default_transform_file_suffix( void )
 
 static  void  output_one_transform(
     FILE                *file,
-    VIO_STR              filename,
+    const char          *filename,
     int                 *volume_count,
     VIO_BOOL             invert,
     VIO_General_transform   *transform )
@@ -269,9 +269,9 @@ static  void  output_one_transform(
 
 VIOAPI  VIO_Status  output_transform(
     FILE                *file,
-    VIO_STR              filename,
+    const char          *filename,
     int                 *volume_count_ptr,
-    VIO_STR              comments,
+    const char          *comments,
     VIO_General_transform   *transform )
 {
     int    volume_count;
@@ -320,7 +320,7 @@ VIOAPI  VIO_Status  output_transform(
 
 static VIO_Status input_one_transform(
     FILE                *file,
-    VIO_STR              filename,
+    const char          *filename,
     VIO_General_transform   *transform )
 {
     VIO_Status        status;
@@ -622,7 +622,7 @@ static VIO_Status input_one_transform(
 
 VIOAPI  VIO_Status  input_transform(
     FILE                *file,
-    VIO_STR              filename,
+    const char          *filename,
     VIO_General_transform   *transform )
 {
     VIO_Status              status;
@@ -701,8 +701,8 @@ VIOAPI  VIO_Status  input_transform(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  VIO_Status  output_transform_file(
-    VIO_STR              filename,
-    VIO_STR              comments,
+    const char           *filename,
+    const char           *comments,
     VIO_General_transform   *transform )
 {
     VIO_Status  status;
@@ -739,7 +739,7 @@ VIOAPI  VIO_Status  output_transform_file(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  VIO_Status  input_transform_file(
-    VIO_STR              filename,
+    const char              *filename,
     VIO_General_transform   *transform )
 {
     VIO_Status  status;

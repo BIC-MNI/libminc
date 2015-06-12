@@ -30,7 +30,7 @@ VIOAPI  VIO_STR  alloc_string(
 }
 
 VIOAPI  VIO_STR  create_string(
-    VIO_STR    initial )
+    const char   *initial )
 {
     VIO_STR   str;
 
@@ -107,7 +107,7 @@ VIOAPI  void  concat_to_string(
 }
 
 VIOAPI  int  string_length(
-    VIO_STR   string )
+    const char   *string )
 {
     if( string == NULL )
         return( 0 );
