@@ -410,8 +410,8 @@ VIOAPI VIO_Status  mni_input_int(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  void  output_comments(
-    FILE     *file,
-    VIO_STR   comments )
+    FILE       *file,
+    const char *comments )
 {
     int   i, len;
 

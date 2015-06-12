@@ -601,7 +601,7 @@ static  VIO_STR  get_user_home_directory(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  VIO_STR  expand_filename(
-    VIO_STR  filename )
+    const char  *filename )
 {
     int      i, new_i, dest, len, env_index;
     VIO_BOOL  tilde_found, prev_was_backslash;
@@ -1079,7 +1079,7 @@ VIOAPI  VIO_Status  open_file(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  VIO_Status  open_file_with_default_suffix(
-    VIO_STR             filename,
+    const char          *filename,
     VIO_STR             default_suffix,
     VIO_IO_types           io_type,
     VIO_File_formats       file_format,
@@ -1228,7 +1228,7 @@ VIOAPI  VIO_Status  close_file(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  VIO_STR  extract_directory(
-    VIO_STR    filename )
+    const char    *filename )
 {
     int     i, slash_index;
     VIO_STR  expanded, directory;
