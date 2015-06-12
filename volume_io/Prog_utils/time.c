@@ -20,7 +20,9 @@
 
 #include  <sys/types.h>
 
-#if HAVE_SYS_TIME_H
+#if HAVE_CLOCK_GETTIME
+# include <time.h>
+#elif HAVE_GETTIMEOFDAY && HAVE_SYS_TIME_H
 # include <sys/time.h>
 #else
 # include <time.h>
