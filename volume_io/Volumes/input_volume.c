@@ -29,6 +29,9 @@
 
 #define   FREE_ENDING   "fre"
 
+#ifdef INPUT_VOLUME_UNUSED
+/* This function is only intended for debugging purposes.
+ */
 void
 print_volume(FILE *fp, VIO_Volume volume)
 {
@@ -70,6 +73,7 @@ print_volume(FILE *fp, VIO_Volume volume)
   }
   fprintf(fp, "VIO_Volume end.\n");
 }
+#endif /* INPUT_VOLUME_UNUSED */
 
 /* ----------------------------- MNI Header -----------------------------------
 @NAME       : start_volume_input

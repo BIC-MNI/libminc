@@ -45,7 +45,7 @@ static  VIO_BOOL  match_dimension_names(
 @CALLS      : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Minc_file  initialize_minc_input_from_minc2_id(
+static  Minc_file  initialize_minc_input_from_minc2_id(
     mihandle_t           minc_id,
     VIO_Volume           volume,
     minc_input_options   *options )
@@ -623,7 +623,7 @@ VIOAPI  VIO_Status  close_minc2_input(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  VIO_Status   input_minc2_hyperslab(
+static  VIO_Status   input_minc2_hyperslab(
     Minc_file        file,
     VIO_Data_types   data_type,
     int              n_array_dims,
@@ -950,6 +950,7 @@ VIOAPI  VIO_BOOL  input_more_minc2_file(
     return( !file->end_volume_flag );
 }
 
+#ifdef INPUT_MNC2_UNUSED
 /* ----------------------------- MNI Header -----------------------------------
 @NAME       : advance_input_volume2
 @INPUT      : file
@@ -1035,7 +1036,7 @@ VIOAPI  VIO_BOOL  advance_input_volume2(
 }
 
 /* ----------------------------- MNI Header -----------------------------------
-@NAME       : reset_input_volume
+@NAME       : reset_input_volume2
 @INPUT      : file
 @OUTPUT     : 
 @RETURNS    : 
@@ -1058,6 +1059,7 @@ VIOAPI  void  reset_input_volume2(
     file->end_volume_flag = FALSE;
 
 }
+#endif /* INPUT_MNC2_UNUSED */
 
 /* ----------------------------- MNI Header -----------------------------------
 @NAME       : match_dimension_names

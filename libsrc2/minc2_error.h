@@ -110,6 +110,7 @@ void MI2_log_pkg_error2(int p1, char *p2);
 void MI2_log_pkg_error3(int p1, char *p2, char *p3);
 void MI2_log_sys_error1(char *p1);
 void mi2log_init(const char *name);
+int mi2log_set_verbosity ( int lvl );
 
 #define MI_LOG_ERROR(code,...) mi2log_message(__FILE__,__LINE__,code , ##__VA_ARGS__ )
 #define MI_CHECK_HDF_CALL(var,call) {if((var)<0) MI_LOG_ERROR(MI2_MSG_HDF5,call);}

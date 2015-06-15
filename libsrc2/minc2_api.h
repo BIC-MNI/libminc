@@ -1229,6 +1229,41 @@ int miconvert_world_to_voxel(mihandle_t volume,
                                     const double world[],
                                     double voxel[]);
 
+/**
+ * This function calculates the start values for the volume dimensions,
+ * assuming that the spatial origin is relocated to the given world
+ * coordinate.
+ *
+ * \ingroup mi2Cvt
+ */
+int
+miconvert_world_origin_to_start( mihandle_t volume,
+                                 double world[],
+                                 double starts[]);
+
+/**
+ * This function calculates the start values for the volume dimensions,
+ * assuming that the spatial origin is relocated to the given world
+ * coordinate.
+ *
+ * \ingroup mi2Cvt
+ */
+int
+miconvert_spatial_frequency_origin_to_start( mihandle_t volume,
+                                             double world[],
+                                             double starts[]);
+
+/**
+ * This function sets the world coordinates of the point (0,0,0) in voxel
+ * coordinates.  This changes the constant offset of the two coordinate
+ * systems.
+ *
+ * \ingroup mi2Cvt
+ */
+int
+miset_spatial_frequency_origin(mihandle_t volume,
+                               double world[]);
+
 /** This function retrieves the real values of a position in the
  *  MINC volume.  The "real" value is the value at the given location 
  *  after scaling has been applied.
