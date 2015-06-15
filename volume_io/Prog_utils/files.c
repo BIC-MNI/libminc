@@ -1484,8 +1484,6 @@ VIOAPI  VIO_Status   skip_input_until(
     VIO_Status   status;
     char     ch;
 
-    status = VIO_OK;
-
     do
     {
         status = input_character( file, &ch );
@@ -2426,9 +2424,7 @@ VIOAPI  VIO_Status  io_quoted_string(
     VIO_STR          *str )
 {
     int      length;
-    VIO_Status   status;
-
-    status = VIO_OK;
+    VIO_Status   status = VIO_OK;
 
     if( format == ASCII_FORMAT )
     {
@@ -2484,9 +2480,7 @@ VIOAPI  VIO_Status  io_boolean(
     VIO_File_formats    format,
     VIO_BOOL         *b )
 {
-    VIO_Status   status;
-
-    status = VIO_OK;
+    VIO_Status   status = VIO_OK;
 
     if( format == ASCII_FORMAT )
     {
@@ -2523,9 +2517,7 @@ VIOAPI  VIO_Status  io_short(
     VIO_File_formats    format,
     short           *short_int )
 {
-    VIO_Status   status;
-
-    status = VIO_OK;
+    VIO_Status   status = VIO_OK;
 
     if( format == ASCII_FORMAT )
     {
@@ -2563,9 +2555,7 @@ VIOAPI  VIO_Status  io_unsigned_short(
     VIO_File_formats    format,
     unsigned short  *unsigned_short )
 {
-    VIO_Status   status;
-
-    status = VIO_OK;
+    VIO_Status   status = VIO_OK;
 
     if( format == ASCII_FORMAT )
     {
@@ -2659,9 +2649,7 @@ VIOAPI  VIO_Status  io_int(
     VIO_File_formats    format,
     int             *i )
 {
-    VIO_Status   status;
-
-    status = VIO_OK;
+    VIO_Status   status = VIO_OK;
 
     if( format == ASCII_FORMAT )
     {
@@ -2698,9 +2686,7 @@ VIOAPI  VIO_Status  io_real(
     VIO_File_formats    format,
     VIO_Real            *r )
 {
-    VIO_Status   status;
-
-    status = VIO_OK;
+    VIO_Status   status = VIO_OK;
 
     if( format == ASCII_FORMAT )
     {
@@ -2737,9 +2723,7 @@ VIOAPI  VIO_Status  io_float(
     VIO_File_formats    format,
     float           *f )
 {
-    VIO_Status   status;
-
-    status = VIO_OK;
+    VIO_Status   status = VIO_OK;
 
     if( format == ASCII_FORMAT )
     {
@@ -2776,9 +2760,7 @@ VIOAPI  VIO_Status  io_double(
     VIO_File_formats    format,
     double          *d )
 {
-    VIO_Status   status;
-
-    status = VIO_OK;
+    VIO_Status   status = VIO_OK;
 
     if( format == ASCII_FORMAT )
     {

@@ -287,7 +287,6 @@ initialize_nifti_format_input(VIO_STR             filename,
                               VIO_Volume          volume,
                               volume_input_struct *in_ptr)
 {
-  VIO_Status        status;
   int               sizes[VIO_MAX_DIMENSIONS];
   long              n_voxels_in_slice;
   nc_type           desired_nc_type;
@@ -301,9 +300,7 @@ initialize_nifti_format_input(VIO_STR             filename,
   nc_type           file_nc_type;
   VIO_BOOL          signed_flag;
 
-  status = VIO_OK;
-
-  /* Read in the NIfTI file header and get a znzFile handle to the data. 
+  /* Read in the NIfTI file header and get a znzFile handle to the data.
    */
   zfp = nifti_image_open(filename, "rb", &nii_ptr);
   if (znz_isnull(zfp))

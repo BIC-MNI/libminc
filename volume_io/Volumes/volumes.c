@@ -568,13 +568,13 @@ VIOAPI  VIO_BOOL  is_an_rgb_volume(
 VIOAPI  void  alloc_volume_data(
     VIO_Volume   volume )
 {
+#ifdef HAVE_MINC1
     unsigned long   data_size;
 
     data_size = (unsigned long) get_volume_total_n_voxels( volume ) *
                 (unsigned long) get_type_size( get_volume_data_type( volume ) );
 
-#ifdef HAVE_MINC1                
-    if( get_n_bytes_cache_threshold() >= 0 &&
+	if( get_n_bytes_cache_threshold() >= 0 &&
         data_size > (unsigned long) get_n_bytes_cache_threshold() )
     {
         volume->is_cached_volume = TRUE;
@@ -582,12 +582,12 @@ VIOAPI  void  alloc_volume_data(
     }
     else
     {
-#endif /*HAVE_MINC1*/      
+#endif /*HAVE_MINC1*/
         volume->is_cached_volume = FALSE;
         alloc_multidim_array( &volume->array );
-#ifdef HAVE_MINC1                
+#ifdef HAVE_MINC1
     }
-#endif /*HAVE_MINC1*/      
+#endif /*HAVE_MINC1*/
 }
 
 /* ----------------------------- MNI Header -----------------------------------

@@ -400,7 +400,6 @@ initialize_mgh_format_input(VIO_STR             filename,
                             VIO_Volume          volume,
                             volume_input_struct *in_ptr)
 {
-  VIO_Status        status;
   int               sizes[VIO_MAX_DIMENSIONS];
   long              n_voxels_in_slice;
   int               n_bytes_per_voxel;
@@ -416,8 +415,6 @@ initialize_mgh_format_input(VIO_STR             filename,
   int               n_dimensions;
   nc_type           file_nc_type;
   VIO_BOOL          signed_flag;
-
-  status = VIO_OK;
 
   if ((fp = znzopen(filename, "rb", 1)) == NULL)
   {

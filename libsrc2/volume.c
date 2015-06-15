@@ -646,7 +646,6 @@ int micreate_volume(const char *filename, int number_of_dimensions,
   */
 
   for (i=0; i < number_of_dimensions ; i++) {
-    dimension_is_vector = 0;
     /* First create the dataspace required to create a
       dimension variable (dataset)
     */
