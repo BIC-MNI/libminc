@@ -89,7 +89,8 @@
 char *time_stamp(int argc, char *argv[])
 {
    char *str, *the_time;
-   int length, i, last;
+   size_t length, last;
+   int i;
    static char separator[]={">>>"};
    time_t timer;
 

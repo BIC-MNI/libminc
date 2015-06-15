@@ -121,7 +121,7 @@ milist_recursion ( milisthandle_t handle, char *path )
 
       if ( r == H5G_GROUP ) {
         char tmp[256];
-        int l;
+        size_t l;
 
         H5Gget_objname_by_idx ( data->frame_ptr->grp_id,
                                 data->frame_ptr->grp_idx - 1,
@@ -246,7 +246,7 @@ static herr_t milist_grp_op ( hid_t loc_id, const char *name, void *op_data )
   H5Gget_objinfo ( loc_id, name, FALSE, &statbuf );
 
   if ( statbuf.type == H5G_GROUP ) {
-    int l;
+    size_t l;
     l = strlen ( data->frame_ptr->relpath );
 
     if ( l > 0 && data->frame_ptr->relpath[l - 1] != '/' ) {
@@ -904,7 +904,7 @@ int miset_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
   hid_t tmp_id;
   char *std_name;
   char *pch;
-  int i, slength;
+  size_t i, slength;
   int status = MI_ERROR;      /* Guilty until proven innocent */
 
   /* Get a handle to the actual HDF file

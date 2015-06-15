@@ -2699,8 +2699,8 @@ is_volume_dimension_irregular(VIO_Volume volume, int idim)
     return (volume->irregular_starts[idim] != NULL);
 }
 
-int
-get_volume_irregular_starts(VIO_Volume volume, int idim, int count, VIO_Real *starts)
+long
+get_volume_irregular_starts(VIO_Volume volume, int idim, long count, VIO_Real *starts)
 {
     int i;
 
@@ -2723,8 +2723,8 @@ get_volume_irregular_starts(VIO_Volume volume, int idim, int count, VIO_Real *st
     return (count);
 }
 
-int
-get_volume_irregular_widths(VIO_Volume volume, int idim, int count, VIO_Real *widths)
+long
+get_volume_irregular_widths(VIO_Volume volume, int idim, long count, VIO_Real *widths)
 {
     int i;
 
@@ -2747,8 +2747,8 @@ get_volume_irregular_widths(VIO_Volume volume, int idim, int count, VIO_Real *wi
     return (count);
 }
 
-int
-set_volume_irregular_starts(VIO_Volume volume, int idim, int count, VIO_Real *starts)
+long
+set_volume_irregular_starts(VIO_Volume volume, int idim, long count, VIO_Real *starts)
 {
     int i;
 
@@ -2780,8 +2780,8 @@ set_volume_irregular_starts(VIO_Volume volume, int idim, int count, VIO_Real *st
     return (count);
 }
 
-int
-set_volume_irregular_widths(VIO_Volume volume, int idim, int count, VIO_Real *widths)
+long
+set_volume_irregular_widths(VIO_Volume volume, int idim, long count, VIO_Real *widths)
 {
     int i;
 
@@ -2845,11 +2845,11 @@ nonspatial_voxel_to_world(VIO_Volume volume, int idim, int voxel)
     return (world);
 }
 
-VIOAPI int
+VIOAPI long
 nonspatial_world_to_voxel(VIO_Volume volume, int idim, VIO_Real world)
 {
-    int voxel;
-    int i;
+    long voxel;
+    long i;
 
     if (is_volume_dimension_irregular(volume, idim)) {
         voxel = volume->array.sizes[idim];

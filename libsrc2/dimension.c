@@ -382,8 +382,7 @@ int miget_volume_dimensions ( mihandle_t volume, midimclass_t class, midimattr_t
                           midimhandle_t dimensions[] )
 {
 
-  hsize_t number_of_dims;
-  int i = 0, max_dims;
+  hsize_t number_of_dims, i = 0, max_dims;
   int num_ret_dims = 0;
 
   if ( volume == NULL ) {

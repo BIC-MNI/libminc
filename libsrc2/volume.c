@@ -450,7 +450,7 @@ int micreate_volume(const char *filename, int number_of_dimensions,
   hid_t dataset_width = -1;
   hid_t dataspace_id = -1;
   char *name;
-  int size;
+  size_t size;
   hsize_t hdf_size[MI2_MAX_VAR_DIMS];
   mihandle_t handle;
   mivolumeprops_t props_handle;

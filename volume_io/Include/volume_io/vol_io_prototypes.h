@@ -969,7 +969,7 @@ VIOAPI  void  terminate_progress_report(
     VIO_progress_struct   *progress );
 
 VIOAPI  VIO_STR  alloc_string(
-    int   length );
+    size_t   length );
 
 VIOAPI  VIO_STR  create_string(
     const char   *initial );
@@ -2044,13 +2044,13 @@ VIOAPI  void  get_volume_direction_cosine(
  * but they are not truly public. That is why they are not declared VIOAPI.
  */
 VIO_BOOL is_volume_dimension_irregular(VIO_Volume, int);
-int get_volume_irregular_starts(VIO_Volume, int, int, VIO_Real *);
-int get_volume_irregular_widths(VIO_Volume, int, int, VIO_Real *);
-int set_volume_irregular_starts(VIO_Volume, int, int, VIO_Real *);
-int set_volume_irregular_widths(VIO_Volume, int, int, VIO_Real *);
+long get_volume_irregular_starts(VIO_Volume, int, long, VIO_Real *);
+long get_volume_irregular_widths(VIO_Volume, int, long, VIO_Real *);
+long set_volume_irregular_starts(VIO_Volume, int, long, VIO_Real *);
+long set_volume_irregular_widths(VIO_Volume, int, long, VIO_Real *);
 
 VIOAPI  VIO_Real nonspatial_voxel_to_world(VIO_Volume, int, int);
-VIOAPI  int nonspatial_world_to_voxel(VIO_Volume, int, VIO_Real);
+VIOAPI  long nonspatial_world_to_voxel(VIO_Volume, int, VIO_Real);
 
 VIOAPI  void  set_volume_translation(
     VIO_Volume  volume,

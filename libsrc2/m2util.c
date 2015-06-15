@@ -492,7 +492,7 @@ int miget_attribute ( mihandle_t volume, const char *path, const char *name,
   */
   if ( data_type == MI_TYPE_STRING ) {
     hid_t atype;            /* Attribute type */
-    int alength;
+    size_t alength;
 
     atype = H5Aget_type ( hdf_attr );
     alength = H5Tget_size ( atype );
@@ -738,12 +738,12 @@ static herr_t mi2_int_to_dbl ( hid_t src_id,
 {
   unsigned char *dst_ptr;
   unsigned char *src_ptr;
-  int src_nb;
-  int dst_nb;
+  size_t src_nb;
+  size_t dst_nb;
   H5T_sign_t src_sg;
   double t;
-  int dst_cnt;
-  int src_cnt;
+  size_t dst_cnt;
+  size_t src_cnt;
   int src_swap;
   int dst_swap;
 
@@ -941,12 +941,12 @@ static herr_t mi2_dbl_to_int ( hid_t src_id,
 {
   unsigned char *dst_ptr;
   unsigned char *src_ptr;
-  int src_nb;
-  int dst_nb;
+  size_t src_nb;
+  size_t dst_nb;
   H5T_sign_t dst_sg;
   double t;
-  int dst_cnt;
-  int src_cnt;
+  size_t dst_cnt;
+  size_t src_cnt;
   int src_swap;
   int dst_swap;
 
@@ -1459,7 +1459,7 @@ static void midownsample_slice ( double *in_ptr, double *out_ptr, hsize_t isize[
       for ( x = 0; x < scale; x++ ) {
         for ( y = 0; y < scale; y++ ) {
           for ( z = 0; z < scale; z++ ) {
-            int x1, y1, z1;
+            size_t x1, y1, z1;
             double t;
             x1 = x;
             y1 = y + ( j * scale );
@@ -1641,8 +1641,8 @@ minc_update_thumbnail ( mihandle_t volume, hid_t loc_id, int igrp, int ogrp )
   double *in_ptr;
   double *out_ptr;
   hsize_t slice;
-  int in_bytes;
-  int out_bytes;
+  size_t in_bytes;
+  size_t out_bytes;
   double smax, smin;          /* Slice minimum and maximum */
   hid_t omax_id=-1;              /* Output image-max dataset */
   hid_t omin_id=-1;              /* Output image-min dataset */

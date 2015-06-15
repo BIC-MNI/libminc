@@ -328,7 +328,7 @@ mgh_header_from_file(znzFile fp, struct mgh_header *hdr_ptr)
 
 static VIO_BOOL
 mgh_scan_for_voxel_range(volume_input_struct *in_ptr, 
-                         int n_voxels_in_slice,
+                         long n_voxels_in_slice,
                          float *min_value_ptr,
                          float *max_value_ptr)
 {
@@ -402,7 +402,7 @@ initialize_mgh_format_input(VIO_STR             filename,
 {
   VIO_Status        status;
   int               sizes[VIO_MAX_DIMENSIONS];
-  int               n_voxels_in_slice;
+  long              n_voxels_in_slice;
   int               n_bytes_per_voxel;
   nc_type           desired_nc_type;
   znzFile           fp;
