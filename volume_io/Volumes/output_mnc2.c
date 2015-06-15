@@ -809,7 +809,7 @@ VIOAPI  VIO_Status  set_minc2_output_random_order(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  VIO_Status  output_minc2_hyperslab(
+static  VIO_Status  output_minc2_hyperslab(
     Minc_file           file,
     VIO_Data_types      data_type,
     int                 n_array_dims,
@@ -1099,7 +1099,6 @@ static  VIO_Status  output_the_volume2(
     long              count[MAX_VAR_DIMS];
     VIO_Real          real_min, real_max;
     VIO_STR           *vol_dimension_names;
-    int               unit_size;
     VIO_BOOL          increment;
     VIO_progress_struct   progress;
 
@@ -1176,7 +1175,6 @@ static  VIO_Status  output_the_volume2(
     file->n_slab_dims = 0;
     slab_size = 1;
     n_steps = 1;
-    unit_size = get_type_size( get_volume_data_type(volume) );
 
     for( d = file->n_file_dimensions-1; d >= 0; d-- ) {
       count[d] = 1;
@@ -1277,7 +1275,7 @@ static  VIO_Status  output_the_volume2(
 @CREATED    : 1993            David MacDonald
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
-
+#ifdef OUTPUT_MNC2_UNUSED
 VIOAPI  VIO_Status  output_volume_to_minc2_file_position(
     Minc_file   file,
     VIO_Volume  volume,
@@ -1288,6 +1286,7 @@ VIOAPI  VIO_Status  output_volume_to_minc2_file_position(
 
     return( output_the_volume2( file, volume, volume_count, file_start ) );
 }
+#endif /* OUTPUT_MNC2_UNUSED */
 
 /* ----------------------------- MNI Header -----------------------------------
 @NAME       : output_minc2_volume
