@@ -24,7 +24,6 @@ initialize_mgh_format_input(VIO_STR             filename,
 /**
  * Dispose of the resources used to read an MGH file.
  * \param in_ptr
- * \return Nothing.
  */
 VIOAPI void
 delete_mgh_format_input(

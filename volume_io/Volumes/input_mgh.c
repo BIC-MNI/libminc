@@ -147,7 +147,6 @@ input_next_slice(
  * \param in_ptr A pointer to the input information for this volume.
  * \param ignore_offsets TRUE if we should use grid centres.
  * \param linear_xform_ptr A pointer to the output transform
- * \returns void
  */
 static void
 mgh_header_to_linear_transform(const struct mgh_header *hdr_ptr,
@@ -507,9 +506,9 @@ initialize_mgh_format_input(VIO_STR             filename,
   for_less( axis, 0, MGH_N_SPATIAL )
   {
     int spatial_axis = VIO_X;
-    float c_x = fabs(hdr.dircos[axis][VIO_X]);
-    float c_y = fabs(hdr.dircos[axis][VIO_Y]);
-    float c_z = fabs(hdr.dircos[axis][VIO_Z]);
+    float c_x = fabsf(hdr.dircos[axis][VIO_X]);
+    float c_y = fabsf(hdr.dircos[axis][VIO_Y]);
+    float c_z = fabsf(hdr.dircos[axis][VIO_Z]);
 
     if (c_y > c_x && c_y > c_z)
     {

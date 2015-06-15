@@ -24,7 +24,6 @@ initialize_nifti_format_input(VIO_STR             filename,
 /**
  * Dispose of the resources used to read a NIfTI-1 file.
  * \param in_ptr
- * \return Nothing.
  */
 VIOAPI void
 delete_nifti_format_input(

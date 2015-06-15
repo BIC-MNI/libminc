@@ -69,7 +69,7 @@ static int create_3D_image ( int attribute_size )
 
   buf = ( unsigned short * ) malloc ( CX * CY * CZ * sizeof ( unsigned short ) );
   for ( i = 0; i < CY * CX * CZ; i++ ) {
-    buf[i] = ( unsigned short ) i * 0.001;
+    buf[i] = ( unsigned short ) (i * 0.001);
   }
 
   start[0] = start[1] = start[2] = 0;

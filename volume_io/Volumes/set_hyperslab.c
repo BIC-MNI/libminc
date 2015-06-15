@@ -833,7 +833,7 @@ static  void  set_voxel_values_3d(
             {
                 for_less( i2, 0, n2 )
                 {
-                    *signed_int_ptr = (signed long) floor( *values + 0.5 );
+                    *signed_int_ptr = (signed int) floor( *values + 0.5 );
                     ++values;
                     signed_int_ptr += step2;
                 }
