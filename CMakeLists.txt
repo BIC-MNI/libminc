@@ -178,11 +178,13 @@ SET(minc_common_SRCS
    libsrc/time_stamp.c
    libsrc/read_file_names.c
    libsrc/ParseArgv.c
+   libsrc/restructure.c
 )
 
 SET(minc_common_HEADERS
   libsrc/time_stamp.h
   libsrc/ParseArgv.h 
+  libsrc/restructure.h
   volume_io/Include/volume_io.h
   nifti/nifti1.h
   nifti/nifti1_io.h
@@ -202,7 +204,6 @@ SET(minc1_LIB_SRCS
    libsrc/minc_compat.c
    libsrc/minc_simple.c
    libsrc/minc_format_convert.c
-   libsrc/restructure.c
    )
 
 SET(minc1_HEADERS
@@ -211,7 +212,6 @@ SET(minc1_HEADERS
   libsrc/nd_loop.h
   libsrc/minc_compat.h
   libsrc/minc_simple.h
-  libsrc/restructure.h
   libsrc/minc_format_convert.h
 )
 
