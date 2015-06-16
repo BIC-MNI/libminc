@@ -143,7 +143,7 @@ static void restructure_array(hsize_t ndims,    /* Dimension count */
 
       offset_next = -1;   /* Initialize. */
 
-#ifdef DEBUG
+#ifdef _DEBUG
       printf("%ld", offset_start);
 #endif /* DEBUG */
 
@@ -213,7 +213,7 @@ static void restructure_array(hsize_t ndims,    /* Dimension count */
 
           BIT_SET(bitmap, offset_next);
 
-#ifdef DEBUG
+#ifdef _DEBUG
           printf(" - %ld", offset_next);
 #endif /* DEBUG */
 
@@ -240,7 +240,7 @@ static void restructure_array(hsize_t ndims,    /* Dimension count */
 
       memcpy(array + (offset * el_size), temp, el_size);
 
-#ifdef DEBUG
+#ifdef _DEBUG
       printf("\n");
 #endif /* DEBUG */
     }
@@ -1009,7 +1009,7 @@ cleanup:
       {\
         double _temp=(( (*_buffer_in) - voxel_offset) / voxel_range)*(image_slice_max_buffer[_i]-image_slice_min_buffer[_i]) + image_slice_min_buffer[_i] ;\
         _temp=(_temp-data_offset)/data_range;\
-        _temp=_temp<0.0?norm_min:_temp>=1.0?norm_max:(rint(_temp*norm_range)+norm_offset); \
+        _temp=(_temp<0.0)?norm_min:(_temp>=1.0)?norm_max:(rint(_temp*norm_range)+norm_offset); \
         *_buffer_out=(type_out)(_temp);\
         _buffer_in++;\
         _buffer_out++;\
@@ -1024,14 +1024,18 @@ cleanup:
     double voxel_offset=voxel_min;\
     double norm_offset=norm_min;\
     double norm_range=(double)norm_max-(double)norm_min;\
+    double data_offset=data_min;\
+    double data_range=(double)data_max-(double)data_min;\
     type_in *_buffer_in=(type_in *)buffer_in;\
+    double *_buffer_out=buffer_out;\
     for(_i=0;_i<total_number_of_slices;_i++)\
       for(_j=0;_j<image_slice_length;_j++)\
       {\
         double _temp=((double)(*_buffer_in)-norm_offset)/norm_range;\
+        _temp=(_temp*data_range)+data_offset;\
         _temp=(((_temp - image_slice_min_buffer[_i])/(image_slice_max_buffer[_i]-image_slice_min_buffer[_i]))*voxel_range + voxel_offset);\
-        *buffer_out=_temp;\
-        buffer_out++;\
+        *_buffer_out=round(_temp);\
+        _buffer_out++;\
         _buffer_in++;\
       }\
   }
@@ -1323,7 +1327,7 @@ static int mirw_hyperslab_normalized(int opcode,
       result=MI_ERROR; /*TODO: error code?*/
       goto cleanup;
     }
-    memcpy(temp_buffer2,buffer,buffer_size);
+    memcpy(temp_buffer2,buffer,input_buffer_size);
     
     if (n_different != 0 ) 
       restructure_array(ndims, temp_buffer2, icount, H5Tget_size(buffer_type_id), imap, idir);
