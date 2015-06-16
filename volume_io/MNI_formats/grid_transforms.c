@@ -290,7 +290,7 @@ VIOAPI  VIO_Status  grid_inverse_transform_point_with_input_steps(
 
     tries = 0;
 
-    error = smallest_e = VIO_FABS(error_x) + VIO_FABS(error_y) + VIO_FABS(error_z);
+    smallest_e = VIO_FABS(error_x) + VIO_FABS(error_y) + VIO_FABS(error_z);
     best_x = tx;
     best_y = ty;
     best_z = tz;

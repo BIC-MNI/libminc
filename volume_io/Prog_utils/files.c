@@ -1361,6 +1361,7 @@ VIOAPI  VIO_Status  input_character(
 
     if( c == EOF )
     {
+        *ch = 0;
         status = VIO_ERROR;
     }
     else

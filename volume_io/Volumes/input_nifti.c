@@ -503,7 +503,7 @@ input_more_nifti_format_file(
 
   if ( in_ptr->slice_index < in_ptr->sizes_in_file[2] )
   {
-    long       n_bytes_per_slice;
+    size_t     n_bytes_per_slice;
     size_t     n_bytes_read;
 
     n_bytes_per_slice = (in_ptr->sizes_in_file[0] *

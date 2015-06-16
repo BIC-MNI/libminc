@@ -153,7 +153,11 @@ static  VIO_BOOL  find_pointer_position(
 
     x = alloc_list->header;
 
-    for( i = alloc_list->level-1;  i >= 0;  --i )
+	i = alloc_list->level-1;
+	if( i < 0 )
+		return FALSE;
+	
+    for( ;  i >= 0;  --i )
     {
         while( x->forward[i] != NULL && (void *) x->forward[i]->ptr < ptr )
         {
