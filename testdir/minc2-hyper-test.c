@@ -30,7 +30,7 @@ static int error_cnt = 0;
 #define NORM_MAX (1.0)
 #define NORM_MIN (-1.0)
 
-int
+static int
 test1()
 {
     mihandle_t hvol;
@@ -439,7 +439,7 @@ test1()
     return (error_cnt);
 }
 
-int
+static int
 test2()
 {
     mihandle_t hvol;
@@ -480,7 +480,7 @@ test2()
     for (i = 0; i < CX; i++) {
         for (j = 0; j < CY; j++) {
             for (k = 0; k < CZ; k++) {
-                stmp2[i][j][k] = (i*XP)+(j*YP)+(k*ZP);
+                stmp2[i][j][k] = (unsigned short)((i*XP)+(j*YP)+(k*ZP));
             }
         }
     }
@@ -623,7 +623,7 @@ test2()
         for (i = 0; i < CZ; i++) {
             for (j = 0; j < CX; j++) {
                 for (k = 0; k < CY; k++) {
-                    short t = (j*XP)+(k*YP)+(((CZ-1)-i)*ZP);
+                    short t = (short)((j*XP)+(k*YP)+(((CZ-1)-i)*ZP));
                     if (stemp[i][j][k] != t) {
                         printf("%d != %d: @ %d,%d,%d", stemp[i][j][k], t,i,j,k);
                         TESTRPT("Value error", 0);
@@ -670,7 +670,7 @@ test2()
                                 y = s + k;
                                 z = q + i;
 
-                                t = (x*XP)+(y*YP)+(((CZ-1)-z)*ZP);
+                                t = (short)((x*XP)+(y*YP)+(((CZ-1)-z)*ZP));
 
                                 if (stmp3[q][r][s] != t) {
                                     printf("%d != %d: ", stmp3[q][r][s], t);
