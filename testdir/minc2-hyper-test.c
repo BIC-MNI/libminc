@@ -70,7 +70,7 @@ main(void)
     for (i = 0; i < CX; i++) {
         for (j = 0; j < CY; j++) {
             for (k = 0; k < CZ; k++) {
-                stmp2[i][j][k] = (i*XP)+(j*YP)+(k*ZP);
+                stmp2[i][j][k] = (unsigned short)((i*XP)+(j*YP)+(k*ZP));
             }
         }
     }
@@ -216,7 +216,7 @@ main(void)
         for (i = 0; i < CZ; i++) {
             for (j = 0; j < CX; j++) {
                 for (k = 0; k < CY; k++) {
-                    short t = (j*XP)+(k*YP)+(((CZ-1)-i)*ZP);
+                    short t = (unsigned short)((j*XP)+(k*YP)+(((CZ-1)-i)*ZP));
                     if (stemp[i][j][k] != t) {
                         printf("%d != %d: @ %d,%d,%d", stemp[i][j][k], t,i,j,k);
                         TESTRPT("Value error", 0);
@@ -263,7 +263,7 @@ main(void)
                                 y = s + k;
                                 z = q + i;
 
-                                t = (x*XP)+(y*YP)+(((CZ-1)-z)*ZP);
+                                t = (unsigned short)((x*XP)+(y*YP)+(((CZ-1)-z)*ZP));
 
                                 if (stmp3[q][r][s] != t) {
                                     printf("%d != %d: ", stmp3[q][r][s], t);
