@@ -20,7 +20,7 @@
 static const  VIO_STR  empty_string = "";
 
 VIOAPI  VIO_STR  alloc_string(
-    int   length )
+    size_t   length )
 {
     VIO_STR   str;
 

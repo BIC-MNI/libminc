@@ -287,9 +287,8 @@ initialize_nifti_format_input(VIO_STR             filename,
                               VIO_Volume          volume,
                               volume_input_struct *in_ptr)
 {
-  VIO_Status        status;
   int               sizes[VIO_MAX_DIMENSIONS];
-  int               n_voxels_in_slice;
+  long              n_voxels_in_slice;
   nc_type           desired_nc_type;
   int               axis;
   nifti_image       *nii_ptr;
@@ -301,9 +300,7 @@ initialize_nifti_format_input(VIO_STR             filename,
   nc_type           file_nc_type;
   VIO_BOOL          signed_flag;
 
-  status = VIO_OK;
-
-  /* Read in the NIfTI file header and get a znzFile handle to the data. 
+  /* Read in the NIfTI file header and get a znzFile handle to the data.
    */
   zfp = nifti_image_open(filename, "rb", &nii_ptr);
   if (znz_isnull(zfp))
@@ -420,7 +417,7 @@ initialize_nifti_format_input(VIO_STR             filename,
     if (axis < 3)
     {
       /* DEBUG */
-      printf("%d %d size:%4d step:%6.3f start:%9.4f dc:[%7.4f %7.4f %7.4f]\n", 
+      printf("%d %d size:%4d step:%6.3f start:%9.4f dc:[%7.4f %7.4f %7.4f]\n",
              axis,
              volume_axis,
              sizes[volume_axis],
@@ -506,8 +503,8 @@ input_more_nifti_format_file(
 
   if ( in_ptr->slice_index < in_ptr->sizes_in_file[2] )
   {
-    int        n_bytes_per_slice;
-    int        n_bytes_read;
+    long       n_bytes_per_slice;
+    size_t     n_bytes_read;
 
     n_bytes_per_slice = (in_ptr->sizes_in_file[0] *
                          in_ptr->sizes_in_file[1] *

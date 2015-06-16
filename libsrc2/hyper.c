@@ -39,12 +39,12 @@ typedef unsigned long mioffset_t;
  * Map a set of array coordinates to a linear offset in the array memory.
  */
 static mioffset_t
-index_to_offset(int ndims,
+index_to_offset(hsize_t ndims,
                 const misize_t sizes[],
                 const misize_t index[])
 {
   mioffset_t offset = index[0];
-  int i;
+  hsize_t i;
 
   for (i = 1; i < ndims; i++) {
     offset *= sizes[i];
@@ -57,12 +57,12 @@ index_to_offset(int ndims,
  * Map a linear offset to a set of coordinates in a multidimensional array.
  */
 static void
-offset_to_index(int ndims,
+offset_to_index(hsize_t ndims,
                 const misize_t sizes[],
                 mioffset_t offset,
                 misize_t index[])
 {
-  int i;
+  hsize_t i;
 
   for (i = ndims - 1; i > 0; i--) {
     index[i] = offset % sizes[i];
@@ -78,10 +78,10 @@ offset_to_index(int ndims,
 
 /** The main restructuring code.
  */
-void restructure_array(int ndims,    /* Dimension count */
+static void restructure_array(hsize_t ndims,    /* Dimension count */
                               unsigned char *array, /* Raw data */
                               const misize_t *lengths_perm, /* Permuted lengths */
-                              int el_size,  /* Element size, in bytes */
+                              size_t el_size,  /* Element size, in bytes */
                               const int *map, /* Mapping array */
                               const int *dir) /* Direction array, in permuted order */
 {
@@ -94,7 +94,7 @@ void restructure_array(int ndims,    /* Dimension count */
   mioffset_t offset;
   unsigned char *bitmap;
   size_t total;
-  int i;
+  hsize_t i;
 
   if ((temp = malloc(el_size)) == NULL) {
     MI_LOG_ERROR(MI2_MSG_OUTOFMEM,el_size);
@@ -258,7 +258,7 @@ void miget_hyperslab_size_hdf(hid_t hdf_type_id, int n_dimensions,
                                 const hsize_t count[], 
                                 misize_t *size_ptr)
 {
-  int voxel_size;
+  size_t voxel_size;
   misize_t temp;
   int i;
   voxel_size = H5Tget_size(hdf_type_id);

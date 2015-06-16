@@ -147,7 +147,6 @@ input_next_slice(
  * \param in_ptr A pointer to the input information for this volume.
  * \param ignore_offsets TRUE if we should use grid centres.
  * \param linear_xform_ptr A pointer to the output transform
- * \returns void
  */
 static void
 mgh_header_to_linear_transform(const struct mgh_header *hdr_ptr,
@@ -329,7 +328,7 @@ mgh_header_from_file(znzFile fp, struct mgh_header *hdr_ptr)
 
 static VIO_BOOL
 mgh_scan_for_voxel_range(volume_input_struct *in_ptr, 
-                         int n_voxels_in_slice,
+                         long n_voxels_in_slice,
                          float *min_value_ptr,
                          float *max_value_ptr)
 {
@@ -401,9 +400,8 @@ initialize_mgh_format_input(VIO_STR             filename,
                             VIO_Volume          volume,
                             volume_input_struct *in_ptr)
 {
-  VIO_Status        status;
   int               sizes[VIO_MAX_DIMENSIONS];
-  int               n_voxels_in_slice;
+  long              n_voxels_in_slice;
   int               n_bytes_per_voxel;
   nc_type           desired_nc_type;
   znzFile           fp;
@@ -417,8 +415,6 @@ initialize_mgh_format_input(VIO_STR             filename,
   int               n_dimensions;
   nc_type           file_nc_type;
   VIO_BOOL          signed_flag;
-
-  status = VIO_OK;
 
   if ((fp = znzopen(filename, "rb", 1)) == NULL)
   {
@@ -507,9 +503,9 @@ initialize_mgh_format_input(VIO_STR             filename,
   for_less( axis, 0, MGH_N_SPATIAL )
   {
     int spatial_axis = VIO_X;
-    float c_x = fabs(hdr.dircos[axis][VIO_X]);
-    float c_y = fabs(hdr.dircos[axis][VIO_Y]);
-    float c_z = fabs(hdr.dircos[axis][VIO_Z]);
+    float c_x = fabsf(hdr.dircos[axis][VIO_X]);
+    float c_y = fabsf(hdr.dircos[axis][VIO_Y]);
+    float c_z = fabsf(hdr.dircos[axis][VIO_Z]);
 
     if (c_y > c_x && c_y > c_z)
     {

@@ -60,7 +60,7 @@ static int create_2D_image ( void )
   if(r<0) return r;
 
   for ( i = 0; i < CX * CY; i++ ) {
-    buf[i] = ( short ) i * 0.1;
+    buf[i] = ( short ) (i * 0.1);
   }
   start[0] = start[1] = 0;
   count[0] = CX; count[1] = CY;
@@ -120,7 +120,7 @@ static int create_3D_image ( void )
   
 
   for ( i = 0; i < CY * CX * CZ; i++ ) {
-    buf[i] = ( unsigned short ) i * 0.001;
+    buf[i] = ( unsigned short ) (i * 0.001);
   }
 
   start[0] = start[1] = start[2] = 0;

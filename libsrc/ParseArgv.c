@@ -150,9 +150,9 @@ ParseArgv(argcPtr, argv, argTable, flags)
 				 * argument should be copied (never greater
 				 * than srcIndex). */
    int argc;			/* # arguments in argv still to process. */
-   int length;			/* Number of characters in current argument. */
-   int nargs;        /* Number of following arguments to get. */
-   int i;
+   size_t length;			/* Number of characters in current argument. */
+   uintptr_t nargs;        /* Number of following arguments to get. */
+   uintptr_t i;
 
 /* Macro to optionally print errors */
 #define FPRINTF if (!(flags&ARGV_NO_PRINT)) (void) fprintf
@@ -232,7 +232,7 @@ ParseArgv(argcPtr, argv, argTable, flags)
          *((int *) infoPtr->dst) = (intptr_t) infoPtr->src;
          break;
       case ARGV_INT:
-         nargs = (intptr_t) infoPtr->src;
+         nargs = (uintptr_t) infoPtr->src;
          if (nargs<1) nargs=1;
          for (i=0; i<nargs; i++) {
             if (argc == 0) {
@@ -254,7 +254,7 @@ ParseArgv(argcPtr, argv, argTable, flags)
          }
          break;
       case ARGV_LONG:
-         nargs = (intptr_t) infoPtr->src;
+         nargs = (uintptr_t) infoPtr->src;
          if (nargs<1) nargs=1;
          for (i=0; i<nargs; i++) {
             if (argc == 0) {
@@ -277,7 +277,7 @@ ParseArgv(argcPtr, argv, argTable, flags)
          break;
 
       case ARGV_STRING:
-         nargs = (intptr_t) infoPtr->src;
+         nargs = (uintptr_t) infoPtr->src;
          if (nargs<1) nargs=1;
          for (i=0; i<nargs; i++) {
             if (argc == 0) {
@@ -293,7 +293,7 @@ ParseArgv(argcPtr, argv, argTable, flags)
          *((int *) infoPtr->dst) = dstIndex;
          goto argsDone;
       case ARGV_FLOAT:
-         nargs = (intptr_t) infoPtr->src;
+         nargs = (uintptr_t) infoPtr->src;
          if (nargs<1) nargs=1;
          for (i=0; i<nargs; i++) {
             if (argc == 0) {
@@ -400,11 +400,11 @@ PrintUsage(argTable, flags)
 				 * information for default options. */
 {
    ArgvInfo *infoPtr;
-   int width, i, j, numSpaces;
+   size_t width, i, numSpaces;
 #define NUM_SPACES 20
    static char spaces[] = "                    ";
 /*   char tmp[30]; */
-   int nargs;
+   intptr_t j, nargs;
 
 /* Macro to optionally print errors */
 #define FPRINTF if (!(flags&ARGV_NO_PRINT)) (void) fprintf
@@ -418,7 +418,7 @@ PrintUsage(argTable, flags)
    for (i = 0; i < 2; i++) {
       for (infoPtr = i ? defaultTable : argTable;
            infoPtr->type != ARGV_END; infoPtr++) {
-         int length;
+         size_t length;
          if (infoPtr->key == NULL) {
             continue;
          }
