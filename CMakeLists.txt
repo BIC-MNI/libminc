@@ -202,6 +202,7 @@ SET(minc1_LIB_SRCS
    libsrc/minc_compat.c
    libsrc/minc_simple.c
    libsrc/minc_format_convert.c
+   libsrc/restructure.c
    )
 
 SET(minc1_HEADERS
@@ -210,6 +211,7 @@ SET(minc1_HEADERS
   libsrc/nd_loop.h
   libsrc/minc_compat.h
   libsrc/minc_simple.h
+  libsrc/restructure.h
   libsrc/minc_format_convert.h
 )
 
