@@ -226,6 +226,7 @@ minc_load_data(char *path, void *dataptr, int datatype,
     int icv;                    /* MINC image conversion variable */
     long start[MI_S_NDIMS];
     long count[MI_S_NDIMS];
+    size_t ucount[MI_S_NDIMS];
     int dir[MI_S_NDIMS];        /* Dimension "directions" */
     int map[MI_S_NDIMS];        /* Dimension mapping */
     int old_ncopts;             /* For storing the old state of ncopts */
@@ -389,11 +390,11 @@ minc_load_data(char *path, void *dataptr, int datatype,
     j = 0;
     for (i = 0; i < MI_S_NDIMS; i++) {
         if (dim_len[i] > 0) {
-            count[j++] = dim_len[i];
+            ucount[j++] = dim_len[i];
         }
     }
 
-    restructure_array(var_ndims, dataptr, count, nctypelen(nctype),
+    restructure_array(var_ndims, dataptr, ucount, nctypelen(nctype),
                       map, dir);
 
     miicv_detach(icv);
