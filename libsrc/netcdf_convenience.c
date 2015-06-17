@@ -207,8 +207,6 @@
 #endif
 
 /* Private functions */
-PRIVATE int execute_decompress_command(char *command, char *infile, 
-                                       char *outfile, int header_only);
 PRIVATE int MI_vcopy_action(int ndims, long start[], long count[], 
                             long nvalues, void *var_buffer, void *caller_data);
 
@@ -1481,7 +1479,7 @@ MNCAPI int micopy_var_def(int incdfid, int invarid, int outcdfid)
 @CREATED    : 
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
-int
+PRIVATE int
 mivarsize(int fd, int varid, long *size_ptr)
 {
     int i;
