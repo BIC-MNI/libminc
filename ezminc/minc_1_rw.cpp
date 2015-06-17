@@ -154,7 +154,6 @@ namespace minc
   int minc_1_base::att_number(const char *var_name) const
   {
     int varid;
-    int natts;
     if (*var_name=='\0') {
         varid = NC_GLOBAL;
     } else {
@@ -218,9 +217,7 @@ namespace minc
   std::string minc_1_base::att_name(const char *var_name,int no) const
   {
     int varid;
-    int attid;
-    char name[MAX_NC_NAME];
-    if (*var_name=='\0') 
+    if (*var_name=='\0')
         varid = NC_GLOBAL;
     else 
     {
@@ -232,7 +229,6 @@ namespace minc
   
   std::string minc_1_base::att_name(int varid,int no) const
   {
-    int attid;
     char name[MAX_NC_NAME];
     if(ncattname(_mincid, varid, no, name)==MI_ERROR)
       return "";
@@ -243,9 +239,7 @@ namespace minc
   std::string minc_1_base::att_value_string(const char *var_name,const char *att_name) const
   {
     int varid;
-    int attid;
-    char name[MAX_NC_NAME];
-    if (*var_name=='\0') 
+    if (*var_name=='\0')
         varid = NC_GLOBAL;
     else 
     {
@@ -468,9 +462,6 @@ namespace minc
 #endif 
     _metadate_only=metadate_only;
     _read_prepared=false;
-    int element_size;
-    int idim;
-    int nstart, ncount;
     _positive_directions=positive_directions;
     //ncopts = 0;
 
@@ -502,7 +493,6 @@ namespace minc
     //get image data type... not used for now
     miget_datatype(_mincid, _imgid, &_datatype, &_is_signed);
     //dir_cos.SetIdentity();
-    int dim_cnt=0;
     miget_image_range(_mincid, _image_range);
     //go through dimensions , calculating parameters for reshaping into ZYX array if needed
     _info.resize(_ndims);
@@ -522,7 +512,6 @@ namespace minc
       _info[i].length=dimlength;
       _info[i].have_dir_cos=false;
       int axis=-1;
-      unsigned int sz=0;
       
       if(!strcmp(dimname,MIxspace))
       { 
