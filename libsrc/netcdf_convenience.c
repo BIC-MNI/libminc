@@ -240,7 +240,7 @@ static int mi_h5_files = 0;
 @CREATED    : January 20, 1995 (Peter Neelin)
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
-PRIVATE int execute_decompress_command(char *command, char *infile, 
+PRIVATE int execute_decompress_command(char *command, const char *infile,
                                        char *outfile, int header_only)
 {
    char whole_command[1024];
@@ -292,7 +292,7 @@ PRIVATE int execute_decompress_command(char *command, char *infile,
 @CREATED    : January 20, 1995 (Peter Neelin)
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
-MNCAPI char *miexpand_file(char *path, char *tempfile, int header_only,
+MNCAPI char *miexpand_file(const char *path, char *tempfile, int header_only,
                            int *created_tempfile)
 {
    typedef enum 
@@ -471,7 +471,7 @@ MNCAPI char *miexpand_file(char *path, char *tempfile, int header_only,
 @CREATED    : November 2, 1993 (Peter Neelin)
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
-MNCAPI int miopen(char *path, int mode)
+MNCAPI int miopen(const char *path, int mode)
 {
    int status, oldncopts, created_tempfile;
    char *tempfile;
@@ -576,7 +576,7 @@ MNCAPI int miopen(char *path, int mode)
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 #if MINC2
-MNCAPI int micreatex(char *path, int cmode, struct mi2opts *opts_ptr)
+MNCAPI int micreatex(const char *path, int cmode, struct mi2opts *opts_ptr)
 {
     int fd;
 
@@ -611,7 +611,7 @@ MNCAPI int micreatex(char *path, int cmode, struct mi2opts *opts_ptr)
     MI_RETURN(fd);
 }
 
-MNCAPI int micreate(char *path, int cmode)
+MNCAPI int micreate(const char *path, int cmode)
 {
     MI_SAVE_ROUTINE_NAME("micreate");
 

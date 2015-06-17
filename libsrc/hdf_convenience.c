@@ -1720,11 +1720,11 @@ hdf_varputg(int fd, int varid, const long *start,
 	 */
 	idim = maxidim;
     carry:
-	value = ((char *)value) + mymap[idim];
+	value = ((const char *)value) + mymap[idim];
 	mystart[idim] += mystride[idim];
 	if (mystart[idim] == stop[idim]) {
 	    mystart[idim] = start[idim];
-	    value = ((char *)value) - length[idim];
+	    value = ((const char *)value) - length[idim];
 	    if (--idim < 0)
 		break; /* normal return */
 	    goto carry;
