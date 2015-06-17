@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <memory.h>
 
+#include "restructure.h"
+
 /** In-place array dimension restructuring.
  *
  * Based on Chris H.Q. Ding, "An Optimal Index Reshuffle Algorithm for
