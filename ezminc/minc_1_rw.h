@@ -389,8 +389,8 @@ namespace minc
       //! \param inf  - information about dimensions
       //! \param slice_dimensions - number of dimensions per slice (used for storage)
       //! \param datatype - storage datatype
-      //! \param __signed - check if datatype will be signed or not
-      void open(const char *path,const minc_info& inf,int slice_dimensions,nc_type datatype,int __signed=0);
+      //! \param is_signed - check if datatype will be signed or not
+      void open(const char *path,const minc_info& inf,int slice_dimensions,nc_type datatype,int is_signed=0);
       
       //! open minc file for writing - will overwrite existing 
       //! \param path - path to minc file
