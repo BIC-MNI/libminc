@@ -54,5 +54,5 @@ namespace minc
       return _code;
     }
   };
-}; //minc
+} //minc
 #endif //__EXCPETIONS_H__

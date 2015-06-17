@@ -1468,4 +1468,4 @@ namespace minc
     ncattput(_mincid, create_var_id(varname),attname, NC_BYTE, val.size(), (void *) &val[0]);
   }
   
-};
+}

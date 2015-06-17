@@ -440,5 +440,5 @@ namespace minc
       //!write a single slice, size of the buffer should be more or equall to slab_len
       void write(void* slice);
   };
-};
+}
 #endif //__PRIMITIVE_MINC_IO__

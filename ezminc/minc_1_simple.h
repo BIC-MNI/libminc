@@ -299,6 +299,6 @@ namespace minc
   }
   
   
-};//minc
+}//minc
 
 #endif //__MINC_1_SIMPLE_H__

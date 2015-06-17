@@ -370,6 +370,6 @@ namespace minc
     return val;
   }	
 	
-};
+}
 
 #endif //__FIXED_VECTOR_H__
