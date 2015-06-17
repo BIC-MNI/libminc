@@ -949,7 +949,7 @@ PRIVATE void setup_variables(int inmincid, int outmincid,
    int indim[MAX_VAR_DIMS], outdim[MAX_VAR_DIMS];
    nc_type datatype;
    int idim, odim, ivar, in_ndims, out_ndims, in_nimgdims, out_nimgdims;
-   char dimname[MAX_NC_NAME];
+   char dimname[MAX_NC_NAME + 1];
    int nvars, varlist[MAX_VAR_DIMS*2];
    long dimlength;
    int input_vector_length;
@@ -1015,7 +1015,7 @@ PRIVATE void setup_variables(int inmincid, int outmincid,
             ncopts = 0;
             for (ivar=0; ivar < 2; ivar++) {
                if (ivar == 1) 
-                  (void) strcat(dimname, "_width");
+                  (void) strncat(dimname, "_width", MAX_NC_NAME);
                varlist[nvars] = ncvarid(inmincid, dimname);
                if (varlist[nvars] != MI_ERROR) {
                   (void) micopy_var_def(inmincid, varlist[nvars], outmincid);
@@ -1046,10 +1046,10 @@ PRIVATE void setup_variables(int inmincid, int outmincid,
       varlist[nvars] = ncvarid(inmincid, MIimagemin);
       if (varlist[nvars] != MI_ERROR) nvars++;
       if (loop_options->loop_dimension != NULL) {
-         (void) strcpy(dimname, loop_options->loop_dimension);
+         (void) strncpy(dimname, loop_options->loop_dimension, MAX_NC_NAME);
          varlist[nvars] = ncvarid(inmincid, dimname);
          if (varlist[nvars] != MI_ERROR) nvars++;
-         (void) strcat(dimname, "_width");
+         (void) strncat(dimname, "_width", MAX_NC_NAME);
          varlist[nvars] = ncvarid(inmincid, dimname);
          if (varlist[nvars] != MI_ERROR) nvars++;
       }
@@ -2258,7 +2258,7 @@ PRIVATE void set_input_sequential(Loopfile_Info *loopfile_info,
 {
    int old_input_all_open;
    int ifile, num_files;
-   int mincid, icvid;
+   int mincid = MI_ERROR, icvid;
    int current_input_file_number;
 
    /* Set flag for sequential access */

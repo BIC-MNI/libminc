@@ -359,6 +359,8 @@ initialize_nifti_format_input(VIO_STR             filename,
     break;
   default:
     print_error("Unknown NIfTI-1 data type.\n");
+    nifti_image_free(nii_ptr);
+    znzclose(zfp);
     return VIO_ERROR;
   }
 
