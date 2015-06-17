@@ -2172,6 +2172,7 @@ hdf_open_dsets(struct m2_file *file, hid_t grp_id, char *cpath, int is_dim)
                     }
                     else {
                         milog_message(MI_MSG_SNH);
+                        length = 0;
                     }
 
 		    hdf_dim_add(file, temp, length);
