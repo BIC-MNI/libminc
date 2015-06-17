@@ -497,10 +497,10 @@ extern "C" {
 /* MINC public functions */
 
 /* From netcdf_convenience.c */
-MNCAPI char *miexpand_file(char *path, char *tempfile, 
+MNCAPI char *miexpand_file(const char *path, char *tempfile, 
                            int header_only, int *created_tempfile);
-MNCAPI int miopen(char *path, int mode);
-MNCAPI int micreate(char *path, int cmode);
+MNCAPI int miopen(const char *path, int mode);
+MNCAPI int micreate(const char *path, int cmode);
 MNCAPI int miclose(int cdfid);
 MNCAPI int miattget_with_sign(int cdfid, int varid, char *name, 
                               char *insign, nc_type datatype, char *outsign,
@@ -619,7 +619,7 @@ struct mi2opts {
 
 #define MI2_ISH5OBJ(x) (H5Iget_type(x) > 0)
 
-MNCAPI int micreatex(char *path, int cmode, struct mi2opts *opts_ptr);
+MNCAPI int micreatex(const char *path, int cmode, struct mi2opts *opts_ptr);
 
 #else
 #define MI2_ISH5OBJ(x) (0)

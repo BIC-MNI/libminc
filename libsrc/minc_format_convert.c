@@ -40,7 +40,7 @@ MNCAPI int minc_format_convert(const char *input,const char *output)
     int flags;
     struct mi2opts opts;
     
-    old_fd = miopen((char *)input, NC_NOWRITE);
+    old_fd = miopen(input, NC_NOWRITE);
     if (old_fd < 0) {
         perror(input);
         return MI_ERROR;
@@ -51,7 +51,7 @@ MNCAPI int minc_format_convert(const char *input,const char *output)
     memset(&opts,0,sizeof(struct mi2opts));
     opts.struct_version = MI2_OPTS_V1;
 
-    new_fd = micreatex((char *)output, flags, &opts);
+    new_fd = micreatex(output, flags, &opts);
     if (new_fd < 0) {
         perror(output);
         exit MI_ERROR;
