@@ -50,7 +50,7 @@ struct testinfo {
 
 /* Test case 1 - file creation & definition. 
  */
-int test1(struct testinfo *ip, struct dimdef *dims, int ndims)
+static int test1(struct testinfo *ip, struct dimdef *dims, int ndims)
 {
   int varid;
   int stat;
@@ -117,7 +117,7 @@ int test1(struct testinfo *ip, struct dimdef *dims, int ndims)
   return (0);
 }
 
-int test2(struct testinfo *ip, struct dimdef *dims, int ndims)
+static int test2(struct testinfo *ip, struct dimdef *dims, int ndims)
 {
   int i, j, k;
   int stat;
@@ -171,7 +171,7 @@ int test2(struct testinfo *ip, struct dimdef *dims, int ndims)
   return (0);
 }
 
-int
+static int
 test3(struct testinfo *ip, struct dimdef *dims, int ndims)
 {
   /* Get the same variable again, but this time use an ICV to scale it.
@@ -286,7 +286,7 @@ test3(struct testinfo *ip, struct dimdef *dims, int ndims)
 }
 
 
-void test4(struct testinfo *ip, struct dimdef *dims, int ndims)
+static void test4(struct testinfo *ip, struct dimdef *dims, int ndims)
 {
   mihandle_t vol;  
   

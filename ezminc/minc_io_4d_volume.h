@@ -166,6 +166,6 @@ namespace minc
       volume_list _volumes;
   }; 
 
-};
+}
 
 #endif //__MINC_IO_4D_VOLUME_H_

@@ -38,7 +38,7 @@ struct m2_dim {
     char name[NC_MAX_NAME];
 };
 
-struct m2_file {
+static struct m2_file {
     struct m2_file *link;
     hid_t fd;
     int wr_ok;                  /* non-zero if write OK */
@@ -144,7 +144,7 @@ hdf_id_del(int fd)
     return (MI_ERROR);
 }
 
-struct m2_var *
+static struct m2_var *
 hdf_var_byname(struct m2_file *file, const char *name)
 {
     int i;
@@ -157,7 +157,7 @@ hdf_var_byname(struct m2_file *file, const char *name)
     return (NULL);
 }
 
-struct m2_var *
+static struct m2_var *
 hdf_var_byid(struct m2_file *file, int varid)
 {
     if (varid >= 0 && varid < file->nvars) {
@@ -166,7 +166,7 @@ hdf_var_byid(struct m2_file *file, int varid)
     return (NULL);
 }
 
-struct m2_var *
+static struct m2_var *
 hdf_var_add(struct m2_file *file, const char *name, const char *path, 
 	    int ndims, hsize_t *dims)
 {
@@ -211,7 +211,7 @@ hdf_var_add(struct m2_file *file, const char *name, const char *path,
 
 /** Find a dimension by name.
  */
-struct m2_dim *
+static struct m2_dim *
 hdf_dim_byname(struct m2_file *file, const char *name)
 {
     int i;
@@ -226,7 +226,7 @@ hdf_dim_byname(struct m2_file *file, const char *name)
 
 /** Find a dimension by ID number.
  */
-struct m2_dim *
+static struct m2_dim *
 hdf_dim_byid(struct m2_file *file, int dimid)
 {
     if (dimid >= 0 && dimid < file->ndims) {
@@ -235,7 +235,7 @@ hdf_dim_byid(struct m2_file *file, int dimid)
     return (NULL);
 }
 
-struct m2_dim *
+static struct m2_dim *
 hdf_dim_add(struct m2_file *file, const char *name, long length)
 {
     struct m2_dim *new;
@@ -313,7 +313,7 @@ hdf_path_from_name(struct m2_file *file, const char *varnm, char *varpath)
 }
 
 /* map NetCDF types onto HDF types */
-hid_t 
+static hid_t
 nc_to_hdf5_type(nc_type dtype, int is_signed)
 {
     switch (dtype) {
@@ -2114,7 +2114,7 @@ herr_t hdf_copy_attr(hid_t in_id, const char *attr_name, void *op_data)
    return (status);
 }
 
-int
+static int
 hdf_open_dsets(struct m2_file *file, hid_t grp_id, char *cpath, int is_dim)
 {
     hsize_t nobjs;
@@ -2172,6 +2172,7 @@ hdf_open_dsets(struct m2_file *file, hid_t grp_id, char *cpath, int is_dim)
                     }
                     else {
                         milog_message(MI_MSG_SNH);
+                        length = 0;
                     }
 
 		    hdf_dim_add(file, temp, length);

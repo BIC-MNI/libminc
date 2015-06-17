@@ -367,7 +367,6 @@ VIOAPI  Minc_file  initialize_minc_input_from_minc_id(
                 if (!strcmp(spacing_type, MI_IRREGULAR)) {
                     long start[1];
                     long count[1];
-                    int i;
 
                     irr_starts[d] = malloc(sizeof(VIO_Real) * file->sizes_in_file[d]);
                     irr_widths[d] = malloc(sizeof(VIO_Real) * file->sizes_in_file[d]);

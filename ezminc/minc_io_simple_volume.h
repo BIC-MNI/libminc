@@ -659,7 +659,7 @@ namespace minc
   typedef simple_volume<fixed_vec<3,float> > minc_grid_volume;
   typedef simple_volume<unsigned char>       minc_byte_volume;
 
-}; //minc
+} //minc
 
 
 #endif // __SIMPLE_VOLUME_H__

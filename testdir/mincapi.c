@@ -46,7 +46,7 @@ struct testinfo {
 
 /* Test case 1 - file creation & definition. 
  */
-int
+static int
 test1(struct testinfo *ip, struct dimdef *dims, int ndims)
 {
   int fd2;
@@ -137,7 +137,7 @@ test1(struct testinfo *ip, struct dimdef *dims, int ndims)
   return (0);
 }
 
-int 
+static int
 test2(struct testinfo *ip, struct dimdef *dims, int ndims)
 {
   int i, j, k;
@@ -192,7 +192,7 @@ test2(struct testinfo *ip, struct dimdef *dims, int ndims)
   return (0);
 }
 
-int
+static int
 test3(struct testinfo *ip, struct dimdef *dims, int ndims)
 {
   /* Try to read the data back. */
@@ -247,7 +247,7 @@ test3(struct testinfo *ip, struct dimdef *dims, int ndims)
 }
 
 
-int
+static int
 test4(struct testinfo *ip, struct dimdef *dims, int ndims)
 {
   /* Get the same variable again, but this time use an ICV to scale it.
@@ -390,7 +390,7 @@ test4(struct testinfo *ip, struct dimdef *dims, int ndims)
 }
 
 
-int
+static int
 test5(struct testinfo *ip, struct dimdef *dims, int ndims)
 {
   /* Get the same variable again, but this time use an ICV to scale it.
@@ -528,7 +528,7 @@ test5(struct testinfo *ip, struct dimdef *dims, int ndims)
   return (0);
 }
 
-int
+static int
 test6(struct testinfo *ip, struct dimdef *dims, int ndims)
 {
   size_t total;
@@ -624,7 +624,7 @@ test6(struct testinfo *ip, struct dimdef *dims, int ndims)
   return (0);
 }
 
-int
+static int
 test7(struct testinfo *ip, struct dimdef *dims, int ndims)
 {
   size_t total;

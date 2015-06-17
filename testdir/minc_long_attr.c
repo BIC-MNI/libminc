@@ -51,7 +51,7 @@ struct testinfo {
 
 /* Test case 1 - file creation & definition. 
  */
-int test1(struct testinfo *ip, struct dimdef *dims, int ndims)
+static int test1(struct testinfo *ip, struct dimdef *dims, int ndims)
 {
   int varid;
   int stat;
@@ -130,7 +130,7 @@ int test1(struct testinfo *ip, struct dimdef *dims, int ndims)
   return (0);
 }
 
-int test2(struct testinfo *ip, struct dimdef *dims, int ndims)
+static int test2(struct testinfo *ip, struct dimdef *dims, int ndims)
 {
   int i, j, k;
   int stat;
@@ -184,7 +184,7 @@ int test2(struct testinfo *ip, struct dimdef *dims, int ndims)
   return (0);
 }
 
-int
+static int
 test3(struct testinfo *ip, struct dimdef *dims, int ndims)
 {
   /* Try to read the data back. */

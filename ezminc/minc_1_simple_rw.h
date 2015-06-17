@@ -343,6 +343,6 @@ namespace minc
       save_4d_volume(wrt,vol);
   }
   
-};
+}
 
 #endif //__MINC_1_SIMPLE_RW_H__
