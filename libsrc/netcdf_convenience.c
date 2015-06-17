@@ -180,6 +180,7 @@
 ---------------------------------------------------------------------------- */
 
 #include "minc_private.h"
+#include "ParseArgv.h"
 
 #if HAVE_UNISTD_H
 #include <unistd.h>
