@@ -26,7 +26,7 @@ namespace minc
   dim_info::dim_info(int l, double sta,
                      double spa,dimensions d,
                      bool hd):
-      length(l),start(sta),step(spa),dim(d),have_dir_cos(hd)
+      length(l),step(spa),start(sta),have_dir_cos(hd),dim(d)
   {
     switch(dim)
     {
@@ -44,19 +44,20 @@ namespace minc
     _icvid(MI_ERROR),
     _cur(MAX_VAR_DIMS,0),
     _slab(MAX_VAR_DIMS,1),
+    _slice_dimensions(0),
     _last(false),
     _positive_directions(true),
     _datatype(MI_ORIGINAL_TYPE),
     _io_datatype(MI_ORIGINAL_TYPE),
-    _mincid(MI_ERROR),
-    _imgid(MI_ERROR),
-    _dims(3,0),
-    _map_to_std(5,-1),
-    _minc2(false),
-    _slice_dimensions(0),
     _ndims(0),
     _is_signed(false),
-    _icmax(-1),_icmin(-1)
+    _mincid(MI_ERROR),
+    _imgid(MI_ERROR),
+    _icmax(-1),
+    _icmin(-1),
+    _dims(3,0),
+    _map_to_std(5,-1),
+    _minc2(false)
   {
     _icvid=miicv_create();
   }
