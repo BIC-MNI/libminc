@@ -86,6 +86,7 @@ char **read_file_names(char *filelist, int *num_files)
       if (files[nfiles] == NULL) {
          (void) fprintf(stderr, "Error allocating memory\n");
          free(files);
+         fclose(fp);
          return NULL;
       }
       nfiles++;

@@ -1867,7 +1867,7 @@ miread_cfg(const char *name, char *buffer, int maxlen)
     char path[256];
 
     if (home_ptr != NULL) {
-      strcpy(path, home_ptr);
+      strncpy(path, home_ptr, sizeof(path) - 1);
     }
     else {
       path[0] = '\0';
@@ -1904,7 +1904,7 @@ miget_cfg_bool(const char *name)
     char *var_ptr;
 
     if ((var_ptr = getenv(name)) != NULL) {
-        strncpy(buffer, var_ptr, sizeof (buffer));
+        strncpy(buffer, var_ptr, sizeof (buffer) - 1);
     }
     else {
         if (!miread_cfg(name, buffer, sizeof (buffer))) {
@@ -1921,7 +1921,7 @@ miget_cfg_int(const char *name)
     char *var_ptr;
     
     if ((var_ptr = getenv(name)) != NULL) {
-        strncpy(buffer, var_ptr, sizeof (buffer));
+        strncpy(buffer, var_ptr, sizeof (buffer) - 1);
     }
     else {
         if (!miread_cfg(name, buffer, sizeof(buffer))) {
@@ -1938,7 +1938,7 @@ miget_cfg_str(const char *name)
     char *var_ptr;
 
     if ((var_ptr = getenv(name)) != NULL) {
-        strncpy(buffer, var_ptr, sizeof(buffer));
+        strncpy(buffer, var_ptr, sizeof(buffer) - 1);
     }
     else {
         if (!miread_cfg(name, buffer, sizeof(buffer))) {

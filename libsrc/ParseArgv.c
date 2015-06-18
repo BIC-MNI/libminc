@@ -315,9 +315,7 @@ ParseArgv(argcPtr, argv, argTable, flags)
          }
          break;
       case ARGV_FUNC: {
-         int (*handlerProc)();
-
-         handlerProc = (int (*)())infoPtr->src;
+         int (*handlerProc)() =  (int (*)())(uintptr_t)infoPtr->src;
 		
          if ((*handlerProc)(infoPtr->dst, infoPtr->key,
                             argv[srcIndex])) {
@@ -327,9 +325,7 @@ ParseArgv(argcPtr, argv, argTable, flags)
          break;
       }
       case ARGV_GENFUNC: {
-         int	    (*handlerProc)();
-
-         handlerProc = (int (*)())infoPtr->src;
+         int (*handlerProc)() = (int (*)())(uintptr_t)infoPtr->src;
 
          argc = (*handlerProc)(infoPtr->dst, infoPtr->key,
                                argc, argv+srcIndex);
@@ -483,7 +479,7 @@ PrintUsage(argTable, flags)
                   FPRINTF(stderr, " \"%s\"", string);
                }
                else {
-                  FPRINTF(stderr, " \"%s\"", string);
+                  FPRINTF(stderr, " <null>"); /* Don't print null strings. */
                }
             }
 
