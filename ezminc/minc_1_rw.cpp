@@ -615,7 +615,7 @@ namespace minc
     }
     std::fill(_slab.begin(),_slab.end(),1);
     _slab_len=1;
-    for(int i=0;i<_slice_dimensions;i++)
+    for(size_t i=0;i<_slice_dimensions;i++)
     {
       _slab[_ndims-i-1]=_info[_ndims-i-1].length;
       _slab_len*=_info[_ndims-i-1].length;
@@ -696,7 +696,7 @@ namespace minc
       }
     }
     _slab_len=1;
-    for(int i=0;i<_slice_dimensions;i++)
+    for(size_t i=0;i<_slice_dimensions;i++)
     {
       _slab[_ndims-i-1]=_info[_ndims-i-1].length;
       _slab_len*=_info[_ndims-i-1].length;
