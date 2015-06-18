@@ -18,11 +18,17 @@
 #include "minc2.h"
 #include "minc2_private.h"
 
+/* Redefinition of H5_VERSION_GE which is new in HDF5 1.8.7. */
+#define MI_H5_VERSION_GE(Maj,Min,Rel) \
+       (((H5_VERS_MAJOR==Maj) && (H5_VERS_MINOR==Min) && (H5_VERS_RELEASE>=Rel)) || \
+        ((H5_VERS_MAJOR==Maj) && (H5_VERS_MINOR>Min)) || \
+        (H5_VERS_MAJOR>Maj))
+
 /* Uggh!!! The HDF5 team changed the definition of the H5Tconvert(),
 * H5Tregister(), and H5T_conv_t functions, and the result is that we
 * have to special-case these types.  I am bummed.
 */
-#if (H5_VERS_MAJOR > 1) || (H5_VERS_MINOR > 6) || (H5_VERS_RELEASE > 2)
+#if MI_H5_VERSION_GE(1, 6, 3)
 #define H5_NELEMENTS_T size_t
 #else
 #define H5_NELEMENTS_T hsize_t
@@ -31,7 +37,7 @@
 /* They also redefined the type of the 4th argument to H5Sselect_elements.
 * This is harmless as long as sizeof(hssize_t) == sizeof(hsize_t).
 */
-#if (H5_VERS_MAJOR > 1) || (H5_VERS_MINOR > 6) || (H5_VERS_RELEASE > 3)
+#if MI_H5_VERSION_GE(1, 6, 4)
 #define H5_START_T hsize_t
 #else
 #define H5_START_T hssize_t
