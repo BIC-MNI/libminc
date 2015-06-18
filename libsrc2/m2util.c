@@ -18,26 +18,6 @@
 #include "minc2.h"
 #include "minc2_private.h"
 
-/* Uggh!!! The HDF5 team changed the definition of the H5Tconvert(),
-* H5Tregister(), and H5T_conv_t functions, and the result is that we
-* have to special-case these types.  I am bummed.
-*/
-#if (H5_VERS_MAJOR > 1) || (H5_VERS_MINOR > 6) || (H5_VERS_RELEASE > 2)
-#define H5_NELEMENTS_T size_t
-#else
-#define H5_NELEMENTS_T hsize_t
-#endif
-
-/* They also redefined the type of the 4th argument to H5Sselect_elements.
-* This is harmless as long as sizeof(hssize_t) == sizeof(hsize_t).
-*/
-#if (H5_VERS_MAJOR > 1) || (H5_VERS_MINOR > 6) || (H5_VERS_RELEASE > 3)
-#define H5_START_T hsize_t
-#else
-#define H5_START_T hssize_t
-#endif
-
-
 #ifdef _MSC_VER
 double rint(double v)
 {
@@ -729,7 +709,7 @@ static void miswap2 ( unsigned char *tmp_ptr )
 static herr_t mi2_int_to_dbl ( hid_t src_id,
                                hid_t dst_id,
                                H5T_cdata_t *cdata,
-                               H5_NELEMENTS_T nelements,
+                               size_t nelements,
                                size_t buf_stride,
                                size_t bkg_stride,
                                void *buf_ptr,
@@ -932,7 +912,7 @@ static herr_t mi2_int_to_dbl ( hid_t src_id,
 static herr_t mi2_dbl_to_int ( hid_t src_id,
                                hid_t dst_id,
                                H5T_cdata_t *cdata,
-                               H5_NELEMENTS_T nelements,
+                               size_t nelements,
                                size_t buf_stride,
                                size_t bkg_stride,
                                void *buf_ptr,
@@ -1370,7 +1350,7 @@ void miinit ( void )
 static herr_t mi2_null_conv ( hid_t src_id,
                               hid_t dst_id,
                               H5T_cdata_t *cdata,
-                              H5_NELEMENTS_T nelements,
+                              size_t nelements,
                               size_t buf_stride,
                               size_t bkg_stride,
                               void *buf_ptr,
@@ -1481,7 +1461,7 @@ static void midownsample_slice ( double *in_ptr, double *out_ptr, hsize_t isize[
 * could form the basis for a public function one day, but for now it
 * is considered private.
 */
-static void miconvert_hyperslab_to_voxel ( mihandle_t volume, H5_START_T start[],
+static void miconvert_hyperslab_to_voxel ( mihandle_t volume, hsize_t start[],
     hsize_t count[], double *slab_ptr,
     double *max_ptr, double *min_ptr )
 {
@@ -1544,7 +1524,7 @@ static void miconvert_hyperslab_to_voxel ( mihandle_t volume, H5_START_T start[]
 * the basis for a public function one day, but for now it is
 * considered private.
 */
-static void miconvert_hyperslab_to_real ( mihandle_t volume, H5_START_T start[],
+static void miconvert_hyperslab_to_real ( mihandle_t volume, hsize_t start[],
     hsize_t count[], double *slab_ptr )
 {
   /* This code is not intended to be a general hyperslab-to-real
@@ -1626,7 +1606,7 @@ minc_update_thumbnail ( mihandle_t volume, hid_t loc_id, int igrp, int ogrp )
   hsize_t isize[MI2_MAX_VAR_DIMS];
   hsize_t osize[MI2_MAX_VAR_DIMS];
   hsize_t count[MI2_MAX_VAR_DIMS];
-  H5_START_T start[MI2_MAX_VAR_DIMS];
+  hsize_t start[MI2_MAX_VAR_DIMS];
   hid_t idst_id=-1;              /* Input dataset */
   hid_t odst_id=-1;              /* Output dataset */
   hid_t ifspc_id=-1;             /* Input "file" dataspace */
@@ -1811,8 +1791,7 @@ minc_update_thumbnail ( mihandle_t volume, hid_t loc_id, int igrp, int ogrp )
     
     if ( volume->volume_class == MI_CLASS_REAL ) {
       /* Select the right point in tfspc_id */
-      H5Sselect_elements ( tfspc_id, H5S_SELECT_SET, 1,
-                           ( const H5_START_T * ) &start[0] );
+      H5Sselect_elements ( tfspc_id, H5S_SELECT_SET, 1, &start[0] );
 
       H5Dwrite ( omax_id, H5T_NATIVE_DOUBLE, tmspc_id, tfspc_id,
                  H5P_DEFAULT, &smax );
