@@ -57,7 +57,7 @@ static void create_test_file ( void )
   micreate_volume_image ( hvol );
 
   for ( i = 0; i < CZ * CY * CX; i++ ) {
-    buf[i] = ( unsigned short ) (i * 0.01);
+    buf[i] = ( unsigned short ) (i * 0.001);
   }
 
   start[0] = start[1] = start[2] = 0;
