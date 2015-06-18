@@ -1366,7 +1366,7 @@ hdf_vardef(int fd, const char *varnm, nc_type vartype, int ndims,
 
             for (i = 0; i < ndims; i++) {
                 if( chunk_length >= MI2_CHUNK_MIN_SIZE ) {
-                    if( chkdims[i] > chunk_length ) {
+                    if( chkdims[i] > (hsize_t)chunk_length ) {
                         chkdims[i] = chunk_length;
                     }
                 }

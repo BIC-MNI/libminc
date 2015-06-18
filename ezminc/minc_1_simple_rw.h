@@ -156,7 +156,7 @@ namespace minc
     {
       size_t address=0;
       size_t slice=0;
-      for(size_t i=0;i<rw.dim_no();i++)
+      for(int i=0;i<rw.dim_no();i++)
       {
         if(strides[i]>0)
           address+=in.cur()[i]*strides[i];
@@ -225,7 +225,7 @@ namespace minc
     {
       size_t address=0;
       size_t slice=0;
-      for(size_t i=0;i<rw.dim_no();i++)
+      for(int i=0;i<rw.dim_no();i++)
       {
         if(strides[i]>0)
           address+=out.cur()[i]*strides[i];

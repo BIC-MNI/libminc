@@ -23,7 +23,7 @@ int main(int argc, char **argv)
    };
 /*   static struct { long len; char *name;} diminfo[]=
       {3, MIzspace, 4, MIyspace, 5, MIxspace}; */
-   static int numdims=sizeof(diminfo)/sizeof(diminfo[0]);
+   static const int numdims=sizeof(diminfo)/sizeof(diminfo[0]);
    static long coord[]={0,0,0};
    static long count[]={3,4,5};
    double dvalue;

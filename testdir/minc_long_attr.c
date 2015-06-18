@@ -16,7 +16,7 @@
 #define TST_Y 1
 #define TST_Z 2
 
-long errors = 0;
+static long errors = 0;
 
 extern void icv_tests(void);
 

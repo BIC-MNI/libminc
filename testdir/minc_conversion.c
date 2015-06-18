@@ -17,7 +17,7 @@
 #define TST_Y 1
 #define TST_Z 2
 
-long errors = 0;
+static long errors = 0;
 
 extern void icv_tests(void);
 
@@ -302,7 +302,7 @@ static void test4(struct testinfo *ip, struct dimdef *dims, int ndims)
   miclass_t      volume_class;
   mitype_t       volume_type;
   
-  int i,j,k;
+  misize_t i,j,k;
   
   float *buffer;
   float *flt_ptr;
@@ -368,7 +368,7 @@ static void test4(struct testinfo *ip, struct dimdef *dims, int ndims)
         float tmp = (i * 10000) + (j * 100) + k;
         
         if (*flt_ptr != (float) tmp ) {
-          fprintf(stderr, "2. Data error at (%d,%d,%d) %f != %f\n", i,j,k, *flt_ptr, tmp);
+          fprintf(stderr, "2. Data error at (%llu,%llu,%llu) %f != %f\n", i,j,k, *flt_ptr, tmp);
           errors++;
         }
         flt_ptr++;

@@ -25,7 +25,7 @@
 #endif
 
 
-struct {
+static struct {
    nc_type type;
    char *sign;
    char *ctype;
@@ -38,7 +38,7 @@ struct {
 	     { NC_INT,    MI_SIGNED,   "int" },
 	     { NC_FLOAT,  MI_SIGNED,   "float" },
 	     { NC_DOUBLE, MI_SIGNED,   "double" } };
-int ntypes = sizeof(types)/sizeof(types[0]);
+static const int ntypes = sizeof(types)/sizeof(types[0]);
 
 int main(int argc, char **argv)
 {
