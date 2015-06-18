@@ -298,7 +298,8 @@ MNCAPI char *miexpand_file(const char *path, char *tempfile, int header_only,
    typedef enum 
       {BZIPPED, GZIPPED, COMPRESSED, PACKED, ZIPPED, UNKNOWN} Compress_type;
    int status, oldncopts, first_ncerr, iext;
-   char *newfile, *extension, *compfile;
+   char *newfile, *compfile;
+   const char *extension;
    FILE *fp;
    Compress_type compress_type;
    static struct {
