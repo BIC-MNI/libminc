@@ -535,8 +535,8 @@ namespace minc
         _info[i].dim=dim_info::DIM_TIME;
         _map_to_std[4]=i;
       } else  {
-        REPORT_ERROR ("Unknown dimension");
         _info[i].dim=dim_info::DIM_UNKNOWN;
+        REPORT_ERROR ("Unknown dimension");
       }
       
       if(_info[i].dim!=dim_info::DIM_VEC)
