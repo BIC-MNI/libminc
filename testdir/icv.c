@@ -39,7 +39,7 @@ int main(int argc, char **argv)
       331, 333, 335, 337, 339,
       341, 343, 345, 347, 349
    };
-   int i, j, k;
+   long i, j, k;
    int cflag = 0;
 
 #if MINC2
