@@ -635,8 +635,6 @@ int miset_apparent_record_dimension_flag ( mihandle_t volume, int record_flag )
    */
   volume->number_of_dims++;
 
-  record_flag = 1;
-
   return ( MI_NOERROR );
 }
 
