@@ -246,7 +246,7 @@ test3(struct testinfo *ip, struct dimdef *dims, int ndims)
   if(varid<0)
     FUNC_ERROR("ncvarid");
 
-  if ((ncattinq(ip->fd, varid, (char *)"test", &att_datatype, &att_length) == MI_ERROR) ||
+  if ((ncattinq(ip->fd, varid, "test", &att_datatype, &att_length) == MI_ERROR) ||
         (att_datatype != NC_CHAR))
     FUNC_ERROR("ncattinq");
 
@@ -255,7 +255,7 @@ test3(struct testinfo *ip, struct dimdef *dims, int ndims)
 
   att=malloc(att_length);
 
-  if(miattgetstr(ip->fd, varid, (char *)"test", att_length, att)==NULL)
+  if(miattgetstr(ip->fd, varid, "test", att_length, att)==NULL)
     FUNC_ERROR("miattgetstr");
 
   if(memcmp(att,ip->large_attribute,att_length)!=0)

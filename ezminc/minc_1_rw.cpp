@@ -255,7 +255,7 @@ namespace minc
     nc_type datatype;
     
     //TODO: make this handle other (double?) data types correctly
-    if ((ncattinq(_mincid, varid, (char *)att_name, &datatype,&att_length) == MI_ERROR) ||
+    if ((ncattinq(_mincid, varid, att_name, &datatype,&att_length) == MI_ERROR) ||
         (datatype != NC_CHAR))
     {
       //ncopts=op;
@@ -328,7 +328,7 @@ namespace minc
     int att_length;
     nc_type datatype;
     
-    if ((ncattinq(_mincid, varid, (char *)att_name, &datatype,&att_length) == MI_ERROR) ||
+    if ((ncattinq(_mincid, varid, att_name, &datatype,&att_length) == MI_ERROR) ||
          (datatype != NC_INT))
     {
       //ncopts=op;
@@ -347,7 +347,7 @@ namespace minc
     nc_type datatype;
     
     //TODO: make this handle other (double?) data types correctly
-    if ((ncattinq(_mincid, varid, (char *)att_name, &datatype,&att_length) == MI_ERROR) ||
+    if ((ncattinq(_mincid, varid, att_name, &datatype,&att_length) == MI_ERROR) ||
         (datatype != NC_DOUBLE))
     {
       //ncopts=op;
@@ -365,7 +365,7 @@ namespace minc
     nc_type datatype;
     
     //TODO: make this handle other (double?) data types correctly
-    if ((ncattinq(_mincid, varid, (char *)att_name, &datatype,&att_length) == MI_ERROR) ||
+    if ((ncattinq(_mincid, varid, att_name, &datatype,&att_length) == MI_ERROR) ||
          (datatype != NC_SHORT))
     {
       //ncopts=op;
@@ -383,7 +383,7 @@ namespace minc
     nc_type datatype;
     
     //TODO: make this handle other (double?) data types correctly
-    if ((ncattinq(_mincid, varid, (char *)att_name, &datatype,&att_length) == MI_ERROR) ||
+    if ((ncattinq(_mincid, varid, att_name, &datatype,&att_length) == MI_ERROR) ||
          (datatype != NC_BYTE))
     {
       //ncopts=op;
@@ -414,7 +414,7 @@ namespace minc
     int att_length;
     nc_type datatype;
     
-    if(ncattinq(_mincid, varid, (char *)att_name, &datatype,&att_length) == MI_ERROR)
+    if(ncattinq(_mincid, varid, att_name, &datatype,&att_length) == MI_ERROR)
       return MI_ORIGINAL_TYPE;
     return datatype;
   }
@@ -438,7 +438,7 @@ namespace minc
     int att_length;
     nc_type datatype;
     
-    if(ncattinq(_mincid, varid, (char *)att_name, &datatype,&att_length) == MI_ERROR)
+    if(ncattinq(_mincid, varid, att_name, &datatype,&att_length) == MI_ERROR)
       return 0;
     
     return att_length;
