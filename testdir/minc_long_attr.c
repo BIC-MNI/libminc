@@ -255,7 +255,7 @@ test3(struct testinfo *ip, struct dimdef *dims, int ndims)
 
   att=malloc(att_length);
 
-  if(miattgetstr(ip->fd, varid, (char *)"test", att_length, att)<0)
+  if(miattgetstr(ip->fd, varid, (char *)"test", att_length, att)==NULL)
     FUNC_ERROR("miattgetstr");
 
   if(memcmp(att,ip->large_attribute,att_length)!=0)
