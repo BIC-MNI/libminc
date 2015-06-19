@@ -697,7 +697,7 @@ MNCAPI int miclose(int cdfid)
 @MODIFIED   : August 20, 2001 (P.N.)
                  - changed to call miattget_with_sign
 ---------------------------------------------------------------------------- */
-MNCAPI int miattget(int cdfid, int varid, char *name, nc_type datatype,
+MNCAPI int miattget(int cdfid, int varid, const char *name, nc_type datatype,
                     int max_length, void *value, int *att_length)
 {
     int status;
@@ -738,7 +738,7 @@ MNCAPI int miattget(int cdfid, int varid, char *name, nc_type datatype,
                  - slightly modified version of old miattget
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
-MNCAPI int miattget_with_sign(int cdfid, int varid, char *name, 
+MNCAPI int miattget_with_sign(int cdfid, int varid, const char *name, 
                               char *insign, nc_type datatype, char *outsign,
                               int max_length, void *value, int *att_length)
 {
@@ -874,7 +874,7 @@ MNCAPI int miattget1(int cdfid, int varid, char *name, nc_type datatype,
 @CREATED    : July 28, 1992 (Peter Neelin)
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
-MNCAPI char *miattgetstr(int cdfid, int varid, char *name, 
+MNCAPI char *miattgetstr(int cdfid, int varid, const char *name,
                          int maxlen, char *value)
 {
    nc_type att_type;          /* Type of attribute */
@@ -1008,7 +1008,7 @@ MNCAPI int miattputdbl(int cdfid, int varid, char *name, double value)
 @CREATED    : July 28, 1992 (Peter Neelin)
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
-MNCAPI int miattputstr(int cdfid, int varid, char *name, char *value)
+MNCAPI int miattputstr(int cdfid, int varid, const char *name, const char *value)
 {
     int status;
     MI_SAVE_ROUTINE_NAME("miattputstr");
@@ -1047,7 +1047,7 @@ MNCAPI int miattputstr(int cdfid, int varid, char *name, char *value)
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 MNCAPI int mivarget(int cdfid, int varid, long start[], long count[],
-                    nc_type datatype, char *sign, void *values)
+                    nc_type datatype, const char *sign, void *values)
 {
     int status;
     MI_SAVE_ROUTINE_NAME("mivarget");
@@ -1086,7 +1086,7 @@ MNCAPI int mivarget(int cdfid, int varid, long start[], long count[],
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 MNCAPI int mivarget1(int cdfid, int varid, long mindex[],
-                     nc_type datatype, char *sign, void *value)
+                     nc_type datatype, const char *sign, void *value)
 {
     int status;
     long count[MAX_VAR_DIMS];
@@ -1130,7 +1130,7 @@ MNCAPI int mivarget1(int cdfid, int varid, long mindex[],
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 MNCAPI int mivarput(int cdfid, int varid, long start[], long count[],
-                    nc_type datatype, char *sign, void *values)
+                    nc_type datatype, const char *sign, void *values)
 {
     int status;
     MI_SAVE_ROUTINE_NAME("mivarput");
@@ -1169,7 +1169,7 @@ MNCAPI int mivarput(int cdfid, int varid, long start[], long count[],
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 MNCAPI int mivarput1(int cdfid, int varid, long mindex[],
-                     nc_type datatype, char *sign, void *value)
+                     nc_type datatype, const char *sign, void *value)
 {
     int status;
     long count[MAX_VAR_DIMS];
