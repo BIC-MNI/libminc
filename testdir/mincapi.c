@@ -528,6 +528,7 @@ test5(struct testinfo *ip, struct dimdef *dims, int ndims)
   return (0);
 }
 
+#if 0
 static int
 test6(struct testinfo *ip, struct dimdef *dims, int ndims)
 {
@@ -623,6 +624,7 @@ test6(struct testinfo *ip, struct dimdef *dims, int ndims)
 
   return (0);
 }
+#endif
 
 static int
 test7(struct testinfo *ip, struct dimdef *dims, int ndims)
@@ -752,7 +754,9 @@ main(int argc, char **argv)
 
   test5(&info, dimtab1, 3);
 
-  /* test6(&info, dimtab1, 3); */
+#if 0
+  test6(&info, dimtab1, 3);
+#endif
 
   test7(&info, dimtab1, 3);
 
