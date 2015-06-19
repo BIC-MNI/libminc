@@ -90,7 +90,7 @@ namespace minc
     }
     char* str = new char[att_length+1];
     str[0] = '\0';
-    miattgetstr(_mincid, NC_GLOBAL, (char*)MIhistory, att_length+1,str);
+    miattgetstr(_mincid, NC_GLOBAL, MIhistory, att_length+1,str);
     std::string r(str);
     delete [] str;
     return r;
@@ -255,7 +255,7 @@ namespace minc
     nc_type datatype;
     
     //TODO: make this handle other (double?) data types correctly
-    if ((ncattinq(_mincid, varid, (char *)att_name, &datatype,&att_length) == MI_ERROR) ||
+    if ((ncattinq(_mincid, varid, att_name, &datatype,&att_length) == MI_ERROR) ||
         (datatype != NC_CHAR))
     {
       //ncopts=op;
@@ -263,7 +263,7 @@ namespace minc
     }
     char* str = new char[att_length+1];
     str[0] = '\0';
-    miattgetstr(_mincid, varid, (char *)att_name, att_length+1, str);
+    miattgetstr(_mincid, varid, att_name, att_length+1, str);
     //ncopts=op;
     std::string r(str);
     delete [] str;
@@ -328,14 +328,14 @@ namespace minc
     int att_length;
     nc_type datatype;
     
-    if ((ncattinq(_mincid, varid, (char *)att_name, &datatype,&att_length) == MI_ERROR) ||
+    if ((ncattinq(_mincid, varid, att_name, &datatype,&att_length) == MI_ERROR) ||
          (datatype != NC_INT))
     {
       //ncopts=op;
       return std::vector<int>(0);
     }
     std::vector<int> r(att_length);
-    miattget(_mincid, varid, (char*)att_name, NC_INT, att_length,&r[0], NULL) ;
+    miattget(_mincid, varid, att_name, NC_INT, att_length,&r[0], NULL) ;
     //ncopts=op;
     return r;
   }
@@ -347,14 +347,14 @@ namespace minc
     nc_type datatype;
     
     //TODO: make this handle other (double?) data types correctly
-    if ((ncattinq(_mincid, varid, (char *)att_name, &datatype,&att_length) == MI_ERROR) ||
+    if ((ncattinq(_mincid, varid, att_name, &datatype,&att_length) == MI_ERROR) ||
         (datatype != NC_DOUBLE))
     {
       //ncopts=op;
       return std::vector<double>(0);
     }
     std::vector<double> r(att_length);
-    miattget(_mincid, varid, (char*)att_name, NC_DOUBLE, att_length,&r[0], NULL) ;
+    miattget(_mincid, varid, att_name, NC_DOUBLE, att_length,&r[0], NULL) ;
     //ncopts=op;
     return r;
   }
@@ -365,14 +365,14 @@ namespace minc
     nc_type datatype;
     
     //TODO: make this handle other (double?) data types correctly
-    if ((ncattinq(_mincid, varid, (char *)att_name, &datatype,&att_length) == MI_ERROR) ||
+    if ((ncattinq(_mincid, varid, att_name, &datatype,&att_length) == MI_ERROR) ||
          (datatype != NC_SHORT))
     {
       //ncopts=op;
       return std::vector<short>(0);
     }
     std::vector<short> r(att_length);
-    miattget(_mincid, varid, (char*)att_name, NC_SHORT, att_length,&r[0], NULL) ;
+    miattget(_mincid, varid, att_name, NC_SHORT, att_length,&r[0], NULL) ;
     //ncopts=op;
     return r;
   }
@@ -383,14 +383,14 @@ namespace minc
     nc_type datatype;
     
     //TODO: make this handle other (double?) data types correctly
-    if ((ncattinq(_mincid, varid, (char *)att_name, &datatype,&att_length) == MI_ERROR) ||
+    if ((ncattinq(_mincid, varid, att_name, &datatype,&att_length) == MI_ERROR) ||
          (datatype != NC_BYTE))
     {
       //ncopts=op;
       return std::vector<unsigned char>(0);
     }
     std::vector<unsigned char> r(att_length);
-    miattget(_mincid, varid, (char*)att_name, NC_BYTE, att_length,&r[0], NULL) ;
+    miattget(_mincid, varid, att_name, NC_BYTE, att_length,&r[0], NULL) ;
     //ncopts=op;
     return r;
   }
@@ -414,7 +414,7 @@ namespace minc
     int att_length;
     nc_type datatype;
     
-    if(ncattinq(_mincid, varid, (char *)att_name, &datatype,&att_length) == MI_ERROR)
+    if(ncattinq(_mincid, varid, att_name, &datatype,&att_length) == MI_ERROR)
       return MI_ORIGINAL_TYPE;
     return datatype;
   }
@@ -438,7 +438,7 @@ namespace minc
     int att_length;
     nc_type datatype;
     
-    if(ncattinq(_mincid, varid, (char *)att_name, &datatype,&att_length) == MI_ERROR)
+    if(ncattinq(_mincid, varid, att_name, &datatype,&att_length) == MI_ERROR)
       return 0;
     
     return att_length;
@@ -535,8 +535,8 @@ namespace minc
         _info[i].dim=dim_info::DIM_TIME;
         _map_to_std[4]=i;
       } else  {
-        REPORT_ERROR ("Unknown dimension");
         _info[i].dim=dim_info::DIM_UNKNOWN;
+        REPORT_ERROR ("Unknown dimension");
       }
       
       if(_info[i].dim!=dim_info::DIM_VEC)
@@ -559,7 +559,7 @@ namespace minc
           _info[i].step=-_info[i].step;
         }
         
-        if(miattget(_mincid, dimid, (char*)MIdirection_cosines, NC_DOUBLE, 3, &_info[i].dir_cos[0], NULL)!= MI_ERROR)
+        if(miattget(_mincid, dimid, MIdirection_cosines, NC_DOUBLE, 3, &_info[i].dir_cos[0], NULL)!= MI_ERROR)
         {
           _info[i].have_dir_cos=true;
           
@@ -692,7 +692,7 @@ namespace minc
         miattputdbl(_mincid, dimid, (char*)MIstart,_info[i].start);
         
         if(_info[i].have_dir_cos)
-          ncattput(_mincid, dimid, (char*)MIdirection_cosines,NC_DOUBLE, 3, _info[i].dir_cos);
+          ncattput(_mincid, dimid, MIdirection_cosines,NC_DOUBLE, 3, _info[i].dir_cos);
       }
     }
     _slab_len=1;
@@ -744,9 +744,9 @@ namespace minc
         break;
       default:break;
     };
-    miattputstr(_mincid, _imgid, (char*)MIcomplete, (char*)MI_FALSE);
-    miattputstr(_mincid, _imgid, (char*)MIsigntype, (char*)(_is_signed?MI_SIGNED:MI_UNSIGNED));
-    ncattput(_mincid, _imgid, (char*)MIvalid_range, NC_DOUBLE, 2, vrange);
+    miattputstr(_mincid, _imgid, MIcomplete, MI_FALSE);
+    miattputstr(_mincid, _imgid, MIsigntype, (_is_signed?MI_SIGNED:MI_UNSIGNED));
+    ncattput(_mincid, _imgid, MIvalid_range, NC_DOUBLE, 2, vrange);
     miset_valid_range(_mincid, _imgid, vrange);
   }
   
@@ -1409,10 +1409,10 @@ namespace minc
     att_length += strlen(append_history) + 1;
     char* str = new char[att_length];
     str[0] = '\0';
-    miattgetstr(_mincid, NC_GLOBAL, (char*)MIhistory, att_length+1,str);
+    miattgetstr(_mincid, NC_GLOBAL, MIhistory, att_length+1,str);
     //ncopts=NC_VERBOSE | NC_FATAL;
     strcat(str, append_history);
-    miattputstr(_mincid, NC_GLOBAL, (char*)MIhistory, str);
+    miattputstr(_mincid, NC_GLOBAL, MIhistory, str);
     delete [] str;
   }
   

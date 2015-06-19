@@ -502,26 +502,26 @@ MNCAPI char *miexpand_file(const char *path, char *tempfile,
 MNCAPI int miopen(const char *path, int mode);
 MNCAPI int micreate(const char *path, int cmode);
 MNCAPI int miclose(int cdfid);
-MNCAPI int miattget_with_sign(int cdfid, int varid, char *name, 
+MNCAPI int miattget_with_sign(int cdfid, int varid, const char *name, 
                               char *insign, nc_type datatype, char *outsign,
                               int max_length, void *value, int *att_length);
-MNCAPI int miattget(int cdfid, int varid, char *name, nc_type datatype,
+MNCAPI int miattget(int cdfid, int varid, const char *name, nc_type datatype,
                     int max_length, void *value, int *att_length);
 MNCAPI int miattget1(int cdfid, int varid, char *name, nc_type datatype,
                      void *value);
-MNCAPI char *miattgetstr(int cdfid, int varid, char *name, 
+MNCAPI char *miattgetstr(int cdfid, int varid, const char *name,
                          int maxlen, char *value);
 MNCAPI int miattputint(int cdfid, int varid, char *name, int value);
 MNCAPI int miattputdbl(int cdfid, int varid, char *name, double value);
-MNCAPI int miattputstr(int cdfid, int varid, char *name, char *value);
+MNCAPI int miattputstr(int cdfid, int varid, const char *name, const char *value);
 MNCAPI int mivarget(int cdfid, int varid, long start[], long count[],
-                    nc_type datatype, char *sign, void *values);
+                    nc_type datatype, const char *sign, void *values);
 MNCAPI int mivarget1(int cdfid, int varid, long mindex[],
-                     nc_type datatype, char *sign, void *value);
+                     nc_type datatype, const char *sign, void *value);
 MNCAPI int mivarput(int cdfid, int varid, long start[], long count[],
-                    nc_type datatype, char *sign, void *values);
+                    nc_type datatype, const char *sign, void *values);
 MNCAPI int mivarput1(int cdfid, int varid, long mindex[],
-                     nc_type datatype, char *sign, void *value);
+                     nc_type datatype, const char *sign, void *value);
 MNCAPI long *miset_coords(int nvals, long value, long coords[]);
 MNCAPI long *mitranslate_coords(int cdfid, 
                                 int invar,  long incoords[],
