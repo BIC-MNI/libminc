@@ -1025,7 +1025,7 @@ hdf_attget(int fd, int varid, const char *attnm, void *value)
 
 int
 hdf_attput(int fd, int varid, const char *attnm, nc_type val_typ, 
-	   int val_len, void *val_ptr)
+	   int val_len, const void *val_ptr)
 {
     hid_t att_id = -1;
     hid_t mtyp_id = -1;         /* Memory type */
