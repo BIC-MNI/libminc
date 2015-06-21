@@ -960,7 +960,7 @@ MNCAPI int miattputint(int cdfid, int varid, char *name, int value)
     MI_SAVE_ROUTINE_NAME("miattputint");
 
     lvalue = value;
-    status = ncattput(cdfid, varid, name, NC_INT, 1, (void *) &lvalue);
+    status = ncattput(cdfid, varid, name, NC_INT, 1, &lvalue);
     if (status < 0) {
 	milog_message(MI_MSG_WRITEATTR, name);
     }
@@ -986,7 +986,7 @@ MNCAPI int miattputdbl(int cdfid, int varid, char *name, double value)
 {
     int status;
     MI_SAVE_ROUTINE_NAME("miattputdbl");
-    status = ncattput(cdfid, varid, name, NC_DOUBLE, 1, (void *) &value);
+    status = ncattput(cdfid, varid, name, NC_DOUBLE, 1, &value);
     if (status < 0) {
 	milog_message(MI_MSG_WRITEATTR, name);
     }
@@ -1014,7 +1014,7 @@ MNCAPI int miattputstr(int cdfid, int varid, const char *name, const char *value
     MI_SAVE_ROUTINE_NAME("miattputstr");
 
     status = ncattput(cdfid, varid, name, NC_CHAR, 
-                       strlen(value) + 1, (void *) value);
+                       strlen(value) + 1, value);
     if (status < 0) {
 	milog_message(MI_MSG_WRITEATTR, name);
     }

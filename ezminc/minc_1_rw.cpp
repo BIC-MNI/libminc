@@ -1430,32 +1430,32 @@ namespace minc
       
   void minc_1_base::insert(const char *varname,const char *attname,double val)
   {
-    ncattput(_mincid, create_var_id(varname),attname, NC_DOUBLE, 1, (void *) &val);
+    ncattput(_mincid, create_var_id(varname),attname, NC_DOUBLE, 1, &val);
   }
   
   void minc_1_base::insert(const char *varname,const char *attname,const char* val)
   {
-    ncattput(_mincid, create_var_id(varname),attname, NC_CHAR, strlen(val) + 1, (void *) val);
+    ncattput(_mincid, create_var_id(varname),attname, NC_CHAR, strlen(val) + 1, val);
   }
   
   void minc_1_base::insert(const char *varname,const char *attname,const std::vector<double> &val)
   {
-    ncattput(_mincid, create_var_id(varname),attname, NC_DOUBLE, val.size(), (void *) &val[0]);
+    ncattput(_mincid, create_var_id(varname),attname, NC_DOUBLE, val.size(), &val[0]);
   }
   
   void minc_1_base::insert(const char *varname,const char *attname,const std::vector<int> &val)
   {
-    ncattput(_mincid, create_var_id(varname),attname, NC_INT, val.size(), (void *) &val[0]);
+    ncattput(_mincid, create_var_id(varname),attname, NC_INT, val.size(), &val[0]);
   }
   
   void minc_1_base::insert(const char *varname,const char *attname,const std::vector<short> &val)
   {
-    ncattput(_mincid, create_var_id(varname),attname, NC_SHORT, val.size(), (void *) &val[0]);
+    ncattput(_mincid, create_var_id(varname),attname, NC_SHORT, val.size(), &val[0]);
   }
   
   void minc_1_base::insert(const char *varname,const char *attname,const std::vector<unsigned char> &val)
   {
-    ncattput(_mincid, create_var_id(varname),attname, NC_BYTE, val.size(), (void *) &val[0]);
+    ncattput(_mincid, create_var_id(varname),attname, NC_BYTE, val.size(), &val[0]);
   }
   
 }

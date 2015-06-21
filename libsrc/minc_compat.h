@@ -32,7 +32,7 @@ MNCAPI int MI2dimdef(int fd, const char *dimnm, long length);
 MNCAPI int MI2attget(int fd, int varid, const char *attnm, void *value);
 
 MNCAPI int MI2attput(int fd, int varid, const char *attnm, nc_type val_typ, 
-           int val_len, void *val_ptr);
+           int val_len, const void *val_ptr);
 
 MNCAPI int MI2endef(int fd);
 
