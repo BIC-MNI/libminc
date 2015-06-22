@@ -2505,7 +2505,7 @@ int nifti_fileexists(const char* fname)
 *//*--------------------------------------------------------------------*/
 int nifti_is_complete_filename(const char* fname)
 {
-   char * ext;
+   const char * ext;
 
    /* check input file(s) for sanity */
    if( fname == NULL || *fname == '\0' ){
@@ -2549,7 +2549,7 @@ int nifti_is_complete_filename(const char* fname)
 *//*--------------------------------------------------------------------*/
 int nifti_validfilename(const char* fname)
 {
-   char * ext;
+   const char * ext;
 
    /* check input file(s) for sanity */
    if( fname == NULL || *fname == '\0' ){
@@ -2580,9 +2580,10 @@ int nifti_validfilename(const char* fname)
 
     \return a pointer to the extension (within the filename), or NULL
 *//*--------------------------------------------------------------------*/
-char * nifti_find_file_extension( const char * name )
+const char * nifti_find_file_extension( const char * name )
 {
-   char * ext, extcopy[8];
+   const char * ext;
+   char    extcopy[8];
    int    len;
    char   extnii[8] = ".nii";   /* modifiable, for possible uppercase */
    char   exthdr[8] = ".hdr";   /* (leave space for .gz) */
@@ -2599,10 +2600,10 @@ char * nifti_find_file_extension( const char * name )
    len = (int)strlen(name);
    if ( len < 4 ) return NULL;
 
-   ext = (char *)name + len - 4;
+   ext = name + len - 4;
 
    /* make manipulation copy, and possibly convert to lowercase */
-   strcpy(extcopy, ext);
+   strncpy(extcopy, ext, sizeof(extcopy) - 1);
    if( g_opts.allow_upper_fext ) make_lowercase(extcopy);
 
    /* if it look like a basic extension, fail or return it */
@@ -2617,10 +2618,10 @@ char * nifti_find_file_extension( const char * name )
 #ifdef HAVE_ZLIB
    if ( len < 7 ) return NULL;
 
-   ext = (char *)name + len - 7;
+   ext = name + len - 7;
 
    /* make manipulation copy, and possibly convert to lowercase */
-   strcpy(extcopy, ext);
+   strncpy(extcopy, ext, sizeof(extcopy) - 1);
    if( g_opts.allow_upper_fext ) make_lowercase(extcopy);
 
    /* go after .gz extensions using the modifiable strings */
@@ -2679,13 +2680,14 @@ int nifti_compiled_with_zlib(void)
 *//*--------------------------------------------------------------------*/
 char * nifti_makebasename(const char* fname)
 {
-   char *basename, *ext;
+   char *basename;
+   const char *ext;
 
    basename=nifti_strdup(fname);
 
    ext = nifti_find_file_extension(basename);
-   if ( ext ) *ext = '\0';  /* clear out extension */
-   
+   if ( ext != NULL ) 
+     basename[ext - basename] = '\0'; /* clear out extension */
    return basename;  /* in either case */
 }
 
@@ -2734,7 +2736,8 @@ void nifti_set_allow_upper_fext( int allow )
 *//*-------------------------------------------------------------------*/
 char * nifti_findhdrname(const char* fname)
 {
-   char *basename, *hdrname, *ext;
+   char *basename, *hdrname;
+   const char *ext;
    char  elist[2][5] = { ".hdr", ".nii" };
    char  extzip[4]   = ".gz";
    int   efirst = 1;    /* init to .nii extension */
@@ -2836,7 +2839,7 @@ char * nifti_findimgname(const char* fname , int nifti_type)
    char *basename, *imgname, elist[2][5] = { ".nii", ".img" };
    char  extzip[4] = ".gz";
    char  extnia[5] = ".nia";
-   char *ext;
+   const char *ext;
    int   first;  /* first extension to use */
 
    /* check input file(s) for sanity */
@@ -2918,7 +2921,8 @@ char * nifti_findimgname(const char* fname , int nifti_type)
 char * nifti_makehdrname(const char * prefix, int nifti_type, int check,
                          int comp)
 {
-   char * iname, * ext;
+   char * iname;
+   const char * ext;
    char   extnii[5] = ".nii";   /* modifiable, for possible uppercase */
    char   exthdr[5] = ".hdr";
    char   extimg[5] = ".img";
@@ -2944,7 +2948,7 @@ char * nifti_makehdrname(const char * prefix, int nifti_type, int check,
       }
 
       if( strncmp(ext,extimg,4) == 0 )
-         memcpy(ext,exthdr,4);   /* then convert img name to hdr */
+         memcpy(&iname[ext-iname],exthdr,4); /* then convert img name to hdr */
    }
    /* otherwise, make one up */
    else if( nifti_type == NIFTI_FTYPE_NIFTI1_1 ) strcat(iname, extnii);
@@ -2985,7 +2989,8 @@ char * nifti_makehdrname(const char * prefix, int nifti_type, int check,
 char * nifti_makeimgname(const char * prefix, int nifti_type, int check,
                          int comp)
 {
-   char * iname, * ext;
+   char * iname;
+   const char * ext;
    char   extnii[5] = ".nii";   /* modifiable, for possible uppercase */
    char   exthdr[5] = ".hdr";
    char   extimg[5] = ".img";
@@ -3011,7 +3016,7 @@ char * nifti_makeimgname(const char * prefix, int nifti_type, int check,
       }
 
       if( strncmp(ext,exthdr,4) == 0 )
-         memcpy(ext,extimg,4);   /* then convert hdr name to img */
+         memcpy(&iname[ext-iname],extimg,4); /* then convert hdr name to img */
    }
    /* otherwise, make one up */
    else if( nifti_type == NIFTI_FTYPE_NIFTI1_1 ) strcat(iname, extnii);
@@ -3106,7 +3111,7 @@ int nifti_set_filenames( nifti_image * nim, const char * prefix, int check,
 int nifti_type_and_names_match( nifti_image * nim, int show_warn )
 {
    char func[] = "nifti_type_and_names_match";
-   char * ext_h, * ext_i;  /* header and image filename extensions */
+   const char * ext_h, * ext_i;  /* header and image filename extensions */
    int  errs = 0;          /* error counter */
 
    /* sanity checks */
@@ -3202,12 +3207,12 @@ static int fileext_compare(const char * test_ext, const char * known_ext)
    char caps[8] = "";
    int  c, cmp, len;
 
+   /* if anything odd, use default */
+   if( !test_ext || !known_ext ) return 0;
+
    /* if equal, don't need to check case (store to avoid multiple calls) */
    cmp = strcmp(test_ext, known_ext);
    if( cmp == 0 ) return cmp;
-
-   /* if anything odd, use default */
-   if( !test_ext || !known_ext ) return cmp;
 
    len = strlen(known_ext);
    if( len > 7 ) return cmp;
@@ -3228,12 +3233,12 @@ static int fileext_n_compare(const char * test_ext,
    char caps[8] = "";
    int  c, cmp, len;
 
+   /* if anything odd, use default */
+   if( !test_ext || !known_ext ) return 0;
+
    /* if equal, don't need to check case (store to avoid multiple calls) */
    cmp = strncmp(test_ext, known_ext, maxlen);
    if( cmp == 0 ) return cmp;
-
-   /* if anything odd, use default */
-   if( !test_ext || !known_ext ) return cmp;
 
    len = strlen(known_ext);
    if( len > maxlen ) len = maxlen;     /* ignore anything past maxlen */
@@ -3250,11 +3255,11 @@ static int fileext_n_compare(const char * test_ext,
 /* return 1 if there are uppercase but no lowercase */
 static int is_uppercase(const char * str)
 {
-   int c, hasupper = 0;
-
+   int hasupper = 0;
+   size_t c, n;
    if( !str || !*str ) return 0;
-
-   for(c = 0; c < strlen(str); c++ ) {
+   n = strlen(str);
+   for(c = 0; c < n; c++ ) {
       if( islower(str[c]) ) return 0;
       if( !hasupper && isupper(str[c]) ) hasupper = 1;
    }
@@ -3265,11 +3270,11 @@ static int is_uppercase(const char * str)
 /* return 1 if there are both uppercase and lowercase characters */
 static int is_mixedcase(const char * str)
 {
-   int c, hasupper = 0, haslower = 0;
-
+   int hasupper = 0, haslower = 0;
+   size_t c, n;
    if( !str || !*str ) return 0;
-
-   for(c = 0; c < strlen(str); c++ ) {
+   n = strlen(str);
+   for(c = 0; c < n; c++ ) {
       if( !haslower && islower(str[c]) ) haslower = 1;
       if( !hasupper && isupper(str[c]) ) hasupper = 1;
 
@@ -3282,11 +3287,11 @@ static int is_mixedcase(const char * str)
 /* convert any lowercase chars to uppercase */
 static int make_uppercase(char * str)
 {
-   int c;
+   size_t c, n;
 
    if( !str || !*str ) return 0;
-
-   for(c = 0; c < strlen(str); c++ )
+   n = strlen(str);
+   for(c = 0; c < n; c++ )
       if( islower(str[c]) ) str[c] = toupper(str[c]);
 
    return 0;
@@ -3295,11 +3300,12 @@ static int make_uppercase(char * str)
 /* convert any uppercase chars to lowercase */
 static int make_lowercase(char * str)
 {
-   int c;
+   size_t c, n;
 
    if( !str || !*str ) return 0;
 
-   for(c = 0; c < strlen(str); c++ )
+   n = strlen(str);
+   for(c = 0; c < n; c++ )
       if( isupper(str[c]) ) str[c] = tolower(str[c]);
 
    return 0;
@@ -3589,6 +3595,7 @@ int disp_nifti_1_header( const char * info, const nifti_1_header * hp )
 #undef  ERREX
 #define ERREX(msg)                                           \
  do{ fprintf(stderr,"** ERROR: nifti_convert_nhdr2nim: %s\n", (msg) ) ;  \
+     if (nim != NULL) free(nim); \
      return NULL ; } while(0)
 
 /*----------------------------------------------------------------------*/
@@ -4312,7 +4319,11 @@ nifti_image * nifti_read_ascii_image(znzFile fp, char *fname, int flen,
       fprintf(stderr,"** %s: failed to alloc %d bytes for sbuf",lfunc,65530);
       free(fname);  znzclose(fp);  return NULL;
    }
-   znzread( sbuf , 1 , slen , fp ) ;
+   if (znzread( sbuf , 1 , slen - 1, fp ) <= 0) {
+     free(fname);
+     znzclose(fp);
+     return NULL;
+   }
    nim = nifti_image_from_ascii( sbuf, &txt_size ) ; free( sbuf ) ;
    if( nim == NULL ){
       LNI_FERR(lfunc,"failed nifti_image_from_ascii()",fname);
@@ -4324,7 +4335,11 @@ nifti_image * nifti_read_ascii_image(znzFile fp, char *fname, int flen,
    remain = flen - txt_size - (int)nifti_get_volsize(nim);
    if( remain > 4 ){
       /* read extensions (reposition file pointer, first) */
-      znzseek(fp, txt_size, SEEK_SET);
+      if (znzseek(fp, txt_size, SEEK_SET) < 0) {
+         free(fname);
+         znzclose(fp);
+         return NULL;
+      }
       (void) nifti_read_extensions(nim, fp, remain);
    }
 
@@ -4603,7 +4618,8 @@ static int nifti_read_next_extension( nifti1_extension * nex, nifti_image *nim,
    if( count != 2 ){
       if( g_opts.debug > 2 )
          fprintf(stderr,"-d current extension read failed\n");
-      znzseek(fp, -4*count, SEEK_CUR); /* back up past any read */
+      if (znzseek(fp, -4*count, SEEK_CUR) < 0) /* back up past any read */
+         return -1;
       return 0;                        /* no extension, no error condition */
    }
 
@@ -5102,7 +5118,7 @@ size_t nifti_write_buffer(znzFile fp, const void *buffer, size_t numbytes)
       fprintf(stderr,"** ERROR: nifti_write_buffer: null file pointer\n");
       return 0;
    }
-   ss = znzwrite( (void*)buffer , 1 , numbytes , fp ) ;
+   ss = znzwrite( buffer , 1 , numbytes , fp ) ;
    return ss;
 }
 
@@ -5783,7 +5799,11 @@ znzFile nifti_image_write_hdr_img2(nifti_image *nim, int write_opts,
       }
    }
 
-   znzseek(fp, nim->iname_offset, SEEK_SET);  /* in any case, seek to offset */
+   /* in any case, seek to offset */
+   if (znzseek(fp, nim->iname_offset, SEEK_SET) < 0) {
+     znzclose(fp);
+     return NULL;
+   }
 
    if( write_data ) nifti_write_all_data(fp,nim,NBL);
    if( ! leave_open ) znzclose(fp);
@@ -6361,14 +6381,14 @@ int nifti_short_order(void)   /* determine this CPU's byte order */
 nifti_image *nifti_image_from_ascii( const char *str, int * bytes_read )
 {
    char lhs[1024] , rhs[1024] ;
-   int ii , spos, nn , slen ;
+   int ii , spos, nn ;
    nifti_image *nim ;              /* will be output */
 
    if( str == NULL || *str == '\0' ) return NULL ;  /* bad input!? */
 
    /* scan for opening string */
 
-   spos = 0 ; slen = (int)strlen(str) ;
+   spos = 0 ;
    ii = sscanf( str+spos , "%1023s%n" , lhs , &nn ) ; spos += nn ;
    if( ii == 0 || strcmp(lhs,"<nifti_image") != 0 ) return NULL ;
 
@@ -6749,7 +6769,7 @@ int nifti_read_collapsed_image( nifti_image * nim, const int dims [8],
    /** - check pointers for sanity */
    if( !nim || !dims || !data ){
       fprintf(stderr,"** nifti_RCI: bad params %p, %p, %p\n",
-              (void *)nim, (void *)dims, (void *)data);
+              (void *) nim, (const void *)dims, (void *)data);
       return -1;
    }
 
@@ -6991,7 +7011,13 @@ int nifti_read_subregion_image( nifti_image * nim,
                 (m * strides[2]) +
                 (n * strides[1]) +
                 (si[0] * strides[0]);
-              znzseek(fp, offset, SEEK_SET); /* seek to current row */
+              if (znzseek(fp, offset, SEEK_SET) < 0) { /* seek to current row */
+                if (g_opts.debug > 1) {
+                  fprintf(stderr,"read of %d bytes failed on seek\n",
+                          read_amount);
+                }
+                return -1;
+              }
               read_amount = rs[0] * nim->nbyper; /* read a row of the subregion*/
               nread = (int)nifti_read_buffer(fp, readptr, read_amount, nim);
               if(nread != read_amount)
@@ -7011,6 +7037,7 @@ int nifti_read_subregion_image( nifti_image * nim,
       }
     }
   }
+  znzclose(fp);
   return bytes;
 }
 
@@ -7045,7 +7072,8 @@ static int rci_read_data(nifti_image * nim, int * pivots, int * prods,
       }
 
       /* so just seek and read (prods[0] * nbyper) bytes from the file */
-      znzseek(fp, (long)base_offset, SEEK_SET);
+      if (znzseek(fp, (long)base_offset, SEEK_SET) < 0)
+         return -1;
       bytes = (size_t)prods[0] * nim->nbyper;
       nread = nifti_read_buffer(fp, data, bytes, nim);
       if( nread != bytes ){

@@ -167,7 +167,7 @@ size_t znzread(void* buf, size_t size, size_t nmemb, znzFile file)
 size_t znzwrite(const void* buf, size_t size, size_t nmemb, znzFile file)
 {
   size_t     remain = size*nmemb;
-  char     * cbuf = (char *)buf;
+  const char * cbuf = buf;
   unsigned   n2write;
   int        nwritten;
 
@@ -176,7 +176,7 @@ size_t znzwrite(const void* buf, size_t size, size_t nmemb, znzFile file)
   if (file->zfptr!=NULL) {
     while( remain > 0 ) {
        n2write = (remain < ZNZ_MAX_BLOCK_SIZE) ? remain : ZNZ_MAX_BLOCK_SIZE;
-       nwritten = gzwrite(file->zfptr, (void *)cbuf, n2write);
+       nwritten = gzwrite(file->zfptr, cbuf, n2write);
 
        /* gzread returns 0 on error, but in case that ever changes... */
        if( nwritten < 0 ) return nwritten;
