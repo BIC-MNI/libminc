@@ -67,6 +67,9 @@ IF(LIBMINC_MINC1_SUPPORT)
   add_minc_test(minc_conversion minc_conversion)
 ENDIF(LIBMINC_MINC1_SUPPORT)
 
+ADD_EXECUTABLE(nifti_test nifti_test.c)
+ADD_TEST(nifti_test-1 nifti_test)
+
 # Volume IO tests
 ADD_EXECUTABLE(test_xfm   vio_xfm_test/test-xfm.c)
 TARGET_LINK_LIBRARIES(test_xfm ${VOLUME_IO_LIBRARY} ${LIBMINC_LIBRARIES})
