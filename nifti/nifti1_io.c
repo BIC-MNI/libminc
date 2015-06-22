@@ -2589,7 +2589,9 @@ const char * nifti_find_file_extension( const char * name )
    char   exthdr[8] = ".hdr";   /* (leave space for .gz) */
    char   extimg[8] = ".img";
    char   extnia[8] = ".nia";
+#ifdef HAVE_ZLIB
    char   extgz[4]  = ".gz";
+#endif
    char * elist[4]  = { NULL, NULL, NULL, NULL};
 
    /* stupid compiler... */
