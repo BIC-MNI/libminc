@@ -251,7 +251,7 @@ MNCAPI void milog_init(const char *name)
         _MI_log.level = level;
     }
 
-    strncpy(_MI_log.prog, name, sizeof (_MI_log.prog));
+    strncpy(_MI_log.prog, name, sizeof(_MI_log.prog) - 1 );
 
     if (fname_str != NULL) {
         free(fname_str);
