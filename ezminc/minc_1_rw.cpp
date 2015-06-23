@@ -1373,7 +1373,7 @@ namespace minc
   {
     
     //code copied from mincresample
-    int nexcluded, excluded_vars[10];
+    int nexcluded, excluded_vars[10] = {0,0,0,0,0,0,0,0,0,0};
     int varid;
     
     /* Create the list of excluded variables */
