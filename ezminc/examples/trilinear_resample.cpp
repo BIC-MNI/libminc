@@ -22,7 +22,7 @@
 
 using namespace minc;
 
-void show_usage (const char * prog)
+static void show_usage (const char * prog)
 {
   std::cerr<<"Usage: "<<prog<<" <input.mnc> <output.mnc> [--step <f> --verbose ]"<<std::endl;
 }
