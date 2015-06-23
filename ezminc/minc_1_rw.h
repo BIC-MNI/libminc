@@ -39,7 +39,7 @@ namespace minc
   struct dim_info
   {
     enum dimensions {DIM_UNKNOWN=0,DIM_X,DIM_Y,DIM_Z,DIM_TIME,DIM_VEC} ;
-    dim_info():length(0),step(0),start(0),have_dir_cos(false)
+    dim_info():length(0),step(0),start(0),have_dir_cos(false),dim(DIM_UNKNOWN)
     {
       dir_cos[0]=dir_cos[1]=dir_cos[2]=0.0;
     }

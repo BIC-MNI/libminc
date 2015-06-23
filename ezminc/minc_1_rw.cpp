@@ -19,6 +19,7 @@
 //minc stuff
 #include <math.h>
 #include <limits.h>
+#include <stdlib.h>
 #include "minc_1_rw.h"
 
 namespace minc

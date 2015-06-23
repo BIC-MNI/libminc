@@ -179,7 +179,7 @@ namespace minc
         _allocate();
       }
 
-      simple_volume():_vol(0)
+      simple_volume():_vol(0),_count(0),_free_memory(false)
       {
         for(size_t i=0;i<ndims;i++)
         {
