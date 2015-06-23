@@ -7015,8 +7015,7 @@ int nifti_read_subregion_image( nifti_image * nim,
                 (si[0] * strides[0]);
               if (znzseek(fp, offset, SEEK_SET) < 0) { /* seek to current row */
                 if (g_opts.debug > 1) {
-                  fprintf(stderr,"read of %d bytes failed on seek\n",
-                          read_amount);
+                  fprintf(stderr,"read failed on seek\n");
                 }
                 return -1;
               }
