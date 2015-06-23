@@ -624,12 +624,16 @@ namespace minc
   
   void minc_1_reader::close(void)
   {
-    if(_have_temp_file)
-      remove(_tempfile.c_str());
     
     _have_temp_file=false;
     
     minc_1_base::close();
+    
+    if(_have_temp_file)
+    {
+      if(remove(_tempfile.c_str()))
+        REPORT_ERROR ("Error removing temporary file");
+    }
   }
   
   minc_1_reader::~minc_1_reader()
