@@ -29,7 +29,6 @@ void show_usage(const char *name)
   int clobber=0;
   int verbose=0;
 
-  int i;
   // read the arguments
   static struct option long_options[] =
     {
