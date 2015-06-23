@@ -166,10 +166,12 @@ size_t znzread(void* buf, size_t size, size_t nmemb, znzFile file)
 
 size_t znzwrite(const void* buf, size_t size, size_t nmemb, znzFile file)
 {
+#ifdef HAVE_ZLIB
   size_t     remain = size*nmemb;
   const char * cbuf = buf;
   unsigned   n2write;
   int        nwritten;
+#endif
 
   if (file==NULL) { return 0; }
 #ifdef HAVE_ZLIB
@@ -295,7 +297,9 @@ int znzgetc(znzFile file)
 int znzprintf(znzFile stream, const char *format, ...)
 {
   int retval=0;
+#ifdef HAVE_ZLIB
   char *tmpstr;
+#endif
   va_list va;
   if (stream==NULL) { return 0; }
   va_start(va, format);

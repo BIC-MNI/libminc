@@ -76,7 +76,7 @@ int main(int argc, char **argv)
    coord[0]=0;
    miicv_attach(icv, cdfid, img);
    miicv_put(icv, coord, count, ivalue);
-   for (i=0; i< sizeof(ivalue)/sizeof(ivalue[0]); i++)
+   for (i=0; i< (long)(sizeof(ivalue)/sizeof(ivalue[0])); i++)
       ivalue[i] = 0;
    miicv_get(icv, coord, count, ivalue);
    for (i=0; i<3; i++) {
