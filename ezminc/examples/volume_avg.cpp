@@ -22,7 +22,7 @@
 
 using namespace minc;
 
-void show_usage(const char *name)
+static void show_usage(const char *name)
 {
   std::cerr 
 	  << "Usage: "<<name<<" <input1> .... <inputn>  <output> " << std::endl
