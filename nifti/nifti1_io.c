@@ -2478,7 +2478,7 @@ size_t nifti_get_volsize(const nifti_image *nim)
 
     \return 1 on existence, 0 otherwise
 *//*--------------------------------------------------------------------*/
-int nifti_fileexists(const char* fname)
+static int nifti_fileexists(const char* fname)
 {
    znzFile fp;
    fp = znzopen( fname , "rb" , 1 ) ;
@@ -5601,7 +5601,7 @@ int nifti_copy_extensions(nifti_image * nim_dest, const nifti_image * nim_src)
     and the bytes used for the data.  Each esize also needs to be a
     multiple of 16, so it may be greater than the sum of its 3 parts.
 *//*--------------------------------------------------------------------*/
-int nifti_extension_size(nifti_image *nim)
+static int nifti_extension_size(nifti_image *nim)
 {
    int c, size = 0;
 

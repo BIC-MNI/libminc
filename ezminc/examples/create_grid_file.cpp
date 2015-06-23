@@ -14,7 +14,7 @@
 using namespace  std;
 using namespace  minc;
 
-void show_usage(const char *name)
+static void show_usage(const char *name)
 {
   std::cerr 
     << "Usage: "<<name<<" <output_grid_mnc>" << std::endl
