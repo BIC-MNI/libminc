@@ -1404,8 +1404,6 @@ char *nifti_orientation_string( int ii )
     \param nbyper   pointer to return value: number of bytes per voxel
     \param swapsize pointer to return value: size of swap blocks
 
-    \return appropriate values at nbyper and swapsize
-
     The swapsize is set to 0 if this datatype doesn't ever need swapping.
 
     \sa NIFTI1_DATATYPES in nifti1.h
@@ -4476,7 +4474,7 @@ static int nifti_read_extensions( nifti_image *nim, znzFile fp, int remain )
 
    \param nim    - nifti_image to add extension to
    \param data   - raw extension data
-   \param length - length of raw extension data
+   \param len    - length of raw extension data
    \param ecode  - extension code
 
    \sa extension codes NIFTI_ECODE_* in nifti1_io.h
@@ -6838,7 +6836,7 @@ compute_strides(int *strides,const int *size,int nbyper)
 }
 
 /*---------------------------------------------------------------------------*/
-/*! read an arbitrary subregion from a nifti image
+/*! read an arbitrary subregion from a nifti image  <pre>
 
     This function may be used to read a single arbitary subregion of any
     rectangular size from a nifti dataset, such as a small 5x5x5 subregion
