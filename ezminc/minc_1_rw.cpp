@@ -474,8 +474,12 @@ namespace minc
       char * tempfile = miexpand_file((char*)path, NULL, true, &created_tempfile);
       if (tempfile == NULL) REPORT_ERROR("Error expanding minc file");
       _tempfile=tempfile;
+      
       path=_tempfile.c_str();
       _have_temp_file=created_tempfile;
+      
+      if(created_tempfile)
+        free(tempfile);
     }
     _mincid = miopen((char*)path, rw?NC_WRITE:NC_NOWRITE);
 
