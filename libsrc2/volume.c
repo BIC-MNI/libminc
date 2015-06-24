@@ -70,7 +70,7 @@ static int _generate_ident( char * id_str, size_t length )
   
   temp_ptr = getenv("LOGNAME");
   if (temp_ptr != NULL) {
-    strcpy(user_str, temp_ptr);
+    strncpy(user_str, temp_ptr, sizeof(user_str) - 1);
   }
   else {
     strcpy(user_str, "nobody");
@@ -276,9 +276,9 @@ int micreate_volume_image(mihandle_t volume)
     /* Create the dimorder string, ordered comma-separated
       list of dimension names.
     */
-    strcat(dimorder, volume->dim_handles[i]->name);
+    strncat(dimorder, volume->dim_handles[i]->name, MI2_CHAR_LENGTH - 1);
     if (i != volume->number_of_dims - 1) {
-      strcat(dimorder, ",");
+      strncat(dimorder, ",", MI2_CHAR_LENGTH - 1);
     }
   }
 
@@ -331,9 +331,9 @@ int micreate_volume_image(mihandle_t volume)
         /* Create the dimorder string, ordered comma-separated
           list of dimension names.
         */
-        strcat(dimorder, volume->dim_handles[i]->name);
+        strncat(dimorder, volume->dim_handles[i]->name, MI2_CHAR_LENGTH - 1);
         if (i != volume->number_of_dims - 1) {
-          strcat(dimorder, ",");
+          strncat(dimorder, ",", MI2_CHAR_LENGTH - 1);
         }
       }
     }
@@ -525,6 +525,7 @@ int micreate_volume(const char *filename, int number_of_dimensions,
       miinit_enum(handle->mtype_id);
       break;
     default:
+      free(handle);
       return (MI_ERROR);
     }
     break;
@@ -539,6 +540,7 @@ int micreate_volume(const char *filename, int number_of_dimensions,
       handle->mtype_id = mitype_to_hdftype(volume_type, TRUE);
       break;
     default:
+      free(handle);
       return MI_LOG_ERROR(MI2_MSG_BADTYPE,volume_type);
     }
     break;
@@ -550,6 +552,7 @@ int micreate_volume(const char *filename, int number_of_dimensions,
     break;
 
   default:
+    free(handle);
     return (MI_ERROR);
   }
 
@@ -563,6 +566,7 @@ int micreate_volume(const char *filename, int number_of_dimensions,
 
   file_id = _hdf_create(filename, H5F_ACC_TRUNC);
   if (file_id < 0) {
+    free(handle);
     return (MI_ERROR);
   }
 
@@ -634,6 +638,7 @@ int micreate_volume(const char *filename, int number_of_dimensions,
   if (create_props != NULL && create_props->depth > 0) {
     for (i=0; i < create_props->depth ; i++) {
       if (minc_create_thumbnail(handle, i+1) < 0) {
+        free(handle);
         return (MI_ERROR);
       }
     }
@@ -657,6 +662,7 @@ int micreate_volume(const char *filename, int number_of_dimensions,
     }
 
     if (dataspace_id < 0) {
+      free(handle);
       return (MI_ERROR);
     }
     
@@ -684,6 +690,7 @@ int micreate_volume(const char *filename, int number_of_dimensions,
     */
     if (dimensions[i]->attr & MI_DIMATTR_NOT_REGULARLY_SAMPLED) {
       if (dimensions[i]->offsets == NULL) {
+        free(handle);
         return (MI_ERROR);
       } else {
 
@@ -1290,6 +1297,7 @@ int miopen_volume(const char *filename, int mode, mihandle_t *volume)
   handle->number_of_dims = _miget_file_dimension_count(file_id);
   
   if( handle->number_of_dims <= 0 ) {
+    free(handle);
     return MI_LOG_ERROR(MI2_MSG_GENERIC,"Trying to open minc file without image variable");
   }
 
@@ -1299,6 +1307,7 @@ int miopen_volume(const char *filename, int mode, mihandle_t *volume)
                         sizeof(midimhandle_t));
   
   if(handle->dim_handles == NULL) {
+    free(handle);
     return MI_LOG_ERROR(MI2_MSG_OUTOFMEM, handle->number_of_dims * sizeof(midimhandle_t));
   }
   
