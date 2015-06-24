@@ -310,6 +310,7 @@ int znzprintf(znzFile stream, const char *format, ...)
     tmpstr = (char *)calloc(1, size);
     if( tmpstr == NULL ){
        fprintf(stderr,"** ERROR: znzprintf failed to alloc %d bytes\n", size);
+       va_end(va);
        return retval;
     }
     vsprintf(tmpstr,format,va);

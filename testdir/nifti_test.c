@@ -7,16 +7,18 @@ enum NIFTITEST_BOOL {
   NIFTITEST_FALSE=0
 };
 
+static enum NIFTITEST_BOOL g_verbose = NIFTITEST_FALSE;
+
 static void _PrintTest(const int line,const char * message,const int FailureOccured, const enum NIFTITEST_BOOL isFatal,int *ErrorAccum)
 {
-  if(FailureOccured==NIFTITEST_TRUE)  /* This line can be commented out for a more verbose output */
+  if(g_verbose || FailureOccured > 0)
     {
     char const * const PREFIX= (FailureOccured)?"==========ERROR":"..........SUCCESS";
     char const * const ISFATALPREFIX= (isFatal && FailureOccured)?" FATAL":"";
     printf("%s%s (LINE %d): %s\n",PREFIX,ISFATALPREFIX,line,message);
     fflush(stdout);
     *ErrorAccum+=FailureOccured;
-    if(isFatal==NIFTITEST_TRUE && FailureOccured==NIFTITEST_TRUE)
+    if(isFatal && FailureOccured > 0)
       {
       printf("\n\nTOTAL ERRORS=%d\n",*ErrorAccum);
       exit( *ErrorAccum);
@@ -84,8 +86,8 @@ static nifti_image * generate_reference_image( const char * write_image_filename
   reference_header.magic[2]='1';
   reference_header.magic[3]='\0';
   /* String is purposfully too long */
-  strncpy(reference_header.intent_name,"PHANTOM_DATA to be used for regression testing the nifti reader/writer",16);
-  strncpy(reference_header.descrip,"This is a very long dialog here to use up more than 80 characters of space to test to see if the code is robust enough to deal appropriatly with very long and obnoxious lines.",80);
+  memcpy(reference_header.intent_name,"TEST_DATA_STRING",16);
+  memcpy(reference_header.descrip,"01234567890123456789012345678901234567890123456789012345678901234567890123456789",80);
 
   {
   int nbyper;

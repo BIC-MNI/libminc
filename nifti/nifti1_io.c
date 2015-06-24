@@ -3709,7 +3709,7 @@ nifti_image* nifti_convert_nhdr2nim(struct nifti_1_header nhdr,
   nim->datatype = nhdr.datatype ;
   
   nifti_datatype_sizes( nim->datatype , &(nim->nbyper) , &(nim->swapsize) ) ;
-  if( nim->nbyper == 0 ){ free(nim); ERREX("bad datatype"); }
+  if( nim->nbyper == 0 ){ ERREX("bad datatype"); }
   
   /**- set the grid spacings */
   
@@ -4338,6 +4338,7 @@ nifti_image * nifti_read_ascii_image(znzFile fp, char *fname, int flen,
       if (znzseek(fp, txt_size, SEEK_SET) < 0) {
          free(fname);
          znzclose(fp);
+         free(nim);
          return NULL;
       }
       (void) nifti_read_extensions(nim, fp, remain);
@@ -4599,7 +4600,7 @@ static int nifti_read_next_extension( nifti1_extension * nex, nifti_image *nim,
                                       int remain, znzFile fp )
 {
    int swap = nim->byteorder != nifti_short_order();
-   int count, size, code;
+   int count, size, code = 0;
 
    /* first clear nex */
    nex->esize = nex->ecode = 0;
@@ -6968,8 +6969,9 @@ int nifti_read_subregion_image( nifti_image * nim,
     if(g_opts.debug > 1)
       {
       fprintf(stderr,"allocation of %d bytes failed\n",total_alloc_size);
-      return -1;
       }
+    znzclose(fp);
+    return -1;
     }
 
   /* point to start of data buffer as char * */
@@ -7171,6 +7173,8 @@ static int make_pivot_list(nifti_image * nim, const int dims[], int pivots[],
 
    len = 0;
    index = nim->dim[0];
+   if (index <= 0 || index >= 8)
+     return -1;
    while( index > 0 ){
       prods[len] = 1;
       while( index > 0 && (nim->dim[index] == 1 || dims[index] == -1) ){
