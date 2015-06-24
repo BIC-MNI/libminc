@@ -2317,6 +2317,8 @@ hdf_create(const char *path, int cmode, struct mi2opts *opts_ptr)
         fd = H5Fcreate(path, cmode, H5P_DEFAULT, fpid);
     } H5E_END_TRY;
     if (fd < 0) {
+      fprintf(stderr, "Error creating HDF file '%s' with mode '%x', result %d\n", path, cmode, fd);
+      H5Eprint1(stderr);
       return (MI_ERROR);
     }
 
@@ -2326,25 +2328,35 @@ hdf_create(const char *path, int cmode, struct mi2opts *opts_ptr)
      * Should we use a non-zero value for size_hint (parameter 3)???
      */
     if ((grp_id = H5Gcreate2(fd, MI2_GRPNAME, H5P_DEFAULT, hdf_gpid, H5P_DEFAULT)) < 0) {
+      fprintf(stderr, "Error creating groups on line %d\n", __LINE__);
+      H5Eprint1(stderr);
       return (MI_ERROR);
     }
 
     if ((tmp_id = H5Gcreate2(grp_id, "dimensions", H5P_DEFAULT, hdf_gpid, H5P_DEFAULT)) < 0) {
+      fprintf(stderr, "Error creating groups on line %d\n", __LINE__);
+      H5Eprint1(stderr);
       return (MI_ERROR);
     }
     H5Gclose(tmp_id);
 
     if ((tmp_id = H5Gcreate2(grp_id, "info", H5P_DEFAULT, hdf_gpid, H5P_DEFAULT)) < 0) {
+      fprintf(stderr, "Error creating groups on line %d\n", __LINE__);
+      H5Eprint1(stderr);
       return (MI_ERROR);
     }
     H5Gclose(tmp_id);
 
     if ((tmp_id = H5Gcreate2(grp_id, "image", H5P_DEFAULT, hdf_gpid, H5P_DEFAULT)) < 0) {
+      fprintf(stderr, "Error creating groups on line %d\n", __LINE__);
+      H5Eprint1(stderr);
       return (MI_ERROR);
     }
     H5Gclose(tmp_id);
 
     if ((tmp_id = H5Gcreate2(grp_id, "image/0", H5P_DEFAULT, hdf_gpid, H5P_DEFAULT)) < 0) {
+      fprintf(stderr, "Error creating groups on line %d\n", __LINE__);
+      H5Eprint1(stderr);
       return (MI_ERROR);
     }
     
@@ -2354,6 +2366,8 @@ hdf_create(const char *path, int cmode, struct mi2opts *opts_ptr)
 
     file = hdf_id_add(fd);      /* Add it to the list */
     if (file == NULL) {
+        fprintf(stderr, "Error adding ID to list.\n");
+        H5Eprint1(stderr);
         return (MI_ERROR);      /* Should not happen?? */
     }
 
