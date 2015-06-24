@@ -1421,9 +1421,9 @@ static void midownsample_slice ( double *in_ptr, double *out_ptr, hsize_t isize[
   hsize_t j, k;
   int x, y, z;
   double d;
-  hsize_t total;
+  double total;
 
-  total = scale * scale * scale;
+  total = (double) scale * (double) scale * (double) scale;
 
   /* These two loops iterate over all of the voxels in the 2D output
   * image.
