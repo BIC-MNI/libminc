@@ -8,6 +8,15 @@
 #include <float.h>
 #include <minc.h>
 
+
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+
 #ifdef HAVE_STRING_H
 #include <string.h>
 #endif
@@ -34,6 +43,7 @@ int main(int argc, char **argv)
    };
    static int ivallen = sizeof(ivalue)/sizeof(ivalue[0]);
    int cflag = 0;
+   char filename[256];
 
 #if MINC2
    if (argc == 2 && !strcmp(argv[1], "-2")) {
@@ -45,7 +55,8 @@ int main(int argc, char **argv)
    (void) miicv_setint(icv, MI_ICV_VALID_MAX, 200);
    (void) miicv_setint(icv, MI_ICV_VALID_MIN, 0);
    (void) miicv_setint(icv, MI_ICV_DO_FILLVALUE, TRUE);
-   mincid=micreate("test.mnc", NC_CLOBBER | cflag);
+   snprintf(filename, sizeof(filename), "test_icv_fillvalue-%d.mnc", getpid());
+   mincid=micreate(filename, NC_CLOBBER | cflag);
    for (i=0; i<2; i++) {
       dim[i]=ncdimdef(mincid, diminfo[i].name, diminfo[i].len);
    }
@@ -95,6 +106,6 @@ int main(int argc, char **argv)
    }
 
    (void) miclose(mincid);
-
+   unlink(filename);
    return 0;
 }

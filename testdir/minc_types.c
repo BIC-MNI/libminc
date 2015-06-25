@@ -20,6 +20,14 @@
 #include <limits.h>
 #include <minc.h>
 
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+
 #ifdef HAVE_STRING_H
 #include <string.h>
 #endif
@@ -50,6 +58,7 @@ int main(int argc, char **argv)
    double image[256*256];
    int i, itype, jtype;
    int cflag = 0;
+   char filename[256];
 
 #if MINC2
    if (argc == 2 && !strcmp(argv[1], "-2")) {
@@ -57,10 +66,12 @@ int main(int argc, char **argv)
    }
 #endif /* MINC2 */
 
+   snprintf(filename, sizeof(filename), "test_minc_types-%d.mnc", getpid());
+
    ncopts=NC_VERBOSE|NC_FATAL;
    for (itype=0; itype<ntypes; itype++) {
       for (jtype=0; jtype<ntypes; jtype++) {
-         cdf=micreate("test.mnc",NC_CLOBBER | cflag);
+         cdf=micreate(filename, NC_CLOBBER | cflag);
          count[2]=256;
          count[1]=20;
          count[0]=7;
@@ -106,5 +117,6 @@ int main(int argc, char **argv)
          (void) miclose(cdf);
       }
    }
+   unlink(filename);
    return(0);
 }

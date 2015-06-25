@@ -13,9 +13,18 @@
 #if HAVE_CONFIG_H
 #include "config.h"
 #endif
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <minc.h>
+
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
 
 int main()
 {
@@ -27,9 +36,13 @@ int main()
    long count[MAX_VAR_DIMS];
    double image[256*256];
    int i, j, k, ioff;
+   char filename[256];
+   char filename2[256];
 
    ncopts=NC_VERBOSE|NC_FATAL;
-   cdf=micreate("test.mnc",NC_CLOBBER);
+   snprintf(filename, sizeof(filename), "test_minc-%d.mnc", getpid());
+   snprintf(filename2, sizeof(filename2), "test_minc2-%d.mnc", getpid());
+   cdf=micreate(filename, NC_CLOBBER);
    count[2]=5;
    count[1]=3;
    count[0]=7;
@@ -49,7 +62,7 @@ int main()
             image[ioff+k]=ioff+k+10;
       }
    }
-   cdf2=micreate("test2.mnc",NC_CLOBBER);
+   cdf2=micreate(filename2,NC_CLOBBER);
    (void) ncdimdef(cdf2, "junkdim", NC_UNLIMITED);
    (void) micopy_all_var_defs(cdf, cdf2, 1, &img);
    (void) ncendef(cdf2);
@@ -60,5 +73,7 @@ int main()
    (void) micopy_all_var_values(cdf, cdf2, 1, &img);
    (void) miclose(cdf2);
    (void) miclose(cdf);
+   unlink(filename);
+   unlink(filename2);
    return(0);
 }
