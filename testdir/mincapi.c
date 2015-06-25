@@ -744,20 +744,26 @@ main(int argc, char **argv)
 
   ncopts &= ~(NC_FATAL | NC_VERBOSE);
 
+  fprintf(stderr, "Part 1...\n");
   test1(&info, dimtab1, 3);
 
+  fprintf(stderr, "Part 2...\n");
   test2(&info, dimtab1, 3);
 
+  fprintf(stderr, "Part 3...\n");
   test3(&info, dimtab1, 3);
 
+  fprintf(stderr, "Part 4...\n");
   test4(&info, dimtab1, 3);
 
+  fprintf(stderr, "Part 5...\n");
   test5(&info, dimtab1, 3);
 
 #if 0
   test6(&info, dimtab1, 3);
 #endif
 
+  fprintf(stderr, "Part 7...\n");
   test7(&info, dimtab1, 3);
 
   stat = miicv_free(rand());
