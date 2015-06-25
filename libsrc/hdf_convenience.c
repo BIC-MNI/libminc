@@ -1847,11 +1847,11 @@ hdf_vargetg(int fd, int varid, const long *start,
      * Check start, edges
      */
     for (idim = 0; idim < maxidim; idim++) {
-        if ((unsigned long) mystart[idim] >= varp->dims[idim]) {
+        if ((hsize_t) mystart[idim] >= varp->dims[idim]) {
 	    status = MI_ERROR;
 	    goto done;
 	}
-	if ((unsigned long) (mystart[idim] + myedges[idim]) > varp->dims[idim]) {
+	if ((hsize_t) (mystart[idim] + myedges[idim]) > varp->dims[idim]) {
 	    status = MI_ERROR;
 	    goto done;
 	}
