@@ -779,7 +779,7 @@ main(int argc, char **argv)
     FUNC_ERROR("miclose");
   }
 
-  if (miclose(rand()) != MI_ERROR) {
+  if (miclose(42) != MI_ERROR) {
     FUNC_ERROR("miclose");
   }
 
