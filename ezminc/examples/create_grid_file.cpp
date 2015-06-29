@@ -84,7 +84,7 @@ static void show_usage(const char *name)
   {
     minc_info output_info_grid;
     
-    const int nx=20,ny=20,nz=20;
+    const size_t nx=20,ny=20,nz=20;
     const double step=10;
     const double start_x=-100,start_y=-100,start_z=-100;
     const double amp=2.0; // amplitude of the harmonic deformation 
