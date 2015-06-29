@@ -2131,7 +2131,7 @@ void nifti_mat44_to_orientation( mat44 R , int *icod, int *jcod, int *kcod )
  * 
  *  Due to alignment of structures at some architectures (e.g. on ARM),
  *  stick to char varaibles.
- *  Fixes http://bugs.debian.org/446893   Yaroslav <debian@onerussian.com>
+ *  Fixes http://bugs.debian.org/446893   Yaroslav <debian\@onerussian.com>
  *
 *//*--------------------------------------------------------------------*/
 void nifti_swap_2bytes( size_t n , void *ar )    /* 2 bytes at a time */
@@ -2820,9 +2820,10 @@ char * nifti_findhdrname(const char* fname)
 /*------------------------------------------------------------------------*/
 /*! check current directory for existing image file
 
-    \param fname filename to check for
-    \nifti_type  nifti_type for dataset - this determines whether to
-                 first check for ".nii" or ".img" (since both may exist)
+    \param fname       filename to check for
+    \param nifti_type  nifti_type for dataset - this determines whether to
+                       first check for ".nii" or ".img" (since both may
+                       exist)
 
     \return filename of data/img file on success and NULL if no appropriate
             file could be found
