@@ -1,6 +1,10 @@
 /*
  * test program for NIFTI lib.
  */
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <nifti1_io.h>
 enum NIFTITEST_BOOL {
   NIFTITEST_TRUE=1,
@@ -172,6 +176,10 @@ int main (int argc, char *argv[])
   PrintTest("NOT REALLY AN ERROR, JUST TESTING THE ERROR COUNTING MECHANISM",Errors==1,NIFTITEST_FALSE,&Errors);
   Errors=0;
   }
+#if !defined(HAVE_ZLIB)
+  PrintTest("This test will not run properly if HAVE_ZLIB is not set.",
+            1, NIFTITEST_TRUE, &Errors);
+#endif
   {
   const char write_image_filename[6][64]={
     "ATestReferenceImageForReadingAndWriting.nii",
