@@ -975,8 +975,6 @@ static  void  input_slab(
         ind = to_volume[file_ind];
         if( ind != INVALID_AXIS )
             volume_start[ind] = file_start[file_ind];
-        else
-            volume_start[ind] = 0;
     }
 
     get_multidim_sizes( &volume->array, array_sizes );
