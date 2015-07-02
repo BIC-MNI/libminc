@@ -1,5 +1,5 @@
-#ifndef  MINC_STRUCTURES_HEADER_FILE
-#define  MINC_STRUCTURES_HEADER_FILE
+#ifndef MINC_STRUCTURES_H
+#define MINC_STRUCTURES_H
 
 /* ----------------------------- MNI Header -----------------------------------
 @NAME       : minc_structures.h

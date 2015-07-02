@@ -1,5 +1,5 @@
-#ifndef MINC_HEADER_FILE
-#define MINC_HEADER_FILE
+#ifndef MINC_H
+#define MINC_H
 
 /* ----------------------------- MNI Header -----------------------------------
 @NAME       : minc.h
@@ -629,5 +629,5 @@ MNCAPI int micreatex(const char *path, int cmode, struct mi2opts *opts_ptr);
 }
 #endif /* __cplusplus */
 
-/* End ifndef MINC_HEADER_FILE */
+/* End ifndef MINC_H */
 #endif

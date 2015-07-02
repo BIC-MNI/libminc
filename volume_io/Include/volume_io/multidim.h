@@ -1,5 +1,5 @@
-#ifndef  __MULTI_DIM_H_
-#define  __MULTI_DIM_H_ 1 
+#ifndef VOL_IO_MULTI_DIM_H
+#define VOL_IO_MULTI_DIM_H 
 
 /* ----------------------------------------------------------------------------
 @COPYRIGHT  :

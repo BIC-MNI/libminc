@@ -1,6 +1,6 @@
 /** internal minc2 data structures*/
-#ifndef __MINC2_STRUCTS_H__
-#define __MINC2_STRUCTS_H__ 1 
+#ifndef MINC2_STRUCTS_H
+#define MINC2_STRUCTS_H 
 
 #include "H5public.h"
 
@@ -190,4 +190,4 @@ typedef struct {
   double imag;                  /**< Imaginary part */
 } midcomplex_t;
 
-#endif //__MINC2_STRUCTS_H__
+#endif //MINC2_STRUCTS_H

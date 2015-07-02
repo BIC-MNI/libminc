@@ -12,8 +12,8 @@
               software for any purpose.  It is provided "as is" without
               express or implied warranty.
 ---------------------------------------------------------------------------- */
-#ifndef __MINC_1_RW__
-#define __MINC_1_RW__
+#ifndef MINC_1_RW_H
+#define MINC_1_RW_H
 
 #include <vector>
 #include <string>

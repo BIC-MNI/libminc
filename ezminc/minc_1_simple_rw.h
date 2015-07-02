@@ -12,8 +12,8 @@
               software for any purpose.  It is provided "as is" without
               express or implied warranty.
 ---------------------------------------------------------------------------- */
-#ifndef __MINC_1_SIMPLE_RW_H__
-#define __MINC_1_SIMPLE_RW_H__
+#ifndef MINC_1_SIMPLE_RW_H
+#define MINC_1_SIMPLE_RW_H
 
 #include "minc_1_simple.h"
 #include "minc_io_simple_volume.h"
@@ -345,4 +345,4 @@ namespace minc
   
 }
 
-#endif //__MINC_1_SIMPLE_RW_H__
+#endif //MINC_1_SIMPLE_RW_H

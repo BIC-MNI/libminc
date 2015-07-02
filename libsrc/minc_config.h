@@ -1,5 +1,5 @@
-#ifndef _MINC_CONFIG_H_
-#define _MINC_CONFIG_H_
+#ifndef MINC_CONFIG_H
+#define MINC_CONFIG_H
 
 #define MICFG_FORCE_V2 "MINC_FORCE_V2"
 #define MICFG_COMPRESS "MINC_COMPRESS"
@@ -13,4 +13,4 @@ extern int miget_cfg_bool(const char *);
 extern int miget_cfg_int(const char *);
 extern char * miget_cfg_str(const char *);
 
-#endif /* _MINC_CONFIG_H_ */
+#endif /* MINC_CONFIG_H */

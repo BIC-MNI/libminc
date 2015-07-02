@@ -1,5 +1,5 @@
-#ifndef  __VOLUME_CACHE_H__
-#define  __VOLUME_CACHE_H__
+#ifndef VOL_IO_VOLUME_CACHE_H
+#define VOL_IO_VOLUME_CACHE_H
 
 #include "volume.h"
 
@@ -98,4 +98,4 @@ typedef struct
     int                         n_prev_hits;
 } VIO_volume_cache_struct;
 
-#endif /* __VOLUME_CACHE_H__ */
+#endif /* VOL_IO_VOLUME_CACHE_H */

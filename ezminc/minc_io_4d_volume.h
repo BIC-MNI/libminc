@@ -12,7 +12,7 @@
               software for any purpose.  It is provided "as is" without
               express or implied warranty.
 ---------------------------------------------------------------------------- */
-#ifndef __MINC_IO_4D_VOLUME_H_
+#ifndef MINC_IO_4D_VOLUME_H
 
 #include "minc_io_simple_volume.h"
 #include <vector>
@@ -168,4 +168,4 @@ namespace minc
 
 }
 
-#endif //__MINC_IO_4D_VOLUME_H_
+#endif //MINC_IO_4D_VOLUME_H
