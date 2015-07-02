@@ -23,17 +23,6 @@
 #else
 #define MNCAPI
 #endif
-/*
- * Definitions that allow this header file to be used either with or
- * without ANSI C features like function prototypes.
- */
-
-#undef _ANSI_ARGS_
-#if ((defined(__STDC__) || defined(SABER)) && !defined(NO_PROTOTYPE)) || defined(__cplusplus)
-#   define _ANSI_ARGS_(x)	x
-#else
-#   define _ANSI_ARGS_(x)	()
-#endif
 
 /*
  * Structure used to specify how to handle argv options.
@@ -89,10 +78,10 @@ typedef struct {
 extern "C" {
 #endif
   
-int MNCAPI ParseArgv _ANSI_ARGS_((int *argcPtr, char **argv,
-                                  ArgvInfo *argTable, int flags));
+int MNCAPI ParseArgv(int *argcPtr, char **argv,
+                     ArgvInfo *argTable, int flags);
 
-long int MNCAPI ParseLong _ANSI_ARGS_((const char *argPtr, char **endPtr));
+long int MNCAPI ParseLong(const char *argPtr, char **endPtr);
 
 #if defined(__cplusplus)
 }
