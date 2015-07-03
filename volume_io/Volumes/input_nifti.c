@@ -29,7 +29,7 @@ nifti_find_data_range(nifti_image *nii_ptr,
   double slope;
   double inter;
   long int initial_offset = znztell(zfp);
-  char data[CHUNK_SIZE];
+  double data[CHUNK_SIZE / sizeof(double)];
   size_t n_voxels_per_chunk;
 
   if (initial_offset < 0)       /* Did znztell() give an error? */
@@ -470,7 +470,11 @@ initialize_nifti_format_input(VIO_STR             filename,
   in_ptr->slice_index = 0;
   in_ptr->volume_file = (FILE *) zfp;
   in_ptr->header_info = nii_ptr;
-  ALLOC(in_ptr->byte_slice_buffer, n_voxels_in_slice * nii_ptr->nbyper);
+  in_ptr->generic_slice_buffer = malloc(n_voxels_in_slice * nii_ptr->nbyper);
+  if (in_ptr->generic_slice_buffer == NULL)
+  {
+    return VIO_ERROR;
+  }
   return VIO_OK;
 }
 
@@ -483,7 +487,7 @@ delete_nifti_format_input(
   znzFile zfp = (znzFile) in_ptr->volume_file;
   nifti_image_free(nii_ptr);
   znzclose(zfp);
-  FREE(in_ptr->byte_slice_buffer);
+  free(in_ptr->generic_slice_buffer);
 }
 
 VIOAPI  VIO_BOOL
@@ -495,7 +499,8 @@ input_more_nifti_format_file(
 {
   nifti_image    *nii_ptr = (nifti_image *) in_ptr->header_info;
   znzFile        zfp = (znzFile) in_ptr->volume_file;
-  unsigned char  *data_ptr = in_ptr->byte_slice_buffer;
+  void           *data_ptr = in_ptr->generic_slice_buffer;
+  int            data_ind = 0;
   double         value = 0;
   double         value_offset, value_scale;
   int            *inner_index;
@@ -564,36 +569,34 @@ input_more_nifti_format_file(
         switch ( in_ptr->file_data_type )
         {
         case VIO_UNSIGNED_BYTE:
-          value = *((unsigned char *) data_ptr);
+          value = ((unsigned char *) data_ptr)[data_ind++];
           break;
         case VIO_SIGNED_BYTE:
-          value = *((char *) data_ptr);
+          value = ((char *) data_ptr)[data_ind++];
           break;
         case VIO_UNSIGNED_SHORT:
-          value = *((unsigned short *) data_ptr);
+          value = ((unsigned short *) data_ptr)[data_ind++];
           break;
         case VIO_SIGNED_SHORT:
-          value = *((short *) data_ptr);
+          value = ((short *) data_ptr)[data_ind++];
           break;
         case VIO_UNSIGNED_INT:
-          value = *((unsigned int *) data_ptr);
+          value = ((unsigned int *) data_ptr)[data_ind++];
           break;
         case VIO_SIGNED_INT:
-          value = *((int *) data_ptr);
+          value = ((int *) data_ptr)[data_ind++];
           break;
         case VIO_FLOAT:
-          value = *((float *) data_ptr);
+          value = ((float *) data_ptr)[data_ind++];
           break;
         case VIO_DOUBLE:
-          value = *((double *)data_ptr);
+          value = ((double *)data_ptr)[data_ind++];
           break;
         default:
           handle_internal_error( "input_more_nifti_format_file" );
           break;
         }
         
-        data_ptr += nii_ptr->nbyper;
-
         value = (value - value_offset) / value_scale;
 
         switch (get_volume_data_type(volume))

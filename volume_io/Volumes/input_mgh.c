@@ -119,7 +119,7 @@ input_next_slice(
   n_bytes_per_voxel = get_type_size(in_ptr->file_data_type);
   n_voxels_in_slice = (in_ptr->sizes_in_file[0] *
                        in_ptr->sizes_in_file[1]);
-  if (znzread(in_ptr->byte_slice_buffer,
+  if (znzread(in_ptr->generic_slice_buffer,
               n_bytes_per_voxel,
               n_voxels_in_slice,
               fp) != n_voxels_in_slice)
@@ -338,7 +338,7 @@ mgh_scan_for_voxel_range(volume_input_struct *in_ptr,
   int slice;
   float value = 0;
   int i;
-  unsigned char *data_ptr;
+  void *data_ptr;
   long int data_offset = znztell((znzFile) fp);
 
   if (data_offset < 0)
@@ -347,29 +347,25 @@ mgh_scan_for_voxel_range(volume_input_struct *in_ptr,
   for (slice = 0; slice < in_ptr->sizes_in_file[2]; slice++)
   {
     input_next_slice( in_ptr );
-    data_ptr = in_ptr->byte_slice_buffer;
+    data_ptr = in_ptr->generic_slice_buffer;
     for (i = 0; i < n_voxels_in_slice; i++)
     {
       switch (in_ptr->file_data_type)
       {
       case VIO_UNSIGNED_BYTE:
-        value = *(unsigned char *)data_ptr;
-        data_ptr += sizeof(unsigned char);
+        value = ((unsigned char *)data_ptr)[i];
         break;
   
       case VIO_SIGNED_SHORT:
-        value = ntohs(*(short *)data_ptr);
-        data_ptr += sizeof(short);
+        value = ntohs(((short *)data_ptr)[i]);
         break;
 
       case VIO_SIGNED_INT:
-        value = ntohl(*(int *)data_ptr);
-        data_ptr += sizeof(int);
+        value = ntohl(((int *)data_ptr)[i]);
         break;
 
       case VIO_FLOAT:
-        value = swapFloat(*(float *)data_ptr);
-        data_ptr += sizeof(float);
+        value = swapFloat(((float *)data_ptr)[i]);
         break;
 
       case VIO_NO_DATA_TYPE:
@@ -573,7 +569,11 @@ initialize_mgh_format_input(VIO_STR             filename,
 
   /* Allocate the slice buffer. */
 
-  ALLOC(in_ptr->byte_slice_buffer, n_voxels_in_slice * n_bytes_per_voxel);
+  in_ptr->generic_slice_buffer = malloc(n_voxels_in_slice * n_bytes_per_voxel);
+  if (in_ptr->generic_slice_buffer == NULL)
+  {
+    return VIO_ERROR;
+  }
 
   in_ptr->volume_file = (FILE *) fp;
 
@@ -600,7 +600,7 @@ delete_mgh_format_input(
 {
   znzFile fp = (znzFile) in_ptr->volume_file;
 
-  FREE( in_ptr->byte_slice_buffer );
+  free( in_ptr->generic_slice_buffer );
 
   znzclose( fp );
 }
@@ -618,7 +618,8 @@ input_more_mgh_format_file(
   VIO_Real       value_translation, value_scale;
   VIO_Real       original_min_voxel, original_max_voxel;
   int            *inner_index, indices[VIO_MAX_DIMENSIONS];
-  unsigned char  *data_ptr;
+  void           *data_ptr;
+  int            data_ind;
 
   if ( in_ptr->slice_index < in_ptr->sizes_in_file[2] )
   {
@@ -663,7 +664,8 @@ input_more_mgh_format_file(
 
     if ( status == VIO_OK )
     {
-      data_ptr = in_ptr->byte_slice_buffer;
+      data_ptr = in_ptr->generic_slice_buffer;
+      data_ind = 0;
 
       for_less( i, 0, in_ptr->sizes_in_file[1] )
       {
@@ -673,20 +675,16 @@ input_more_mgh_format_file(
           switch ( in_ptr->file_data_type )
           {
           case VIO_UNSIGNED_BYTE:
-            value = *(unsigned char *)data_ptr;
-            data_ptr += sizeof(unsigned char);
+            value = ((unsigned char *)data_ptr)[data_ind++];
             break;
           case VIO_SIGNED_SHORT:
-            value = ntohs(*(short *)data_ptr);
-            data_ptr += sizeof(short);
+            value = ntohs(((short *)data_ptr)[data_ind++]);
             break;
           case VIO_SIGNED_INT:
-            value = ntohl(*(int *)data_ptr);
-            data_ptr += sizeof(int);
+            value = ntohl(((int *)data_ptr)[data_ind++]);
             break;
           case VIO_FLOAT:
-            value = swapFloat(*(float *)data_ptr);
-            data_ptr += sizeof(float);
+            value = swapFloat(((float *)data_ptr)[data_ind++]);
             break;
           default:
             handle_internal_error( "input_more_mgh_format_file" );

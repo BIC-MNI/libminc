@@ -474,6 +474,7 @@ typedef struct
     int                  *slice_byte_offsets;
     unsigned char        *byte_slice_buffer;
     unsigned short       *short_slice_buffer;
+    void                 *generic_slice_buffer;
     VIO_Real             min_value, max_value;
     void                 *header_info;
 } volume_input_struct;
