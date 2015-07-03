@@ -82,7 +82,6 @@ static  Minc_file  initialize_minc_input_from_minc2_id(
     VIO_BOOL            no_volume_data_type;
     double              *irr_starts[MAX_VAR_DIMS];
     double              *irr_widths[MAX_VAR_DIMS];
-    int                 unit_size;
 
     double              volume_min=0.0,volume_max=0.0;
     double              valid_min=0.0,valid_max=0.0;
@@ -493,7 +492,6 @@ static  Minc_file  initialize_minc_input_from_minc2_id(
 
     file->n_slab_dims = 0;
     slab_size = 1;
-    unit_size = get_type_size( get_volume_data_type(volume) );
 
     for( d = file->n_file_dimensions-1; d >= 0; d-- ) {
       if( file->to_volume_index[d] != INVALID_AXIS ) {

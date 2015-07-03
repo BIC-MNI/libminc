@@ -831,7 +831,7 @@ MNCAPI int miattget_with_sign(int cdfid, int varid, const char *name,
 @CREATED    : July 27, 1992 (Peter Neelin)
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
-MNCAPI int miattget1(int cdfid, int varid, char *name, nc_type datatype,
+MNCAPI int miattget1(int cdfid, int varid, const char *name, nc_type datatype,
                     void *value)
 {
    int att_length;      /* Actual length of the attribute */
@@ -952,7 +952,7 @@ MNCAPI char *miattgetstr(int cdfid, int varid, const char *name,
 @CREATED    : November 25, 1992 (Peter Neelin)
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
-MNCAPI int miattputint(int cdfid, int varid, char *name, int value)
+MNCAPI int miattputint(int cdfid, int varid, const char *name, int value)
 {
     int lvalue;
     int status;
@@ -982,7 +982,7 @@ MNCAPI int miattputint(int cdfid, int varid, char *name, int value)
 @CREATED    : August 5, 1992 (Peter Neelin)
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
-MNCAPI int miattputdbl(int cdfid, int varid, char *name, double value)
+MNCAPI int miattputdbl(int cdfid, int varid, const char *name, double value)
 {
     int status;
     MI_SAVE_ROUTINE_NAME("miattputdbl");

@@ -507,12 +507,12 @@ MNCAPI int miattget_with_sign(int cdfid, int varid, const char *name,
                               int max_length, void *value, int *att_length);
 MNCAPI int miattget(int cdfid, int varid, const char *name, nc_type datatype,
                     int max_length, void *value, int *att_length);
-MNCAPI int miattget1(int cdfid, int varid, char *name, nc_type datatype,
+MNCAPI int miattget1(int cdfid, int varid, const char *name, nc_type datatype,
                      void *value);
 MNCAPI char *miattgetstr(int cdfid, int varid, const char *name,
                          int maxlen, char *value);
-MNCAPI int miattputint(int cdfid, int varid, char *name, int value);
-MNCAPI int miattputdbl(int cdfid, int varid, char *name, double value);
+MNCAPI int miattputint(int cdfid, int varid, const char *name, int value);
+MNCAPI int miattputdbl(int cdfid, int varid, const char *name, double value);
 MNCAPI int miattputstr(int cdfid, int varid, const char *name, const char *value);
 MNCAPI int mivarget(int cdfid, int varid, long start[], long count[],
                     nc_type datatype, const char *sign, void *values);
@@ -543,15 +543,15 @@ MNCAPI int miget_datatype(int cdfid, int imgid,
 MNCAPI int miget_default_range(nc_type datatype, int is_signed, 
                                double default_range[]);
 MNCAPI int miget_valid_range(int cdfid, int imgid, double valid_range[]);
-MNCAPI int miset_valid_range(int cdfid, int imgid, double valid_range[]);
+MNCAPI int miset_valid_range(int cdfid, int imgid, const double valid_range[]);
 MNCAPI int miget_image_range(int cdfid, double image_range[]);
-MNCAPI int mivar_exists(int cdfid, char *varname);
-MNCAPI int miattput_pointer(int cdfid, int varid, char *name, int ptrvarid);
-MNCAPI int miattget_pointer(int cdfid, int varid, char *name);
+MNCAPI int mivar_exists(int cdfid, const char *varname);
+MNCAPI int miattput_pointer(int cdfid, int varid, const char *name, int ptrvarid);
+MNCAPI int miattget_pointer(int cdfid, int varid, const char *name);
 MNCAPI int miadd_child(int cdfid, int parent_varid, int child_varid);
-MNCAPI int micreate_std_variable(int cdfid, char *name, nc_type datatype, 
+MNCAPI int micreate_std_variable(int cdfid, const char *name, nc_type datatype, 
                                  int ndims, int dim[]);
-MNCAPI int micreate_group_variable(int cdfid, char *name);
+MNCAPI int micreate_group_variable(int cdfid, const char *name);
 MNCAPI const char *miget_version(void);
 MNCAPI int miappend_history(int fd, const char *tm_stamp);
 MNCAPI int micreate_ident(char * id_str, size_t length);
