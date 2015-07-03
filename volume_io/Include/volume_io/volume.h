@@ -1,5 +1,5 @@
-#ifndef  __VOLUME_H__
-#define  __VOLUME_H__ 1
+#ifndef VOL_IO_VOLUME_H
+#define VOL_IO_VOLUME_H
 
 /* ----------------------------------------------------------------------------
 @COPYRIGHT  :
@@ -488,4 +488,4 @@ typedef enum {
                TRIANGLE_FILTER,
                GAUSSIAN_FILTER } VIO_Filter_types;
 
-#endif /* __VOLUME_H__ */
+#endif /* VOL_IO_VOLUME_H */

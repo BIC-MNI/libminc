@@ -3,8 +3,8 @@
  * MINC2 API FUNCTION DECLARATIONS
  **/
 
-#ifndef __MINC2_API_H__
-#define __MINC2_API_H__ 1
+#ifndef MINC2_API_H
+#define MINC2_API_H
 
 #ifdef __cplusplus
 extern "C" {               /* Hey, Mr. Compiler - this is "C" code! */
@@ -1452,5 +1452,5 @@ int miget_label_value_by_index(mihandle_t volume, int idx, int *value);
 #endif /* __cplusplus defined */
 
 
-#endif /*__MINC2_API_H__*/
+#endif /*MINC2_API_H*/
 // kate: indent-mode cstyle; indent-width 2; replace-tabs on; 

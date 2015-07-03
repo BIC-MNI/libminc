@@ -1,5 +1,5 @@
-#ifndef  __VOL_IO_PROTOTYPES_H__
-#define  __VOL_IO_PROTOTYPES_H__ 1
+#ifndef VOL_IO_PROTOTYPES_H
+#define VOL_IO_PROTOTYPES_H
 
 #include "basic.h"
 #include "minc2_structs.h"
@@ -2202,4 +2202,4 @@ VIOAPI  VIO_Status  grid_inverse_transform_point(
     VIO_Real                *y_transformed,
     VIO_Real                *z_transformed );
 
-#endif /*__VOL_IO_PROTOTYPES_H__*/
+#endif /*VOL_IO_PROTOTYPES_H*/

@@ -32,9 +32,8 @@
               software for any purpose.  It is provided "as is" without
               express or implied warranty.
 ---------------------------------------------------------------------------- */
-
-#ifndef _MINC2_ERROR_H_
-#define _MINC2_ERROR_H_ 1
+#ifndef MINC2_ERROR_H
+#define MINC2_ERROR_H
 
 /* message levels */
 #define MI2_MSG_FATAL 0
@@ -116,4 +115,4 @@ int mi2log_set_verbosity ( int lvl );
 #define MI_CHECK_HDF_CALL(var,call) {if((var)<0) MI_LOG_ERROR(MI2_MSG_HDF5,call);}
 #define MI_CHECK_HDF_CALL_RET(var,call) {if((var)<0) return MI_LOG_ERROR(MI2_MSG_HDF5,call);}
 
-#endif /* _MINC2_ERROR_H_ not defined */
+#endif /* MINC2_ERROR_H */

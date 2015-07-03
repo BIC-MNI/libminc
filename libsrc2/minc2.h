@@ -2,8 +2,8 @@
  * \brief MINC 2.0 public constants, types, and definitions.
  */
 
-#ifndef _MINC2_H_ /* Avoid multiple inclusions */
-#define _MINC2_H_ 1
+#ifndef MINC2_H
+#define MINC2_H
 
 #include <hdf5.h>
 #include "minc2_defs.h"
@@ -11,4 +11,4 @@
 #include "minc2_error.h"
 #include "minc2_api.h"
 
-#endif /* _MINC2_H_ */
+#endif /* MINC2_H */

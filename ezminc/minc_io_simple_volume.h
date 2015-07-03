@@ -12,9 +12,8 @@
               software for any purpose.  It is provided "as is" without
               express or implied warranty.
 ---------------------------------------------------------------------------- */
-
-#ifndef __SIMPLE_VOLUME_H__
-#define __SIMPLE_VOLUME_H__
+#ifndef MINC_IO_SIMPLE_VOLUME_H
+#define MINC_IO_SIMPLE_VOLUME_H
 
 #include "minc_io_exceptions.h"
 #include "minc_io_fixed_vector.h"
@@ -662,4 +661,4 @@ namespace minc
 } //minc
 
 
-#endif // __SIMPLE_VOLUME_H__
+#endif // MINC_IO_SIMPLE_VOLUME_H

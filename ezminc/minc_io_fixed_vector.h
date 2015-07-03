@@ -12,8 +12,8 @@
               software for any purpose.  It is provided "as is" without
               express or implied warranty.
 ---------------------------------------------------------------------------- */
-#ifndef __FIXED_VECTOR_H__
-#define __FIXED_VECTOR_H__
+#ifndef MINC_IO_FIXED_VECTOR_H
+#define MINC_IO_FIXED_VECTOR_H
 
 #include <limits>
 
@@ -378,4 +378,4 @@ namespace minc
 	
 }
 
-#endif //__FIXED_VECTOR_H__
+#endif //MINC_IO_FIXED_VECTOR_H

@@ -2,8 +2,8 @@
  * \file minc2_private.h
  * \brief MINC 2.0 private constants, types, and functions.
  */
-#ifndef __MINC2_PRIVATE_H__
-#define __MINC2_PRIVATE_H__ 1
+#ifndef MINC2_PRIVATE_H
+#define MINC2_PRIVATE_H
 
 #include <string.h>
 #include "minc2_structs.h"
@@ -212,4 +212,4 @@ double rint(double v);
 #define strncasecmp _strnicmp 
 #endif
 
-#endif /*__MINC2_PRIVATE_H__*/
+#endif /*MINC2_PRIVATE_H*/

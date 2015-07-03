@@ -1,5 +1,5 @@
-#ifndef  MINC_ROUTINES_HEADER_FILE
-#define  MINC_ROUTINES_HEADER_FILE
+#ifndef MINC_ROUTINES_H
+#define MINC_ROUTINES_H
 
 /* ----------------------------- MNI Header -----------------------------------
 @NAME       : minc_routines.h

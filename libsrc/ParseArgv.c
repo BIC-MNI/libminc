@@ -71,11 +71,11 @@ static ArgvInfo defaultTable[] = {
 };
 
 /*
- * Forward declarations for procedures defined in this file:
+ * Forward declarations for functions defined in this file:
  */
 
-static void	PrintUsage _ANSI_ARGS_((ArgvInfo *argTable, int flags));
-static void     PrintVersion(ArgvInfo *argTable);
+static void PrintUsage(ArgvInfo *argTable, int flags);
+static void PrintVersion(ArgvInfo *argTable);
 
 /*
  * ParseLong
@@ -375,6 +375,11 @@ ParseArgv(argcPtr, argv, argTable, flags)
  *
  *	Generate a help string describing command-line options.
  *
+ * argTable: Array of command-specific argument descriptions.
+ *
+ * flags: If the ARGV_NO_DEFAULTS bit is set in this word, then don't
+ *        generate information for default options.
+ *
  * Results:
  *	Prints on stderr (unless ARGV_NO_PRINT is specified in flags) 
  *	a help string describing all the options in argTable, plus all those
@@ -388,12 +393,7 @@ ParseArgv(argcPtr, argv, argTable, flags)
  */
 
 static void
-PrintUsage(argTable, flags)
-     ArgvInfo *argTable;	/* Array of command-specific argument
-				 * descriptions. */
-     int flags;			/* If the ARGV_NO_DEFAULTS bit is set
-				 * in this word, then don't generate
-				 * information for default options. */
+PrintUsage(ArgvInfo *argTable, int flags)
 {
    ArgvInfo *infoPtr;
    size_t width, i, numSpaces;

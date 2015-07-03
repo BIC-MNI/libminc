@@ -1,5 +1,5 @@
-#ifndef  _INTERNAL_VOLUME_IO_H
-#define  _INTERNAL_VOLUME_IO_H
+#ifndef VOL_IO_INTERNAL_VOLUME_IO_H
+#define VOL_IO_INTERNAL_VOLUME_IO_H
 
 /* ----------------------------------------------------------------------------
 @COPYRIGHT  :

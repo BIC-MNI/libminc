@@ -1,6 +1,5 @@
-
-#ifndef  MINC_BASIC_HEADER_FILE
-#define  MINC_BASIC_HEADER_FILE
+#ifndef MINC_BASIC_H
+#define MINC_BASIC_H
 
 /* ----------------------------- MNI Header -----------------------------------
 @NAME       : minc_basic.h

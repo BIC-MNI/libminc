@@ -1,5 +1,5 @@
-#ifndef  DEF_GEOMETRY
-#define  DEF_GEOMETRY
+#ifndef VOL_IO_GEOMETRY_H
+#define VOL_IO_GEOMETRY_H
 
 /* ----------------------------------------------------------------------------
 @COPYRIGHT  :
@@ -208,4 +208,4 @@
             fill_Point( point, \
                         Vector_x(vector), Vector_y(vector), Vector_z(vector) )
 
-#endif /* DEF_GEOMETRY */
+#endif /* VOL_IO_GEOMETRY_H */

@@ -1,5 +1,5 @@
-#ifndef  __PROGRESS_H_
-#define  __PROGRESS_H_ 1
+#ifndef VOL_IO_PROGRESS_H
+#define VOL_IO_PROGRESS_H
 
 /* ----------------------------------------------------------------------------
 @COPYRIGHT  :
@@ -53,4 +53,4 @@ typedef  struct
 } VIO_progress_struct;
 
 
-#endif /* __PROGRESS_H_ */
+#endif /* VOL_IO_PROGRESS_H */
