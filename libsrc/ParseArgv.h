@@ -34,7 +34,7 @@ typedef struct {
     int type;		/* Indicates option type;  see below. */
     const char *src;    /* Value to be used in setting dst;  usage
 			 * depends on type. */
-    char *dst;          /* Address of value to be modified;  usage
+    void *dst;          /* Address of value to be modified;  usage
 			 * depends on type. */
     const char *help;   /* Documentation message describing this option. */
 } ArgvInfo;
