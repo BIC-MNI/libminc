@@ -1222,6 +1222,7 @@ int miopen_volume(const char *filename, int mode, mihandle_t *volume)
   H5T_class_t hdf_class;
   size_t nbytes;
   int is_signed;
+  int n_dimensions;
 
   /* Initialization.
     For the actual body of this function look at m2utils.c
@@ -1294,21 +1295,21 @@ int miopen_volume(const char *filename, int mode, mihandle_t *volume)
 
   /* GET THE DIMENSION COUNT
   */
-  handle->number_of_dims = _miget_file_dimension_count(file_id);
+  n_dimensions = handle->number_of_dims = _miget_file_dimension_count(file_id);
   
-  if( handle->number_of_dims <= 0 ) {
+  if( n_dimensions <= 0 ) {
     free(handle);
     return MI_LOG_ERROR(MI2_MSG_GENERIC,"Trying to open minc file without image variable");
   }
 
   /* READ EACH OF THE DIMENSIONS
   */
-  handle->dim_handles = (midimhandle_t *)malloc(handle->number_of_dims *
+  handle->dim_handles = (midimhandle_t *)malloc(n_dimensions *
                         sizeof(midimhandle_t));
   
   if(handle->dim_handles == NULL) {
     free(handle);
-    return MI_LOG_ERROR(MI2_MSG_OUTOFMEM, handle->number_of_dims * sizeof(midimhandle_t));
+    return MI_LOG_ERROR(MI2_MSG_OUTOFMEM, n_dimensions * sizeof(midimhandle_t));
   }
   
   /* Get the attribute (dimorder) from the image dataset */
