@@ -396,7 +396,7 @@ static void
 PrintUsage(ArgvInfo *argTable, int flags)
 {
    ArgvInfo *infoPtr;
-   size_t width, i, numSpaces;
+   int width, i, numSpaces;
 #define NUM_SPACES 20
    static char spaces[] = "                    ";
 /*   char tmp[30]; */
