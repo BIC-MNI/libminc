@@ -397,9 +397,6 @@ PrintUsage(ArgvInfo *argTable, int flags)
 {
    ArgvInfo *infoPtr;
    int width, i, numSpaces;
-#define NUM_SPACES 20
-   static char spaces[] = "                    ";
-/*   char tmp[30]; */
    intptr_t j, nargs;
 
 /* Macro to optionally print errors */
@@ -414,11 +411,11 @@ PrintUsage(ArgvInfo *argTable, int flags)
    for (i = 0; i < 2; i++) {
       for (infoPtr = i ? defaultTable : argTable;
            infoPtr->type != ARGV_END; infoPtr++) {
-         size_t length;
+         int length;
          if (infoPtr->key == NULL) {
             continue;
          }
-         length = strlen(infoPtr->key);
+         length = (int) strlen(infoPtr->key);
          if (length > width) {
             width = length;
          }
@@ -437,16 +434,10 @@ PrintUsage(ArgvInfo *argTable, int flags)
             continue;
          }
          FPRINTF(stderr, "\n %s:", infoPtr->key);
+         /* Write out padding after the key, followed by the help text. 
+          */
          numSpaces = width + 1 - strlen(infoPtr->key);
-         while (numSpaces > 0) {
-            if (numSpaces >= NUM_SPACES) {
-               FPRINTF(stderr, "%s",spaces);
-            } else {
-               FPRINTF(stderr, "%s",spaces+NUM_SPACES-numSpaces);
-            }
-            numSpaces -= NUM_SPACES;
-         }
-         FPRINTF(stderr, "%s",infoPtr->help);
+         FPRINTF(stderr, "%*s %s", numSpaces, "", infoPtr->help);
          switch (infoPtr->type) {
          case ARGV_INT: {
             FPRINTF(stderr, "\n\t\tDefault value:");
