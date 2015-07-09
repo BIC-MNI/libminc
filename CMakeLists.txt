@@ -185,6 +185,7 @@ SET(minc_common_SRCS
 SET(minc_common_HEADERS
   libsrc/time_stamp.h
   libsrc/ParseArgv.h 
+  libsrc/read_file_names.h
   libsrc/restructure.h
   volume_io/Include/volume_io.h
   nifti/nifti1.h
