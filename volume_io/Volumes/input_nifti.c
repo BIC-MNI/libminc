@@ -252,10 +252,44 @@ nifti_image_to_minc_attributes(nifti_image *nii_ptr,
     }
   }
 
-  /* Store the start and step values for the time dimension.
+  /* Adjust start and step values if alternate units are specified.
    */
-  mnc_starts[3] = 0.0;
-  mnc_steps[3] = nii_ptr->dt;
+  switch (nii_ptr->xyz_units) {
+  case NIFTI_UNITS_METER:
+    for (i = 0; i < VIO_N_DIMENSIONS; i++)
+    {
+      mnc_starts[i] *= 1000.0;
+      mnc_steps[i] *= 1000.0;
+    }
+    break;
+  case NIFTI_UNITS_MICRON:
+    for (i = 0; i < VIO_N_DIMENSIONS; i++)
+    {
+      mnc_starts[i] /= 1000.0;
+      mnc_steps[i] /= 1000.0;
+    }
+    break;
+  default:
+    break;
+  }
+
+  /* Store the start and step values for the time dimension, adjusting
+   * the units as needed.
+   */
+  switch (nii_ptr->time_units) {
+  case NIFTI_UNITS_MSEC:
+    mnc_starts[3] = nii_ptr->toffset / 1000.0;
+    mnc_steps[3] = nii_ptr->dt / 1000.0;
+    break;
+  case NIFTI_UNITS_USEC:
+    mnc_starts[3] = nii_ptr->toffset / 1000000.0;
+    mnc_steps[3] = nii_ptr->dt / 1000000.0;
+    break;
+  default:                      /* Either seconds or unknown. */
+    mnc_starts[3] = nii_ptr->toffset;
+    mnc_steps[3] = nii_ptr->dt;
+    break;
+  }
 }
 
 /**
