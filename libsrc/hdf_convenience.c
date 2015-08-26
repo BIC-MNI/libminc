@@ -2199,21 +2199,7 @@ hdf_open(const char *path, int mode)
     struct m2_var *var;
 
     H5E_BEGIN_TRY {
-#if HDF5_MMAP_TEST
-        if (mode & 0x8000) {
-            hid_t prp_id;
-
-            prp_id = H5Pcreate(H5P_FILE_ACCESS);
-            H5Pset_fapl_mmap(prp_id, 8192, 1);
-            fd = H5Fopen(path, mode & 0x7FFF, prp_id);
-            H5Pclose(prp_id);
-        }
-        else {
-            fd = H5Fopen(path, mode, H5P_DEFAULT);
-        }
-#else
-        fd = H5Fopen(path, mode, H5P_DEFAULT);
-#endif
+      fd = H5Fopen(path, mode, H5P_DEFAULT);
     } H5E_END_TRY;
 
     if (fd < 0) {
