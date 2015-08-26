@@ -30,10 +30,10 @@
 #define FALSE 0
 #endif
 
-int NZ = 9;                    /* NZ,NY, and NX should be <= 10! */
-int NY = 8;
-int NX = 10;
-int NV = 6;
+static const int NZ = 9;                    /* NZ,NY, and NX should be <= 10! */
+static const int NY = 8;
+static const int NX = 10;
+static const int NV = 6;
 
 /* define the dimension ordering we use - z,y,x,vector_dimension */
 enum dimension_index { IZ, IY, IX, IV, N_DIM };
