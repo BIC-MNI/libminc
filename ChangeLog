@@ -1,3 +1,8 @@
+
+2014-04-12  Andrew L Janke <a.janke@gmail.com>
+   * Updated README.release for CMake build instructions
+   * Release handover to Matthijs van Eede <matthijs@mouseimaging.ca>
+
 2014-04-09 Vladimir S Fonov
    * Incorporated multiple bug fixes from Sean McBride
    * Added some info in NEWS 
