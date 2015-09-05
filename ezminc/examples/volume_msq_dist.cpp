@@ -73,7 +73,7 @@ int main(int argc,char **argv)
     
     double avg=0;
     int cnt=0;
-    for(int i=0;i<size;i++)
+    for(unsigned long i=0;i<size;i++)
     {
       if(!mask[i]) continue;
       double d=buffer1[i]-buffer2[i];

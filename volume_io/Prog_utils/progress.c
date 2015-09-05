@@ -197,7 +197,7 @@ static  void  show_one_line_progress(
     VIO_progress_struct    *progress,
     int                current_step )
 {
-    int     i, n_dots;
+    long     i, n_dots;
 
     n_dots = VIO_ROUND( (VIO_Real) current_step / (VIO_Real) progress->n_steps *
                     (VIO_Real) progress->total_n_dots );
@@ -245,7 +245,7 @@ static  void  show_multi_line_progress(
     VIO_Real               time_so_far,
     VIO_Real               est_total_time )
 {
-    int     percent_done;
+    long     percent_done;
     VIO_STR  time_so_far_str, est_total_time_str;
 
     percent_done = VIO_ROUND( 100.0 * (VIO_Real) current_step /
@@ -254,7 +254,7 @@ static  void  show_multi_line_progress(
     time_so_far_str = format_time( "%g %s", time_so_far );
     est_total_time_str = format_time( "%g %s", est_total_time );
 
-    print( "%s: %3d%% done. (%d/%d)   Time: %s out of approx %s\n",
+    print( "%s: %3ld%% done. (%d/%d)   Time: %s out of approx %s\n",
            progress->title, percent_done, current_step, progress->n_steps,
            time_so_far_str, est_total_time_str );
 

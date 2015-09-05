@@ -1,4 +1,5 @@
-#ifndef  DEF_SYSTEM_DEPENDENT_H
+#ifndef VOL_IO_SYSTEM_DEPENDENT_H
+#define VOL_IO_SYSTEM_DEPENDENT_H
 
 /* ----------------------------------------------------------------------------
 @COPYRIGHT  :

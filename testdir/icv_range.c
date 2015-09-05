@@ -5,6 +5,15 @@
 #include <stdio.h>
 #include <minc.h>
 
+
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+
 #ifdef HAVE_STRING_H
 #include <string.h>
 #endif
@@ -42,12 +51,15 @@ int main(int argc, char **argv)
    short int ivalue;
    int i, intype, inorm, outtype, imax, ival;
    int cflag = 0;
+   char filename[256];
 
 #if MINC2
    if (argc == 2 && !strcmp(argv[1], "-2")) {
        cflag = MI2_CREATE_V2;
    }
 #endif /* MINC2 */
+
+   snprintf(filename, sizeof(filename), "test_icv_range-%d.mnc", getpid());
 
    for (intype=0; intype<MAX_IN_TYPES; intype++) {
       for (inorm=0; inorm<MAX_NORM; inorm++) {
@@ -63,7 +75,7 @@ int main(int argc, char **argv)
                      "in : %s, out : %s, norm : %s, imgmax : %s, valid : %s\n",
                          typenm[intype], typenm[outtype], boolnm[inorm],
                          boolnm[imax], boolnm[ival]);
-                  cdfid=micreate("test.mnc", NC_CLOBBER | cflag);
+                  cdfid=micreate(filename, NC_CLOBBER | cflag);
                   for (i=0; i<numdims; i++) 
                      dim[i]=ncdimdef(cdfid, diminfo[i].name, diminfo[i].len);
                   img=micreate_std_variable(cdfid, MIimage, outtypes[outtype],
@@ -118,6 +130,6 @@ int main(int argc, char **argv)
          miicv_free(icv);
       }
    }
-   
+   unlink(filename);
    return 0;
 }

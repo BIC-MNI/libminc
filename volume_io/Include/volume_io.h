@@ -1,5 +1,5 @@
-#ifndef  DEF_VOLUME_IO
-#define  DEF_VOLUME_IO
+#ifndef VOL_IO_VOLUME_IO_H
+#define VOL_IO_VOLUME_IO_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -57,4 +57,4 @@ extern "C" {
 }
 #endif
 
-#endif /* DEF_VOLUME_IO */
+#endif /* VOL_IO_VOLUME_IO_H */

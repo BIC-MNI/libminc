@@ -1,5 +1,5 @@
-#ifndef  __FILES_H_
-#define  __FILES_H_ 1
+#ifndef VOL_IO_FILES_H
+#define VOL_IO_FILES_H
 
 /* ----------------------------------------------------------------------------
 @COPYRIGHT  :
@@ -36,4 +36,4 @@ typedef  enum  { ASCII_FORMAT, BINARY_FORMAT }          VIO_File_formats;
 
 typedef  enum  { READ_FILE, WRITE_FILE, APPEND_FILE }   VIO_IO_types;
 
-#endif /* __FILES_H_ */
+#endif /* VOL_IO_FILES_H */

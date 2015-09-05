@@ -12,9 +12,8 @@
               software for any purpose.  It is provided "as is" without
               express or implied warranty.
 ---------------------------------------------------------------------------- */
-
-#ifndef __SIMPLE_VOLUME_H__
-#define __SIMPLE_VOLUME_H__
+#ifndef MINC_IO_SIMPLE_VOLUME_H
+#define MINC_IO_SIMPLE_VOLUME_H
 
 #include "minc_io_exceptions.h"
 #include "minc_io_fixed_vector.h"
@@ -179,7 +178,7 @@ namespace minc
         _allocate();
       }
 
-      simple_volume():_vol(0)
+      simple_volume():_vol(0),_count(0),_free_memory(false)
       {
         for(size_t i=0;i<ndims;i++)
         {
@@ -659,7 +658,7 @@ namespace minc
   typedef simple_volume<fixed_vec<3,float> > minc_grid_volume;
   typedef simple_volume<unsigned char>       minc_byte_volume;
 
-}; //minc
+} //minc
 
 
-#endif // __SIMPLE_VOLUME_H__
+#endif // MINC_IO_SIMPLE_VOLUME_H

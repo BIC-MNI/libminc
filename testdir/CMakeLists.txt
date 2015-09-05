@@ -36,7 +36,7 @@ IF(LIBMINC_MINC1_SUPPORT)
 
   ADD_EXECUTABLE(minc_tst minc.c)
   ADD_EXECUTABLE(icv icv.c)
-
+  ADD_EXECUTABLE(icv_vec icv_vec.c)
   ADD_EXECUTABLE(icv_dim1 icv_dim1.c)
   ADD_EXECUTABLE(icv_dim icv_dim.c)
   ADD_EXECUTABLE(icv_fillvalue icv_fillvalue.c)
@@ -58,6 +58,7 @@ IF(LIBMINC_MINC1_SUPPORT)
 
   add_minc_test(arg_parse ${CMAKE_CURRENT_SOURCE_DIR}/run_test_arg_parse_cmake.sh ${CMAKE_CURRENT_BINARY_DIR}/test_arg_parse)
   add_minc_test(icv icv)
+  add_minc_test(icv_vec icv_vec)
   add_minc_test(minc minc_tst)
   add_minc_test(mincapi mincapi)
   add_minc_test(test_mconv test_mconv)
@@ -66,6 +67,9 @@ IF(LIBMINC_MINC1_SUPPORT)
   add_minc_test(minc_long_attr_1m minc_long_attr 1000000)
   add_minc_test(minc_conversion minc_conversion)
 ENDIF(LIBMINC_MINC1_SUPPORT)
+
+ADD_EXECUTABLE(nifti_test nifti_test.c)
+ADD_TEST(nifti_test-1 nifti_test)
 
 # Volume IO tests
 ADD_EXECUTABLE(test_xfm   vio_xfm_test/test-xfm.c)

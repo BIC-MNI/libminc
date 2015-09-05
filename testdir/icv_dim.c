@@ -3,6 +3,15 @@
 #endif
 
 #include <stdio.h>
+
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+
 #include <minc.h>
 
 #ifdef HAVE_STRING_H
@@ -23,7 +32,7 @@ int main(int argc, char **argv)
    };
 /*   static struct { long len; char *name;} diminfo[]=
       {3, MIzspace, 4, MIyspace, 5, MIxspace}; */
-   static int numdims=sizeof(diminfo)/sizeof(diminfo[0]);
+   static const int numdims=sizeof(diminfo)/sizeof(diminfo[0]);
    static long coord[]={0,0,0};
    static long count[]={3,4,5};
    double dvalue;
@@ -41,8 +50,9 @@ int main(int argc, char **argv)
       331, 333, 335, 337, 339,
       341, 343, 345, 347, 349
    };
-   int i, j, k;
+   long i, j, k;
    int cflag = 0;
+   char filename[256];
 
 #if MINC2
    if (argc == 2 && !strcmp(argv[1], "-2")) {
@@ -59,7 +69,8 @@ int main(int argc, char **argv)
    miicv_setint(icv, MI_ICV_DO_DIM_CONV, TRUE);
    miicv_setint(icv, MI_ICV_KEEP_ASPECT, FALSE);
    miicv_setint(icv, MI_ICV_DO_NORM, TRUE);
-   cdfid=micreate("test.mnc", NC_CLOBBER | cflag);
+   snprintf(filename, sizeof(filename), "test_icv_dim-%d.mnc", getpid());
+   cdfid=micreate(filename, NC_CLOBBER | cflag);
    for (i=0; i<numdims; i++) {
       dim[i]=ncdimdef(cdfid, diminfo[i].name, diminfo[i].len);
       dimvar=micreate_std_variable(cdfid, diminfo[i].name, NC_DOUBLE,
@@ -95,7 +106,7 @@ int main(int argc, char **argv)
    miicv_inqdbl(icv, MI_ICV_NORM_MIN, &dvalue);
    printf(", min = %g\n", dvalue);
    miicv_put(icv, coord, count, ivalue);
-   for (i=0; i< sizeof(ivalue)/sizeof(ivalue[0]); i++)
+   for (i=0; i< (long)(sizeof(ivalue)/sizeof(ivalue[0])); i++)
       ivalue[i] = 0;
    miicv_get(icv, coord, count, ivalue);
    for (i=0; i<3; i++) {
@@ -108,7 +119,7 @@ int main(int argc, char **argv)
    }
    miclose(cdfid);
    miicv_free(icv);
-   
+   unlink(filename);
    return 0;
 }
 

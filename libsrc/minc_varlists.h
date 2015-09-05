@@ -47,16 +47,16 @@
 
 /* List of dimension variables. Note that MIvector_dimension is not included
    since it should not have an associated variable. */
-static char *dimvarlist[]={MIxspace, MIyspace, MIzspace, MItime, MItfrequency,
+static const char *dimvarlist[]={MIxspace, MIyspace, MIzspace, MItime, MItfrequency,
                            MIxfrequency, MIyfrequency, MIzfrequency, NULL};
 
 /* List of dimension width variables */
-static char *dimwidthlist[]={MIxspace_width, MIyspace_width, MIzspace_width,
+static const char *dimwidthlist[]={MIxspace_width, MIyspace_width, MIzspace_width,
                              MItime_width, MItfrequency_width, 
                              MIxfrequency_width, MIyfrequency_width,
                              MIzfrequency_width, NULL};
 
 /* List of variables */
-static char *varlist[]={MIrootvariable, MIimage, MIimagemax, MIimagemin, 
+static const char *varlist[]={MIrootvariable, MIimage, MIimagemax, MIimagemin, 
                         MIpatient, MIstudy, MIacquisition, NULL};
 

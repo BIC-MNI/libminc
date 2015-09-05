@@ -1,5 +1,5 @@
-#ifndef MINC_HEADER_FILE
-#define MINC_HEADER_FILE
+#ifndef MINC_H
+#define MINC_H
 
 /* ----------------------------- MNI Header -----------------------------------
 @NAME       : minc.h
@@ -401,10 +401,12 @@ extern "C" {
 #define MIinjection_route       "injection_route"
 
 /* Constants for image conversion variable (icv) properties */
-/* Maximum number of icv's allowed */
-/* changed to 32 as netcdf 4.x no longer defines MAX_NC_OPEN */
-/* #define MI_MAX_NUM_ICV MAX_NC_OPEN */
-#define MI_MAX_NUM_ICV 32
+
+/* This value is not really enforced in the code (see miicv_create() in
+ * image_conversion.c), but this value is used in voxel_loop.c to set the
+ * maximum number of allowable open files.
+ */
+#define MI_MAX_NUM_ICV 1000 /**< Maximum number of icv's allowed */
 
 /* Default max and min for normalization */
 #define MI_DEFAULT_MAX 1.0
@@ -495,31 +497,31 @@ extern "C" {
 /* MINC public functions */
 
 /* From netcdf_convenience.c */
-MNCAPI char *miexpand_file(char *path, char *tempfile, 
+MNCAPI char *miexpand_file(const char *path, char *tempfile, 
                            int header_only, int *created_tempfile);
-MNCAPI int miopen(char *path, int mode);
-MNCAPI int micreate(char *path, int cmode);
+MNCAPI int miopen(const char *path, int mode);
+MNCAPI int micreate(const char *path, int cmode);
 MNCAPI int miclose(int cdfid);
-MNCAPI int miattget_with_sign(int cdfid, int varid, char *name, 
+MNCAPI int miattget_with_sign(int cdfid, int varid, const char *name, 
                               char *insign, nc_type datatype, char *outsign,
                               int max_length, void *value, int *att_length);
-MNCAPI int miattget(int cdfid, int varid, char *name, nc_type datatype,
+MNCAPI int miattget(int cdfid, int varid, const char *name, nc_type datatype,
                     int max_length, void *value, int *att_length);
-MNCAPI int miattget1(int cdfid, int varid, char *name, nc_type datatype,
+MNCAPI int miattget1(int cdfid, int varid, const char *name, nc_type datatype,
                      void *value);
-MNCAPI char *miattgetstr(int cdfid, int varid, char *name, 
+MNCAPI char *miattgetstr(int cdfid, int varid, const char *name,
                          int maxlen, char *value);
-MNCAPI int miattputint(int cdfid, int varid, char *name, int value);
-MNCAPI int miattputdbl(int cdfid, int varid, char *name, double value);
-MNCAPI int miattputstr(int cdfid, int varid, char *name, char *value);
+MNCAPI int miattputint(int cdfid, int varid, const char *name, int value);
+MNCAPI int miattputdbl(int cdfid, int varid, const char *name, double value);
+MNCAPI int miattputstr(int cdfid, int varid, const char *name, const char *value);
 MNCAPI int mivarget(int cdfid, int varid, long start[], long count[],
-                    nc_type datatype, char *sign, void *values);
+                    nc_type datatype, const char *sign, void *values);
 MNCAPI int mivarget1(int cdfid, int varid, long mindex[],
-                     nc_type datatype, char *sign, void *value);
+                     nc_type datatype, const char *sign, void *value);
 MNCAPI int mivarput(int cdfid, int varid, long start[], long count[],
-                    nc_type datatype, char *sign, void *values);
+                    nc_type datatype, const char *sign, void *values);
 MNCAPI int mivarput1(int cdfid, int varid, long mindex[],
-                     nc_type datatype, char *sign, void *value);
+                     nc_type datatype, const char *sign, void *value);
 MNCAPI long *miset_coords(int nvals, long value, long coords[]);
 MNCAPI long *mitranslate_coords(int cdfid, 
                                 int invar,  long incoords[],
@@ -541,15 +543,15 @@ MNCAPI int miget_datatype(int cdfid, int imgid,
 MNCAPI int miget_default_range(nc_type datatype, int is_signed, 
                                double default_range[]);
 MNCAPI int miget_valid_range(int cdfid, int imgid, double valid_range[]);
-MNCAPI int miset_valid_range(int cdfid, int imgid, double valid_range[]);
+MNCAPI int miset_valid_range(int cdfid, int imgid, const double valid_range[]);
 MNCAPI int miget_image_range(int cdfid, double image_range[]);
-MNCAPI int mivar_exists(int cdfid, char *varname);
-MNCAPI int miattput_pointer(int cdfid, int varid, char *name, int ptrvarid);
-MNCAPI int miattget_pointer(int cdfid, int varid, char *name);
+MNCAPI int mivar_exists(int cdfid, const char *varname);
+MNCAPI int miattput_pointer(int cdfid, int varid, const char *name, int ptrvarid);
+MNCAPI int miattget_pointer(int cdfid, int varid, const char *name);
 MNCAPI int miadd_child(int cdfid, int parent_varid, int child_varid);
-MNCAPI int micreate_std_variable(int cdfid, char *name, nc_type datatype, 
+MNCAPI int micreate_std_variable(int cdfid, const char *name, nc_type datatype, 
                                  int ndims, int dim[]);
-MNCAPI int micreate_group_variable(int cdfid, char *name);
+MNCAPI int micreate_group_variable(int cdfid, const char *name);
 MNCAPI const char *miget_version(void);
 MNCAPI int miappend_history(int fd, const char *tm_stamp);
 MNCAPI int micreate_ident(char * id_str, size_t length);
@@ -560,7 +562,7 @@ MNCAPI int miicv_free(int icvid);
 MNCAPI int miicv_setdbl(int icvid, int icv_property, double value);
 MNCAPI int miicv_setint(int icvid, int icv_property, int value);
 MNCAPI int miicv_setlong(int icvid, int icv_property, long value);
-MNCAPI int miicv_setstr(int icvid, int icv_property, char *value);
+MNCAPI int miicv_setstr(int icvid, int icv_property, const char *value);
 MNCAPI int miicv_inqdbl(int icvid, int icv_property, double *value);
 MNCAPI int miicv_inqint(int icvid, int icv_property, int *value);
 MNCAPI int miicv_inqlong(int icvid, int icv_property, long *value);
@@ -587,6 +589,8 @@ MNCAPI int minc_format_convert(const char *input,const char *output);
 
 /* New functions, not directly part of compatibility layer. */
 extern int MI2varsize(int fd, int varid, long *size_ptr);
+
+extern int miget_file_type(const char *filename);
 
 #define MI2_GRPNAME "/minc-2.0"
 /* These must not interfere with any NC_ flags we might have to support. */
@@ -615,7 +619,7 @@ struct mi2opts {
 
 #define MI2_ISH5OBJ(x) (H5Iget_type(x) > 0)
 
-MNCAPI int micreatex(char *path, int cmode, struct mi2opts *opts_ptr);
+MNCAPI int micreatex(const char *path, int cmode, struct mi2opts *opts_ptr);
 
 #else
 #define MI2_ISH5OBJ(x) (0)
@@ -625,5 +629,5 @@ MNCAPI int micreatex(char *path, int cmode, struct mi2opts *opts_ptr);
 }
 #endif /* __cplusplus */
 
-/* End ifndef MINC_HEADER_FILE */
+/* End ifndef MINC_H */
 #endif

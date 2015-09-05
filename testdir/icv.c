@@ -3,6 +3,15 @@
 #endif
 
 #include <stdio.h>
+
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+
 #include <minc.h>
 
 #ifdef HAVE_STRING_H
@@ -39,8 +48,9 @@ int main(int argc, char **argv)
       331, 333, 335, 337, 339,
       341, 343, 345, 347, 349
    };
-   int i, j, k;
+   long i, j, k;
    int cflag = 0;
+   char filename[256];
 
 #if MINC2
    if (argc == 2 && !strcmp(argv[1], "-2")) {
@@ -50,7 +60,8 @@ int main(int argc, char **argv)
 
    icv=miicv_create();
    miicv_setint(icv, MI_ICV_DO_NORM, TRUE);
-   cdfid=micreate("test.mnc", NC_CLOBBER | cflag);
+   snprintf(filename, sizeof(filename), "test_icv-%d.mnc", getpid());
+   cdfid=micreate(filename, NC_CLOBBER | cflag);
    for (i=0; i<numdims; i++) {
       dim[i]=ncdimdef(cdfid, diminfo[i].name, diminfo[i].len);
       dimvar=micreate_std_variable(cdfid, diminfo[i].name, NC_DOUBLE,
@@ -76,7 +87,7 @@ int main(int argc, char **argv)
    coord[0]=0;
    miicv_attach(icv, cdfid, img);
    miicv_put(icv, coord, count, ivalue);
-   for (i=0; i< sizeof(ivalue)/sizeof(ivalue[0]); i++)
+   for (i=0; i< (long)(sizeof(ivalue)/sizeof(ivalue[0])); i++)
       ivalue[i] = 0;
    miicv_get(icv, coord, count, ivalue);
    for (i=0; i<3; i++) {
@@ -89,7 +100,7 @@ int main(int argc, char **argv)
    }
    miclose(cdfid);
    miicv_free(icv);
-   
+   unlink(filename);
    return 0;
 }
 

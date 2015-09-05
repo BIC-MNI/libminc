@@ -12,8 +12,8 @@
               software for any purpose.  It is provided "as is" without
               express or implied warranty.
 ---------------------------------------------------------------------------- */
-#ifndef __EXCPETIONS_H__
-#define __EXCPETIONS_H__
+#ifndef MINC_IO_EXCEPTIONS_H
+#define MINC_IO_EXCEPTIONS_H
 
 #define REPORT_ERROR(MSG) throw minc::generic_error(__FILE__,__LINE__,MSG)
 
@@ -54,5 +54,5 @@ namespace minc
       return _code;
     }
   };
-}; //minc
-#endif //__EXCPETIONS_H__
+} //minc
+#endif //MINC_IO_EXCEPTIONS_H

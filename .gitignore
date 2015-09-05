@@ -1,6 +1,5 @@
 *~
 INSTALL
-*.in
 *.o
 *.lo
 *.la

@@ -1,6 +1,5 @@
-
-#ifndef  MINC_PRIVATE_HEADER_FILE
-#define  MINC_PRIVATE_HEADER_FILE
+#ifndef MINC_PRIVATE_H
+#define MINC_PRIVATE_H
 
 /* ----------------------------- MNI Header -----------------------------------
 @NAME       : minc_private.h

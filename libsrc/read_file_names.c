@@ -34,7 +34,7 @@ char **read_file_names(char *filelist, int *num_files)
    int nfiles;
    FILE *fp;
    char line[FILE_PATH_MAX+1];
-   int length;
+   size_t length;
 
    /* Open the file */
    if (strcmp(filelist, "-") == 0) {
@@ -86,6 +86,7 @@ char **read_file_names(char *filelist, int *num_files)
       if (files[nfiles] == NULL) {
          (void) fprintf(stderr, "Error allocating memory\n");
          free(files);
+         fclose(fp);
          return NULL;
       }
       nfiles++;

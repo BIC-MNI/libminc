@@ -45,7 +45,7 @@ static  VIO_BOOL  match_dimension_names(
 @CALLS      : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  Minc_file  initialize_minc_input_from_minc2_id(
+static  Minc_file  initialize_minc_input_from_minc2_id(
     mihandle_t           minc_id,
     VIO_Volume           volume,
     minc_input_options   *options )
@@ -79,10 +79,9 @@ VIOAPI  Minc_file  initialize_minc_input_from_minc2_id(
     int                 d, which_valid_axis, axis;
     int                 spatial_axis_indices[MAX_VAR_DIMS];
     minc_input_options  default_options;
-    VIO_BOOL            no_volume_data_type;
+    VIO_BOOL            no_volume_data_type = TRUE;
     double              *irr_starts[MAX_VAR_DIMS];
     double              *irr_widths[MAX_VAR_DIMS];
-    int                 unit_size;
 
     double              volume_min=0.0,volume_max=0.0;
     double              valid_min=0.0,valid_max=0.0;
@@ -129,6 +128,13 @@ VIOAPI  Minc_file  initialize_minc_input_from_minc2_id(
     
     miget_volume_dimension_count(file->minc2id, MI_DIMCLASS_ANY, MI_DIMATTR_ALL, 
                                  &file->n_file_dimensions);
+    /* Set the number of dimensions iff the file has fewer dimensions
+     * than the initially created volume.
+     */
+    if (get_volume_n_dimensions( volume ) > file->n_file_dimensions )
+    {
+        set_volume_n_dimensions( volume, file->n_file_dimensions );
+    }
 
     miget_volume_dimensions(file->minc2id, MI_DIMCLASS_ANY, MI_DIMATTR_ALL, 
                             MI_DIMORDER_FILE, file->n_file_dimensions,
@@ -486,7 +492,6 @@ VIOAPI  Minc_file  initialize_minc_input_from_minc2_id(
 
     file->n_slab_dims = 0;
     slab_size = 1;
-    unit_size = get_type_size( get_volume_data_type(volume) );
 
     for( d = file->n_file_dimensions-1; d >= 0; d-- ) {
       if( file->to_volume_index[d] != INVALID_AXIS ) {
@@ -616,7 +621,7 @@ VIOAPI  VIO_Status  close_minc2_input(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-VIOAPI  VIO_Status   input_minc2_hyperslab(
+static  VIO_Status   input_minc2_hyperslab(
     Minc_file        file,
     VIO_Data_types   data_type,
     int              n_array_dims,
@@ -640,6 +645,7 @@ VIOAPI  VIO_Status   input_minc2_hyperslab(
     VIO_Colour           colour;
     VIO_multidim_array   buffer_array, rgb_array;
 
+    n_tmp_dims = file->n_file_dimensions;
     n_file_dims = file->n_file_dimensions;
     direct_to_array = TRUE;
     expected_ind = n_array_dims-1;
@@ -827,8 +833,6 @@ static  void  input_slab(
         ind = to_volume[file_ind];
         if( ind != INVALID_AXIS )
             volume_start[ind] = file_start[file_ind];
-        else
-            volume_start[ind] = 0;
     }
 
     get_multidim_sizes( &volume->array, array_sizes );
@@ -943,6 +947,7 @@ VIOAPI  VIO_BOOL  input_more_minc2_file(
     return( !file->end_volume_flag );
 }
 
+#ifdef INPUT_MNC2_UNUSED
 /* ----------------------------- MNI Header -----------------------------------
 @NAME       : advance_input_volume2
 @INPUT      : file
@@ -1028,7 +1033,7 @@ VIOAPI  VIO_BOOL  advance_input_volume2(
 }
 
 /* ----------------------------- MNI Header -----------------------------------
-@NAME       : reset_input_volume
+@NAME       : reset_input_volume2
 @INPUT      : file
 @OUTPUT     : 
 @RETURNS    : 
@@ -1051,6 +1056,7 @@ VIOAPI  void  reset_input_volume2(
     file->end_volume_flag = FALSE;
 
 }
+#endif /* INPUT_MNC2_UNUSED */
 
 /* ----------------------------- MNI Header -----------------------------------
 @NAME       : match_dimension_names
@@ -1085,7 +1091,7 @@ static  VIO_BOOL  match_dimension_names(
 {
     int       i, j, iteration, n_matches, dummy;
     int       to_file_index[VIO_MAX_DIMENSIONS];
-    VIO_BOOL  match;
+    VIO_BOOL  match = FALSE;
     VIO_BOOL  volume_dim_found[VIO_MAX_DIMENSIONS];
 
     n_matches = 0;

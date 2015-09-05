@@ -286,7 +286,7 @@ int micreate_dimension(const char *name, midimclass_t dimclass, midimattr_t attr
   }
 
   // do not set start and step if vector_dimension present
-  if ( strcmp ( name, "vector_dimension" ) ) {
+  if ( strcmp ( name, MIvector_dimension ) ) {
     handle->start = 0.0;
     handle->step = 1.0;
   } else {
@@ -382,8 +382,7 @@ int miget_volume_dimensions ( mihandle_t volume, midimclass_t class, midimattr_t
                           midimhandle_t dimensions[] )
 {
 
-  hsize_t number_of_dims;
-  int i = 0, max_dims;
+  hsize_t number_of_dims, i = 0, max_dims;
   int num_ret_dims = 0;
 
   if ( volume == NULL ) {
@@ -635,8 +634,6 @@ int miset_apparent_record_dimension_flag ( mihandle_t volume, int record_flag )
      will appear to have (n+1) dimensions
    */
   volume->number_of_dims++;
-
-  record_flag = 1;
 
   return ( MI_NOERROR );
 }

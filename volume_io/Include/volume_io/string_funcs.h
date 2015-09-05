@@ -1,5 +1,5 @@
-#ifndef  DEF_STRING
-#define  DEF_STRING
+#ifndef VOL_IO_STRING_H
+#define VOL_IO_STRING_H
 
 /* ----------------------------------------------------------------------------
 @COPYRIGHT  :
@@ -39,4 +39,4 @@
          (void) memcpy( (void *) (dest), (void *) (src),                    \
                         (size_t) (n_items) * sizeof((src)[0]) )
 
-#endif /* DEF_STRING */
+#endif /* VOL_IO_STRING_H */

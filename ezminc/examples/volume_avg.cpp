@@ -22,7 +22,7 @@
 
 using namespace minc;
 
-void show_usage(const char *name)
+static void show_usage(const char *name)
 {
   std::cerr 
 	  << "Usage: "<<name<<" <input1> .... <inputn>  <output> " << std::endl
@@ -103,7 +103,7 @@ int main(int argc,char **argv)
     minc_float_volume _tmp(_avg);
     
 
-    for(int i=0;i<_avg.c_buf_size();i++)
+    for(size_t i=0;i<_avg.c_buf_size();i++)
     {
       _sd.c_buf()[i]=_avg.c_buf()[i]*_avg.c_buf()[i];
     }
@@ -123,7 +123,7 @@ int main(int argc,char **argv)
       _sd+=_tmp;
     }
     _avg/=(float)(argc-1);
-    for(int i=0;i<_avg.c_buf_size();i++)
+    for(size_t i=0;i<_avg.c_buf_size();i++)
     {
       _sd.c_buf()[i]=sqrt(_sd.c_buf()[i]/(argc-1) - _avg.c_buf()[i]*_avg.c_buf()[i] );
     }

@@ -1,5 +1,5 @@
-#ifndef  __ALLOC_H__
-#define  __ALLOC_H__  1
+#ifndef VOL_IO_ALLOC_H
+#define VOL_IO_ALLOC_H
 
 /* ----------------------------------------------------------------------------
 @COPYRIGHT  :
@@ -293,4 +293,4 @@
 #define  VIO_FREE5D( ptr )                                                        \
          free_memory_5d( (void ******) &(ptr) _ALLOC_SOURCE_LINE )
 
-#endif /*__ALLOC_H__*/
+#endif /*VOL_IO_ALLOC_H*/

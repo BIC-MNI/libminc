@@ -10,7 +10,7 @@ extern int hdf_varid(int fd, const char *varnm);
 
 extern int hdf_attget(int fd, int varid, const char *attnm, void *value);
 extern int hdf_attput(int fd, int varid, const char *attnm, nc_type val_typ, 
-		      int val_len, void *val_ptr);
+		      int val_len, const void *val_ptr);
 extern int hdf_attdel(int fd, int varid, const char *attnm);
 extern int hdf_attinq(int fd, int varid, const char *attnm, nc_type *type_ptr,
 		      int *length_ptr);

@@ -12,8 +12,8 @@
               software for any purpose.  It is provided "as is" without
               express or implied warranty.
 ---------------------------------------------------------------------------- */
-#ifndef __FIXED_VECTOR_H__
-#define __FIXED_VECTOR_H__
+#ifndef MINC_IO_FIXED_VECTOR_H
+#define MINC_IO_FIXED_VECTOR_H
 
 #include <limits>
 
@@ -205,6 +205,12 @@ namespace minc
 
     //@}
 
+    fixed_vec( const fixed_vec& b )
+    {
+      for(unsigned int i=0;i<dim;i++)
+        c[i]=b[i];
+    }
+
     //! assignement operator, copies contents
     fixed_vec<dim,I>& operator=(const fixed_vec<dim,I>& b)
     {
@@ -370,6 +376,6 @@ namespace minc
     return val;
   }	
 	
-};
+}
 
-#endif //__FIXED_VECTOR_H__
+#endif //MINC_IO_FIXED_VECTOR_H

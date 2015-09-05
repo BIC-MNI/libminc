@@ -15,7 +15,7 @@
 #define TST_Y 1
 #define TST_Z 2
 
-long errors = 0;
+static long errors = 0;
 
 extern void icv_tests(void);
 
@@ -46,7 +46,7 @@ struct testinfo {
 
 /* Test case 1 - file creation & definition. 
  */
-int
+static int
 test1(struct testinfo *ip, struct dimdef *dims, int ndims)
 {
   int fd2;
@@ -137,7 +137,7 @@ test1(struct testinfo *ip, struct dimdef *dims, int ndims)
   return (0);
 }
 
-int 
+static int
 test2(struct testinfo *ip, struct dimdef *dims, int ndims)
 {
   int i, j, k;
@@ -192,7 +192,7 @@ test2(struct testinfo *ip, struct dimdef *dims, int ndims)
   return (0);
 }
 
-int
+static int
 test3(struct testinfo *ip, struct dimdef *dims, int ndims)
 {
   /* Try to read the data back. */
@@ -247,7 +247,7 @@ test3(struct testinfo *ip, struct dimdef *dims, int ndims)
 }
 
 
-int
+static int
 test4(struct testinfo *ip, struct dimdef *dims, int ndims)
 {
   /* Get the same variable again, but this time use an ICV to scale it.
@@ -390,7 +390,7 @@ test4(struct testinfo *ip, struct dimdef *dims, int ndims)
 }
 
 
-int
+static int
 test5(struct testinfo *ip, struct dimdef *dims, int ndims)
 {
   /* Get the same variable again, but this time use an ICV to scale it.
@@ -528,7 +528,8 @@ test5(struct testinfo *ip, struct dimdef *dims, int ndims)
   return (0);
 }
 
-int
+#if 0
+static int
 test6(struct testinfo *ip, struct dimdef *dims, int ndims)
 {
   size_t total;
@@ -623,8 +624,9 @@ test6(struct testinfo *ip, struct dimdef *dims, int ndims)
 
   return (0);
 }
+#endif
 
-int
+static int
 test7(struct testinfo *ip, struct dimdef *dims, int ndims)
 {
   size_t total;
@@ -742,18 +744,26 @@ main(int argc, char **argv)
 
   ncopts &= ~(NC_FATAL | NC_VERBOSE);
 
+  fprintf(stderr, "Part 1...\n");
   test1(&info, dimtab1, 3);
 
+  fprintf(stderr, "Part 2...\n");
   test2(&info, dimtab1, 3);
 
+  fprintf(stderr, "Part 3...\n");
   test3(&info, dimtab1, 3);
 
+  fprintf(stderr, "Part 4...\n");
   test4(&info, dimtab1, 3);
 
+  fprintf(stderr, "Part 5...\n");
   test5(&info, dimtab1, 3);
 
-  /* test6(&info, dimtab1, 3); */
+#if 0
+  test6(&info, dimtab1, 3);
+#endif
 
+  fprintf(stderr, "Part 7...\n");
   test7(&info, dimtab1, 3);
 
   stat = miicv_free(rand());
@@ -769,7 +779,7 @@ main(int argc, char **argv)
     FUNC_ERROR("miclose");
   }
 
-  if (miclose(rand()) != MI_ERROR) {
+  if (miclose(42) != MI_ERROR) {
     FUNC_ERROR("miclose");
   }
 

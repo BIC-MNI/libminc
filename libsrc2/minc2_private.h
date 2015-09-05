@@ -2,8 +2,8 @@
  * \file minc2_private.h
  * \brief MINC 2.0 private constants, types, and functions.
  */
-#ifndef __MINC2_PRIVATE_H__
-#define __MINC2_PRIVATE_H__ 1
+#ifndef MINC2_PRIVATE_H
+#define MINC2_PRIVATE_H
 
 #include <string.h>
 #include "minc2_structs.h"
@@ -56,12 +56,12 @@ typedef long long mi_i64_t;
  * Volume properties  
  */
 struct mivolprops {
-    miboolean_t enable_flag;    /*< enable multi-res */
-    int depth;                  /*< multi-res depth */
+    miboolean_t enable_flag;    /* enable multi-res */
+    int depth;                  /* multi-res depth */
     micompression_t compression_type;
     int zlib_level; 
-    int edge_count;             /*< how many chunks */
-    int *edge_lengths;          /*< size of each chunk */
+    int edge_count;             /* how many chunks */
+    int *edge_lengths;          /* size of each chunk */
     int max_lengths;
     misize_t record_length;
     char *record_name;
@@ -72,21 +72,21 @@ struct mivolprops {
  * Dimension handle  
  */
 struct midimension {
-  midimattr_t attr;             /*< Dimension attributes */
-  midimclass_t dim_class;       /*< Dimension class */
-  double direction_cosines[3];  /*< Direction cosines */
+  midimattr_t attr;             /* Dimension attributes */
+  midimclass_t dim_class;       /* Dimension class */
+  double direction_cosines[3];  /* Direction cosines */
   miflipping_t flipping_order;
-  char *name;                   /*< Dimension name */
-  double *offsets;              /*< Offsets (if irregular) */
-  double step;                  /*< Step size */
-  misize_t length;          /*< Length */
-  double start;                 /*< Start value */
-  char *units;                  /*< Units string */
-  double width;                 /*< Sample width (if regular) */
-  double *widths;               /*< Widths (if irregular) */
-  char *comments;               /*< Comment string */
-  mihandle_t volume_handle;     /*< Handle of associated volume */
-  short world_index;            /*< -1, MI2_X, MI2_Y, or MI2_Z */
+  char *name;                   /* Dimension name */
+  double *offsets;              /* Offsets (if irregular) */
+  double step;                  /* Step size */
+  misize_t length;              /* Length */
+  double start;                 /* Start value */
+  char *units;                  /* Units string */
+  double width;                 /* Sample width (if regular) */
+  double *widths;               /* Widths (if irregular) */
+  char *comments;               /* Comment string */
+  mihandle_t volume_handle;     /* Handle of associated volume */
+  short world_index;            /* -1, MI2_X, MI2_Y, or MI2_Z */
 };
 
 /** \internal
@@ -96,26 +96,26 @@ struct mivolume {
   hid_t hdf_id;
   miboolean_t has_slice_scaling;
   int number_of_dims;
-  midimhandle_t *dim_handles;   /*< file order of dimensions */
-  int *dim_indices;             /*< apparent order of dimensions */
+  midimhandle_t *dim_handles;   /* file order of dimensions */
+  int *dim_indices;             /* apparent order of dimensions */
   mitype_t volume_type;
   miclass_t volume_class;
   mivolumeprops_t create_props;
-  double valid_min;             /*< Volume-wide valid min */
-  double valid_max;             /*< Volume-wide valid max */
-  mi_lin_xfm_t v2w_transform;   /*< Voxel-to-world transform */
-  mi_lin_xfm_t w2v_transform;   /*< World-to-voxel transform (inverse) */
-  int selected_resolution;      /*< The current resolution (0-N) */
-  int mode;                     /*< Open mode */
-  hid_t ftype_id;               /*< File type ID of image. */
-  hid_t mtype_id;               /*< Memory type ID of image. */
-  hid_t plist_id;               /*< Image property list */
-  hid_t image_id;               /*< Dataset for image */
-  hid_t imax_id;                /*< Dataset for image-max */
-  hid_t imin_id;                /*< Dataset for image-min */
-  double scale_min;             /*< Global minimum */
-  double scale_max;             /*< Global maximum */
-  miboolean_t is_dirty;         /*< TRUE if data has been modified. */
+  double valid_min;             /* Volume-wide valid min */
+  double valid_max;             /* Volume-wide valid max */
+  mi_lin_xfm_t v2w_transform;   /* Voxel-to-world transform */
+  mi_lin_xfm_t w2v_transform;   /* World-to-voxel transform (inverse) */
+  int selected_resolution;      /* The current resolution (0-N) */
+  int mode;                     /* Open mode */
+  hid_t ftype_id;               /* File type ID of image. */
+  hid_t mtype_id;               /* Memory type ID of image. */
+  hid_t plist_id;               /* Image property list */
+  hid_t image_id;               /* Dataset for image */
+  hid_t imax_id;                /* Dataset for image-max */
+  hid_t imin_id;                /* Dataset for image-min */
+  double scale_min;             /* Global minimum */
+  double scale_max;             /* Global maximum */
+  miboolean_t is_dirty;         /* TRUE if data has been modified. */
 };
 
 /**
@@ -212,4 +212,4 @@ double rint(double v);
 #define strncasecmp _strnicmp 
 #endif
 
-#endif /*__MINC2_PRIVATE_H__*/
+#endif /*MINC2_PRIVATE_H*/

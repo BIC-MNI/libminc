@@ -1,5 +1,5 @@
-#ifndef  DEF_MATH
-#define  DEF_MATH
+#ifndef VOL_IO_MATH_H
+#define VOL_IO_MATH_H
 
 /* ----------------------------------------------------------------------------
 @COPYRIGHT  :

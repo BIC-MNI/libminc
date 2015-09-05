@@ -1,19 +1,26 @@
 #if HAVE_CONFIG_H
 #include "config.h"
 #endif
+
+#include <stdio.h>
 #include <minc.h>
 
-#ifndef NULL
-#  define NULL ((void *) 0)
+
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
 #endif
 
 int main()
 {
-   char *file = "test.mnc";
+   char filename[256];
    int cdfid;
    int dim[MAX_VAR_DIMS];
-
-   cdfid=nccreate(file, NC_CLOBBER);
+   snprintf(filename, sizeof(filename), "test_mconv-%d.mnc", getpid());
+   cdfid=nccreate(filename, NC_CLOBBER);
    dim[0]=ncdimdef(cdfid, MIzspace, 3L);
    dim[1]=ncdimdef(cdfid, MIyspace, 5L);
    dim[2]=ncdimdef(cdfid, MIxspace, 6L);
@@ -26,6 +33,8 @@ int main()
    (void) micreate_group_variable(cdfid, MIstudy);
    (void) micreate_group_variable(cdfid, MIacquisition);
    (void) ncclose(cdfid);
+
+   unlink(filename);
 
    return 0;
 }

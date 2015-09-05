@@ -1,5 +1,6 @@
-#ifndef  DEF_ARRAYS
-#define  DEF_ARRAYS
+#ifndef VOL_IO_ARRAYS_H
+#define VOL_IO_ARRAYS_H
+
 /* ----------------------------------------------------------------------------
 @COPYRIGHT  :
               Copyright 1993,1994,1995 David MacDonald,
@@ -140,4 +141,4 @@
              ++(n_elems);                                                     \
          }
 
-#endif /* DEF_ARRAYS */
+#endif /* VOL_IO_ARRAYS_H */

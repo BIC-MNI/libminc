@@ -18,6 +18,8 @@
 
 
 #include  <internal_volume_io.h>
+#include "input_mgh.h"
+#include "input_nifti.h"
 
 #ifdef HAVE_MINC1
 #include  <minc.h>
@@ -26,6 +28,52 @@
 #endif /*HAVE_MINC1*/
 
 #define   FREE_ENDING   "fre"
+
+#ifdef INPUT_VOLUME_UNUSED
+/* This function is only intended for debugging purposes.
+ */
+void
+print_volume(FILE *fp, VIO_Volume volume)
+{
+  int n_dimensions = volume->array.n_dimensions;
+  int i;
+
+  if (volume == NULL) {
+    fprintf(fp, "Volume is NULL.\n");
+    return;
+  }
+
+  fprintf(fp, "VIO_Volume at %lx has %d dimensions.\n", 
+          (unsigned long)volume, n_dimensions);
+  fprintf(fp, "  nc_data_type: %d, signed_flag: %d\n", 
+          volume->nc_data_type, volume->signed_flag);
+  fprintf(fp,"  is_cached_volume: %d, is_rgba_data: %d\n", 
+          volume->is_cached_volume,
+          volume->is_rgba_data);
+  fprintf(fp, "  voxel_min: %g, voxel_max: %g\n", 
+          volume->voxel_min, volume->voxel_max);
+  fprintf(fp, "  real_range_set: %d\n", volume->real_range_set);
+  fprintf(fp, "  real_value_scale: %g, real_value_translation: %g\n", 
+          volume->real_value_scale,
+          volume->real_value_translation);
+  fprintf(fp, "  voxel_to_world_transform_uptodate: %d\n", 
+          volume->voxel_to_world_transform_uptodate);
+  fprintf(fp, "  coordinate_system_name: %s\n", volume->coordinate_system_name);
+  for (i = 0; i < n_dimensions; i++) {
+    fprintf(fp, "  %d. %s %d size %d step %g start %g cosines:[%g %g %g]\n",
+            i, 
+            volume->dimension_names[i], 
+            volume->spatial_axes[i], 
+            volume->array.sizes[i],
+            volume->separations[i], 
+            volume->starts[i],
+            volume->direction_cosines[i][VIO_X],
+            volume->direction_cosines[i][VIO_Y],
+            volume->direction_cosines[i][VIO_Z]);
+  }
+  fprintf(fp, "VIO_Volume end.\n");
+}
+#endif /* INPUT_VOLUME_UNUSED */
 
 /* ----------------------------- MNI Header -----------------------------------
 @NAME       : start_volume_input
@@ -67,15 +115,9 @@ VIOAPI  VIO_Status  start_volume_input(
     if( create_volume_flag || *volume == (VIO_Volume) NULL )
     {
         if( n_dimensions < 1 || n_dimensions > VIO_MAX_DIMENSIONS )
-#ifdef HAVE_MINC1
-            n_dimensions = get_minc_file_n_dimensions( filename );
-#elif defined HAVE_MINC2
-            n_dimensions = get_minc2_file_n_dimensions( filename );
-#else
-            n_dimensions = 0;
-#endif
-        if( n_dimensions < 1 )
-            return( VIO_ERROR );
+        {
+            n_dimensions = VIO_MAX_DIMENSIONS;
+        }
 
         if( dim_names == (VIO_STR *) NULL )
             dim_names = get_default_dim_names( n_dimensions );
@@ -86,21 +128,31 @@ VIOAPI  VIO_Status  start_volume_input(
     }
     else if( n_dimensions != get_volume_n_dimensions( *volume ) &&
              volume_is_alloced( *volume ) )
+    {
         free_volume_data( *volume );
+    }
 
     expanded_filename = expand_filename( filename );
 
-#ifdef HAVE_MINC1
-    if( !filename_extension_matches( expanded_filename, FREE_ENDING ) )
-        input_info->file_format = MNC_FORMAT;
-    else
-#elif defined HAVE_MINC2
-    if( !filename_extension_matches( expanded_filename, FREE_ENDING ) )
-        input_info->file_format = MNC2_FORMAT;
-    else
-#endif
+    if (filename_extension_matches( expanded_filename, FREE_ENDING ) ) {
         input_info->file_format = FREE_FORMAT;
-
+    }
+    else if (filename_extension_matches( expanded_filename, "mgh" ) ||
+             filename_extension_matches( expanded_filename, "mgz" )
+             ) {
+        input_info->file_format = MGH_FORMAT; /* FreeSurfer */
+    }
+    else if (filename_extension_matches( expanded_filename, "nii" ) ||
+             filename_extension_matches( expanded_filename, "hdr" )) {
+        input_info->file_format = NII_FORMAT; /* NIfTI-1 */
+    }
+    else {
+#ifdef HAVE_MINC1
+        input_info->file_format = MNC_FORMAT;
+#elif defined HAVE_MINC2
+        input_info->file_format = MNC2_FORMAT;
+#endif
+    }
     switch( input_info->file_format )
     {
 #ifdef HAVE_MINC1
@@ -139,6 +191,14 @@ VIOAPI  VIO_Status  start_volume_input(
     case  FREE_FORMAT:
         status = initialize_free_format_input( expanded_filename,
                                                *volume, input_info );
+        break;
+      case MGH_FORMAT:
+        status = initialize_mgh_format_input( expanded_filename,
+                                              *volume, input_info );
+        break;
+      case NII_FORMAT:
+        status = initialize_nifti_format_input( expanded_filename,
+                                                *volume, input_info );
         break;
       default:
         /*Unsupported file format*/
@@ -184,6 +244,12 @@ VIOAPI  void  delete_volume_input(
     case  FREE_FORMAT:
         delete_free_format_input( input_info );
         break;
+    case MGH_FORMAT:
+        delete_mgh_format_input ( input_info );
+        break;
+    case NII_FORMAT:
+        delete_nifti_format_input ( input_info );
+        break;
     }
 }
 
@@ -227,6 +293,16 @@ VIOAPI  VIO_BOOL  input_more_of_volume(
     case  FREE_FORMAT:
         more_to_do = input_more_free_format_file( volume, input_info,
                                                   fraction_done );
+        break;
+
+    case MGH_FORMAT:
+        more_to_do = input_more_mgh_format_file( volume, input_info,
+                                                 fraction_done );
+        break;
+
+    case NII_FORMAT:
+        more_to_do = input_more_nifti_format_file( volume, input_info,
+                                                   fraction_done );
         break;
     }
 
@@ -310,8 +386,10 @@ VIOAPI  VIO_Status  input_volume(
           status = VIO_ERROR;
         }
     }
-    get_volume_voxel_range( *volume, &volume_min, &volume_max );
-
+    if (status == VIO_OK)
+    {
+      get_volume_voxel_range( *volume, &volume_min, &volume_max );
+    }
     return( status );
 }
 

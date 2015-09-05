@@ -479,7 +479,7 @@ SEMIPRIVATE int MI_var_loop(int ndims, long start[], long count[],
 @CREATED    : July 30, 1992 (Peter Neelin)
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
-SEMIPRIVATE int MI_get_sign_from_string(nc_type datatype, char *sign)
+SEMIPRIVATE int MI_get_sign_from_string(nc_type datatype, const char *sign)
 {
    MI_SAVE_ROUTINE_NAME("MI_get_sign_from_string");
 

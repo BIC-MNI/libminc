@@ -158,7 +158,7 @@ template<class TPixel> void make_rw_test(const char * filename,int slice_dim,nc_
         REPORT_ERROR("Data mismatched!");
   } else { //ALLOW rounding error
     for(int i=0;i<volume;i++)
-      if(fabs(buffer[i]-in_buffer[i])>max_diff)
+      if(fabs((double)(buffer[i]-in_buffer[i]))>max_diff)
       {
         std::cerr<<"Expected:"<<buffer[i]<<" got:"<<in_buffer[i]<<" @ "<<i<<std::endl;
         REPORT_ERROR("Data mismatched too much!");

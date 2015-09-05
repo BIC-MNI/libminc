@@ -1,6 +1,5 @@
-
-#ifndef  MINC_USEFUL_HEADER_FILE
-#define  MINC_USEFUL_HEADER_FILE
+#ifndef MINC_USEFUL_H
+#define MINC_USEFUL_H
 
 /* ----------------------------- MNI Header -----------------------------------
 @NAME       : minc_useful.h
