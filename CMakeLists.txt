@@ -190,6 +190,7 @@ SET(minc_common_HEADERS
   volume_io/Include/volume_io.h
   nifti/nifti1.h
   nifti/nifti1_io.h
+  nifti/znzlib.h
 )
 
 # some variables
