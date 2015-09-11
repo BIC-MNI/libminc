@@ -1,3 +1,8 @@
+-- Release of minc 2.3.00 --
+
+2015-09-11  Robert D. Vincent <robert.d.vincent@mcgill.ca>
+   * Remove autoconf/automake support.
+
 2015-08-24  Robert D. Vincent <robert.d.vincent@mcgill.ca>
    * libsrc/netcdf_convenience.c: Changed the logic in miopen() to
 	explicitly differentiate netCDF vs. HDF5 files. This was needed
