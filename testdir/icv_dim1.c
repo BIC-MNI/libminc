@@ -3,6 +3,15 @@
 #endif
 
 #include <stdio.h>
+
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+
 #include <minc.h>
 
 #ifdef HAVE_STRING_H
@@ -43,6 +52,7 @@ int main(int argc, char **argv)
    };
    int i, j, k;
    int cflag = 0;
+   char filename[256];
 
 #if MINC2
    if (argc == 2 && !strcmp(argv[1], "-2")) {
@@ -61,7 +71,8 @@ int main(int argc, char **argv)
    miicv_setint(icv, MI_ICV_DO_DIM_CONV, TRUE);
    miicv_setint(icv, MI_ICV_KEEP_ASPECT, FALSE);
    miicv_setint(icv, MI_ICV_DO_NORM, TRUE);
-   cdfid=micreate("test.mnc", NC_CLOBBER | cflag);
+   snprintf(filename, sizeof(filename), "test_icv_dim1-%d.mnc", getpid());
+   cdfid=micreate(filename, NC_CLOBBER | cflag);
    for (i=0; i<numdims; i++) {
       dim[i]=ncdimdef(cdfid, diminfo[i].name, diminfo[i].len);
       dimvar=micreate_std_variable(cdfid, diminfo[i].name, NC_DOUBLE,
@@ -108,7 +119,7 @@ int main(int argc, char **argv)
    }
    miclose(cdfid);
    miicv_free(icv);
-   
+   unlink(filename);
    return 0;
 }
 

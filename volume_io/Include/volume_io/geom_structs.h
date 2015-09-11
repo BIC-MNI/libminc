@@ -1,5 +1,5 @@
-#ifndef  __GEOM_STRUCTS_H_
-#define  __GEOM_STRUCTS_H_ 1
+#ifndef VOL_IO_GEOM_STRUCTS_H
+#define VOL_IO_GEOM_STRUCTS_H
 
 /* ----------------------------------------------------------------------------
 @COPYRIGHT  :
@@ -252,4 +252,4 @@ typedef  struct
 
 #define  Transform_elem( t, i, j ) ((t).m[j][i])
 
-#endif /* __GEOM_STRUCTS_H_ */
+#endif /* VOL_IO_GEOM_STRUCTS_H */

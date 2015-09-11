@@ -66,8 +66,6 @@ VIOAPI  VIO_Status  initialize_free_format_input(
     VIO_BOOL       axis_valid;
     int            axis;
 
-    status = VIO_OK;
-
     file_status = open_file_with_default_suffix(
                          filename, DEFAULT_SUFFIX,
                          READ_FILE, ASCII_FORMAT, &file );

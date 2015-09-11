@@ -568,13 +568,13 @@ VIOAPI  VIO_BOOL  is_an_rgb_volume(
 VIOAPI  void  alloc_volume_data(
     VIO_Volume   volume )
 {
+#ifdef HAVE_MINC1
     unsigned long   data_size;
 
     data_size = (unsigned long) get_volume_total_n_voxels( volume ) *
                 (unsigned long) get_type_size( get_volume_data_type( volume ) );
 
-#ifdef HAVE_MINC1                
-    if( get_n_bytes_cache_threshold() >= 0 &&
+	if( get_n_bytes_cache_threshold() >= 0 &&
         data_size > (unsigned long) get_n_bytes_cache_threshold() )
     {
         volume->is_cached_volume = TRUE;
@@ -582,12 +582,12 @@ VIOAPI  void  alloc_volume_data(
     }
     else
     {
-#endif /*HAVE_MINC1*/      
+#endif /*HAVE_MINC1*/
         volume->is_cached_volume = FALSE;
         alloc_multidim_array( &volume->array );
-#ifdef HAVE_MINC1                
+#ifdef HAVE_MINC1
     }
-#endif /*HAVE_MINC1*/      
+#endif /*HAVE_MINC1*/
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -676,6 +676,30 @@ VIOAPI  void  delete_volume(
     delete_string( volume->coordinate_system_name );
 
     FREE( volume );
+}
+
+/* ----------------------------- MNI Header -----------------------------------
+@NAME       : set_volume_n_dimensions
+@INPUT      : volume
+@OUTPUT     : 
+@RETURNS    : TRUE if successful
+@DESCRIPTION: Returns the number of dimensions of the volume
+@METHOD     : 
+@GLOBALS    : 
+@CALLS      : 
+@CREATED    : June, 1993           David MacDonald
+@MODIFIED   : 
+---------------------------------------------------------------------------- */
+
+VIOAPI  VIO_BOOL  set_volume_n_dimensions(
+    VIO_Volume volume,
+    int        n_dimensions)
+{
+  if ( volume != NULL )
+  {
+    return set_multidim_n_dimensions( &volume->array, n_dimensions );
+  }
+  return FALSE;
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -2284,7 +2308,8 @@ VIOAPI  void  set_volume_voxel_range(
     VIO_Real     voxel_min,
     VIO_Real     voxel_max )
 {
-    VIO_Real  real_min, real_max;
+    VIO_Real  real_min = 0.0;
+    VIO_Real  real_max = 0.0;
 
     if( voxel_min >= voxel_max ) /*VF: trying to fix the situation when whole volume have the same value all around*/
     {
@@ -2461,6 +2486,12 @@ VIOAPI  void  set_volume_real_range(
                                        (voxel_max - voxel_min);
             volume->real_value_translation = real_min -
                                        voxel_min * volume->real_value_scale;
+            /* We never really want a scale value of zero.
+             */
+            if (real_max == real_min)
+            {
+                volume->real_value_scale = 1.0;
+            }
         }
         else
         {
@@ -2503,7 +2534,7 @@ VIOAPI  VIO_Volume   copy_volume_definition_no_alloc(
     nc_type  nc_data_type,
     VIO_BOOL  signed_flag,
     VIO_Real     voxel_min,
-    VIO_Real     voxel_max )
+    VIO_Real     voxel_max)
 {
     int                c, sizes[VIO_MAX_DIMENSIONS];
     VIO_Real               separations[VIO_MAX_DIMENSIONS];
@@ -2669,8 +2700,8 @@ is_volume_dimension_irregular(VIO_Volume volume, int idim)
     return (volume->irregular_starts[idim] != NULL);
 }
 
-int
-get_volume_irregular_starts(VIO_Volume volume, int idim, int count, VIO_Real *starts)
+long
+get_volume_irregular_starts(VIO_Volume volume, int idim, long count, VIO_Real *starts)
 {
     int i;
 
@@ -2693,8 +2724,8 @@ get_volume_irregular_starts(VIO_Volume volume, int idim, int count, VIO_Real *st
     return (count);
 }
 
-int
-get_volume_irregular_widths(VIO_Volume volume, int idim, int count, VIO_Real *widths)
+long
+get_volume_irregular_widths(VIO_Volume volume, int idim, long count, VIO_Real *widths)
 {
     int i;
 
@@ -2717,8 +2748,8 @@ get_volume_irregular_widths(VIO_Volume volume, int idim, int count, VIO_Real *wi
     return (count);
 }
 
-int
-set_volume_irregular_starts(VIO_Volume volume, int idim, int count, VIO_Real *starts)
+long
+set_volume_irregular_starts(VIO_Volume volume, int idim, long count, VIO_Real *starts)
 {
     int i;
 
@@ -2750,8 +2781,8 @@ set_volume_irregular_starts(VIO_Volume volume, int idim, int count, VIO_Real *st
     return (count);
 }
 
-int
-set_volume_irregular_widths(VIO_Volume volume, int idim, int count, VIO_Real *widths)
+long
+set_volume_irregular_widths(VIO_Volume volume, int idim, long count, VIO_Real *widths)
 {
     int i;
 
@@ -2815,11 +2846,11 @@ nonspatial_voxel_to_world(VIO_Volume volume, int idim, int voxel)
     return (world);
 }
 
-VIOAPI int
+VIOAPI long
 nonspatial_world_to_voxel(VIO_Volume volume, int idim, VIO_Real world)
 {
-    int voxel;
-    int i;
+    long voxel;
+    long i;
 
     if (is_volume_dimension_irregular(volume, idim)) {
         voxel = volume->array.sizes[idim];

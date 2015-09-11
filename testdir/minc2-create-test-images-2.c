@@ -64,7 +64,7 @@ static int create_real_as_int_image(void)
   if( r!= MI_NOERROR )    TESTRPT("micreate_volume_image",r);
   
   for (i = 0; i < CY*CX*CZ; i++) {
-    buf[i] = (int) i * 0.001;
+    buf[i] = (int) (i * 0.001);
   }
   
   start[0] = start[1] = start[2] = 0;

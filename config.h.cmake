@@ -4,6 +4,8 @@
 #define MINC2 @MINC2@
 #endif
 
+#cmakedefine DEBUG 1
+
 #define MINC_PACKAGE_NAME "@LIBMINC_PACKAGE_NAME@"
 #define MINC_PACKAGE_BUGREPORT "@LIBMINC_PACKAGE_BUGREPORT@"
 #define MINC_PACKAGE_VERSION "@LIBMINC_PACKAGE_VERSION@"
@@ -60,3 +62,5 @@
 #cmakedefine HAVE_SRAND48 1 
 #cmakedefine HAVE_DRAND48 1 
 #cmakedefine HAVE_SLEEP 1 
+#cmakedefine HAVE_CLOCK_GETTIME 1
+#cmakedefine HAVE_GETTIMEOFDAY 1

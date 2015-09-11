@@ -64,4 +64,4 @@ namespace minc
     return true;
   }
 
-};
+}

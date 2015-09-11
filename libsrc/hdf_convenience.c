@@ -13,6 +13,11 @@
 #define MI2_LENGTH "length"
 #define MI2_CLASS "class"
 
+/* So we build with 1.8.4 */  
+#ifndef H5F_LIBVER_18
+#define H5F_LIBVER_18 H5F_LIBVER_LATEST
+#endif
+
 /************************************************************************
  * Structures for files, variables, and dimensions.
  ************************************************************************/
@@ -38,7 +43,7 @@ struct m2_dim {
     char name[NC_MAX_NAME];
 };
 
-struct m2_file {
+static struct m2_file {
     struct m2_file *link;
     hid_t fd;
     int wr_ok;                  /* non-zero if write OK */
@@ -144,7 +149,7 @@ hdf_id_del(int fd)
     return (MI_ERROR);
 }
 
-struct m2_var *
+static struct m2_var *
 hdf_var_byname(struct m2_file *file, const char *name)
 {
     int i;
@@ -157,7 +162,7 @@ hdf_var_byname(struct m2_file *file, const char *name)
     return (NULL);
 }
 
-struct m2_var *
+static struct m2_var *
 hdf_var_byid(struct m2_file *file, int varid)
 {
     if (varid >= 0 && varid < file->nvars) {
@@ -166,7 +171,7 @@ hdf_var_byid(struct m2_file *file, int varid)
     return (NULL);
 }
 
-struct m2_var *
+static struct m2_var *
 hdf_var_add(struct m2_file *file, const char *name, const char *path, 
 	    int ndims, hsize_t *dims)
 {
@@ -211,7 +216,7 @@ hdf_var_add(struct m2_file *file, const char *name, const char *path,
 
 /** Find a dimension by name.
  */
-struct m2_dim *
+static struct m2_dim *
 hdf_dim_byname(struct m2_file *file, const char *name)
 {
     int i;
@@ -226,7 +231,7 @@ hdf_dim_byname(struct m2_file *file, const char *name)
 
 /** Find a dimension by ID number.
  */
-struct m2_dim *
+static struct m2_dim *
 hdf_dim_byid(struct m2_file *file, int dimid)
 {
     if (dimid >= 0 && dimid < file->ndims) {
@@ -235,7 +240,7 @@ hdf_dim_byid(struct m2_file *file, int dimid)
     return (NULL);
 }
 
-struct m2_dim *
+static struct m2_dim *
 hdf_dim_add(struct m2_file *file, const char *name, long length)
 {
     struct m2_dim *new;
@@ -313,7 +318,7 @@ hdf_path_from_name(struct m2_file *file, const char *varnm, char *varpath)
 }
 
 /* map NetCDF types onto HDF types */
-hid_t 
+static hid_t
 nc_to_hdf5_type(nc_type dtype, int is_signed)
 {
     switch (dtype) {
@@ -1025,7 +1030,7 @@ hdf_attget(int fd, int varid, const char *attnm, void *value)
 
 int
 hdf_attput(int fd, int varid, const char *attnm, nc_type val_typ, 
-	   int val_len, void *val_ptr)
+	   int val_len, const void *val_ptr)
 {
     hid_t att_id = -1;
     hid_t mtyp_id = -1;         /* Memory type */
@@ -1366,7 +1371,7 @@ hdf_vardef(int fd, const char *varnm, nc_type vartype, int ndims,
 
             for (i = 0; i < ndims; i++) {
                 if( chunk_length >= MI2_CHUNK_MIN_SIZE ) {
-                    if( chkdims[i] > chunk_length ) {
+                    if( chkdims[i] > (hsize_t)chunk_length ) {
                         chkdims[i] = chunk_length;
                     }
                 }
@@ -1720,11 +1725,11 @@ hdf_varputg(int fd, int varid, const long *start,
 	 */
 	idim = maxidim;
     carry:
-	value = ((char *)value) + mymap[idim];
+	value = ((const char *)value) + mymap[idim];
 	mystart[idim] += mystride[idim];
 	if (mystart[idim] == stop[idim]) {
 	    mystart[idim] = start[idim];
-	    value = ((char *)value) - length[idim];
+	    value = ((const char *)value) - length[idim];
 	    if (--idim < 0)
 		break; /* normal return */
 	    goto carry;
@@ -1847,11 +1852,11 @@ hdf_vargetg(int fd, int varid, const long *start,
      * Check start, edges
      */
     for (idim = 0; idim < maxidim; idim++) {
-	if (mystart[idim] >= varp->dims[idim]) {
+        if ((hsize_t) mystart[idim] >= varp->dims[idim]) {
 	    status = MI_ERROR;
 	    goto done;
 	}
-	if (mystart[idim] + myedges[idim] > varp->dims[idim]) {
+	if ((hsize_t) (mystart[idim] + myedges[idim]) > varp->dims[idim]) {
 	    status = MI_ERROR;
 	    goto done;
 	}
@@ -2114,7 +2119,7 @@ herr_t hdf_copy_attr(hid_t in_id, const char *attr_name, void *op_data)
    return (status);
 }
 
-int
+static int
 hdf_open_dsets(struct m2_file *file, hid_t grp_id, char *cpath, int is_dim)
 {
     hsize_t nobjs;
@@ -2172,6 +2177,7 @@ hdf_open_dsets(struct m2_file *file, hid_t grp_id, char *cpath, int is_dim)
                     }
                     else {
                         milog_message(MI_MSG_SNH);
+                        length = 0;
                     }
 
 		    hdf_dim_add(file, temp, length);
@@ -2316,6 +2322,8 @@ hdf_create(const char *path, int cmode, struct mi2opts *opts_ptr)
         fd = H5Fcreate(path, cmode, H5P_DEFAULT, fpid);
     } H5E_END_TRY;
     if (fd < 0) {
+      fprintf(stderr, "Error creating HDF file '%s' with mode '%x', result %d\n", path, cmode, fd);
+      H5Eprint1(stderr);
       return (MI_ERROR);
     }
 
@@ -2325,25 +2333,35 @@ hdf_create(const char *path, int cmode, struct mi2opts *opts_ptr)
      * Should we use a non-zero value for size_hint (parameter 3)???
      */
     if ((grp_id = H5Gcreate2(fd, MI2_GRPNAME, H5P_DEFAULT, hdf_gpid, H5P_DEFAULT)) < 0) {
+      fprintf(stderr, "Error creating groups on line %d\n", __LINE__);
+      H5Eprint1(stderr);
       return (MI_ERROR);
     }
 
     if ((tmp_id = H5Gcreate2(grp_id, "dimensions", H5P_DEFAULT, hdf_gpid, H5P_DEFAULT)) < 0) {
+      fprintf(stderr, "Error creating groups on line %d\n", __LINE__);
+      H5Eprint1(stderr);
       return (MI_ERROR);
     }
     H5Gclose(tmp_id);
 
     if ((tmp_id = H5Gcreate2(grp_id, "info", H5P_DEFAULT, hdf_gpid, H5P_DEFAULT)) < 0) {
+      fprintf(stderr, "Error creating groups on line %d\n", __LINE__);
+      H5Eprint1(stderr);
       return (MI_ERROR);
     }
     H5Gclose(tmp_id);
 
     if ((tmp_id = H5Gcreate2(grp_id, "image", H5P_DEFAULT, hdf_gpid, H5P_DEFAULT)) < 0) {
+      fprintf(stderr, "Error creating groups on line %d\n", __LINE__);
+      H5Eprint1(stderr);
       return (MI_ERROR);
     }
     H5Gclose(tmp_id);
 
     if ((tmp_id = H5Gcreate2(grp_id, "image/0", H5P_DEFAULT, hdf_gpid, H5P_DEFAULT)) < 0) {
+      fprintf(stderr, "Error creating groups on line %d\n", __LINE__);
+      H5Eprint1(stderr);
       return (MI_ERROR);
     }
     
@@ -2353,6 +2371,8 @@ hdf_create(const char *path, int cmode, struct mi2opts *opts_ptr)
 
     file = hdf_id_add(fd);      /* Add it to the list */
     if (file == NULL) {
+        fprintf(stderr, "Error adding ID to list.\n");
+        H5Eprint1(stderr);
         return (MI_ERROR);      /* Should not happen?? */
     }
 

@@ -12,8 +12,8 @@
               software for any purpose.  It is provided "as is" without
               express or implied warranty.
 ---------------------------------------------------------------------------- */
-#ifndef __MINC_1_RW__
-#define __MINC_1_RW__
+#ifndef MINC_1_RW_H
+#define MINC_1_RW_H
 
 #include <vector>
 #include <string>
@@ -39,7 +39,7 @@ namespace minc
   struct dim_info
   {
     enum dimensions {DIM_UNKNOWN=0,DIM_X,DIM_Y,DIM_Z,DIM_TIME,DIM_VEC} ;
-    dim_info():length(0),step(0),start(0),have_dir_cos(false)
+    dim_info():length(0),step(0),start(0),have_dir_cos(false),dim(DIM_UNKNOWN)
     {
       dir_cos[0]=dir_cos[1]=dir_cos[2]=0.0;
     }
@@ -389,8 +389,8 @@ namespace minc
       //! \param inf  - information about dimensions
       //! \param slice_dimensions - number of dimensions per slice (used for storage)
       //! \param datatype - storage datatype
-      //! \param __signed - check if datatype will be signed or not
-      void open(const char *path,const minc_info& inf,int slice_dimensions,nc_type datatype,int __signed=0);
+      //! \param is_signed - check if datatype will be signed or not
+      void open(const char *path,const minc_info& inf,int slice_dimensions,nc_type datatype,int is_signed=0);
       
       //! open minc file for writing - will overwrite existing 
       //! \param path - path to minc file
@@ -440,5 +440,5 @@ namespace minc
       //!write a single slice, size of the buffer should be more or equall to slab_len
       void write(void* slice);
   };
-};
+}
 #endif //__PRIMITIVE_MINC_IO__

@@ -270,6 +270,7 @@ miconvert_world_origin_to_start( mihandle_t volume,
                                  double world[3],
                                  double starts[3])
 {
+    fprintf(stderr, "miconvert_world_origin_to_start: Not implemented.\n");
     return (MI_NOERROR);
 }
 
@@ -285,6 +286,7 @@ miconvert_spatial_frequency_origin_to_start( mihandle_t volume,
                                              double world[3],
                                              double starts[3])
 {
+    fprintf(stderr, "miconvert_spatial_frequency_origin_to_start: Not implemented.\n");
     return (MI_NOERROR);
 }
 
@@ -452,6 +454,7 @@ miset_spatial_frequency_origin(mihandle_t volume,
         return (MI_ERROR);
     }
 
+    fprintf(stderr, "miset_spatial_frequency_origin: Not implemented.\n");
     return (MI_NOERROR);
 }
 

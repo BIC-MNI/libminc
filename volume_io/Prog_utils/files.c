@@ -601,7 +601,7 @@ static  VIO_STR  get_user_home_directory(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  VIO_STR  expand_filename(
-    VIO_STR  filename )
+    const char  *filename )
 {
     int      i, new_i, dest, len, env_index;
     VIO_BOOL  tilde_found, prev_was_backslash;
@@ -1079,7 +1079,7 @@ VIOAPI  VIO_Status  open_file(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  VIO_Status  open_file_with_default_suffix(
-    VIO_STR             filename,
+    const char          *filename,
     VIO_STR             default_suffix,
     VIO_IO_types           io_type,
     VIO_File_formats       file_format,
@@ -1228,7 +1228,7 @@ VIOAPI  VIO_Status  close_file(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  VIO_STR  extract_directory(
-    VIO_STR    filename )
+    const char    *filename )
 {
     int     i, slash_index;
     VIO_STR  expanded, directory;
@@ -1361,6 +1361,7 @@ VIOAPI  VIO_Status  input_character(
 
     if( c == EOF )
     {
+        *ch = 0;
         status = VIO_ERROR;
     }
     else
@@ -1484,8 +1485,6 @@ VIOAPI  VIO_Status   skip_input_until(
     VIO_Status   status;
     char     ch;
 
-    status = VIO_OK;
-
     do
     {
         status = input_character( file, &ch );
@@ -1547,7 +1546,7 @@ VIOAPI  VIO_Status  input_string(
     VIO_STR  *str,
     char    termination_char )
 {
-    char    ch;
+    char    ch = 0;
     VIO_Status  status;
 
     status = input_nonwhite_character( file, &ch );
@@ -2426,9 +2425,7 @@ VIOAPI  VIO_Status  io_quoted_string(
     VIO_STR          *str )
 {
     int      length;
-    VIO_Status   status;
-
-    status = VIO_OK;
+    VIO_Status   status = VIO_OK;
 
     if( format == ASCII_FORMAT )
     {
@@ -2484,9 +2481,7 @@ VIOAPI  VIO_Status  io_boolean(
     VIO_File_formats    format,
     VIO_BOOL         *b )
 {
-    VIO_Status   status;
-
-    status = VIO_OK;
+    VIO_Status   status = VIO_OK;
 
     if( format == ASCII_FORMAT )
     {
@@ -2523,9 +2518,7 @@ VIOAPI  VIO_Status  io_short(
     VIO_File_formats    format,
     short           *short_int )
 {
-    VIO_Status   status;
-
-    status = VIO_OK;
+    VIO_Status   status = VIO_OK;
 
     if( format == ASCII_FORMAT )
     {
@@ -2563,9 +2556,7 @@ VIOAPI  VIO_Status  io_unsigned_short(
     VIO_File_formats    format,
     unsigned short  *unsigned_short )
 {
-    VIO_Status   status;
-
-    status = VIO_OK;
+    VIO_Status   status = VIO_OK;
 
     if( format == ASCII_FORMAT )
     {
@@ -2659,9 +2650,7 @@ VIOAPI  VIO_Status  io_int(
     VIO_File_formats    format,
     int             *i )
 {
-    VIO_Status   status;
-
-    status = VIO_OK;
+    VIO_Status   status = VIO_OK;
 
     if( format == ASCII_FORMAT )
     {
@@ -2698,9 +2687,7 @@ VIOAPI  VIO_Status  io_real(
     VIO_File_formats    format,
     VIO_Real            *r )
 {
-    VIO_Status   status;
-
-    status = VIO_OK;
+    VIO_Status   status = VIO_OK;
 
     if( format == ASCII_FORMAT )
     {
@@ -2737,9 +2724,7 @@ VIOAPI  VIO_Status  io_float(
     VIO_File_formats    format,
     float           *f )
 {
-    VIO_Status   status;
-
-    status = VIO_OK;
+    VIO_Status   status = VIO_OK;
 
     if( format == ASCII_FORMAT )
     {
@@ -2776,9 +2761,7 @@ VIOAPI  VIO_Status  io_double(
     VIO_File_formats    format,
     double          *d )
 {
-    VIO_Status   status;
-
-    status = VIO_OK;
+    VIO_Status   status = VIO_OK;
 
     if( format == ASCII_FORMAT )
     {

@@ -1,7 +1,8 @@
-#ifndef  __VOL_IO_PROTOTYPES_H__
-#define  __VOL_IO_PROTOTYPES_H__ 1
+#ifndef VOL_IO_PROTOTYPES_H
+#define VOL_IO_PROTOTYPES_H
 
 #include "basic.h"
+#include "minc2_structs.h"
 
 /*transforms*/
 
@@ -9,23 +10,23 @@ VIOAPI  VIO_STR  get_default_transform_file_suffix( void );
 
 VIOAPI  VIO_Status  output_transform(
     FILE                *file,
-    VIO_STR              filename,
+    const char          *filename,
     int                 *volume_count_ptr,
-    VIO_STR              comments,
+    const char          *comments,
     VIO_General_transform   *transform );
 
 VIOAPI  VIO_Status  input_transform(
     FILE                *file,
-    VIO_STR              filename,
+    const char          *filename,
     VIO_General_transform   *transform );
 
 VIOAPI  VIO_Status  output_transform_file(
-    VIO_STR              filename,
-    VIO_STR              comments,
+    const char           *filename,
+    const char           *comments,
     VIO_General_transform   *transform );
 
 VIOAPI  VIO_Status  input_transform_file(
-    VIO_STR              filename,
+    const char              *filename,
     VIO_General_transform   *transform );
 
 VIOAPI  void  create_linear_transform(
@@ -175,8 +176,8 @@ VIOAPI  VIO_Status  mni_input_int(
     int     *i );
 
 VIOAPI  void  output_comments(
-    FILE     *file,
-    VIO_STR   comments );
+    FILE       *file,
+    const char *comments );
 
 VIOAPI  VIO_STR  get_default_tag_file_suffix( void );
 
@@ -690,7 +691,7 @@ VIOAPI  VIO_Status  move_file(
     VIO_STR  dest );
 
 VIOAPI  VIO_STR  expand_filename(
-    VIO_STR  filename );
+    const char  *filename );
 
 VIOAPI  VIO_BOOL filename_extension_matches(
     VIO_STR   filename,
@@ -712,7 +713,7 @@ VIOAPI  VIO_Status  open_file(
     FILE               **file );
 
 VIOAPI  VIO_Status  open_file_with_default_suffix(
-    VIO_STR            filename,
+    const char         *filename,
     VIO_STR            default_suffix,
     VIO_IO_types       io_type,
     VIO_File_formats   file_format,
@@ -726,7 +727,7 @@ VIOAPI  VIO_Status  close_file(
     FILE     *file );
 
 VIOAPI  VIO_STR  extract_directory(
-    VIO_STR    filename );
+    const char    *filename );
 
 VIOAPI  VIO_STR  get_absolute_filename(
     VIO_STR    filename,
@@ -968,10 +969,10 @@ VIOAPI  void  terminate_progress_report(
     VIO_progress_struct   *progress );
 
 VIOAPI  VIO_STR  alloc_string(
-    int   length );
+    size_t   length );
 
 VIOAPI  VIO_STR  create_string(
-    VIO_STR    initial );
+    const char   *initial );
 
 VIOAPI  void  delete_string(
     VIO_STR   string );
@@ -993,11 +994,11 @@ VIOAPI  void  concat_to_string(
     VIO_STR   str2 );
 
 VIOAPI  int  string_length(
-    VIO_STR   string );
+    const char   *string );
 
 VIOAPI  VIO_BOOL equal_strings(
-    VIO_STR   str1,
-    VIO_STR   str2 );
+    const char   *str1,
+    const char   *str2 );
 
 VIOAPI  VIO_BOOL is_lower_case(
     char  ch );
@@ -1457,6 +1458,10 @@ VIOAPI  void  get_type_range(
     VIO_Data_types   type,
     VIO_Real         *min_value,
     VIO_Real         *max_value );
+
+VIOAPI VIO_BOOL set_multidim_n_dimensions(
+    VIO_multidim_array *array,
+    int                n_dimensions);
 
 VIOAPI  void  set_multidim_sizes(
     VIO_multidim_array   *array,
@@ -1953,6 +1958,9 @@ VIOAPI  void  delete_volume(
 VIOAPI  int  get_volume_n_dimensions(
     VIO_Volume volume );
 
+VIOAPI  VIO_BOOL  set_volume_n_dimensions(
+    VIO_Volume volume, int n_dimensions);
+
 VIOAPI  void  get_volume_sizes(
     VIO_Volume volume,
     int      sizes[] );
@@ -2036,13 +2044,13 @@ VIOAPI  void  get_volume_direction_cosine(
  * but they are not truly public. That is why they are not declared VIOAPI.
  */
 VIO_BOOL is_volume_dimension_irregular(VIO_Volume, int);
-int get_volume_irregular_starts(VIO_Volume, int, int, VIO_Real *);
-int get_volume_irregular_widths(VIO_Volume, int, int, VIO_Real *);
-int set_volume_irregular_starts(VIO_Volume, int, int, VIO_Real *);
-int set_volume_irregular_widths(VIO_Volume, int, int, VIO_Real *);
+long get_volume_irregular_starts(VIO_Volume, int, long, VIO_Real *);
+long get_volume_irregular_widths(VIO_Volume, int, long, VIO_Real *);
+long set_volume_irregular_starts(VIO_Volume, int, long, VIO_Real *);
+long set_volume_irregular_widths(VIO_Volume, int, long, VIO_Real *);
 
 VIOAPI  VIO_Real nonspatial_voxel_to_world(VIO_Volume, int, int);
-VIOAPI  int nonspatial_world_to_voxel(VIO_Volume, int, VIO_Real);
+VIOAPI  long nonspatial_world_to_voxel(VIO_Volume, int, VIO_Real);
 
 VIOAPI  void  set_volume_translation(
     VIO_Volume  volume,
@@ -2194,4 +2202,4 @@ VIOAPI  VIO_Status  grid_inverse_transform_point(
     VIO_Real                *y_transformed,
     VIO_Real                *z_transformed );
 
-#endif /*__VOL_IO_PROTOTYPES_H__*/
+#endif /*VOL_IO_PROTOTYPES_H*/

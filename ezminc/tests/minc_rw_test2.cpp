@@ -20,9 +20,9 @@ int main(int argc,char **argv)
     vol.resize(rdr.ndim(1),rdr.ndim(2),rdr.ndim(3));
     load_non_standard_volume<float>(rdr,vol.c_buf());
     //rdr.close();
-    for(int z=0;z<vol.dim(2);z++)
-      for(int y=0;y<vol.dim(1);y++)
-        for(int x=0;x<vol.dim(0);x++)
+    for(size_t z=0;z<vol.dim(2);z++)
+      for(size_t y=0;y<vol.dim(1);y++)
+        for(size_t x=0;x<vol.dim(0);x++)
         {
           vol(x,y,z)=x+y+z;
         }

@@ -1,5 +1,5 @@
-#ifndef  MINC_ROUTINES_HEADER_FILE
-#define  MINC_ROUTINES_HEADER_FILE
+#ifndef MINC_ROUTINES_H
+#define MINC_ROUTINES_H
 
 /* ----------------------------- MNI Header -----------------------------------
 @NAME       : minc_routines.h
@@ -86,7 +86,7 @@ SEMIPRIVATE int MI_var_loop(int ndims, long start[], long count[],
                             void *caller_data,
                             int (*action_func) (int, long [], long [], 
                                                 long, void *, void *));
-SEMIPRIVATE int MI_get_sign_from_string(nc_type datatype, char *sign);
+SEMIPRIVATE int MI_get_sign_from_string(nc_type datatype, const char *sign);
 SEMIPRIVATE int MI_convert_type(long number_of_values,
                                 nc_type intype,  int insign,  void *invalues,
                                 nc_type outtype, int outsign, void *outvalues,

@@ -71,7 +71,7 @@ int miset_record_field_name(mihandle_t volume,
 {
     hid_t mtype_id;
     hid_t ftype_id;
-    int offset;
+    size_t offset;
 
     if (volume == NULL || name == NULL) {
         return (MI_ERROR);

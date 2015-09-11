@@ -99,6 +99,7 @@ static  void  initialize_thin_plate_transform(
     transform->inverse_flag = FALSE;
     transform->n_dimensions = n_dimensions;
     transform->n_points = n_points;
+    transform->displacement_volume = NULL;
 
     VIO_ALLOC2D( transform->points, n_points, n_dimensions );
     VIO_ALLOC2D( transform->displacements, n_points + n_dimensions + 1,

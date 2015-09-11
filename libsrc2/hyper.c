@@ -15,240 +15,10 @@
 
 #include "minc2.h"
 #include "minc2_private.h"
+#include "restructure.h"
 
 #define MIRW_OP_READ 1
 #define MIRW_OP_WRITE 2
-
-typedef unsigned long mioffset_t;
-
-/** In-place array dimension restructuring.
- *
- * Based on Chris H.Q. Ding, "An Optimal Index Reshuffle Algorithm for
- * Multidimensional Arrays and its Applications for Parallel Architectures"
- * IEEE Transactions on Parallel and Distributed Systems, Vol.12, No.3,
- * March 2001, pp.306-315.
- *
- * I rewrote the algorithm in "C" an generalized it to N dimensions.
- *
- * Guaranteed to do the minimum number of memory moves, but requires
- * that we allocate a bitmap of nelem/8 bytes.  The paper suggests
- * ways to eliminate the bitmap - I'll work on it.
- */
-
-/**
- * Map a set of array coordinates to a linear offset in the array memory.
- */
-static mioffset_t
-index_to_offset(int ndims,
-                const misize_t sizes[],
-                const misize_t index[])
-{
-  mioffset_t offset = index[0];
-  int i;
-
-  for (i = 1; i < ndims; i++) {
-    offset *= sizes[i];
-    offset += index[i];
-  }
-  return (offset);
-}
-
-/**
- * Map a linear offset to a set of coordinates in a multidimensional array.
- */
-static void
-offset_to_index(int ndims,
-                const misize_t sizes[],
-                mioffset_t offset,
-                misize_t index[])
-{
-  int i;
-
-  for (i = ndims - 1; i > 0; i--) {
-    index[i] = offset % sizes[i];
-    offset /= sizes[i];
-  }
-  index[0] = offset;
-}
-
-/* Trivial bitmap test & set.
- */
-#define BIT_TST(bm, i) (bm[(i) / 8] & (1 << ((i) % 8)))
-#define BIT_SET(bm, i) (bm[(i) / 8] |= (1 << ((i) % 8)))
-
-/** The main restructuring code.
- */
-void restructure_array(int ndims,    /* Dimension count */
-                              unsigned char *array, /* Raw data */
-                              const misize_t *lengths_perm, /* Permuted lengths */
-                              int el_size,  /* Element size, in bytes */
-                              const int *map, /* Mapping array */
-                              const int *dir) /* Direction array, in permuted order */
-{
-  misize_t index[MI2_MAX_VAR_DIMS]; /* Raw indices */
-  misize_t index_perm[MI2_MAX_VAR_DIMS]; /* Permuted indices */
-  misize_t lengths[MI2_MAX_VAR_DIMS]; /* Raw (unpermuted) lengths */
-  unsigned char *temp;
-  mioffset_t offset_start;
-  mioffset_t offset_next;
-  mioffset_t offset;
-  unsigned char *bitmap;
-  size_t total;
-  int i;
-
-  if ((temp = malloc(el_size)) == NULL) {
-    MI_LOG_ERROR(MI2_MSG_OUTOFMEM,el_size);
-    return;
-  }
-
-  /**
-   * Permute the lengths from their "output" configuration back into
-   * their "raw" or native order:
-   **/
-  for (i = 0; i < ndims; i++) {
-    lengths[map[i]] = lengths_perm[i];
-  }
-
-  /**
-   * Calculate the total size of the array, in elements.
-   **/
-  total = 1;
-  for (i = 0; i < ndims; i++) {
-    total *= lengths[i];
-  }
-
-  /**
-   * Allocate a bitmap with enough space to hold one bit for each
-   * element in the array.
-   **/
-  bitmap = calloc((total + 8 - 1) / 8, 1); /* bit array */
-  if (bitmap == NULL) {
-    MI_LOG_ERROR(MI2_MSG_OUTOFMEM,(total + 8 - 1) / 8);
-    free(temp);
-    return;
-  }
-
-  for (offset_start = 0; offset_start < total; offset_start++) {
-
-    /**
-     * Look for an unset bit - that's where we start the next
-     * cycle.
-     **/
-
-    if (!BIT_TST(bitmap, offset_start)) {
-
-      /**
-       * Found a cycle we have not yet performed.
-       **/
-
-      offset_next = -1;   /* Initialize. */
-
-#ifdef DEBUG
-      printf("%ld", offset_start);
-#endif /* DEBUG */
-
-      /**
-       * Save the first element in this cycle.
-       **/
-
-      memcpy(temp, array + (offset_start * el_size), el_size);
-
-      /**
-       * We've touched this location.
-       **/
-
-      BIT_SET(bitmap, offset_start);
-
-      offset = offset_start;
-
-      /**
-       * Do until the cycle repeats.
-       **/
-
-      while (offset_next != offset_start) {
-
-        /**
-         * Compute the index from the offset and permuted length.
-         **/
-
-        offset_to_index(ndims, lengths_perm, offset, index_perm);
-
-        /**
-         * Permute the index into the alternate arrangement.
-         **/
-
-        for (i = 0; i < ndims; i++) {
-          if (dir[i] < 0) {
-            index[map[i]] = lengths[map[i]] - index_perm[i] - 1;
-          } else {
-            index[map[i]] = index_perm[i];
-          }
-        }
-
-        /**
-         * Calculate the next offset from the permuted index.
-         **/
-
-        offset_next = index_to_offset(ndims, lengths, index);
-#ifdef DEBUG
-        if (offset_next >= total) {
-          printf("Fatal - offset %ld out of bounds!\n", offset_next);
-          printf("lengths %ld,%ld,%ld\n",
-                 lengths[0],lengths[1],lengths[2]);
-          printf("index %ld,%ld,%ld\n",
-                 index_perm[0], index_perm[0], index_perm[2]);
-          //TODO: report MEMORY error somehow
-          exit(-1);
-        }
-#endif
-        /**
-         * If we are not at the end of the cycle...
-         **/
-
-        if (offset_next != offset_start) {
-
-          /**
-           * Note that we've touched a new location.
-           **/
-
-          BIT_SET(bitmap, offset_next);
-
-#ifdef DEBUG
-          printf(" - %ld", offset_next);
-#endif /* DEBUG */
-
-          /**
-           * Move from old to new location.
-           **/
-
-          memcpy(array + (offset * el_size),
-                 array + (offset_next * el_size),
-                 el_size);
-
-          /**
-           * Advance offset to the next location in the cycle.
-           **/
-
-          offset = offset_next;
-        }
-      }
-
-      /**
-       * Store the first value in the cycle, which we saved in
-       * 'tmp', into the last offset in the cycle.
-       **/
-
-      memcpy(array + (offset * el_size), temp, el_size);
-
-#ifdef DEBUG
-      printf("\n");
-#endif /* DEBUG */
-    }
-  }
-
-  free(bitmap);               /* Get rid of the bitmap. */
-  free(temp);
-}
 
 /** Calculates and returns the number of bytes required to store the
  * hyperslab specified by the \a n_dimensions and the
@@ -258,7 +28,7 @@ void miget_hyperslab_size_hdf(hid_t hdf_type_id, int n_dimensions,
                                 const hsize_t count[], 
                                 misize_t *size_ptr)
 {
-  int voxel_size;
+  size_t voxel_size;
   misize_t temp;
   int i;
   voxel_size = H5Tget_size(hdf_type_id);
@@ -392,7 +162,7 @@ static int mirw_hyperslab_raw(int opcode,
   misize_t buffer_size;
   void *temp_buffer=NULL;
   char path[MI2_MAX_PATH];
-
+  size_t icount[MI2_MAX_VAR_DIMS];
 
   /* Disallow write operations to anything but the highest resolution.
    */
@@ -459,7 +229,12 @@ static int mirw_hyperslab_raw(int opcode,
     /* Restructure the array after reading the data in file orientation.
      */
     if (n_different != 0) {
-      restructure_array(ndims, buffer, count, H5Tget_size(type_id),
+      int i;
+
+      for (i = 0; i < ndims; i++) {
+        icount[i] = count[i];
+      }
+      restructure_array(ndims, buffer, icount, H5Tget_size(type_id),
                         volume->dim_indices, dir);
     }
   } else {
@@ -471,7 +246,6 @@ static int mirw_hyperslab_raw(int opcode,
      */
 
     if (n_different != 0) {
-      misize_t icount[MI2_MAX_VAR_DIMS];
       int idir[MI2_MAX_VAR_DIMS];
       int imap[MI2_MAX_VAR_DIMS];
       int i;
@@ -591,7 +365,7 @@ static int mirw_hyperslab_icv(int opcode,
   double volume_valid_min, volume_valid_max;
   misize_t buffer_size;
   void *temp_buffer=NULL;
-  misize_t icount[MI2_MAX_VAR_DIMS];
+  size_t icount[MI2_MAX_VAR_DIMS];
   int idir[MI2_MAX_VAR_DIMS];
   int imap[MI2_MAX_VAR_DIMS];
   double *image_slice_max_buffer=NULL;
@@ -861,7 +635,10 @@ static int mirw_hyperslab_icv(int opcode,
     }
     
     if (n_different != 0 ) {
-      restructure_array(ndims, buffer, count, H5Tget_size(buffer_type_id),volume->dim_indices, dir);
+      for (i = 0; i < ndims; i++) {
+        icount[i] = count[i];
+      }
+      restructure_array(ndims, buffer, icount, H5Tget_size(buffer_type_id),volume->dim_indices, dir);
       /*TODO: check if we managed to restructure the array*/
       result=0;
     }
@@ -1009,7 +786,7 @@ cleanup:
       {\
         double _temp=(( (*_buffer_in) - voxel_offset) / voxel_range)*(image_slice_max_buffer[_i]-image_slice_min_buffer[_i]) + image_slice_min_buffer[_i] ;\
         _temp=(_temp-data_offset)/data_range;\
-        _temp=_temp<0.0?norm_min:_temp>=1.0?norm_max:(rint(_temp*norm_range)+norm_offset); \
+        _temp=(_temp<0.0)?norm_min:(_temp>=1.0)?norm_max:(rint(_temp*norm_range)+norm_offset); \
         *_buffer_out=(type_out)(_temp);\
         _buffer_in++;\
         _buffer_out++;\
@@ -1024,14 +801,18 @@ cleanup:
     double voxel_offset=voxel_min;\
     double norm_offset=norm_min;\
     double norm_range=(double)norm_max-(double)norm_min;\
+    double data_offset=data_min;\
+    double data_range=(double)data_max-(double)data_min;\
     type_in *_buffer_in=(type_in *)buffer_in;\
+    double *_buffer_out=buffer_out;\
     for(_i=0;_i<total_number_of_slices;_i++)\
       for(_j=0;_j<image_slice_length;_j++)\
       {\
         double _temp=((double)(*_buffer_in)-norm_offset)/norm_range;\
+        _temp=(_temp*data_range)+data_offset;\
         _temp=(((_temp - image_slice_min_buffer[_i])/(image_slice_max_buffer[_i]-image_slice_min_buffer[_i]))*voxel_range + voxel_offset);\
-        *buffer_out=_temp;\
-        buffer_out++;\
+        *_buffer_out=round(_temp);\
+        _buffer_out++;\
         _buffer_in++;\
       }\
   }
@@ -1066,7 +847,7 @@ static int mirw_hyperslab_normalized(int opcode,
   misize_t buffer_size;
   misize_t input_buffer_size;
   double *temp_buffer=NULL;
-  misize_t icount[MI2_MAX_VAR_DIMS];
+  size_t icount[MI2_MAX_VAR_DIMS];
   int idir[MI2_MAX_VAR_DIMS];
   int imap[MI2_MAX_VAR_DIMS];
   double *image_slice_max_buffer=NULL;
@@ -1296,7 +1077,10 @@ static int mirw_hyperslab_normalized(int opcode,
     }
     
     if (n_different != 0 ) {
-      restructure_array(ndims, buffer, count, H5Tget_size(buffer_type_id),volume->dim_indices, dir);
+      for (i = 0; i < ndims; i++) {
+         icount[i] = count[i];
+      }
+      restructure_array(ndims, buffer, icount, H5Tget_size(buffer_type_id),volume->dim_indices, dir);
       /*TODO: check if we managed to restructure the array*/
       result=0;
     }
@@ -1323,7 +1107,7 @@ static int mirw_hyperslab_normalized(int opcode,
       result=MI_ERROR; /*TODO: error code?*/
       goto cleanup;
     }
-    memcpy(temp_buffer2,buffer,buffer_size);
+    memcpy(temp_buffer2,buffer,input_buffer_size);
     
     if (n_different != 0 ) 
       restructure_array(ndims, temp_buffer2, icount, H5Tget_size(buffer_type_id), imap, idir);

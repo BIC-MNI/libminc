@@ -30,6 +30,11 @@
 #include "minc2.h"
 #include "minc2_private.h"
 
+/* So we build with 1.8.4 */  
+#ifndef H5F_LIBVER_18
+#define H5F_LIBVER_18 H5F_LIBVER_LATEST
+#endif
+
 /**
 * \defgroup mi2Vol MINC 2.0 Volume Functions
 */
@@ -70,7 +75,7 @@ static int _generate_ident( char * id_str, size_t length )
   
   temp_ptr = getenv("LOGNAME");
   if (temp_ptr != NULL) {
-    strcpy(user_str, temp_ptr);
+    strncpy(user_str, temp_ptr, sizeof(user_str) - 1);
   }
   else {
     strcpy(user_str, "nobody");
@@ -203,7 +208,7 @@ static hid_t _hdf_create(const char *path, int cmode)
   hid_t fpid;
   
   fpid = H5Pcreate (H5P_FILE_ACCESS);
-  
+
   /*VF use all the features of new HDF5 1.8*/
   H5Pset_libver_bounds (fpid, H5F_LIBVER_18, H5F_LIBVER_18);
   
@@ -276,9 +281,9 @@ int micreate_volume_image(mihandle_t volume)
     /* Create the dimorder string, ordered comma-separated
       list of dimension names.
     */
-    strcat(dimorder, volume->dim_handles[i]->name);
+    strncat(dimorder, volume->dim_handles[i]->name, MI2_CHAR_LENGTH - 1);
     if (i != volume->number_of_dims - 1) {
-      strcat(dimorder, ",");
+      strncat(dimorder, ",", MI2_CHAR_LENGTH - 1);
     }
   }
 
@@ -331,9 +336,9 @@ int micreate_volume_image(mihandle_t volume)
         /* Create the dimorder string, ordered comma-separated
           list of dimension names.
         */
-        strcat(dimorder, volume->dim_handles[i]->name);
+        strncat(dimorder, volume->dim_handles[i]->name, MI2_CHAR_LENGTH - 1);
         if (i != volume->number_of_dims - 1) {
-          strcat(dimorder, ",");
+          strncat(dimorder, ",", MI2_CHAR_LENGTH - 1);
         }
       }
     }
@@ -450,12 +455,13 @@ int micreate_volume(const char *filename, int number_of_dimensions,
   hid_t dataset_width = -1;
   hid_t dataspace_id = -1;
   char *name;
-  int size;
+  size_t size;
   hsize_t hdf_size[MI2_MAX_VAR_DIMS];
   mihandle_t handle;
   mivolumeprops_t props_handle;
   char ident_str[128];
   hid_t tmp_type;
+  int   dimension_is_vector = 0;
 
   /* Initialization.
     For the actual body of this function look at m2utils.c
@@ -524,6 +530,7 @@ int micreate_volume(const char *filename, int number_of_dimensions,
       miinit_enum(handle->mtype_id);
       break;
     default:
+      free(handle);
       return (MI_ERROR);
     }
     break;
@@ -538,6 +545,7 @@ int micreate_volume(const char *filename, int number_of_dimensions,
       handle->mtype_id = mitype_to_hdftype(volume_type, TRUE);
       break;
     default:
+      free(handle);
       return MI_LOG_ERROR(MI2_MSG_BADTYPE,volume_type);
     }
     break;
@@ -549,6 +557,7 @@ int micreate_volume(const char *filename, int number_of_dimensions,
     break;
 
   default:
+    free(handle);
     return (MI_ERROR);
   }
 
@@ -562,6 +571,7 @@ int micreate_volume(const char *filename, int number_of_dimensions,
 
   file_id = _hdf_create(filename, H5F_ACC_TRUNC);
   if (file_id < 0) {
+    free(handle);
     return (MI_ERROR);
   }
 
@@ -633,6 +643,7 @@ int micreate_volume(const char *filename, int number_of_dimensions,
   if (create_props != NULL && create_props->depth > 0) {
     for (i=0; i < create_props->depth ; i++) {
       if (minc_create_thumbnail(handle, i+1) < 0) {
+        free(handle);
         return (MI_ERROR);
       }
     }
@@ -645,7 +656,6 @@ int micreate_volume(const char *filename, int number_of_dimensions,
   */
 
   for (i=0; i < number_of_dimensions ; i++) {
-
     /* First create the dataspace required to create a
       dimension variable (dataset)
     */
@@ -657,9 +667,13 @@ int micreate_volume(const char *filename, int number_of_dimensions,
     }
 
     if (dataspace_id < 0) {
+      free(handle);
       return (MI_ERROR);
     }
-
+    
+    dimension_is_vector= (strcmp ( dimensions[i]->name, MIvector_dimension ) == 0 );
+    
+    
     /* Create a dataset(dimension variable name) in DIMENSIONS GROUP */
     MI_CHECK_HDF_CALL_RET(dataset_id = H5Dcreate1(grp_id, dimensions[i]->name,
                             H5T_IEEE_F64LE, dataspace_id, H5P_DEFAULT),"H5Dcreate1")
@@ -672,13 +686,16 @@ int micreate_volume(const char *filename, int number_of_dimensions,
       write the dimension->widths.
     */
 
-    add_standard_minc_attributes(file_id,dataset_id);
+    if(!dimension_is_vector )
+      add_standard_minc_attributes(file_id,dataset_id);
+    /*vector dimension is a record*/
     
     /* Check for irregular dimension and make sure
       offset values are provided for this dimension
     */
     if (dimensions[i]->attr & MI_DIMATTR_NOT_REGULARLY_SAMPLED) {
       if (dimensions[i]->offsets == NULL) {
+        free(handle);
         return (MI_ERROR);
       } else {
 
@@ -730,7 +747,9 @@ int micreate_volume(const char *filename, int number_of_dimensions,
     /* Create attribute "spacing" and set its value to
       "regular__" or "irregular"
     */
-    miset_attr_at_loc(dataset_id, "spacing", MI_TYPE_STRING,
+    
+    if(!dimension_is_vector)
+      miset_attr_at_loc(dataset_id, "spacing", MI_TYPE_STRING,
                       strlen(name), name);
 
     switch (dimensions[i]->dim_class) {
@@ -759,11 +778,13 @@ int micreate_volume(const char *filename, int number_of_dimensions,
       return (MI_ERROR);
     }
 
-    miset_attr_at_loc(dataset_id, "class", MI_TYPE_STRING, strlen(name),
+    if(!dimension_is_vector)
+      miset_attr_at_loc(dataset_id, "class", MI_TYPE_STRING, strlen(name),
                       name);
 
     /* Create Dimension attribute "direction_cosines"  */
-    miset_attr_at_loc(dataset_id, "direction_cosines", MI_TYPE_DOUBLE,
+    if(!dimension_is_vector)
+      miset_attr_at_loc(dataset_id, "direction_cosines", MI_TYPE_DOUBLE,
                       3, dimensions[i]->direction_cosines);
 
     /* Save dimension length */
@@ -771,19 +792,23 @@ int micreate_volume(const char *filename, int number_of_dimensions,
                       1, &dimensions[i]->length);
 
     /* Save step value. */
-    miset_attr_at_loc(dataset_id, "step", MI_TYPE_DOUBLE,
+    if(!dimension_is_vector)
+      miset_attr_at_loc(dataset_id, "step", MI_TYPE_DOUBLE,
                       1, &dimensions[i]->step);
 
     /* Save start value. */
-    miset_attr_at_loc(dataset_id, "start", MI_TYPE_DOUBLE,
+    if(!dimension_is_vector)
+      miset_attr_at_loc(dataset_id, "start", MI_TYPE_DOUBLE,
                       1, &dimensions[i]->start);
 
     /* Save units. */
-    miset_attr_at_loc(dataset_id, "units", MI_TYPE_STRING,
+    if(!dimension_is_vector)
+      miset_attr_at_loc(dataset_id, "units", MI_TYPE_STRING,
                       strlen(dimensions[i]->units), dimensions[i]->units);
 
     /* Save sample width. */
-    miset_attr_at_loc(dataset_id, "width", MI_TYPE_DOUBLE,
+    if(!dimension_is_vector)
+      miset_attr_at_loc(dataset_id, "width", MI_TYPE_DOUBLE,
                       1,  &dimensions[i]->width);
 
     /* Save comments. If user has not specified
@@ -1077,6 +1102,7 @@ static int _miget_file_dimension(mihandle_t volume, const char *dimname,
   char path[MI2_CHAR_LENGTH];
   char temp[MI2_CHAR_LENGTH];
   midimhandle_t hdim;
+  unsigned int len;
 
   /* Create a path with the dimension name */
   sprintf(path, MI_ROOT_PATH "/dimensions/%s", dimname);
@@ -1128,11 +1154,18 @@ static int _miget_file_dimension(mihandle_t volume, const char *dimname,
         MI_LOG_ERROR(MI2_MSG_GENERIC,"Unknown dimension type");
       }
     }
-    /* Get the attribute (length) from a minc file */
-    r = miget_attribute(volume, path, "length", MI_TYPE_UINT, 1, &hdim->length);
+    /* Get the attribute (length) from a minc file. We have to do this in
+     * two steps, as MI_TYPE_UINT is not necessarily the same size as 
+     * hsize_t/misize_t, so we have to read the value into a variable of
+     * the right type, then assign it to the structure member, to guarantee 
+     * proper promotion.
+     */
+    r = miget_attribute(volume, path, "length", MI_TYPE_UINT, 1, &len);
     if (r < 0) {
       MI_LOG_ERROR(MI2_MSG_GENERIC,"Can't determine dimension length");
     }
+    hdim->length = len;         /* Will promote unsigned int to misize_t. */
+
     /* Get the attribute (start) from a minc file for NON vector_dimension only */
     if (strcmp(dimname, "vector_dimension")) {
       r = miget_attribute(volume, path, MIstart, MI_TYPE_DOUBLE, 1, &hdim->start);
@@ -1194,6 +1227,7 @@ int miopen_volume(const char *filename, int mode, mihandle_t *volume)
   H5T_class_t hdf_class;
   size_t nbytes;
   int is_signed;
+  int n_dimensions;
 
   /* Initialization.
     For the actual body of this function look at m2utils.c
@@ -1266,19 +1300,21 @@ int miopen_volume(const char *filename, int mode, mihandle_t *volume)
 
   /* GET THE DIMENSION COUNT
   */
-  handle->number_of_dims = _miget_file_dimension_count(file_id);
+  n_dimensions = handle->number_of_dims = _miget_file_dimension_count(file_id);
   
-  if( handle->number_of_dims <= 0 ) {
+  if( n_dimensions <= 0 ) {
+    free(handle);
     return MI_LOG_ERROR(MI2_MSG_GENERIC,"Trying to open minc file without image variable");
   }
 
   /* READ EACH OF THE DIMENSIONS
   */
-  handle->dim_handles = (midimhandle_t *)malloc(handle->number_of_dims *
+  handle->dim_handles = (midimhandle_t *)malloc(n_dimensions *
                         sizeof(midimhandle_t));
   
   if(handle->dim_handles == NULL) {
-    return MI_LOG_ERROR(MI2_MSG_OUTOFMEM, handle->number_of_dims * sizeof(midimhandle_t));
+    free(handle);
+    return MI_LOG_ERROR(MI2_MSG_OUTOFMEM, n_dimensions * sizeof(midimhandle_t));
   }
   
   /* Get the attribute (dimorder) from the image dataset */

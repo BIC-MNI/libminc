@@ -3,8 +3,8 @@
  * MINC2 API FUNCTION DECLARATIONS
  **/
 
-#ifndef __MINC2_API_H__
-#define __MINC2_API_H__ 1
+#ifndef MINC2_API_H
+#define MINC2_API_H
 
 #ifdef __cplusplus
 extern "C" {               /* Hey, Mr. Compiler - this is "C" code! */
@@ -158,7 +158,7 @@ int micopy_dimension(midimhandle_t dim_ptr, midimhandle_t *new_dim_ptr);
 /**
   * Define a new dimension in a MINC volume.
   * \param name A pointer to the string specifying the dimension name.
-  * \param class The class of the dimension.
+  * \param dimclass The class of the dimension.
   * \param attr  The attribute of the dimension.
   * \param length The size of the dimension.
   * \param new_dim_ptr A pointer to the dimension handle.
@@ -190,7 +190,7 @@ int micreate_dimension(const char *name, midimclass_t dimclass, midimattr_t attr
 
 /**
   * Delete the dimension definition.
-  * \param dim_prt The dimension handle.
+  * \param dim_ptr The dimension handle.
   *
   * Note: The original document stated that a dimension has to be
   * associated with a given volume before it can be deleted. This
@@ -202,7 +202,7 @@ int mifree_dimension_handle(midimhandle_t dim_ptr);
 /** Retrieve the list of dimensions defined in a MINC volume,
  * with the same class \a class and attribute \a attr.
  * \param volume The volume handle.
- * \param class  The class of the dimensions.
+ * \param dimclass  The class of the dimensions.
  * \param attr   The attribute of the dimensions.
  * \param order  The order of the dimension (file or apparent).
  * \param array_length The number of dimension to be retrieved.
@@ -272,7 +272,7 @@ int miset_apparent_record_dimension_flag(mihandle_t volume, int record_flag);
 /**
   * Get the apparent order of voxels (i.e., the order that voxel indices increase/decrease)
   * \param dimension The dimension handle
-  * \param flipping_order The order of voxels.
+  * \param file_order The order of voxels.
   * \param sign The sign of the step value.
   *
   * This method gets the apparent order of voxels for the specified dimension
@@ -297,7 +297,7 @@ int miset_dimension_apparent_voxel_order(midimhandle_t dimension, miflipping_t f
 /**
  * Get the class of a MINC dimension.
  * \param dimension The dimension handle.
- * \param class A pointer to the dimension class.
+ * \param dimclass A pointer to the dimension class.
  *
  * The "class" of a MINC dimension defines the general type of a dimension,
  * whether it is a spatial dimension, a time dimension, or a frequency dimension
@@ -312,7 +312,7 @@ int miget_dimension_class(midimhandle_t dimension, midimclass_t *dimclass);
 /**
   * Set the class of a MINC dimension.
   * \param dimension The dimension handle.
-  * \param class The dimension class.
+  * \param dimclass The dimension class.
   *
   * Refer to miget_dimension_class().
   * \ingroup mi2Dim
@@ -347,7 +347,7 @@ int miset_dimension_cosines(midimhandle_t dimension,
 /**
   * Set the comments attribute for a given dimension.
   * \param dimension The dimension handle.
-  * \param comments_ptr A pointer for the comments.
+  * \param comments A pointer for the comments.
   *
   * Refer to miget_dimension_description().
   * \ingroup mi2Dim
@@ -383,7 +383,7 @@ int miget_dimension_name(midimhandle_t dimension, char **name_ptr);
 /**
  * Set the identifier (name) of a given MINC dimension.
  * \param dimension The dimension handle.
- * \param name_ptr A pointer for the dimension name.
+ * \param name A pointer for the dimension name.
  *
  * Rename the given dimension.
  * \ingroup mi2Dim
@@ -571,7 +571,7 @@ int miget_dimension_start(midimhandle_t dimension,
 /** 
   * Set the start of a MINC dimension.
   * \param dimension The dimension handle.
-  * \param start The start of the dimension.
+  * \param start_ptr The start of the dimension.
   *
   * Refer to miget_dimension_start().
   * \ingroup mi2Dim
@@ -647,7 +647,7 @@ int miget_dimension_width(midimhandle_t dimension, double *width_ptr);
   * Set the A single full-width half-maximum value for a
   * regularly sampled dimension.
   * \param dimension The dimension handle.
-  * \param width The FWHM value.
+  * \param width_ptr The FWHM value.
   *
   * Refer to miget_dimension_width().
   * \ingroup mi2Dim
@@ -778,7 +778,7 @@ int mifree_volume_props(mivolumeprops_t props);
 /** Get a copy of the volume property list.  When the program is finished 
  * using the property list it should call  mifree_volume_props() to free the
  * memory associated with the list.
- * \param volume A volume handle
+ * \param vol A volume handle
  * \param props A pointer to the returned volume properties handle.
  * \ingroup mi2VPrp
  */
@@ -872,8 +872,8 @@ int miget_props_zlib_compression(mivolumeprops_t props, int *zlib_level);
 
 /** Set blocking structure properties for the volume
  * \param props A volume property list handle
- * \param edge_count 
- * \param edge_lengths
+ * \param edge_count The number of edges (dimensions) in a block
+ * \param edge_lengths The lengths of the edges
  * \ingroup mi2VPrp
  */
 int miset_props_blocking(mivolumeprops_t props, int edge_count, const int *edge_lengths);
@@ -1229,6 +1229,41 @@ int miconvert_world_to_voxel(mihandle_t volume,
                                     const double world[],
                                     double voxel[]);
 
+/**
+ * This function calculates the start values for the volume dimensions,
+ * assuming that the spatial origin is relocated to the given world
+ * coordinate.
+ *
+ * \ingroup mi2Cvt
+ */
+int
+miconvert_world_origin_to_start( mihandle_t volume,
+                                 double world[],
+                                 double starts[]);
+
+/**
+ * This function calculates the start values for the volume dimensions,
+ * assuming that the spatial origin is relocated to the given world
+ * coordinate.
+ *
+ * \ingroup mi2Cvt
+ */
+int
+miconvert_spatial_frequency_origin_to_start( mihandle_t volume,
+                                             double world[],
+                                             double starts[]);
+
+/**
+ * This function sets the world coordinates of the point (0,0,0) in voxel
+ * coordinates.  This changes the constant offset of the two coordinate
+ * systems.
+ *
+ * \ingroup mi2Cvt
+ */
+int
+miset_spatial_frequency_origin(mihandle_t volume,
+                               double world[]);
+
 /** This function retrieves the real values of a position in the
  *  MINC volume.  The "real" value is the value at the given location 
  *  after scaling has been applied.
@@ -1417,5 +1452,5 @@ int miget_label_value_by_index(mihandle_t volume, int idx, int *value);
 #endif /* __cplusplus defined */
 
 
-#endif /*__MINC2_API_H__*/
+#endif /*MINC2_API_H*/
 // kate: indent-mode cstyle; indent-width 2; replace-tabs on; 

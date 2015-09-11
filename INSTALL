@@ -1,4 +1,6 @@
-See INSTALL for generic installation instructions.
+
+libminc is now compiled with cmake
+----------------------------------
 
 Shared or Static libraries?
 ---------------------------
@@ -29,14 +31,9 @@ Compiling
 ---------
 Now that things are configured all you need to do is run:
 
-  make
+  ccmake
 
 and then
 
   make install
 
-
-Building against the MINC2 library
-----------------------------------
-From here on in if you wish to build against the MINC2 library with
-other packages you will have to use the --with-minc2 configure flag

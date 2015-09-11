@@ -26,13 +26,13 @@ static int create_label_image ( void )
   int counter = 0;
 
   result = micreate_dimension ( "xspace", MI_DIMCLASS_SPATIAL,
-                                MI_DIMATTR_REGULARLY_SAMPLED, 10, &hdim[0] );
+                                MI_DIMATTR_REGULARLY_SAMPLED, CX, &hdim[0] );
 
   result = micreate_dimension ( "yspace", MI_DIMCLASS_SPATIAL,
-                                MI_DIMATTR_REGULARLY_SAMPLED, 10, &hdim[1] );
+                                MI_DIMATTR_REGULARLY_SAMPLED, CY, &hdim[1] );
 
   result = micreate_dimension ( "zspace", MI_DIMCLASS_SPATIAL,
-                                MI_DIMATTR_REGULARLY_SAMPLED, 6, &hdim[2] );
+                                MI_DIMATTR_REGULARLY_SAMPLED, CZ, &hdim[2] );
 
   result = micreate_volume ( "tst-label.mnc", 3, hdim, MI_TYPE_UINT,
                              MI_CLASS_LABEL, NULL, &hvol );
@@ -147,21 +147,39 @@ main ( void )
   misize_t coords[NDIMS];
   misize_t count[NDIMS];
   int value;
+  int white_value;
+  int blue_value;
   int counter = 0;
   int id;
   int *buf = ( int * ) malloc ( CX * CY * CZ * sizeof ( int ) );
+  double *dbuf = ( double * ) malloc ( CX * CY * CZ * sizeof ( double ) );
+  int result;
+
   printf ( "Creating label image !! \n" );
   error_cnt += create_label_image();
 
-  error_cnt += miopen_volume ( "tst-label.mnc", MI2_OPEN_READ, &vol );
+  result = miopen_volume ( "tst-label.mnc", MI2_OPEN_RDWR, &vol );
+  if (result != MI_NOERROR) {
+    TESTRPT("miopen_volume:", result);
+  }
   miget_number_of_defined_labels ( vol, &value );
 
   printf ( "Number of defined labels %d \n", value );
-  miget_label_value ( vol, "White", &value );
+  miget_label_value ( vol, "White", &white_value );
+  miget_label_value ( vol, "Blue", &blue_value );
 
+  if (white_value != 0xffffff) {
+    TESTRPT("miget_label_value, White", white_value);
+  }
+  if (blue_value != 0x00ff00) {
+    TESTRPT("miget_label_value, Blue", white_value);
+  }
   coords[0] = coords[1] = coords[2] = 0;
   count[0] = CX; count[1] = CY; count[2] = CZ;
-  error_cnt += miget_voxel_value_hyperslab ( vol, MI_TYPE_INT, coords, count, buf );
+  result = miget_voxel_value_hyperslab ( vol, MI_TYPE_INT, coords, count, buf );
+  if (result != MI_NOERROR) {
+    TESTRPT("miget_voxel_value_hyperslab:", result);
+  }
 
   printf ( "Print label file with file order x,y,z \n" );
   for ( i = 0; i < CX; i++ ) {
@@ -178,7 +196,6 @@ main ( void )
     }
   }
 
-
   miget_volume_dimensions ( vol, MI_DIMCLASS_ANY, MI_DIMATTR_REGULARLY_SAMPLED,
                             MI_DIMORDER_FILE, NDIMS, hdims );
 
@@ -189,7 +206,10 @@ main ( void )
   miset_apparent_dimension_order ( vol, NDIMS, cp_hdims );
   coords[0] = coords[1] = coords[2] = 0;
   count[0] = CZ; count[1] = CY; count[2] = CX;
-  error_cnt += miget_voxel_value_hyperslab ( vol, MI_TYPE_UINT, coords, count, buf );
+  result = miget_voxel_value_hyperslab ( vol, MI_TYPE_UINT, coords, count, buf );
+  if (result != MI_NOERROR) {
+    TESTRPT("miget_voxel_value_hyperslab:", result);
+  }
   printf ( "Print label file with apparent order z,y,x \n" );
   counter = 0;
   for ( i = 0; i < CZ; i++ ) {
@@ -205,8 +225,52 @@ main ( void )
       }
     }
   }
+#if 1
+  counter = 0;
+  for ( i = 0; i < CZ; i++ ) {
+    for ( j = 0; j < CY; j++ ) {
+      for ( k = 0; k < CX; k++ ) {
+        dbuf[counter] = (counter & 1) ? white_value : blue_value;
+        counter++;
+      }
+    }
+  }
 
-  error_cnt += miclose_volume ( vol );
+  result = miset_voxel_value_hyperslab ( vol, MI_TYPE_DOUBLE, coords, count, dbuf );
+  if (result != MI_NOERROR) {
+    error_cnt++;
+  }
+
+  result = miget_voxel_value_hyperslab ( vol, MI_TYPE_INT, coords, count, buf );
+  if (result != MI_NOERROR) {
+    error_cnt++;
+  }
+
+  /* We should read back exactly what we wrote. */
+  counter = 0;
+  for ( i = 0; i < CZ; i++ ) {
+    for ( j = 0; j < CY; j++ ) {
+      for ( k = 0; k < CX; k++ ) {
+        if (counter & 1) {
+          if (buf[counter] != white_value) {
+            TESTRPT("Voxel is not white", buf[counter]);
+          }
+        }
+        else {
+          if (buf[counter] != blue_value) {
+            TESTRPT("Voxel is not blue", buf[counter]);
+          }
+        }
+        counter++;
+      }
+    }
+  }
+#endif
+  result = miclose_volume ( vol );
+  if (result != MI_NOERROR) {
+    error_cnt++;
+  }
+    
   if ( error_cnt != 0 ) {
     fprintf ( stderr, "%d error%s reported\n",
               error_cnt, ( error_cnt == 1 ) ? "" : "s" );

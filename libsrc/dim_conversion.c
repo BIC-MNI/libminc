@@ -903,8 +903,31 @@ PRIVATE int MI_icv_dimconv_init(int operation, mi_icv_type *icvp,
                   - icvp->derv_icv_start[idim] + offset;
          }
       }
-      buffer_off += buffer_index * labs(dcp->buf_step[idim]);
-      values_off += values_index * labs(dcp->usr_step[idim]);
+
+      /* Force these offsets to stay within the presumed limits of the
+       * allocated memory. Before implementing this change it was
+       * possible for miicv_get() or miicv_put() to write outside the
+       * "values" buffer, leading to heap corruption.  I overload the
+       * "pixcount" variable since it is never really used elsewhere
+       * (bert).
+       */
+      pixcount = buffer_index * labs(dcp->buf_step[idim]);
+      if (buffer_off + pixcount < buffer_len) {
+        buffer_off += pixcount;
+      }
+      pixcount = values_index * labs(dcp->usr_step[idim]);
+      if (values_off + pixcount < values_len) {
+        values_off += pixcount;
+      }
+   }
+
+   /* Disallow negative offsets to avoid illegal accesses (bert).
+    */
+   if (buffer_off < 0) {
+     buffer_off = 0;
+   }
+   if (values_off < 0) {
+     values_off = 0;
    }
 
    /* Calculate arrays of offsets for compress/expand. */

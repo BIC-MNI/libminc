@@ -1,5 +1,5 @@
-#ifndef __MINC_FORMAT_CONVERT_H__
-#define __MINC_FORMAT_CONVERT_H__ 1
+#ifndef MINC_FORMAT_CONVERT_H
+#define MINC_FORMAT_CONVERT_H
 
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -19,4 +19,4 @@
 
 
 
-#endif /*__MINC_FORMAT_CONVERT_H__*/
+#endif /*MINC_FORMAT_CONVERT_H*/

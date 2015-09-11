@@ -1,3 +1,56 @@
+-- Release of minc 2.3.00 --
+
+2015-09-11  Robert D. Vincent <robert.d.vincent@mcgill.ca>
+   * Remove autoconf/automake support.
+
+2015-08-24  Robert D. Vincent <robert.d.vincent@mcgill.ca>
+   * libsrc/netcdf_convenience.c: Changed the logic in miopen() to
+	explicitly differentiate netCDF vs. HDF5 files. This was needed
+	because ncopen() in netCDF 4.4 successfully opens HDF5 files, so
+	the old	logic no longer worked.
+
+2015-08-13  Robert D. Vincent <robert.d.vincent@mcgill.ca>
+   * volume_io/Volumes/input_nifti.c: Fix loading of dynamic scans, handle
+	NIfTI units.
+
+2015-06-11  Robert D. Vincent <robert.d.vincent@mcgill.ca>
+   * libsrc/minc.h, libsrc2/minc2_defs.h: Increase MI_MAX_NUM_ICV from 32
+	to 1000. This should improve the behavior of voxel_loop programs
+	when used with a large number of input files.
+
+2015-05-28  Robert D. Vincent <robert.d.vincent@mcgill.ca>
+   * libsrc/ParseArgv.c: Added ParseLong() function to handle numeric
+	command-line parameters. This eliminates the questionable support
+	for octal values. We now support only decimal (with optional
+	leading zeros) and hex (with a leading "0x").
+
+2015-04-23  Robert D. Vincent <robert.d.vincent@mcgill.ca>
+   * Support for loading FreeSurfer and NIfTI-1 format files in volume_io.
+	(volume_io/Volumes/{input_mgh.c, input_nifti.c, input_volume.c})
+   * Added set_volume_n_dimensions() function.
+	(volume_io/Volumes/volumes.c)
+	(volume_io/Volumes/Include/volume_io/vol_io_prototypes.h)
+   * Incorporated public NIfTI-1 library code in new "nifti" subdirectory.
+	(nifti/*)
+
+2015-04-20  Robert D. Vincent <robert.d.vincent@mcgill.ca>
+   * Allow the current_realtime_seconds() function to return fractional seconds.
+	(volume_io/Prog_utils/time.c)
+
+2015-04-20  Robert D. Vincent <robert.d.vincent@mcgill.ca>
+   * Fix some warnings through use of "const" where appropriate.
+	(libsrc/ParseArgv.c, libsrc/ParseArgv.h, libsrc/image_conversion.c)
+	(libsrc/minc.h)
+   * Added range checks to catch edge cases in ICV code.
+	(libsrc/image_conversion.c, libsrc/dim_conversion.c)
+
+2014-08-05  Vladimir S. FONOV <vladimir.fonov@gmail.com>
+   * Merged changes from Steven M. Robbins
+
+2014-04-12  Andrew L Janke <a.janke@gmail.com>
+   * Updated README.release for CMake build instructions
+   * Release handover to Matthijs van Eede <matthijs@mouseimaging.ca>
+
 2014-04-09 Vladimir S Fonov
    * Incorporated multiple bug fixes from Sean McBride
    * Added some info in NEWS 

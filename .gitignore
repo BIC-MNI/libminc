@@ -1,6 +1,5 @@
 *~
 INSTALL
-*.in
 *.o
 *.lo
 *.la
@@ -15,14 +14,6 @@ config.h
 config.log
 config.status
 libtool
-progs/minccomplete/minccomplete
-progs/minccomplete/minccomplete.man1
-progs/mincgen/ncgentab.c
-progs/mincgen/ncgentab.h
-progs/mincgen/ncgenyy.c
-progs/minchistory/minchistory
-progs/minchistory/minchistory.man1
-progs/xfm/xfmflip
 stamp-h1
 volume_io/Testing/example_modify
 volume_io/Testing/example_tags

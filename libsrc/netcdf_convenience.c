@@ -180,6 +180,7 @@
 ---------------------------------------------------------------------------- */
 
 #include "minc_private.h"
+#include "ParseArgv.h"
 
 #if HAVE_UNISTD_H
 #include <unistd.h>
@@ -207,8 +208,6 @@
 #endif
 
 /* Private functions */
-PRIVATE int execute_decompress_command(char *command, char *infile, 
-                                       char *outfile, int header_only);
 PRIVATE int MI_vcopy_action(int ndims, long start[], long count[], 
                             long nvalues, void *var_buffer, void *caller_data);
 
@@ -241,7 +240,7 @@ static int mi_h5_files = 0;
 @CREATED    : January 20, 1995 (Peter Neelin)
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
-PRIVATE int execute_decompress_command(char *command, char *infile, 
+PRIVATE int execute_decompress_command(char *command, const char *infile,
                                        char *outfile, int header_only)
 {
    char whole_command[1024];
@@ -293,13 +292,14 @@ PRIVATE int execute_decompress_command(char *command, char *infile,
 @CREATED    : January 20, 1995 (Peter Neelin)
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
-MNCAPI char *miexpand_file(char *path, char *tempfile, int header_only,
+MNCAPI char *miexpand_file(const char *path, char *tempfile, int header_only,
                            int *created_tempfile)
 {
    typedef enum 
       {BZIPPED, GZIPPED, COMPRESSED, PACKED, ZIPPED, UNKNOWN} Compress_type;
    int status, oldncopts, first_ncerr, iext;
-   char *newfile, *extension, *compfile;
+   char *newfile, *compfile;
+   const char *extension;
    FILE *fp;
    Compress_type compress_type;
    static struct {
@@ -457,6 +457,24 @@ MNCAPI char *miexpand_file(char *path, char *tempfile, int header_only,
 
 }
 
+static int
+is_netcdf_file(const char *filename)
+{
+   unsigned char magic[4];
+   size_t nread;
+   FILE *fp = fopen(filename, "rb");
+   if (fp == NULL) {
+      return 0;
+   }
+   nread = fread(magic, 1, 4, fp);
+   fclose(fp);
+   if (nread != 4) {
+      return 0;
+   }
+   return (magic[0] == 'C' && magic[1] == 'D' && magic[2] == 'F' &&
+           (magic[3] == 1 || magic[3] == 2));
+}
+
 /* ----------------------------- MNI Header -----------------------------------
 @NAME       : miopen
 @INPUT      : path  - name of file to open
@@ -472,7 +490,7 @@ MNCAPI char *miexpand_file(char *path, char *tempfile, int header_only,
 @CREATED    : November 2, 1993 (Peter Neelin)
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
-MNCAPI int miopen(char *path, int mode)
+MNCAPI int miopen(const char *path, int mode)
 {
    int status, oldncopts, created_tempfile;
    char *tempfile;
@@ -482,27 +500,25 @@ MNCAPI int miopen(char *path, int mode)
 
    MI_SAVE_ROUTINE_NAME("miopen");
 
-   /* Try to open the file */
-   oldncopts = ncopts; ncopts = 0;
-   status = ncopen(path, mode);
-   ncopts = oldncopts;
+   if (is_netcdf_file(path)) {
+      /* Try to open the file */
+      oldncopts = ncopts; ncopts = 0;
+      status = ncopen(path, mode);
+      ncopts = oldncopts;
 
-#if MINC2
-   if (status != MI_ERROR) {
-     mi_nc_files++;             /* Count open netcdf files */
-     MI_RETURN(status);
+      if (status != MI_ERROR) {
+         mi_nc_files++;         /* Count open netcdf files */
+      }
+      MI_RETURN(status);
    }
 
+#if MINC2
    if (mode & NC_WRITE) {
      hmode = H5F_ACC_RDWR;
    } 
    else {
      hmode = H5F_ACC_RDONLY;
    }
-
-#if HDF5_MMAP_TEST
-   hmode = (mode & 0x8000);     /* !!!! Pass along magic memory-mapping bit */
-#endif /* HDF5_MMAP_TEST */
 
    status = hdf_open(path, hmode);
 
@@ -517,8 +533,8 @@ MNCAPI int miopen(char *path, int mode)
     * we don't allow write access to compressed files.
     */
    if (mode & NC_WRITE) {
-       milog_message(MI_MSG_NOWRITECMP);
-       MI_RETURN(MI_ERROR);
+      milog_message(MI_MSG_NOWRITECMP);
+      MI_RETURN(MI_ERROR);
    }
 
    /* Try to expand the file */
@@ -531,20 +547,21 @@ MNCAPI int miopen(char *path, int mode)
 
    /* Open the temporary file and unlink it so that it will disappear when
       the file is closed */
-   oldncopts = ncopts;
-   ncopts = 0;
-   status = ncopen(tempfile, mode);
-   ncopts = oldncopts;
-
-#if MINC2
-   if (status == MI_ERROR) {
-     status = hdf_open(tempfile, hmode);
-     if (status >= 0) {
-         mi_h5_files++;
-     }
+   if (is_netcdf_file(tempfile)) {
+      oldncopts = ncopts;
+      ncopts = 0;
+      status = ncopen(tempfile, mode);
+      ncopts = oldncopts;
+      if (status != MI_ERROR) {
+         mi_nc_files++;
+      }
    }
+#if MINC2
    else {
-       mi_nc_files++;
+      status = hdf_open(tempfile, hmode);
+      if (status >= 0) {
+         mi_h5_files++;
+      }
    }
 #endif /* MINC2 defined */
 
@@ -552,9 +569,8 @@ MNCAPI int miopen(char *path, int mode)
       remove(tempfile);
    }
    
-   
    if (status < 0) {
-       milog_message(MI_MSG_OPENFILE, tempfile);
+      milog_message(MI_MSG_OPENFILE, tempfile);
    }
    
    free(tempfile);/*free memory allocated in miexpand_file*/
@@ -577,7 +593,7 @@ MNCAPI int miopen(char *path, int mode)
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 #if MINC2
-MNCAPI int micreatex(char *path, int cmode, struct mi2opts *opts_ptr)
+MNCAPI int micreatex(const char *path, int cmode, struct mi2opts *opts_ptr)
 {
     int fd;
 
@@ -612,7 +628,7 @@ MNCAPI int micreatex(char *path, int cmode, struct mi2opts *opts_ptr)
     MI_RETURN(fd);
 }
 
-MNCAPI int micreate(char *path, int cmode)
+MNCAPI int micreate(const char *path, int cmode)
 {
     MI_SAVE_ROUTINE_NAME("micreate");
 
@@ -697,7 +713,7 @@ MNCAPI int miclose(int cdfid)
 @MODIFIED   : August 20, 2001 (P.N.)
                  - changed to call miattget_with_sign
 ---------------------------------------------------------------------------- */
-MNCAPI int miattget(int cdfid, int varid, char *name, nc_type datatype,
+MNCAPI int miattget(int cdfid, int varid, const char *name, nc_type datatype,
                     int max_length, void *value, int *att_length)
 {
     int status;
@@ -738,7 +754,7 @@ MNCAPI int miattget(int cdfid, int varid, char *name, nc_type datatype,
                  - slightly modified version of old miattget
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
-MNCAPI int miattget_with_sign(int cdfid, int varid, char *name, 
+MNCAPI int miattget_with_sign(int cdfid, int varid, const char *name, 
                               char *insign, nc_type datatype, char *outsign,
                               int max_length, void *value, int *att_length)
 {
@@ -831,7 +847,7 @@ MNCAPI int miattget_with_sign(int cdfid, int varid, char *name,
 @CREATED    : July 27, 1992 (Peter Neelin)
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
-MNCAPI int miattget1(int cdfid, int varid, char *name, nc_type datatype,
+MNCAPI int miattget1(int cdfid, int varid, const char *name, nc_type datatype,
                     void *value)
 {
    int att_length;      /* Actual length of the attribute */
@@ -874,7 +890,7 @@ MNCAPI int miattget1(int cdfid, int varid, char *name, nc_type datatype,
 @CREATED    : July 28, 1992 (Peter Neelin)
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
-MNCAPI char *miattgetstr(int cdfid, int varid, char *name, 
+MNCAPI char *miattgetstr(int cdfid, int varid, const char *name,
                          int maxlen, char *value)
 {
    nc_type att_type;          /* Type of attribute */
@@ -952,7 +968,7 @@ MNCAPI char *miattgetstr(int cdfid, int varid, char *name,
 @CREATED    : November 25, 1992 (Peter Neelin)
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
-MNCAPI int miattputint(int cdfid, int varid, char *name, int value)
+MNCAPI int miattputint(int cdfid, int varid, const char *name, int value)
 {
     int lvalue;
     int status;
@@ -960,7 +976,7 @@ MNCAPI int miattputint(int cdfid, int varid, char *name, int value)
     MI_SAVE_ROUTINE_NAME("miattputint");
 
     lvalue = value;
-    status = ncattput(cdfid, varid, name, NC_INT, 1, (void *) &lvalue);
+    status = ncattput(cdfid, varid, name, NC_INT, 1, &lvalue);
     if (status < 0) {
 	milog_message(MI_MSG_WRITEATTR, name);
     }
@@ -982,11 +998,11 @@ MNCAPI int miattputint(int cdfid, int varid, char *name, int value)
 @CREATED    : August 5, 1992 (Peter Neelin)
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
-MNCAPI int miattputdbl(int cdfid, int varid, char *name, double value)
+MNCAPI int miattputdbl(int cdfid, int varid, const char *name, double value)
 {
     int status;
     MI_SAVE_ROUTINE_NAME("miattputdbl");
-    status = ncattput(cdfid, varid, name, NC_DOUBLE, 1, (void *) &value);
+    status = ncattput(cdfid, varid, name, NC_DOUBLE, 1, &value);
     if (status < 0) {
 	milog_message(MI_MSG_WRITEATTR, name);
     }
@@ -1008,13 +1024,13 @@ MNCAPI int miattputdbl(int cdfid, int varid, char *name, double value)
 @CREATED    : July 28, 1992 (Peter Neelin)
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
-MNCAPI int miattputstr(int cdfid, int varid, char *name, char *value)
+MNCAPI int miattputstr(int cdfid, int varid, const char *name, const char *value)
 {
     int status;
     MI_SAVE_ROUTINE_NAME("miattputstr");
 
     status = ncattput(cdfid, varid, name, NC_CHAR, 
-                       strlen(value) + 1, (void *) value);
+                       strlen(value) + 1, value);
     if (status < 0) {
 	milog_message(MI_MSG_WRITEATTR, name);
     }
@@ -1047,7 +1063,7 @@ MNCAPI int miattputstr(int cdfid, int varid, char *name, char *value)
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 MNCAPI int mivarget(int cdfid, int varid, long start[], long count[],
-                    nc_type datatype, char *sign, void *values)
+                    nc_type datatype, const char *sign, void *values)
 {
     int status;
     MI_SAVE_ROUTINE_NAME("mivarget");
@@ -1086,7 +1102,7 @@ MNCAPI int mivarget(int cdfid, int varid, long start[], long count[],
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 MNCAPI int mivarget1(int cdfid, int varid, long mindex[],
-                     nc_type datatype, char *sign, void *value)
+                     nc_type datatype, const char *sign, void *value)
 {
     int status;
     long count[MAX_VAR_DIMS];
@@ -1130,7 +1146,7 @@ MNCAPI int mivarget1(int cdfid, int varid, long mindex[],
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 MNCAPI int mivarput(int cdfid, int varid, long start[], long count[],
-                    nc_type datatype, char *sign, void *values)
+                    nc_type datatype, const char *sign, void *values)
 {
     int status;
     MI_SAVE_ROUTINE_NAME("mivarput");
@@ -1169,7 +1185,7 @@ MNCAPI int mivarput(int cdfid, int varid, long start[], long count[],
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 MNCAPI int mivarput1(int cdfid, int varid, long mindex[],
-                     nc_type datatype, char *sign, void *value)
+                     nc_type datatype, const char *sign, void *value)
 {
     int status;
     long count[MAX_VAR_DIMS];
@@ -1481,7 +1497,7 @@ MNCAPI int micopy_var_def(int incdfid, int invarid, int outcdfid)
 @CREATED    : 
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
-int
+PRIVATE int
 mivarsize(int fd, int varid, long *size_ptr)
 {
     int i;
@@ -1867,7 +1883,7 @@ miread_cfg(const char *name, char *buffer, int maxlen)
     char path[256];
 
     if (home_ptr != NULL) {
-      strcpy(path, home_ptr);
+      strncpy(path, home_ptr, sizeof(path) - 1);
     }
     else {
       path[0] = '\0';
@@ -1904,7 +1920,7 @@ miget_cfg_bool(const char *name)
     char *var_ptr;
 
     if ((var_ptr = getenv(name)) != NULL) {
-        strncpy(buffer, var_ptr, sizeof (buffer));
+        strncpy(buffer, var_ptr, sizeof (buffer) - 1);
     }
     else {
         if (!miread_cfg(name, buffer, sizeof (buffer))) {
@@ -1921,14 +1937,14 @@ miget_cfg_int(const char *name)
     char *var_ptr;
     
     if ((var_ptr = getenv(name)) != NULL) {
-        strncpy(buffer, var_ptr, sizeof (buffer));
+        strncpy(buffer, var_ptr, sizeof (buffer) - 1);
     }
     else {
         if (!miread_cfg(name, buffer, sizeof(buffer))) {
             return (0);
         }
     }
-    return (atoi(buffer));
+    return (ParseLong(buffer, NULL));
 }
 
 char *
@@ -1938,7 +1954,7 @@ miget_cfg_str(const char *name)
     char *var_ptr;
 
     if ((var_ptr = getenv(name)) != NULL) {
-        strncpy(buffer, var_ptr, sizeof(buffer));
+        strncpy(buffer, var_ptr, sizeof(buffer) - 1);
     }
     else {
         if (!miread_cfg(name, buffer, sizeof(buffer))) {

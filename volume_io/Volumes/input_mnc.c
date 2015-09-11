@@ -160,6 +160,14 @@ VIOAPI  Minc_file  initialize_minc_input_from_minc_id(
     ncvarinq( file->cdfid, file->img_var, (char *) NULL, &file_datatype,
               &file->n_file_dimensions, dim_vars, (int *) NULL );
 
+    /* Set the number of dimensions iff the file has fewer dimensions
+     * than the initially created volume.
+     */
+    if (get_volume_n_dimensions( volume ) > file->n_file_dimensions)
+    {
+        set_volume_n_dimensions( volume, file->n_file_dimensions );
+    }
+
     for_less( d, 0, file->n_file_dimensions )
     {
         (void) ncdiminq( file->cdfid, dim_vars[d], dim_name, &long_size );
@@ -359,7 +367,6 @@ VIOAPI  Minc_file  initialize_minc_input_from_minc_id(
                 if (!strcmp(spacing_type, MI_IRREGULAR)) {
                     long start[1];
                     long count[1];
-                    int i;
 
                     irr_starts[d] = malloc(sizeof(VIO_Real) * file->sizes_in_file[d]);
                     irr_widths[d] = malloc(sizeof(VIO_Real) * file->sizes_in_file[d]);
@@ -605,7 +612,7 @@ VIOAPI  Minc_file  initialize_minc_input_from_minc_id(
           file->n_slab_dims++;  /* integral number of complete dimensions */
         } else {
           slab_size *= MIN( file->sizes_in_file[d],
-                            (size_t)( MI_MAX_VAR_BUFFER_SIZE / ( slab_size * unit_size ) ) );
+                            (long)( MI_MAX_VAR_BUFFER_SIZE / ( slab_size * unit_size ) ) );
           full_dim = 0;
         }
       }
@@ -968,8 +975,6 @@ static  void  input_slab(
         ind = to_volume[file_ind];
         if( ind != INVALID_AXIS )
             volume_start[ind] = file_start[file_ind];
-        else
-            volume_start[ind] = 0;
     }
 
     get_multidim_sizes( &volume->array, array_sizes );

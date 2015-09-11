@@ -16,7 +16,7 @@
 #define TST_Y 1
 #define TST_Z 2
 
-long errors = 0;
+static long errors = 0;
 
 extern void icv_tests(void);
 
@@ -51,7 +51,7 @@ struct testinfo {
 
 /* Test case 1 - file creation & definition. 
  */
-int test1(struct testinfo *ip, struct dimdef *dims, int ndims)
+static int test1(struct testinfo *ip, struct dimdef *dims, int ndims)
 {
   int varid;
   int stat;
@@ -130,7 +130,7 @@ int test1(struct testinfo *ip, struct dimdef *dims, int ndims)
   return (0);
 }
 
-int test2(struct testinfo *ip, struct dimdef *dims, int ndims)
+static int test2(struct testinfo *ip, struct dimdef *dims, int ndims)
 {
   int i, j, k;
   int stat;
@@ -184,7 +184,7 @@ int test2(struct testinfo *ip, struct dimdef *dims, int ndims)
   return (0);
 }
 
-int
+static int
 test3(struct testinfo *ip, struct dimdef *dims, int ndims)
 {
   /* Try to read the data back. */
@@ -246,7 +246,7 @@ test3(struct testinfo *ip, struct dimdef *dims, int ndims)
   if(varid<0)
     FUNC_ERROR("ncvarid");
 
-  if ((ncattinq(ip->fd, varid, (char *)"test", &att_datatype, &att_length) == MI_ERROR) ||
+  if ((ncattinq(ip->fd, varid, "test", &att_datatype, &att_length) == MI_ERROR) ||
         (att_datatype != NC_CHAR))
     FUNC_ERROR("ncattinq");
 
@@ -255,7 +255,7 @@ test3(struct testinfo *ip, struct dimdef *dims, int ndims)
 
   att=malloc(att_length);
 
-  if(miattgetstr(ip->fd, varid, (char *)"test", att_length, att)<0)
+  if(miattgetstr(ip->fd, varid, "test", att_length, att)==NULL)
     FUNC_ERROR("miattgetstr");
 
   if(memcmp(att,ip->large_attribute,att_length)!=0)

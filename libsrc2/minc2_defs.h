@@ -1,6 +1,6 @@
 /** minc2 definitions*/
-#ifndef __MINC2_DEFS_H__
-#define __MINC2_DEFS_H__ 1
+#ifndef MINC2_DEFS_H
+#define MINC2_DEFS_H
 
 #ifndef MNCAPI
 #if defined(_MSC_VER)
@@ -338,9 +338,7 @@ image dimensions */
 
 /* Constants for image conversion variable (icv) properties */
 /* Maximum number of icv's allowed */
-/* changed to 32 as netcdf 4.x no longer defines MAX_NC_OPEN */
-/* #define MI_MAX_NUM_ICV MAX_NC_OPEN */
-#define MI2_MAX_NUM_ICV 32
+#define MI2_MAX_NUM_ICV 1000    /**< Currently, this is never used. */
 
 /* Default max and min for normalization */
 #define MI2_DEFAULT_MAX 1.0
@@ -438,6 +436,6 @@ image dimensions */
 #define _(x) x      /* For future gettext */
 #endif 
 
-#endif /*__MINC2_DEFS_H__*/
+#endif /*MINC2_DEFS_H*/
 
 // kate: indent-mode cstyle; indent-width 2; replace-tabs on; 
