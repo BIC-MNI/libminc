@@ -35,6 +35,10 @@
 #define H5F_LIBVER_18 H5F_LIBVER_LATEST
 #endif
 
+/*Used to optimize chunking size for faster MINC1 API access*/
+#define _MI1_MAX_VAR_BUFFER_SIZE 1000000
+
+
 /**
 * \defgroup mi2Vol MINC 2.0 Volume Functions
 */
@@ -606,21 +610,42 @@ int micreate_volume(const char *filename, int number_of_dimensions,
     raw data for a dataset.
   */
 
-  if (create_props != NULL &&
-      (create_props->compression_type == MI_COMPRESS_ZLIB ||
-       create_props->edge_count != 0)) {
+  if (create_props != NULL  &&
+      ( create_props->compression_type == MI_COMPRESS_ZLIB ||
+        create_props->edge_count != 0 )
+      )
+  {
     /* Set the storage to CHUNKED */
-    MI_CHECK_HDF_CALL_RET(stat = H5Pset_layout(hdf_plist, H5D_CHUNKED),"H5Pset_layout")
-    /* Create an array, hdf_size, containing the size of each chunk
-    */
-    for (i=0; i < number_of_dimensions; i++) {
-      hdf_size[i] = create_props->edge_lengths[i];
-      /* If the size of each chunk is greater than the size of
-        the corresponding dimension, set the chunk size to the
-        dimension size
+    MI_CHECK_HDF_CALL_RET( stat = H5Pset_layout(hdf_plist, H5D_CHUNKED),"H5Pset_layout")
+    
+
+    if(create_props->edge_count != 0) {
+      /* Create an array, hdf_size, containing the size of each chunk
       */
-      if (hdf_size[i] > dimensions[i]->length) {
-        hdf_size[i] = dimensions[i]->length;
+      for ( i=0; i < number_of_dimensions; i++) {
+        hdf_size[i] = create_props->edge_lengths[i];
+        /* If the size of each chunk is greater than the size of
+          the corresponding dimension, set the chunk size to the
+          dimension size
+        */
+        if (hdf_size[i] > dimensions[i]->length) {
+            hdf_size[i] = dimensions[i]->length;
+        }
+      }
+    } else {
+      hsize_t val = 1;
+      size_t unit_size = H5Tget_size(handle->ftype_id);
+      /*adopted code from hdf_convenience.c:1360 to match behaviour of MINC1 API*/
+      for( i = number_of_dimensions-1; i >= 0; i-- ) {
+          if( _MI1_MAX_VAR_BUFFER_SIZE > dimensions[i]->length * val * unit_size ) {
+              hdf_size[i] = dimensions[i]->length;
+          } else {
+            if ( dimensions[i]->length < (hsize_t)( _MI1_MAX_VAR_BUFFER_SIZE / ( val * unit_size ) ) )
+              hdf_size[i] = dimensions[i]->length;
+            else
+              hdf_size[i] = (hsize_t)( _MI1_MAX_VAR_BUFFER_SIZE / ( val * unit_size ));
+          }
+          val *= hdf_size[i];
       }
     }
 

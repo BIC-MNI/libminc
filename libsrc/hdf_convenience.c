@@ -1376,7 +1376,7 @@ hdf_vardef(int fd, const char *varnm, nc_type vartype, int ndims,
                     }
                 }
             }
-
+            
             H5Pset_deflate(prp_id, comp_level);
             H5Pset_chunk(prp_id, ndims, chkdims);
         }

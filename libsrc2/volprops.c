@@ -329,10 +329,17 @@ int miset_props_compression_type(mivolumeprops_t props,
     case MI_COMPRESS_ZLIB:
       props->compression_type = MI_COMPRESS_ZLIB;
       props->zlib_level = MI2_DEFAULT_ZLIB_LEVEL;
+      
+      /*
+       * VF: this will be set on volume creation, when dimensions are known!
+       * 
+      
       for (i = 0; i < MI2_MAX_VAR_DIMS; i++) {
-        edge_lengths[i] = MI2_CHUNK_SIZE;
+        edge_lengths[i] = MI2_CHUNK_SIZE * 2 ;
       }
       miset_props_blocking(props, MI2_MAX_VAR_DIMS, edge_lengths);
+      */
+      
       break;
     default:
       return (MI_ERROR);
