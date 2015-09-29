@@ -335,7 +335,7 @@ int miset_props_compression_type(mivolumeprops_t props,
        * 
       
       for (i = 0; i < MI2_MAX_VAR_DIMS; i++) {
-        edge_lengths[i] = MI2_CHUNK_SIZE * 2 ;
+        edge_lengths[i] = MI2_CHUNK_SIZE ;
       }
       miset_props_blocking(props, MI2_MAX_VAR_DIMS, edge_lengths);
       */

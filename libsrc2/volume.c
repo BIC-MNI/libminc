@@ -109,26 +109,29 @@ static int _generate_ident( char * id_str, size_t length )
 static hid_t _hdf_open(const char *path, int mode)
 {
   hid_t fd;
+  hid_t prp_id;
 /*  hid_t grp_id;
   hid_t dset_id;
   int ndims;*/
   
+  prp_id = H5Pcreate(H5P_FILE_ACCESS);
+  H5Pset_cache(prp_id, 0, 2503, _MI1_MAX_VAR_BUFFER_SIZE*100, 1.0);
+  
   H5E_BEGIN_TRY {
     #if HDF5_MMAP_TEST
     if (mode & 0x8000) {
-      hid_t prp_id;
       
-      prp_id = H5Pcreate(H5P_FILE_ACCESS);
       H5Pset_fapl_mmap(prp_id, 8192, 1);
       fd = H5Fopen(path, mode & 0x7FFF, prp_id);
-      H5Pclose(prp_id);
     } else {
-      fd = H5Fopen(path, mode, H5P_DEFAULT);
+      fd = H5Fopen(path, mode, prp_id);
     }
     #else
-    fd = H5Fopen(path, mode, H5P_DEFAULT);
+    fd = H5Fopen(path, mode, prp_id);
     #endif
   } H5E_END_TRY;
+  
+  H5Pclose(prp_id);
   
   
   /* Open the image variables.
@@ -215,6 +218,7 @@ static hid_t _hdf_create(const char *path, int cmode)
 
   /*VF use all the features of new HDF5 1.8*/
   H5Pset_libver_bounds (fpid, H5F_LIBVER_18, H5F_LIBVER_18);
+  H5Pset_cache(fpid, 0, 2503, _MI1_MAX_VAR_BUFFER_SIZE*100, 1.0);
   
   H5E_BEGIN_TRY {
     fd = H5Fcreate(path, cmode, H5P_DEFAULT, fpid);

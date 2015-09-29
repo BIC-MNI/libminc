@@ -2202,7 +2202,16 @@ hdf_open(const char *path, int mode)
     hsize_t dims[MAX_NC_DIMS];
     int ndims;
     struct m2_var *var;
+    hid_t fpid;
 
+    
+    /*Set cachine parameters*/
+    fpid=H5Pcreate( H5P_FILE_ACCESS );
+    
+    /*setup a bigger cache to work with typical chunking ( MI_MAX_VAR_BUFFER_SIZE )*/
+    H5Pset_cache(fpid, 0, 2503, MI_MAX_VAR_BUFFER_SIZE*100, 1.0);
+    
+    
     H5E_BEGIN_TRY {
 #if HDF5_MMAP_TEST
         if (mode & 0x8000) {
@@ -2214,12 +2223,13 @@ hdf_open(const char *path, int mode)
             H5Pclose(prp_id);
         }
         else {
-            fd = H5Fopen(path, mode, H5P_DEFAULT);
+            fd = H5Fopen(path, mode, fpid);
         }
 #else
-        fd = H5Fopen(path, mode, H5P_DEFAULT);
+        fd = H5Fopen(path, mode, fpid);
 #endif
     } H5E_END_TRY;
+    H5Pclose( fpid );
 
     if (fd < 0) {
       return (MI_ERROR);
@@ -2227,7 +2237,7 @@ hdf_open(const char *path, int mode)
 
     file = hdf_id_add(fd);	/* Add it to the list */
     file->wr_ok = (mode & H5F_ACC_RDWR) != 0;
-
+    
     /* Open the image variables.
      */
     H5E_BEGIN_TRY {
@@ -2304,7 +2314,11 @@ hdf_create(const char *path, int cmode, struct mi2opts *opts_ptr)
     hid_t hdf_gpid;
     hid_t fpid;
   
+    /*Set cachine parameters*/
     fpid = H5Pcreate (H5P_FILE_ACCESS);
+    
+    /*setup a bigger cache to work with typical chunking ( MI_MAX_VAR_BUFFER_SIZE )*/
+    H5Pset_cache(fpid, 0, 2503, MI_MAX_VAR_BUFFER_SIZE*100, 1.0);
   
     /* Convert the MINC (NetCDF) mode to a HDF5 mode.
      */
