@@ -180,6 +180,7 @@ SET(minc_common_SRCS
    libsrc/read_file_names.c
    libsrc/ParseArgv.c
    libsrc/restructure.c
+   libsrc/minc_config.c
 )
 
 SET(minc_common_HEADERS
@@ -191,6 +192,7 @@ SET(minc_common_HEADERS
   nifti/nifti1.h
   nifti/nifti1_io.h
   nifti/znzlib.h
+  libsrc/minc_config.h  
 )
 
 # some variables

@@ -229,10 +229,10 @@ static struct {
 
 MNCAPI void milog_init(const char *name)
 {
-    char *fname_str = miget_cfg_str(MICFG_LOGFILE);
+    const char *fname_str = miget_cfg_str(MICFG_LOGFILE);
     int level = miget_cfg_int(MICFG_LOGLEVEL);
 
-    if (fname_str == NULL) {
+    if (!strlen(fname_str)) {
 	_MI_log.fp = stderr;
     }
     else if (!strcmp(fname_str, "stdout") || !strcmp(fname_str, "-")) {
@@ -252,10 +252,6 @@ MNCAPI void milog_init(const char *name)
     }
 
     strncpy(_MI_log.prog, name, sizeof(_MI_log.prog) - 1 );
-
-    if (fname_str != NULL) {
-        free(fname_str);
-    }
 }
 
 MNCAPI int milog_set_verbosity(int lvl)

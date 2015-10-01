@@ -22,6 +22,7 @@
 #include <hdf5.h>
 #include "minc2.h"
 #include "minc2_private.h"
+#include "minc_config.h"
 
 /**
  * \defgroup mi2VPrp MINC 2.0 Volume Properties Functions
@@ -58,6 +59,7 @@ int minew_volume_props(mivolumeprops_t  *props)
   handle->record_length = 0;
   handle->record_name = NULL;
   handle->template_flag = 0;
+  handle->checksum = miget_cfg_bool(MICFG_MINC_CHECKSUM);
   
   *props = handle;
   
@@ -141,6 +143,7 @@ int miget_volume_props(mihandle_t volume, mivolumeprops_t *props)
     if (nfilters == 0) {
       handle->zlib_level = 0;
       handle->compression_type = MI_COMPRESS_NONE;
+      handle->checksum = 0;
     }
     else {
       for (i = 0; i < nfilters; i++) {
@@ -155,6 +158,7 @@ int miget_volume_props(mihandle_t volume, mivolumeprops_t *props)
           case H5Z_FILTER_SHUFFLE:
             break;
           case H5Z_FILTER_FLETCHER32:
+            handle->checksum=1;
             break;
           case H5Z_FILTER_SZIP:
             break;
@@ -163,12 +167,14 @@ int miget_volume_props(mihandle_t volume, mivolumeprops_t *props)
         }
       }
     }
+    
   }
   else {
     handle->edge_count = 0;
     handle->edge_lengths = NULL;
     handle->zlib_level = 0;
     handle->compression_type = MI_COMPRESS_NONE;
+    handle->checksum = 0;
   }
   
   *props = handle;
@@ -498,6 +504,28 @@ int miset_props_template(mivolumeprops_t props, int template_flag)
   props->template_flag = template_flag;
   return (MI_NOERROR);
 }
+
+
+int miset_props_checksum(mivolumeprops_t props, int on)
+{
+  if (props == NULL) {
+    return (MI_ERROR);
+  }
+  props->checksum=on;
+  return (MI_NOERROR);
+}
+
+
+int miget_props_checksum(mivolumeprops_t props,int *on)
+{
+  if (props == NULL) {
+    return (MI_ERROR);
+  }
+  *on=props->checksum;
+  return (MI_NOERROR);
+}
+
+
 
 
 // kate: indent-mode cstyle; indent-width 2; replace-tabs on; 

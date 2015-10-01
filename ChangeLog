@@ -1,5 +1,14 @@
 -- Release of minc 2.3.00 --
-
+2015-10-01  Vladimir S. FONOV <vladimir.fonov@gmail.com>
+   * Added new configuration environment variable MINC_FILE_CACHE_MB, 
+  it specifies (in megabytes) maximum per file cache for reading MINC2 files
+  default value is 100 Mb. **WARNING** specifying value of 0 will 
+  significantly degrade performance on compressed minc2 files.
+  
+   * Added new configuration environment variable MINC_CHECKSUM, when 
+   set to 1 will enable FLETCHER32 checksum in new MINC2 files, but only when 
+   chunking is enabled
+   
 2015-09-11  Robert D. Vincent <robert.d.vincent@mcgill.ca>
    * Remove autoconf/automake support.
 
