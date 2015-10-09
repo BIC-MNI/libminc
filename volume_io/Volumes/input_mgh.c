@@ -191,7 +191,7 @@ mgh_header_to_linear_transform(const struct mgh_header *hdr_ptr,
     double temp = 0.0;
     for (j = 0; j < MGH_N_SPATIAL; j++)
     {
-      temp += hdr_ptr->dircos[j][i] * (hdr_ptr->sizes[j] / 2.0);
+      temp += mgh_xform[i][j] * (hdr_ptr->sizes[j] / 2.0);
     }
 
     /* Set the origin for the voxel-to-world transform .
@@ -514,7 +514,7 @@ initialize_mgh_format_input(VIO_STR             filename,
     in_ptr->axis_index_from_file[axis] = spatial_axis;
   }
 
-  mgh_header_to_linear_transform(&hdr, in_ptr, TRUE, &mnc_native_xform);
+  mgh_header_to_linear_transform(&hdr, in_ptr, FALSE, &mnc_native_xform);
 
   convert_transform_to_starts_and_steps(&mnc_native_xform,
                                         VIO_N_DIMENSIONS,
