@@ -1,3 +1,10 @@
+2015-10-14  Robert D. Vincent <robert.d.vincent@mcgill.ca>
+   * volume_io/Volumes/input_mgh.c: Fix loading of time-varying MGZ files.
+
+2015-10-07  Robert D. Vincent <robert.d.vincent@mcgill.ca>
+   * libsrc2/m2util.c, libsrc2/volume.c: Fix improper handling of
+	label volumes on big-endian architectures.
+
 -- Release of minc 2.3.00 --
 2015-10-01  Vladimir S. FONOV <vladimir.fonov@gmail.com>
    * Added new configuration environment variable MINC_FILE_CACHE_MB, 
