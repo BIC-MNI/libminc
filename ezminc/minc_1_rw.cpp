@@ -60,8 +60,33 @@ namespace minc
     _map_to_std(5,-1),
     _minc2(false)
   {
-    _icvid=miicv_create();
+    
   }
+  
+  minc_1_base::minc_1_base(const minc_1_base& that):
+    _slab_len(0),
+    _icvid(MI_ERROR),
+    _cur(MAX_VAR_DIMS,0),
+    _slab(MAX_VAR_DIMS,1),
+    _slice_dimensions(0),
+    _last(false),
+    _positive_directions(true),
+    _datatype(MI_ORIGINAL_TYPE),
+    _io_datatype(MI_ORIGINAL_TYPE),
+    _ndims(0),
+    _is_signed(false),
+    _mincid(MI_ERROR),
+    _imgid(MI_ERROR),
+    _icmax(-1),
+    _icmin(-1),
+    _dims(3,0),
+    _map_to_std(5,-1),
+    _minc2(false)
+  {
+    if(that._icvid!=MI_ERROR || that._mincid!=MI_ERROR)
+      REPORT_ERROR("Attempt to copy minc_1_base object with open minc file!");
+  }
+  
 
   //! destructor, closes minc file
   minc_1_base::~minc_1_base()
@@ -73,10 +98,11 @@ namespace minc
   {
     if(_icvid!=MI_ERROR)
     {
-      miicv_free(_icvid);
+      CHECK_MINC_CALL(miicv_free(_icvid));
       _icvid=MI_ERROR;
     }
-    if(_mincid!=MI_ERROR) miclose(_mincid);
+    if(_mincid!=MI_ERROR) 
+      CHECK_MINC_CALL(miclose(_mincid));
     _mincid=MI_ERROR;
   }
 
@@ -460,6 +486,7 @@ namespace minc
   //based on the code from mincextract
   void minc_1_reader::open(const char *path,bool positive_directions/*=true*/,bool metadate_only/*=false*/,bool rw/*=false*/)
   {
+    if(_icvid==MI_ERROR) CHECK_MINC_CALL(_icvid=miicv_create());
 #ifndef WIN32
     ncopts = 0;
 #endif 
@@ -492,15 +519,16 @@ namespace minc
      _minc2 = true;
    }
 #endif
+    if(_mincid<0) REPORT_ERROR("Error opening minc file for reading");
 
     /* Inquire about the image variable */
     _imgid = ncvarid(_mincid, MIimage);
     if(_imgid == MI_ERROR) REPORT_ERROR("Can't get Image ID");
-    ncvarinq(_mincid, _imgid, NULL, NULL, &_ndims, mdims, NULL);
+    CHECK_MINC_CALL(ncvarinq(_mincid, _imgid, NULL, NULL, &_ndims, mdims, NULL))
     //get image data type... not used for now
-    miget_datatype(_mincid, _imgid, &_datatype, &_is_signed);
+    CHECK_MINC_CALL(miget_datatype(_mincid, _imgid, &_datatype, &_is_signed));
     //dir_cos.SetIdentity();
-    miget_image_range(_mincid, _image_range);
+    CHECK_MINC_CALL(miget_image_range(_mincid, _image_range));
     //go through dimensions , calculating parameters for reshaping into ZYX array if needed
     _info.resize(_ndims);
     _world_matrix.resize(_ndims*4,0.0);
@@ -514,7 +542,7 @@ namespace minc
       char dimname[MAX_NC_NAME];
       long dimlength;
       //get dimensions info
-      ncdiminq(_mincid, mdims[i], dimname, &dimlength);
+      CHECK_MINC_CALL(ncdiminq(_mincid, mdims[i], dimname, &dimlength));
       _info[i].name=dimname;
       _info[i].length=dimlength;
       _info[i].have_dir_cos=false;
@@ -664,6 +692,7 @@ namespace minc
   
   void minc_1_writer::open(const char *path,const minc_info& inf,int slice_dimensions,nc_type datatype,int _s)
   {
+    if(_icvid==MI_ERROR) CHECK_MINC_CALL(_icvid=miicv_create());
 #ifndef WIN32
     ncopts = 0;
 #endif
@@ -678,6 +707,8 @@ namespace minc
       _minc2 = true;
     }
 #endif
+    if(_mincid<0) REPORT_ERROR("Error opening minc file for writing");
+    
     _ndims=_info.size();
     _datatype=datatype;
     _slice_dimensions=slice_dimensions;
@@ -696,15 +727,16 @@ namespace minc
         case dim_info::DIM_VEC:_info[i].name=MIvector_dimension;_map_to_std[0]=i;break;
         //default: REPORT_ERROR("Unknown Dimension!");
       }
-      mdims[i]=ncdimdef(_mincid, _info[i].name.c_str(), _info[i].length);
+      CHECK_MINC_CALL(mdims[i]=ncdimdef(_mincid, _info[i].name.c_str(), _info[i].length));
       if(_info[i].dim!=dim_info::DIM_VEC)
       {
-        int dimid=micreate_std_variable(_mincid,_info[i].name.c_str(),NC_INT, 0, NULL);
-        miattputdbl(_mincid, dimid, MIstep,_info[i].step);
-        miattputdbl(_mincid, dimid, MIstart,_info[i].start);
+        int dimid;
+        CHECK_MINC_CALL(dimid=micreate_std_variable(_mincid,_info[i].name.c_str(),NC_INT, 0, NULL));
+        CHECK_MINC_CALL(miattputdbl(_mincid, dimid, MIstep,_info[i].step));
+        CHECK_MINC_CALL(miattputdbl(_mincid, dimid, MIstart,_info[i].start));
         
         if(_info[i].have_dir_cos)
-          ncattput(_mincid, dimid, MIdirection_cosines,NC_DOUBLE, 3, _info[i].dir_cos);
+          CHECK_MINC_CALL(ncattput(_mincid, dimid, MIdirection_cosines,NC_DOUBLE, 3, _info[i].dir_cos));
       }
     }
     _slab_len=1;
@@ -716,7 +748,7 @@ namespace minc
     
     _icmax=_icmin=MI_ERROR;
     //ncopts = NC_OPTS_VAL;
-    _imgid=micreate_std_variable(_mincid, MIimage, _datatype, _ndims, mdims);
+    CHECK_MINC_CALL(_imgid=micreate_std_variable(_mincid, MIimage, _datatype, _ndims, mdims));
     _image_range[0]=DBL_MAX;_image_range[1]=-DBL_MAX;
     
     switch(_datatype)
@@ -756,10 +788,10 @@ namespace minc
         break;
       default:break;
     };
-    miattputstr(_mincid, _imgid, MIcomplete, MI_FALSE);
-    miattputstr(_mincid, _imgid, MIsigntype, (_is_signed?MI_SIGNED:MI_UNSIGNED));
-    ncattput(_mincid, _imgid, MIvalid_range, NC_DOUBLE, 2, vrange);
-    miset_valid_range(_mincid, _imgid, vrange);
+    CHECK_MINC_CALL(miattputstr(_mincid, _imgid, MIcomplete, MI_FALSE));
+    CHECK_MINC_CALL(miattputstr(_mincid, _imgid, MIsigntype, (_is_signed?MI_SIGNED:MI_UNSIGNED)));
+    CHECK_MINC_CALL(ncattput(_mincid, _imgid, MIvalid_range, NC_DOUBLE, 2, vrange));
+    CHECK_MINC_CALL(miset_valid_range(_mincid, _imgid, vrange));
   }
   
   void minc_1_writer::open(const char *path,const minc_1_base& imitate)
@@ -787,16 +819,16 @@ namespace minc
     switch(_datatype)
     {
       case NC_DOUBLE:
-        _icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, 0, NULL);
-        _icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, 0, NULL);
+        CHECK_MINC_CALL(_icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, 0, NULL));
+        CHECK_MINC_CALL(_icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, 0, NULL));
       
         _set_image_range=true;
         _set_slice_range=false;
         break;
       
       case NC_FLOAT:
-        _icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, 0, NULL);
-        _icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, 0, NULL);
+        CHECK_MINC_CALL(_icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, 0, NULL));
+        CHECK_MINC_CALL(_icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, 0, NULL));
       
         _set_image_range=true;
         _set_slice_range=false;
@@ -807,51 +839,51 @@ namespace minc
           _set_image_range=false;
           _set_slice_range=true;
         
-          _icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, _ndims-_slice_dimensions, mdims);
-          _icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, _ndims-_slice_dimensions, mdims);
+          CHECK_MINC_CALL(_icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, _ndims-_slice_dimensions, mdims));
+          CHECK_MINC_CALL(_icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, _ndims-_slice_dimensions, mdims));
         break;
       
       case NC_BYTE:
         _set_image_range=false;
         _set_slice_range=true;
       
-        _icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, _ndims-_slice_dimensions, mdims);
-        _icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, _ndims-_slice_dimensions, mdims);
+        CHECK_MINC_CALL(_icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, _ndims-_slice_dimensions, mdims));
+        CHECK_MINC_CALL(_icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, _ndims-_slice_dimensions, mdims));
         break;
       case NC_INT:
         _set_image_range=false;
         _set_slice_range=true;
       
-        _icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, _ndims-_slice_dimensions, mdims);
-        _icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, _ndims-_slice_dimensions, mdims);
+        CHECK_MINC_CALL(_icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, _ndims-_slice_dimensions, mdims));
+        CHECK_MINC_CALL(_icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, _ndims-_slice_dimensions, mdims));
         break;
       
       default:
         break;
     };
-    ncendef(_mincid);
+    CHECK_MINC_CALL(ncendef(_mincid));
     
     if(_datatype==NC_DOUBLE || _datatype==NC_FLOAT)
     {
-      miicv_setstr(_icvid, MI_ICV_SIGN,    MI_SIGNED);
-      miicv_setint(_icvid, MI_ICV_TYPE,    NC_FLOAT);
-      miicv_setint(_icvid, MI_ICV_DO_NORM,    true);
-      miicv_setint(_icvid, MI_ICV_USER_NORM, true);
-      miicv_setdbl(_icvid, MI_ICV_VALID_MIN, -FLT_MAX);
-      miicv_setdbl(_icvid, MI_ICV_VALID_MAX, FLT_MAX);
+      CHECK_MINC_CALL(miicv_setstr(_icvid, MI_ICV_SIGN,      MI_SIGNED));
+      CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_TYPE,      NC_FLOAT));
+      CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_DO_NORM,   true));
+      CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_USER_NORM, true));
+      CHECK_MINC_CALL(miicv_setdbl(_icvid, MI_ICV_VALID_MIN, -FLT_MAX));
+      CHECK_MINC_CALL(miicv_setdbl(_icvid, MI_ICV_VALID_MAX, FLT_MAX));
       _calc_min_max=true;
       
     } else { //do something smart here?
-      miicv_setstr(_icvid, MI_ICV_SIGN, MI_SIGNED);
-      miicv_setint(_icvid, MI_ICV_TYPE, NC_FLOAT);
-      miicv_setint(_icvid, MI_ICV_DO_NORM, false);
+      CHECK_MINC_CALL(miicv_setstr(_icvid, MI_ICV_SIGN, MI_SIGNED));
+      CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_TYPE, NC_FLOAT));
+      CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_DO_NORM, false));
       //miicv_setint(_icvid, MI_ICV_USER_NORM, false);
-      miicv_setdbl(_icvid, MI_ICV_VALID_MIN, -FLT_MAX);
-      miicv_setdbl(_icvid, MI_ICV_VALID_MAX, FLT_MAX);
+      CHECK_MINC_CALL(miicv_setdbl(_icvid, MI_ICV_VALID_MIN, -FLT_MAX));
+      CHECK_MINC_CALL(miicv_setdbl(_icvid, MI_ICV_VALID_MAX, FLT_MAX));
       _calc_min_max=true;
       
     }
-    miicv_attach(_icvid, _mincid, _imgid);
+    CHECK_MINC_CALL(miicv_attach(_icvid, _mincid, _imgid));
     _io_datatype=NC_FLOAT;
     _write_prepared=true;
   }
@@ -863,16 +895,16 @@ namespace minc
     switch(_datatype)
     {
       case NC_DOUBLE:
-        _icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, 0, NULL);
-        _icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, 0, NULL);
+        CHECK_MINC_CALL(_icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, 0, NULL));
+        CHECK_MINC_CALL(_icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, 0, NULL));
       
         _set_image_range=true;
         _set_slice_range=false;
         break;
       
       case NC_FLOAT:
-        _icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, 0, NULL);
-        _icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, 0, NULL);
+        CHECK_MINC_CALL(_icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, 0, NULL));
+        CHECK_MINC_CALL(_icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, 0, NULL));
       
         _set_image_range=true;
         _set_slice_range=false;
@@ -883,23 +915,23 @@ namespace minc
           _set_image_range=false;
           _set_slice_range=true;
         
-          _icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, _ndims-_slice_dimensions, mdims);
-          _icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, _ndims-_slice_dimensions, mdims);
+          CHECK_MINC_CALL(_icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, _ndims-_slice_dimensions, mdims));
+          CHECK_MINC_CALL(_icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, _ndims-_slice_dimensions, mdims));
         break;
       
       case NC_BYTE:
         _set_image_range=false;
         _set_slice_range=true;
       
-        _icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, _ndims-_slice_dimensions, mdims);
-        _icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, _ndims-_slice_dimensions, mdims);
+        CHECK_MINC_CALL(_icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, _ndims-_slice_dimensions, mdims));
+        CHECK_MINC_CALL(_icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, _ndims-_slice_dimensions, mdims));
         break;
       case NC_INT:
         _set_image_range=false;
         _set_slice_range=true;
       
-        _icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, _ndims-_slice_dimensions, mdims);
-        _icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, _ndims-_slice_dimensions, mdims);
+        CHECK_MINC_CALL(_icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, _ndims-_slice_dimensions, mdims));
+        CHECK_MINC_CALL(_icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, _ndims-_slice_dimensions, mdims));
         break;
       
       default:
@@ -909,59 +941,59 @@ namespace minc
     
     if(_datatype==NC_DOUBLE)
     {
-      miicv_setstr(_icvid, MI_ICV_SIGN,    MI_SIGNED);
-      miicv_setint(_icvid, MI_ICV_TYPE,    NC_DOUBLE);
-      miicv_setint(_icvid, MI_ICV_DO_NORM,    true);
-      miicv_setint(_icvid, MI_ICV_USER_NORM, true);
-      miicv_setdbl(_icvid, MI_ICV_VALID_MIN, -DBL_MAX);
-      miicv_setdbl(_icvid, MI_ICV_VALID_MAX, DBL_MAX);
+      CHECK_MINC_CALL(miicv_setstr(_icvid, MI_ICV_SIGN,    MI_SIGNED));
+      CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_TYPE,    NC_DOUBLE));
+      CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_DO_NORM,    true));
+      CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_USER_NORM, true));
+      CHECK_MINC_CALL(miicv_setdbl(_icvid, MI_ICV_VALID_MIN, -DBL_MAX));
+      CHECK_MINC_CALL(miicv_setdbl(_icvid, MI_ICV_VALID_MAX, DBL_MAX));
       _calc_min_max=true;
       
     } else if(_datatype==NC_FLOAT)  {
-      miicv_setstr(_icvid, MI_ICV_SIGN,    MI_SIGNED);
-      miicv_setint(_icvid, MI_ICV_TYPE,    NC_DOUBLE);
-      miicv_setint(_icvid, MI_ICV_DO_NORM,    true);
-      miicv_setint(_icvid, MI_ICV_USER_NORM, true);
-      miicv_setdbl(_icvid, MI_ICV_VALID_MIN, -DBL_MAX);
-      miicv_setdbl(_icvid, MI_ICV_VALID_MAX, DBL_MAX);
+      CHECK_MINC_CALL(miicv_setstr(_icvid, MI_ICV_SIGN,    MI_SIGNED));
+      CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_TYPE,    NC_DOUBLE));
+      CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_DO_NORM,    true));
+      CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_USER_NORM, true));
+      CHECK_MINC_CALL(miicv_setdbl(_icvid, MI_ICV_VALID_MIN, -DBL_MAX));
+      CHECK_MINC_CALL(miicv_setdbl(_icvid, MI_ICV_VALID_MAX, DBL_MAX));
       _calc_min_max=true;
       
     } else { //do something smart here?
-      miicv_setstr(_icvid, MI_ICV_SIGN, MI_SIGNED);
-      miicv_setint(_icvid, MI_ICV_TYPE, NC_DOUBLE);
-      miicv_setint(_icvid, MI_ICV_DO_NORM, false);
+      CHECK_MINC_CALL(miicv_setstr(_icvid, MI_ICV_SIGN, MI_SIGNED));
+      CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_TYPE, NC_DOUBLE));
+      CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_DO_NORM, false));
       //miicv_setint(_icvid, MI_ICV_USER_NORM, false);
-      miicv_setdbl(_icvid, MI_ICV_VALID_MIN, -DBL_MAX);
-      miicv_setdbl(_icvid, MI_ICV_VALID_MAX, DBL_MAX);
+      CHECK_MINC_CALL(miicv_setdbl(_icvid, MI_ICV_VALID_MIN, -DBL_MAX));
+      CHECK_MINC_CALL(miicv_setdbl(_icvid, MI_ICV_VALID_MAX, DBL_MAX));
       _calc_min_max=true;
       
     }
-    miicv_attach(_icvid, _mincid, _imgid);
+    CHECK_MINC_CALL(miicv_attach(_icvid, _mincid, _imgid));
     _io_datatype=NC_DOUBLE;
     _write_prepared=true;
   }
   
   void minc_1_writer::setup_write_short(bool n)
   {
-    _icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, 0, NULL);
-    _icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, 0, NULL);
+    CHECK_MINC_CALL(_icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, 0, NULL));
+    CHECK_MINC_CALL(_icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, 0, NULL));
     _set_image_range=true;
     _set_slice_range=false;
     
-    ncendef(_mincid);
+    CHECK_MINC_CALL(ncendef(_mincid));
     
-    miicv_setint(_icvid, MI_ICV_TYPE, NC_SHORT);
-    miicv_setstr(_icvid, MI_ICV_SIGN, MI_SIGNED);
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_TYPE, NC_SHORT));
+    CHECK_MINC_CALL(miicv_setstr(_icvid, MI_ICV_SIGN, MI_SIGNED));
     //miicv_setstr(_icvid, MI_ICV_SIGN, true);    
     /* Set range of values */ //TODO: set this to something sensible?
-    miicv_setint(_icvid, MI_ICV_VALID_MIN, SHRT_MIN);
-    miicv_setint(_icvid, MI_ICV_VALID_MAX, SHRT_MAX);
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_VALID_MIN, SHRT_MIN));
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_VALID_MAX, SHRT_MAX));
 
     /* No normalization so that pixels are scaled to the slice */
-    miicv_setint(_icvid, MI_ICV_DO_NORM, false);
-    miicv_setint(_icvid, MI_ICV_DO_RANGE, false);
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_DO_NORM, false));
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_DO_RANGE, false));
     
-    miicv_attach(_icvid, _mincid, _imgid);
+    CHECK_MINC_CALL(miicv_attach(_icvid, _mincid, _imgid));
     
     _io_datatype=NC_SHORT;
     _write_prepared=true;
@@ -969,48 +1001,48 @@ namespace minc
   
   void minc_1_writer::setup_write_ushort(bool n)
   {
-    _icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, 0, NULL);
-    _icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, 0, NULL);
+    CHECK_MINC_CALL(_icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, 0, NULL));
+    CHECK_MINC_CALL(_icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, 0, NULL));
     _set_image_range=true;
     _set_slice_range=false;
     
-    ncendef(_mincid);
-    miicv_setint(_icvid, MI_ICV_TYPE, NC_SHORT);
-    miicv_setstr(_icvid, MI_ICV_SIGN, MI_UNSIGNED);
+    CHECK_MINC_CALL(ncendef(_mincid));
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_TYPE, NC_SHORT));
+    CHECK_MINC_CALL(miicv_setstr(_icvid, MI_ICV_SIGN, MI_UNSIGNED));
     
     /* Set range of values */ //TODO: set this to something sensible?
-    miicv_setint(_icvid, MI_ICV_VALID_MIN, 0);
-    miicv_setint(_icvid, MI_ICV_VALID_MAX, USHRT_MAX);
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_VALID_MIN, 0));
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_VALID_MAX, USHRT_MAX));
 
     /* No normalization so that pixels are scaled to the slice */
-    miicv_setint(_icvid, MI_ICV_DO_NORM, false);
-    miicv_setint(_icvid, MI_ICV_DO_RANGE, false);
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_DO_NORM, false));
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_DO_RANGE, false));
     
-    miicv_attach(_icvid, _mincid, _imgid);
+    CHECK_MINC_CALL(miicv_attach(_icvid, _mincid, _imgid));
     _io_datatype=NC_SHORT;
     _write_prepared=true;
   }
   
   void minc_1_writer::setup_write_byte(bool n)
   {
-    _icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, 0, NULL);
-    _icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, 0, NULL);
+    CHECK_MINC_CALL(_icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, 0, NULL));
+    CHECK_MINC_CALL(_icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, 0, NULL));
     _set_image_range=true;
     _set_slice_range=false;
     
-    ncendef(_mincid);
-    miicv_setint(_icvid, MI_ICV_TYPE, NC_BYTE);
-    miicv_setstr(_icvid, MI_ICV_SIGN, MI_UNSIGNED);
+    CHECK_MINC_CALL(ncendef(_mincid));
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_TYPE, NC_BYTE));
+    CHECK_MINC_CALL(miicv_setstr(_icvid, MI_ICV_SIGN, MI_UNSIGNED));
 
     /* Set range of values */ //TODO: set this to something sensible?
-    miicv_setint(_icvid, MI_ICV_VALID_MIN, 0);
-    miicv_setint(_icvid, MI_ICV_VALID_MAX, UCHAR_MAX);
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_VALID_MIN, 0));
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_VALID_MAX, UCHAR_MAX));
 
     /* No normalization so that pixels are scaled to the slice */
-    miicv_setint(_icvid, MI_ICV_DO_NORM, false);
-    miicv_setint(_icvid, MI_ICV_DO_RANGE, false);
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_DO_NORM, false));
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_DO_RANGE, false));
     
-    miicv_attach(_icvid, _mincid, _imgid);
+    CHECK_MINC_CALL(miicv_attach(_icvid, _mincid, _imgid));
     
     _io_datatype=NC_BYTE;
     _write_prepared=true;
@@ -1018,24 +1050,24 @@ namespace minc
   
   void minc_1_writer::setup_write_int(bool n)
   {
-    _icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, 0, NULL);
-    _icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, 0, NULL);
+    CHECK_MINC_CALL(_icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, 0, NULL));
+    CHECK_MINC_CALL(_icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, 0, NULL));
     _set_image_range=true;
     _set_slice_range=false;
     
-    ncendef(_mincid);
-    miicv_setint(_icvid, MI_ICV_TYPE, NC_INT);
-    miicv_setstr(_icvid, MI_ICV_SIGN, MI_SIGNED);
+    CHECK_MINC_CALL(ncendef(_mincid));
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_TYPE, NC_INT));
+    CHECK_MINC_CALL(miicv_setstr(_icvid, MI_ICV_SIGN, MI_SIGNED));
 
     /* Set range of values */ //TODO: set this to something sensible?
-    miicv_setint(_icvid, MI_ICV_VALID_MIN, INT_MIN);
-    miicv_setint(_icvid, MI_ICV_VALID_MAX, INT_MAX);
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_VALID_MIN, INT_MIN));
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_VALID_MAX, INT_MAX));
 
     /* No normalization so that pixels are scaled to the slice */
-    miicv_setint(_icvid, MI_ICV_DO_NORM, false);
-    miicv_setint(_icvid, MI_ICV_DO_RANGE, false);
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_DO_NORM, false));
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_DO_RANGE, false));
     
-    miicv_attach(_icvid, _mincid, _imgid);
+    CHECK_MINC_CALL(miicv_attach(_icvid, _mincid, _imgid));
 
     
     _io_datatype=NC_INT;
@@ -1044,24 +1076,24 @@ namespace minc
   
   void minc_1_writer::setup_write_uint(bool n)
   {
-    _icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, 0, NULL);
-    _icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, 0, NULL);
+    CHECK_MINC_CALL(_icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, 0, NULL));
+    CHECK_MINC_CALL(_icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, 0, NULL));
     _set_image_range=true;
     _set_slice_range=false;
     
-    ncendef(_mincid);
-    miicv_setint(_icvid, MI_ICV_TYPE, NC_INT);
-    miicv_setstr(_icvid, MI_ICV_SIGN, MI_UNSIGNED);
+    CHECK_MINC_CALL(ncendef(_mincid));
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_TYPE, NC_INT));
+    CHECK_MINC_CALL(miicv_setstr(_icvid, MI_ICV_SIGN, MI_UNSIGNED));
 
     /* Set range of values */ //TODO: set this to something sensible?
-    miicv_setint(_icvid, MI_ICV_VALID_MIN, 0);
-    miicv_setint(_icvid, MI_ICV_VALID_MAX, UINT_MAX);
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_VALID_MIN, 0));
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_VALID_MAX, UINT_MAX));
 
     /* No normalization so that pixels are scaled to the slice */
-    miicv_setint(_icvid, MI_ICV_DO_NORM, false);
-    miicv_setint(_icvid, MI_ICV_DO_RANGE, false);
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_DO_NORM, false));
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_DO_RANGE, false));
     
-    miicv_attach(_icvid, _mincid, _imgid);
+    CHECK_MINC_CALL(miicv_attach(_icvid, _mincid, _imgid));
     _io_datatype=NC_INT;
     _write_prepared=true;
   }
@@ -1077,47 +1109,48 @@ namespace minc
       bottom up. If we wanted patient right on left and drawing from
       top down, we would set to MI_ICV_NEGATIVE. */
       
-      miicv_setint(_icvid, MI_ICV_DO_DIM_CONV, true);
+      CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_DO_DIM_CONV, true));
       //TODO: make sure to change only x,y,z conversions here
       //miicv_setint(_icvid, MI_ICV_XDIM_DIR, 3);
       //we want to convert only X,Y,Z dimensions if they are present
       int num=(_map_to_std[1]>=0?1:0)+(_map_to_std[2]>=0?1:0)+(_map_to_std[3]>=0?1:0);
-      miicv_setint(_icvid, MI_ICV_NUM_IMGDIMS, num);
+      CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_NUM_IMGDIMS, num));
       
       if(_map_to_std[1]>=0) 
       {
-        miicv_setint(_icvid, MI_ICV_DIM_SIZE+_map_to_std[1],-1);
-        miicv_setint(_icvid, MI_ICV_XDIM_DIR, MI_ICV_POSITIVE);
+        CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_DIM_SIZE+_map_to_std[1],-1));
+        CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_XDIM_DIR, MI_ICV_POSITIVE));
       }
       
       if(_map_to_std[2]>=0) 
       {
-        miicv_setint(_icvid, MI_ICV_DIM_SIZE+_map_to_std[2],-1);
-        miicv_setint(_icvid, MI_ICV_YDIM_DIR, MI_ICV_POSITIVE);
+        CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_DIM_SIZE+_map_to_std[2],-1));
+        CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_YDIM_DIR, MI_ICV_POSITIVE));
       }
       
       if(_map_to_std[3]>=0) 
       {
-        miicv_setint(_icvid, MI_ICV_DIM_SIZE+_map_to_std[3],-1);
-        miicv_setint(_icvid, MI_ICV_ZDIM_DIR, MI_ICV_POSITIVE);
+        CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_DIM_SIZE+_map_to_std[3],-1));
+        CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_ZDIM_DIR, MI_ICV_POSITIVE));
       }
     }
-    miicv_setint(_icvid, MI_ICV_DO_SCALAR, false);
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_DO_SCALAR, false));
   }
   
   void minc_1_reader::setup_read_float(void)
   {
     if(_metadate_only)
       REPORT_ERROR("Minc file in metadate only mode!");
-    miicv_setint(_icvid, MI_ICV_TYPE, NC_FLOAT);
-    miicv_setint(_icvid, MI_ICV_DO_NORM, true);
-    miicv_setint(_icvid, MI_ICV_USER_NORM, true);
+    
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_TYPE, NC_FLOAT));
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_DO_NORM, true));
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_USER_NORM, true));
     /* Make sure that any out of range values are mapped to lowest value
       of type (for input only) */
-    miicv_setint(_icvid, MI_ICV_DO_FILLVALUE, true);
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_DO_FILLVALUE, true));
     
     _setup_dimensions();
-    miicv_attach(_icvid, _mincid, _imgid);
+    CHECK_MINC_CALL(miicv_attach(_icvid, _mincid, _imgid));
     _io_datatype=NC_FLOAT;
     _read_prepared=true;
   }
@@ -1126,15 +1159,16 @@ namespace minc
   {
     if(_metadate_only)
       REPORT_ERROR("Minc file in metadate only mode!");
-    miicv_setint(_icvid, MI_ICV_TYPE, NC_DOUBLE);
-    miicv_setint(_icvid, MI_ICV_DO_NORM, true);
-    miicv_setint(_icvid, MI_ICV_USER_NORM, true);
+    
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_TYPE, NC_DOUBLE));
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_DO_NORM, true));
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_USER_NORM, true));
     /* Make sure that any out of range values are mapped to lowest value
       of type (for input only) */
-    miicv_setint(_icvid, MI_ICV_DO_FILLVALUE, true);
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_DO_FILLVALUE, true));
     
     _setup_dimensions();
-    miicv_attach(_icvid, _mincid, _imgid);
+    CHECK_MINC_CALL(miicv_attach(_icvid, _mincid, _imgid));
     _io_datatype=NC_DOUBLE;
     _read_prepared=true;
   }
@@ -1144,22 +1178,22 @@ namespace minc
     if(_metadate_only)
       REPORT_ERROR("Minc file in metadate only mode!");
     
-    miicv_setint(_icvid, MI_ICV_TYPE, NC_SHORT);
-    miicv_setstr(_icvid, MI_ICV_SIGN, MI_SIGNED);
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_TYPE, NC_SHORT));
+    CHECK_MINC_CALL(miicv_setstr(_icvid, MI_ICV_SIGN, MI_SIGNED));
     /* Set range of values */
-    miicv_setdbl(_icvid, MI_ICV_VALID_MIN, _image_range[0]);
-    miicv_setdbl(_icvid, MI_ICV_VALID_MAX, _image_range[1]);
+    CHECK_MINC_CALL(miicv_setdbl(_icvid, MI_ICV_VALID_MIN, _image_range[0]));
+    CHECK_MINC_CALL(miicv_setdbl(_icvid, MI_ICV_VALID_MAX, _image_range[1]));
 
     /* Do normalization so that all pixels are on same scale */
-    miicv_setint(_icvid, MI_ICV_DO_NORM, true);
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_DO_NORM, true));
     //miicv_setint(_icvid, MI_ICV_USER_NORM, true);
     /* Make sure that any out of range values are mapped to lowest value
       of type (for input only) */
-    miicv_setint(_icvid, MI_ICV_DO_FILLVALUE, true);
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_DO_FILLVALUE, true));
     
     _setup_dimensions();
     
-    miicv_attach(_icvid, _mincid, _imgid);
+    CHECK_MINC_CALL(miicv_attach(_icvid, _mincid, _imgid));
     _io_datatype=NC_SHORT;
     _read_prepared=true;
   }
@@ -1169,22 +1203,22 @@ namespace minc
     if(_metadate_only)
       REPORT_ERROR("Minc file in metadate only mode!");
     
-    miicv_setint(_icvid, MI_ICV_TYPE, NC_SHORT);
-    miicv_setstr(_icvid, MI_ICV_SIGN, MI_UNSIGNED);
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_TYPE, NC_SHORT));
+    CHECK_MINC_CALL(miicv_setstr(_icvid, MI_ICV_SIGN, MI_UNSIGNED));
     /* Set range of values */
-    miicv_setdbl(_icvid, MI_ICV_VALID_MIN, _image_range[0]);
-    miicv_setdbl(_icvid, MI_ICV_VALID_MAX, _image_range[1]);
+    CHECK_MINC_CALL(miicv_setdbl(_icvid, MI_ICV_VALID_MIN, _image_range[0]));
+    CHECK_MINC_CALL(miicv_setdbl(_icvid, MI_ICV_VALID_MAX, _image_range[1]));
 
     /* Do normalization so that all pixels are on same scale */
-    miicv_setint(_icvid, MI_ICV_DO_NORM, false);
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_DO_NORM, false));
     //miicv_setint(_icvid, MI_ICV_USER_NORM, true);
     /* Make sure that any out of range values are mapped to lowest value
       of type (for input only) */
-    miicv_setint(_icvid, MI_ICV_DO_FILLVALUE, true);
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_DO_FILLVALUE, true));
     
     _setup_dimensions();
     
-    miicv_attach(_icvid, _mincid, _imgid);
+    CHECK_MINC_CALL(miicv_attach(_icvid, _mincid, _imgid));
     _io_datatype=NC_SHORT;
     _read_prepared=true;
   }
@@ -1193,20 +1227,20 @@ namespace minc
   {
     if(_metadate_only)
       REPORT_ERROR("Minc file in metadate only mode!");
-    miicv_setint(_icvid, MI_ICV_TYPE, NC_BYTE);
-    miicv_setstr(_icvid, MI_ICV_SIGN, MI_UNSIGNED);
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_TYPE, NC_BYTE));
+    CHECK_MINC_CALL(miicv_setstr(_icvid, MI_ICV_SIGN, MI_UNSIGNED));
     /* Set range of values */
-    miicv_setdbl(_icvid, MI_ICV_VALID_MIN, _image_range[0]);
-    miicv_setdbl(_icvid, MI_ICV_VALID_MAX, _image_range[1]);
+    CHECK_MINC_CALL(miicv_setdbl(_icvid, MI_ICV_VALID_MIN, _image_range[0]));
+    CHECK_MINC_CALL(miicv_setdbl(_icvid, MI_ICV_VALID_MAX, _image_range[1]));
 
-   /* Do normalization so that all pixels are on same scale */
-    miicv_setint(_icvid, MI_ICV_DO_NORM, true);
+    /* Do normalization so that all pixels are on same scale */
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_DO_NORM, true));
     /* Make sure that any out of range values are mapped to lowest value
       of type (for input only) */
-    miicv_setint(_icvid, MI_ICV_DO_FILLVALUE, true);
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_DO_FILLVALUE, true));
     
     _setup_dimensions();
-    miicv_attach(_icvid, _mincid, _imgid);
+    CHECK_MINC_CALL(miicv_attach(_icvid, _mincid, _imgid));
     _io_datatype=NC_BYTE;
     _read_prepared=true;
   }
@@ -1215,20 +1249,20 @@ namespace minc
   {
     if(_metadate_only)
       REPORT_ERROR("Minc file in metadate only mode!");
-    miicv_setint(_icvid, MI_ICV_TYPE, NC_INT);
-    miicv_setstr(_icvid, MI_ICV_SIGN, MI_SIGNED);
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_TYPE, NC_INT));
+    CHECK_MINC_CALL(miicv_setstr(_icvid, MI_ICV_SIGN, MI_SIGNED));
     /* Set range of values */
-    miicv_setdbl(_icvid, MI_ICV_VALID_MIN, _image_range[0]);
-    miicv_setdbl(_icvid, MI_ICV_VALID_MAX, _image_range[1]);
+    CHECK_MINC_CALL(miicv_setdbl(_icvid, MI_ICV_VALID_MIN, _image_range[0]));
+    CHECK_MINC_CALL(miicv_setdbl(_icvid, MI_ICV_VALID_MAX, _image_range[1]));
 
-   /* Do normalization so that all pixels are on same scale */
-    miicv_setint(_icvid, MI_ICV_DO_NORM, true);
+    /* Do normalization so that all pixels are on same scale */
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_DO_NORM, true));
     /* Make sure that any out of range values are mapped to lowest value
       of type (for input only) */
-    miicv_setint(_icvid, MI_ICV_DO_FILLVALUE, true);
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_DO_FILLVALUE, true));
     
     _setup_dimensions();
-    miicv_attach(_icvid, _mincid, _imgid);
+    CHECK_MINC_CALL(miicv_attach(_icvid, _mincid, _imgid));
     _io_datatype=NC_INT;
     _read_prepared=true;
   }
@@ -1237,20 +1271,20 @@ namespace minc
   {
     if(_metadate_only)
       REPORT_ERROR("Minc file in metadate only mode!");
-    miicv_setint(_icvid, MI_ICV_TYPE, NC_INT);
-    miicv_setstr(_icvid, MI_ICV_SIGN, MI_UNSIGNED);
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_TYPE, NC_INT));
+    CHECK_MINC_CALL(miicv_setstr(_icvid, MI_ICV_SIGN, MI_UNSIGNED));
     /* Set range of values */
-    miicv_setdbl(_icvid, MI_ICV_VALID_MIN, _image_range[0]);
-    miicv_setdbl(_icvid, MI_ICV_VALID_MAX, _image_range[1]);
+    CHECK_MINC_CALL(miicv_setdbl(_icvid, MI_ICV_VALID_MIN, _image_range[0]));
+    CHECK_MINC_CALL(miicv_setdbl(_icvid, MI_ICV_VALID_MAX, _image_range[1]));
 
    /* Do normalization so that all pixels are on same scale */
-    miicv_setint(_icvid, MI_ICV_DO_NORM, true);
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_DO_NORM, true));
     /* Make sure that any out of range values are mapped to lowest value
       of type (for input only) */
-    miicv_setint(_icvid, MI_ICV_DO_FILLVALUE, true);
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_DO_FILLVALUE, true));
     
     _setup_dimensions();
-    miicv_attach(_icvid, _mincid, _imgid);
+    CHECK_MINC_CALL(miicv_attach(_icvid, _mincid, _imgid));
     _io_datatype=NC_INT;
     _read_prepared=true;
   }
@@ -1260,7 +1294,7 @@ namespace minc
     if(!_read_prepared)
       REPORT_ERROR("Not ready to read, use setup_read_XXXX");
 
-    miicv_get(_icvid, &_cur[0], &_slab[0], buffer);
+    CHECK_MINC_CALL(miicv_get(_icvid, &_cur[0], &_slab[0], buffer));
   }
   
   void minc_1_writer::write(void* buffer)
@@ -1337,31 +1371,31 @@ namespace minc
       
       if(_set_slice_range)
       {
-        miicv_detach(_icvid);
-        miicv_setdbl(_icvid, MI_ICV_VALID_MIN, r_min);
-        miicv_setdbl(_icvid, MI_ICV_VALID_MAX, r_max);
-        miicv_attach(_icvid, _mincid, _imgid);
+        CHECK_MINC_CALL(miicv_detach(_icvid));
+        CHECK_MINC_CALL(miicv_setdbl(_icvid, MI_ICV_VALID_MIN, r_min));
+        CHECK_MINC_CALL(miicv_setdbl(_icvid, MI_ICV_VALID_MAX, r_max));
+        CHECK_MINC_CALL(miicv_attach(_icvid, _mincid, _imgid));
       }
       
       if(_set_slice_range)
       {
-        mivarput1(_mincid, _icmin, &_cur[0], NC_DOUBLE, NULL, &r_min);
-        mivarput1(_mincid, _icmax, &_cur[0], NC_DOUBLE, NULL, &r_max);
+        CHECK_MINC_CALL(mivarput1(_mincid, _icmin, &_cur[0], NC_DOUBLE, NULL, &r_min));
+        CHECK_MINC_CALL(mivarput1(_mincid, _icmax, &_cur[0], NC_DOUBLE, NULL, &r_max));
       }
       
       if(_image_range[0]>r_min) _image_range[0]=r_min;
       if(_image_range[1]<r_max) _image_range[1]=r_max;
     }
-    miicv_put(_icvid, &_cur[0], &_slab[0], buffer);
+    CHECK_MINC_CALL(miicv_put(_icvid, &_cur[0], &_slab[0], buffer));
   }
 
   void minc_1_writer::close(void)
   {
     if(_set_image_range)
     {
-      mivarput1(_mincid, _icmin, 0, NC_DOUBLE, NULL, &_image_range[0]);
-      mivarput1(_mincid, _icmax, 0, NC_DOUBLE, NULL, &_image_range[1]);
-      miset_valid_range(_mincid, _imgid, _image_range);
+      CHECK_MINC_CALL(mivarput1(_mincid, _icmin, 0, NC_DOUBLE, NULL, &_image_range[0]));
+      CHECK_MINC_CALL(mivarput1(_mincid, _icmax, 0, NC_DOUBLE, NULL, &_image_range[1]));
+      CHECK_MINC_CALL(miset_valid_range(_mincid, _imgid, _image_range));
       _set_image_range=false;
     }
     minc_1_base::close();
@@ -1406,7 +1440,7 @@ namespace minc
 //#endif /* MINC2 */
     //ncopts = NC_VERBOSE | NC_FATAL;
     /* Copy all other variable definitions */
-    micopy_all_var_defs(src.mincid(), _mincid, nexcluded, excluded_vars);
+    CHECK_MINC_CALL(micopy_all_var_defs(src.mincid(), _mincid, nexcluded, excluded_vars));
   }
   
   //! append a line into minc history
@@ -1424,7 +1458,7 @@ namespace minc
     miattgetstr(_mincid, NC_GLOBAL, MIhistory, att_length+1,str);
     //ncopts=NC_VERBOSE | NC_FATAL;
     strcat(str, append_history);
-    miattputstr(_mincid, NC_GLOBAL, MIhistory, str);
+    CHECK_MINC_CALL(miattputstr(_mincid, NC_GLOBAL, MIhistory, str));
     delete [] str;
   }
   
@@ -1469,5 +1503,4 @@ namespace minc
   {
     ncattput(_mincid, create_var_id(varname),attname, NC_BYTE, val.size(), &val[0]);
   }
-  
 }
