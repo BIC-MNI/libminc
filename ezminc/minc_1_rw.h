@@ -116,6 +116,9 @@ namespace minc
   
     //! constructor
 	  minc_1_base();
+    
+    //! copy constructor
+    minc_1_base(const minc_1_base& that);
 
     //! destructor, closes minc file
     virtual ~minc_1_base();

@@ -38,7 +38,7 @@ static int create_label_image ( void )
                              MI_CLASS_LABEL, NULL, &hvol );
   if ( result < 0 ) {
     fprintf ( stderr, "Unable to create test file %x\n", result );
-    return ( -1 );
+    return ( 1 );
   }
 
   result = miget_number_of_defined_labels ( hvol, &value );
@@ -172,7 +172,7 @@ main ( void )
     TESTRPT("miget_label_value, White", white_value);
   }
   if (blue_value != 0x00ff00) {
-    TESTRPT("miget_label_value, Blue", white_value);
+    TESTRPT("miget_label_value, Blue", blue_value);
   }
   coords[0] = coords[1] = coords[2] = 0;
   count[0] = CX; count[1] = CY; count[2] = CZ;

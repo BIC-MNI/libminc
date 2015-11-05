@@ -16,6 +16,8 @@
 #define MINC_IO_EXCEPTIONS_H
 
 #define REPORT_ERROR(MSG) throw minc::generic_error(__FILE__,__LINE__,MSG)
+#define CHECK_MINC_CALL(var) { if((var)<0) REPORT_ERROR("MINC CALL FAILED");}
+
 
 namespace minc
 {

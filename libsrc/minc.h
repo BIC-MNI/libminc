@@ -607,6 +607,9 @@ extern int miget_file_type(const char *filename);
 #define MI2_CHUNK_ON 1
 #define MI2_CHUNK_MIN_SIZE 4
 
+#define MI2_CHECKSUM_OFF 0
+#define MI2_CHECKSUM_ON  1
+
 #define MI2_OPTS_V1 1
 
 struct mi2opts {
@@ -615,6 +618,7 @@ struct mi2opts {
     int comp_param;
     int chunk_type;
     int chunk_param;
+    int checksum;
 };
 
 #define MI2_ISH5OBJ(x) (H5Iget_type(x) > 0)
