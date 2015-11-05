@@ -322,8 +322,10 @@ int miflush_from_resolution(mihandle_t volume, int depth)
 int miset_props_compression_type(mivolumeprops_t props,
                                  micompression_t compression_type)
 {
+/*
   int i;
   int edge_lengths[MI2_MAX_VAR_DIMS];
+*/
   
   if (props == NULL) {
     return (MI_ERROR);
