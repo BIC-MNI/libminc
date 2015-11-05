@@ -1,0 +1,24 @@
+sudo: false
+language: c
+os: 
+    - linux
+    - osx
+
+compiler:
+  - gcc
+
+before_install: ./brew/brew_install.sh
+   
+addons:
+  apt:
+    packages:
+      - libnetcdf-dev
+      - libhdf5-serial-dev
+
+script: 
+        - cmake -DCMAKE_BUILD_TYPE=Release -DLIBMINC_MINC1_SUPPORT=OFF
+        - make
+        - make test
+        - cmake -DCMAKE_BUILD_TYPE=Release -DLIBMINC_MINC1_SUPPORT=ON
+        - make
+        - make test
