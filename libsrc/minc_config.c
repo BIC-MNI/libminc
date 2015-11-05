@@ -3,6 +3,7 @@
 #endif /*HAVE_CONFIG_H*/
 
 #include <stdio.h>
+#include <ctype.h>
 
 #ifdef HAVE_STRING_H
 #include <string.h>
@@ -102,7 +103,6 @@ const char * miget_cfg_str(int id)
 
 int miget_cfg_present(int id)
 {
-  const char *_var;
   if(id <0 || id>=MICFG_COUNT) return 0;
   
   miget_cfg_str(id);

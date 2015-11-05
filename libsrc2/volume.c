@@ -120,7 +120,7 @@ static hid_t _hdf_open(const char *path, int mode)
   H5Pset_cache(prp_id, 0, 2503, miget_cfg_present(MICFG_MINC_FILE_CACHE)?miget_cfg_int(MICFG_MINC_FILE_CACHE)*100000:_MI1_MAX_VAR_BUFFER_SIZE*10, 1.0);
   
   H5E_BEGIN_TRY {
-    #if HDF5_MMAP_TEST
+#ifdef HDF5_MMAP_TEST
     if (mode & 0x8000) {
       
       H5Pset_fapl_mmap(prp_id, 8192, 1);
@@ -128,9 +128,9 @@ static hid_t _hdf_open(const char *path, int mode)
     } else {
       fd = H5Fopen(path, mode, prp_id);
     }
-    #else
+#else
     fd = H5Fopen(path, mode, prp_id);
-    #endif
+#endif
   } H5E_END_TRY;
   
   H5Pclose(prp_id);

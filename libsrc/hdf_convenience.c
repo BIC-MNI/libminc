@@ -2218,7 +2218,7 @@ hdf_open(const char *path, int mode)
     H5Pset_cache(fpid, 0, 2503, miget_cfg_present(MICFG_MINC_FILE_CACHE)?miget_cfg_int(MICFG_MINC_FILE_CACHE)*100000:MI_MAX_VAR_BUFFER_SIZE*10, 1.0);
     
     H5E_BEGIN_TRY {
-#if HDF5_MMAP_TEST
+#ifdef HDF5_MMAP_TEST
         if (mode & 0x8000) {
             hid_t prp_id;
 
