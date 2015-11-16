@@ -1,3 +1,11 @@
+2015-11-16  Robert D. Vincent <robert.d.vincent@mcgill.ca>
+   * volume_io/Volumes/volumes.c,
+     volume_io/Include/volume_io/vol_io_protoypes.h: Added
+	copy_volume_new_type() and declared that
+	get_volume_total_n_voxels() returns size_t.
+   * testdir/volume_test.c: Created a simple test for volume functions.
+   * CMakeLists.txt: Updated LIBMINC_SOVERSION
+
 2015-10-14  Robert D. Vincent <robert.d.vincent@mcgill.ca>
    * volume_io/Volumes/input_mgh.c: Fix loading of time-varying MGZ files.
 
