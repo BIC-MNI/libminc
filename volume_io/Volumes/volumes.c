@@ -2666,6 +2666,7 @@ VIOAPI  VIO_Volume  copy_volume_new_type(
     size_t     n_voxels;
     nc_type    old_data_type;
     VIO_BOOL   old_signed_flag;
+    VIO_Real   min_voxel, max_voxel;
 
     if( volume->is_cached_volume )
     {
@@ -2675,8 +2676,9 @@ VIOAPI  VIO_Volume  copy_volume_new_type(
         return( NULL );
     }
 
-    copy = copy_volume_definition( volume, new_data_type, new_signed_flag, 
-                                   0.0, 0.0 );
+    get_volume_voxel_range( volume, &min_voxel, &max_voxel );
+    copy = copy_volume_definition( volume, new_data_type, new_signed_flag,
+                                   min_voxel, max_voxel );
     if( copy == NULL )
     {
         return( NULL );
@@ -2687,6 +2689,9 @@ VIOAPI  VIO_Volume  copy_volume_new_type(
     n_voxels = get_volume_total_n_voxels( volume );
 
     /* --- get a pointer to the beginning of the voxels */
+
+    if (!volume_is_alloced( volume ))
+        return copy;
 
     GET_VOXEL_PTR( src, volume, 0, 0, 0, 0, 0 );
     GET_VOXEL_PTR( dst, copy, 0, 0, 0, 0, 0 );
