@@ -616,6 +616,7 @@ VIOAPI  void  free_memory_5d(
     void   ******ptr
     _ALLOC_SOURCE_LINE_ARG_DEF );
 
+#if 0
 VIOAPI  size_t  get_total_memory_alloced( void );
 
 VIOAPI  VIO_BOOL alloc_checking_enabled( void );
@@ -646,6 +647,7 @@ VIOAPI  void  output_alloc_to_file(
 VIOAPI  void  print_alloc_source_line(
     VIO_STR  filename,
     int     line_number );
+#endif
 
 VIOAPI  void  set_array_size(
     void      **array,
