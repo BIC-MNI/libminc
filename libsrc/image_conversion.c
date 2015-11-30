@@ -1035,9 +1035,9 @@ PRIVATE int MI_icv_get_type(mi_icv_type *icvp, int cdfid, int varid)
    }
 
    /* Try to find out the sign of the variable using MIsigntype. */
-   oldncopts = ncopts; ncopts = 0;
+   oldncopts =get_ncopts(); set_ncopts(0);
    string=miattgetstr(cdfid, varid, MIsigntype, MI_MAX_ATTSTR_LEN, string);
-   ncopts = oldncopts;
+   set_ncopts(oldncopts);
    icvp->var_sign  = MI_get_sign_from_string(icvp->var_type, string);
 
    /* Get type lengths */
@@ -1109,7 +1109,7 @@ PRIVATE double MI_get_default_range(char *what, nc_type datatype, int sign)
       MI_RETURN(range[0]);
    }
    else {
-      ncopts = NC_VERBOSE | NC_FATAL;
+      set_ncopts(NC_VERBOSE | NC_FATAL);
       MI_LOG_PKG_ERROR2(-1,"MINC bug - this line should never be printed");
    }
 
@@ -1156,10 +1156,10 @@ PRIVATE int MI_icv_get_norm(mi_icv_type *icvp, int cdfid, int varid)
    icvp->derv_firstdim=(-1);
 
    /* Look for image max, image min variables */
-   oldncopts=ncopts; ncopts=0;
+   oldncopts=get_ncopts(); set_ncopts(0);
    icvp->imgmaxid=ncvarid(cdfid, icvp->user_maxvar);
    icvp->imgminid=ncvarid(cdfid, icvp->user_minvar);
-   ncopts = oldncopts;
+   set_ncopts(oldncopts);
 
    /* Check to see if normalization to variable max, min should be done */
    if (!icvp->user_do_norm) {

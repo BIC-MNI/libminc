@@ -330,12 +330,12 @@ MNCAPI char *miexpand_file(const char *path, char *tempfile, int header_only,
 #endif /* MINC2 defined */
 
    /* Try to open the file (close it again immediately) */
-   oldncopts = ncopts; ncopts = 0;
+   oldncopts =get_ncopts(); set_ncopts(0);
    status = ncopen(path, NC_NOWRITE);
    if (status != MI_ERROR) {
       (void) ncclose(status);
    }
-   ncopts = oldncopts;
+   set_ncopts(oldncopts);
 
    /* If there is no error then return the original file name */
    if (status != MI_ERROR) {
@@ -502,9 +502,9 @@ MNCAPI int miopen(const char *path, int mode)
 
    if (is_netcdf_file(path)) {
       /* Try to open the file */
-      oldncopts = ncopts; ncopts = 0;
+      oldncopts =get_ncopts(); set_ncopts(0);
       status = ncopen(path, mode);
-      ncopts = oldncopts;
+      set_ncopts(oldncopts);
 
       if (status != MI_ERROR) {
          mi_nc_files++;         /* Count open netcdf files */
@@ -548,10 +548,10 @@ MNCAPI int miopen(const char *path, int mode)
    /* Open the temporary file and unlink it so that it will disappear when
       the file is closed */
    if (is_netcdf_file(tempfile)) {
-      oldncopts = ncopts;
-      ncopts = 0;
+      oldncopts =get_ncopts();
+      set_ncopts(0);
       status = ncopen(tempfile, mode);
-      ncopts = oldncopts;
+      set_ncopts(oldncopts);
       if (status != MI_ERROR) {
          mi_nc_files++;
       }
@@ -1312,7 +1312,7 @@ MNCAPI int micopy_all_atts(int incdfid, int invarid,
 {
    int num_atts;             /* Number of attributes */
    char name[MAX_NC_NAME];   /* Name of attribute */
-   int oldncopts;            /* Old value of ncopts */
+   int oldncopts;            /* Old value of status */
    int status;               /* Status returned by function call */
    int i;
 
@@ -1354,9 +1354,9 @@ MNCAPI int micopy_all_atts(int incdfid, int invarid,
       /* Check to see if it is in the output file. We must set and reset
          ncopts to avoid surprises to the calling program. (This is no
 	 longer needed with new MI_SAVE_ROUTINE_NAME macro). */
-      oldncopts=ncopts; ncopts=0;
+      oldncopts=get_ncopts(); set_ncopts(0);
       status=ncattinq(outcdfid, outvarid, name, NULL, NULL);
-      ncopts=oldncopts;
+      set_ncopts(oldncopts);
 
       /* If the attribute does not exist, copy it.
        * Must always copy signtype, if present!
@@ -1432,9 +1432,9 @@ MNCAPI int micopy_var_def(int incdfid, int invarid, int outcdfid)
        }
 
       /* If it exists in the output file, check the size. */
-      oldncopts=ncopts; ncopts = 0;
+      oldncopts=get_ncopts(); set_ncopts(0);
       outdim[i] = ncdimid(outcdfid, dimname);
-      ncopts=oldncopts;
+      set_ncopts(oldncopts);
       if (outdim[i] != MI_ERROR) {
 	if ((ncdiminq(outcdfid, outdim[i], NULL, &outsize) == MI_ERROR) ||
              ((insize!=0) && (outsize!=0) && (insize != outsize)) ) {
@@ -1448,9 +1448,9 @@ MNCAPI int micopy_var_def(int incdfid, int invarid, int outcdfid)
          /* If the dimension is unlimited then try to create it unlimited
             in the output file */
          if (indim[i]==recdim) {
-            oldncopts=ncopts; ncopts=0;
+            oldncopts=get_ncopts(); set_ncopts(0);
             outdim[i]=ncdimdef(outcdfid, dimname, NC_UNLIMITED);
-            ncopts=oldncopts;
+            set_ncopts(oldncopts);
          }
          /* If it's not meant to be unlimited, or if we cannot create it
             unlimited, then create it with the current size */
@@ -1870,5 +1870,84 @@ micreate_tempfile(void)
     tmpfile_ptr = NULL;
   }
   return (tmpfile_ptr);
+}
+
+
+#ifndef NCOPTS_STACK_LIMIT 
+ #define NCOPTS_STACK_LIMIT 10
+#endif
+
+static int _ncopts_stack[NCOPTS_STACK_LIMIT];
+static int _ncopts_stack_pointer=0;
+/* ----------------------------- MNI Header -----------------------------------
+@NAME       : set_ncopts
+@INPUT      : int 
+@OUTPUT     : int
+@RETURNS    : Old value of ncopts.
+@DESCRIPTION: Sets new value of ncopts
+@CREATED    : 30-Nov-2016 Vladimir S. FONOV
+@MODIFIED   : 
+---------------------------------------------------------------------------- */
+MNCAPI int set_ncopts(int new_ncopts)
+{
+  int old_ncopts=ncopts;
+  ncopts=new_ncopts;
+  return old_ncopts;
+}
+
+/* ----------------------------- MNI Header -----------------------------------
+@NAME       : get_ncopts
+@INPUT      : None
+@OUTPUT     : int
+@RETURNS    : Current value of ncopts
+@DESCRIPTION: Current value of ncopts
+@CREATED    : 30-Nov-2016 Vladimir S. FONOV
+@MODIFIED   : 
+---------------------------------------------------------------------------- */
+MNCAPI int get_ncopts(void)
+{
+  return ncopts;
+}
+/* ----------------------------- MNI Header -----------------------------------
+@NAME       : push_ncopts
+@INPUT      : int 
+@OUTPUT     : int
+@RETURNS    : Old value of ncopts.
+@DESCRIPTION: Sets new value of ncopts, pushes old value into stack
+@CREATED    : 30-Nov-2016 Vladimir S. FONOV
+@MODIFIED   : 
+---------------------------------------------------------------------------- */
+MNCAPI int push_ncopts(int new_ncopts)
+{
+  int old_ncopts=ncopts;
+  if(_ncopts_stack_pointer>=NCOPTS_STACK_LIMIT)
+  {
+    milog_message(MI_MSG_NCOPTS_STACK_OVER);  
+  } else {
+    _ncopts_stack[_ncopts_stack_pointer]=old_ncopts;
+    _ncopts_stack_pointer++;
+  }
+  ncopts=new_ncopts;
+  return old_ncopts;
+}
+/* ----------------------------- MNI Header -----------------------------------
+@NAME       : pop_ncopts
+@INPUT      : None
+@OUTPUT     : int
+@RETURNS    : New value of ncopts.
+@DESCRIPTION: Sets new value of ncopts, from stack
+@CREATED    : 30-Nov-2016 Vladimir S. FONOV
+@MODIFIED   : 
+---------------------------------------------------------------------------- */
+MNCAPI int pop_ncopts(void)
+{
+  if(_ncopts_stack_pointer>0)
+  {
+    _ncopts_stack_pointer--;
+    ncopts=_ncopts_stack[_ncopts_stack_pointer];
+  } else {
+    milog_message(MI_MSG_NCOPTS_STACK_UNDER);  
+  }
+  return ncopts;
 }
 

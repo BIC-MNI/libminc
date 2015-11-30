@@ -537,6 +537,13 @@ MNCAPI int micopy_all_var_values(int incdfid, int outcdfid, int nexclude,
                                  int excluded_vars[]);
 MNCAPI char *micreate_tempfile(void);
 
+MNCAPI int set_ncopts(int new_ncopts);
+MNCAPI int get_ncopts(void);
+
+MNCAPI int push_ncopts(int new_ncopts);
+MNCAPI int pop_ncopts(void);
+
+
 /* From minc_convenience.c */
 MNCAPI int miget_datatype(int cdfid, int imgid, 
                           nc_type *datatype, int *is_signed);

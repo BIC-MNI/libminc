@@ -68,7 +68,7 @@ int main(int argc, char **argv)
 
    snprintf(filename, sizeof(filename), "test_minc_types-%d.mnc", getpid());
 
-   ncopts=NC_VERBOSE|NC_FATAL;
+   set_ncopts(NC_VERBOSE|NC_FATAL);
    for (itype=0; itype<ntypes; itype++) {
       for (jtype=0; jtype<ntypes; jtype++) {
          cdf=micreate(filename, NC_CLOBBER | cflag);

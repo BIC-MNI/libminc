@@ -39,7 +39,7 @@ int main()
    char filename[256];
    char filename2[256];
 
-   ncopts=NC_VERBOSE|NC_FATAL;
+   set_ncopts(NC_VERBOSE|NC_FATAL);
    snprintf(filename, sizeof(filename), "test_minc-%d.mnc", getpid());
    snprintf(filename2, sizeof(filename2), "test_minc2-%d.mnc", getpid());
    cdf=micreate(filename, NC_CLOBBER);

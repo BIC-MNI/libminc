@@ -488,7 +488,7 @@ namespace minc
   {
     if(_icvid==MI_ERROR) CHECK_MINC_CALL(_icvid=miicv_create());
 #ifndef WIN32
-    ncopts = 0;
+    set_ncopts(0);
 #endif 
     _metadate_only=metadate_only;
     _read_prepared=false;
@@ -694,7 +694,7 @@ namespace minc
   {
     if(_icvid==MI_ERROR) CHECK_MINC_CALL(_icvid=miicv_create());
 #ifndef WIN32
-    ncopts = 0;
+    set_ncopts(0);
 #endif
 	  _info=inf;
     //int  mdims[MAX_VAR_DIMS];
@@ -1464,13 +1464,13 @@ namespace minc
   
   int minc_1_base::create_var_id(const char *varname)
   {
-    int old_ncopts = ncopts; ncopts = 0;
+    int old_ncopts =get_ncopts(); set_ncopts(0);
     int res=var_id(varname);
     if(res==MI_ERROR) //need to create a variable
       res=micreate_group_variable(_mincid,varname);//ncvardef(_mincid,varname,NC_INT,0,0);
     if(res==MI_ERROR) //need to create a variable
       res=ncvardef(_mincid,varname,NC_INT,0,0);
-    ncopts = old_ncopts;
+    set_ncopts(old_ncopts);
     return res;
   }
       
