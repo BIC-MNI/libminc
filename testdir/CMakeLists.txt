@@ -81,8 +81,10 @@ IF(LIBMINC_MINC1_SUPPORT)
   add_minc_test(minc_conversion minc_conversion)
 ENDIF(LIBMINC_MINC1_SUPPORT)
 
-ADD_EXECUTABLE(nifti_test nifti_test.c)
-ADD_TEST(nifti_test-1 nifti_test)
+IF(LIBMINC_NIFTI_SUPPORT)
+  ADD_EXECUTABLE(nifti_test nifti_test.c)
+  ADD_TEST(nifti_test-1 nifti_test)
+ENDIF(LIBMINC_NIFTI_SUPPORT)
 
 # Volume IO tests
 ADD_EXECUTABLE(volume_test volume_test.c)
@@ -189,7 +191,7 @@ add_minc_test(minc2-volprops-test minc2-volprops-test)
 IF(APPLE)
     # FIX RPATH for test executables. right now this will work only inside minc-toolkit build system
     foreach(t 
-        nifti_test volume_test test_xfm copy_xfm create_grid_xfm verify_xfm 
+        volume_test test_xfm copy_xfm create_grid_xfm verify_xfm 
         minc2-convert-test minc2-create-test-images-2 minc2-create-test-images 
         minc2-large-attribute minc2-dimension-test 
         minc2-full-test
