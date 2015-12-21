@@ -81,11 +81,6 @@ IF(LIBMINC_MINC1_SUPPORT)
   add_minc_test(minc_conversion minc_conversion)
 ENDIF(LIBMINC_MINC1_SUPPORT)
 
-IF(LIBMINC_NIFTI_SUPPORT)
-  ADD_EXECUTABLE(nifti_test nifti_test.c)
-  ADD_TEST(nifti_test-1 nifti_test)
-ENDIF(LIBMINC_NIFTI_SUPPORT)
-
 # Volume IO tests
 ADD_EXECUTABLE(volume_test volume_test.c)
 ADD_TEST(volume_test-1 volume_test)
