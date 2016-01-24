@@ -62,7 +62,7 @@ IF(NOT LIBMINC_EXTERNALLY_CONFIGURED)
   FIND_PACKAGE(ZLIB REQUIRED)
   FIND_PACKAGE(HDF5 REQUIRED)
   IF (LIBMINC_USE_SYSTEM_NIFTI)
-    FIND_PACKAGE(NIFTI REQUIRED)
+    FIND_PACKAGE(NIFTI OPTIONAL)
   ELSE(LIBMINC_USE_SYSTEM_NIFTI)
     INCLUDE(ExternalProject)
     INCLUDE(BuildNIFTI)
@@ -169,6 +169,14 @@ IF(LIBMINC_BUILD_EZMINC)
     ${CMAKE_CURRENT_SOURCE_DIR}/ezminc
    )
 ENDIF(LIBMINC_BUILD_EZMINC)
+
+IF(NIFTI_FOUND)
+SET(LIBMINC_NIFTI_SUPPORT ON)
+SET(LIBMINC_NIFTI_SOURCES
+  volume_io/Volumes/input_nifti.c
+  volume_io/Volumes/input_mgh.c
+)
+ENDIF(NIFTI_FOUND)
 
 # config files for build
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h @ONLY)
@@ -293,6 +301,7 @@ SET(volume_io_LIB_SRCS
    volume_io/Volumes/volumes.c
    volume_io/Volumes/input_mnc2.c
    volume_io/Volumes/output_mnc2.c
+   ${LIBMINC_NIFTI_SOURCES}
 )
 
 SET(volume_io_HEADERS
