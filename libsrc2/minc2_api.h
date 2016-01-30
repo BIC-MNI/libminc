@@ -51,7 +51,8 @@ int midelete_attr(mihandle_t vol, const char *path, const char *name);
  */
 int midelete_group(mihandle_t vol, const char *path, const char *name);
 
-/** Delete the subgroup \a name from the group \a path
+/** Returns the length in bytes of the attribute \a name in the
+ *  group or dataset at \a path
  * \ingroup mi2Group
  */
 int miget_attr_length(mihandle_t vol, const char *path, 
