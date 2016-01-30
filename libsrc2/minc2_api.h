@@ -51,8 +51,11 @@ int midelete_attr(mihandle_t vol, const char *path, const char *name);
  */
 int midelete_group(mihandle_t vol, const char *path, const char *name);
 
-/** Returns the length in bytes of the attribute \a name in the
- *  group or dataset at \a path
+/**
+ * Returns the length in bytes of the attribute \a name in the
+ * group or dataset at \a path. For strings, this length will reflect
+ * the number of characters actually stored, which may not include the
+ * terminating null character.
  * \ingroup mi2Group
  */
 int miget_attr_length(mihandle_t vol, const char *path, 
