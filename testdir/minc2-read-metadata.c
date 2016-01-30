@@ -67,7 +67,7 @@ static int print_metadata(mihandle_t vol, const char * path,int ident)
           case MI_TYPE_STRING:
           {
             char *tmp=(char*)malloc(att_length+1);
-            if(miget_attr_values(vol,att_data_type,int_path,attribute,att_length,tmp) == MI_NOERROR )
+            if(miget_attr_values(vol,att_data_type,int_path,attribute,att_length+1,tmp) == MI_NOERROR )
               printf("%*s %s\n",ident,"",tmp);
             free(tmp);
           }
