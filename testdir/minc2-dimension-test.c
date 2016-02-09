@@ -144,6 +144,7 @@ int main(void)
     int i,j,k;
     double offset;
     unsigned int voxel;
+    double widths[CT];
 
     /* Write data one voxel at a time. */
     for (i = 0; i < NDIMS; i++) {
@@ -159,6 +160,14 @@ int main(void)
     for (i = 0; i < CT; i++) {
         offset = (i * i) + 100.0;
         r = miset_dimension_offsets(dim[0], 1, i, &offset);
+        if (r < 0) {
+            TESTRPT("failed", r);
+        }
+    }
+
+    for (i = 0; i < CT; i++) {
+        offset = 30.0 + i;
+        r = miset_dimension_widths(dim[0], 1, i, &offset);
         if (r < 0) {
             TESTRPT("failed", r);
         }
@@ -277,6 +286,41 @@ int main(void)
         TESTRPT("wrong result", n);
     }
 
+    r = miget_volume_dimensions(vol, MI_DIMCLASS_ANY, 0, 
+                                MI_DIMORDER_FILE, NDIMS, dim);
+    for (i = 0; i < CT; i++) {
+        r = miget_dimension_offsets(dim[0], 1, i, &offset);
+        if (r < 0) {
+            TESTRPT("failed", r);
+        }
+        if (offset != (i * i) + 100.0) {
+            TESTRPT("wrong result", i);
+        }
+    }
+
+    for (i = 0; i < CT; i++) {
+        r = miget_dimension_widths(dim[0], MI_ORDER_FILE, 1, i, &offset);
+        if (r < 0) {
+            TESTRPT("failed", r);
+        }
+        if (offset != i + 30.0) {
+            TESTRPT("wrong result", i);
+        }
+    }
+
+    for (i = 0; i < CT; i++) {
+        widths[i] = -1.0;
+    }
+
+    r = miget_dimension_widths(dim[0], MI_ORDER_FILE, CT, 0, widths);
+    if (r < 0) {
+        TESTRPT("failed", r);
+    }
+    for (i = 0; i < CT; i++) {
+        if (widths[i] != i + 30.0) {
+            TESTRPT("wrong result", i);
+        }
+    }
     r = miclose_volume(vol);
     if (r < 0) {
         TESTRPT("failed", r);

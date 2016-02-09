@@ -1135,6 +1135,57 @@ static int _miget_volume_class(mihandle_t volume, miclass_t *volume_class)
   return (MI_NOERROR);
 }
 
+/* Read the irregular spacing information from a file.
+ */
+static int _miget_irregular_spacing(mihandle_t hvol, midimhandle_t hdim)
+{
+  herr_t status;
+  hid_t dset_id;
+  hid_t dspc_id;
+  char path[MI2_CHAR_LENGTH];
+  hssize_t n_points;
+
+  sprintf(path, MI_ROOT_PATH "/dimensions/%s", hdim->name);
+  MI_CHECK_HDF_CALL_RET(dset_id = H5Dopen1(hvol->hdf_id, path),"H5Dopen1");
+  MI_CHECK_HDF_CALL_RET(dspc_id = H5Dget_space(dset_id), "H5Dget_space");
+
+  n_points = H5Sget_simple_extent_npoints(dspc_id);
+
+  hdim->offsets = malloc(n_points * sizeof(double));
+  if (hdim->offsets == NULL)
+    return MI_LOG_ERROR(MI2_MSG_OUTOFMEM, n_points * sizeof(double));
+
+  /* Read the raw data to buffer (dimensions[i]->offsets)
+     from the dataset.
+  */
+  MI_CHECK_HDF_CALL_RET(status = H5Dread(dset_id, H5T_NATIVE_DOUBLE, 
+                                         H5S_ALL, H5S_ALL, H5P_DEFAULT,
+                                         hdim->offsets), "H5Dread")
+        
+  H5Dclose(dset_id);
+  sprintf(path, MI_ROOT_PATH "/dimensions/%s-width", hdim->name);
+  dset_id = H5Dopen1(hvol->hdf_id, path);
+  if (dset_id < 0) {
+    /* Unfortunately, the emulation library in MINC1 puts this variable
+     * in the wrong place.
+     */
+    sprintf(path, MI_ROOT_PATH "/info/%s-width", hdim->name);
+    dset_id = H5Dopen1(hvol->hdf_id, path);
+    if (dset_id < 0) {
+      return 0;
+    }
+  }
+  hdim->widths = malloc(n_points * sizeof(double));
+  if (hdim->widths == NULL)
+    return MI_LOG_ERROR(MI2_MSG_OUTOFMEM, n_points * sizeof(double));
+
+  MI_CHECK_HDF_CALL_RET(status = H5Dread(dset_id, H5T_NATIVE_DOUBLE, 
+                                         H5S_ALL, H5S_ALL, H5P_DEFAULT, 
+                                         hdim->widths), "H5Dread")
+  H5Dclose(dset_id);
+  return 0;
+}
+
 /* Get dimension variable attributes for the given dimension name */
 static int _miget_file_dimension(mihandle_t volume, const char *dimname,
                       midimhandle_t *hdim_ptr)
@@ -1161,6 +1212,7 @@ static int _miget_file_dimension(mihandle_t volume, const char *dimname,
     
     if (r==MI_NOERROR && !strcmp(temp, "irregular")) {
       hdim->attr |= MI_DIMATTR_NOT_REGULARLY_SAMPLED;
+      _miget_irregular_spacing(volume, hdim);
     } else {
       hdim->attr |= MI_DIMATTR_REGULARLY_SAMPLED;
     }
