@@ -79,7 +79,7 @@ test1(void)
       for (k = 0; k < sizes[2]; k++)
         for (t = 0; t < sizes[3]; t++)
           for (v = 0; v < sizes[4]; v++)
-            set_volume_voxel_value( v1, i, j, k, t, v, rand() );
+            set_volume_voxel_value( v1, i, j, k, t, v, rand() % 256 );
 
   srand(0);
   for (i = 0; i < sizes[0]; i++)
@@ -282,7 +282,7 @@ test2(void)
   for (i = 0; i < sizes[0]; i++)
     for (j = 0; j < sizes[1]; j++) 
       for (k = 0; k < sizes[2]; k++)
-        set_volume_voxel_value( v1, i, j, k, 0, 0, rand() );
+        set_volume_voxel_value( v1, i, j, k, 0, 0, rand() % 32768 );
 
   srand(0);
   for (i = 0; i < sizes[0]; i++)
@@ -292,9 +292,9 @@ test2(void)
         VIO_Real x1 = get_volume_voxel_value( v1, i, j, k, 0, 0 ) ;
         /* There is no range check even if we set the max and min voxel
          * values, so the only constraint on values is the precision of
-         * the unsigned short.
+         * the signed short.
          */
-        int expected_value = (short)(rand() % 65536);
+        int expected_value = (short)(rand() % 32768);
         if ( x1 != expected_value )
         {
           ERROR;
