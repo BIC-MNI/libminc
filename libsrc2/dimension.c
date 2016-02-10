@@ -1636,7 +1636,7 @@ int miset_dimension_widths ( midimhandle_t dimension,
   }
 
   for ( i = start_position, j = 0; i < end_position; i++, j++ ) {
-    if ( widths[i] < 0 ) {
+    if ( widths[j] < 0 ) { /* NOTE: is this test even useful? */
       dimension->widths[i] = -1 * widths[j];
     } else {
       dimension->widths[i] = widths[j];
