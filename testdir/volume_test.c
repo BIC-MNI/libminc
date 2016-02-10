@@ -117,7 +117,7 @@ test1(void)
               ERROR;
               return 1;
             }
-            set_volume_voxel_value( v2, i, j, k, t, v, (value + 1) % 256 );
+            set_volume_voxel_value( v2, i, j, k, t, v, ((int)value + 1) % 256 );
 
             value = get_volume_voxel_value( v1, i, j, k, t, v );
             if (value != expected_value )
