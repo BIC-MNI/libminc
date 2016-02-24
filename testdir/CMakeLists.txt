@@ -1,8 +1,4 @@
 LINK_LIBRARIES(${LIBMINC_LIBRARIES})
-IF(APPLE)
-    LIST(GET MINC_TEST_ENVIRONMENT 2 _RPATH)
-    STRING(REPLACE DYLD_LIBRARY_PATH= "" _RPATH ${_RPATH})
-ENDIF(APPLE)
 
 MACRO(minc_test cmd)
   # minc 1 version
@@ -50,17 +46,6 @@ IF(LIBMINC_MINC1_SUPPORT)
   ADD_EXECUTABLE(test_mconv test_mconv.c)
   ADD_EXECUTABLE(minc_long_attr minc_long_attr.c)
   ADD_EXECUTABLE(minc_conversion minc_conversion.c)
-    
-  IF(APPLE)
-      # FIX RPATH for test executables. right now this will work only inside minc-toolkit build system
-      foreach(t minc_tst icv icv_vec icv_dim1  icv_dim icv_fillvalue icv_range mincapi minc_types test_mconv minc_long_attr minc_conversion)
-      add_custom_command(TARGET ${t} 
-        POST_BUILD COMMAND 
-          ${CMAKE_INSTALL_NAME_TOOL} -add_rpath "${_RPATH}"
-          $<TARGET_FILE:${t}>)
-      endforeach(t)
-  ENDIF(APPLE)    
-  #ADD_EXECUTABLE(test_speed test_speed.c)
 
   # running tests
   minc_test(minc_types)
@@ -183,29 +168,3 @@ add_minc_test(minc2-valid-test minc2-valid-test)
 add_minc_test(minc2-vector_dimension-test minc2-vector_dimension-test)
 add_minc_test(minc2-volprops-test minc2-volprops-test)
 
-IF(APPLE)
-    # FIX RPATH for test executables. right now this will work only inside minc-toolkit build system
-    foreach(t 
-        volume_test test_xfm copy_xfm create_grid_xfm verify_xfm 
-        minc2-convert-test minc2-create-test-images-2 minc2-create-test-images 
-        minc2-large-attribute minc2-dimension-test 
-        minc2-full-test
-        minc2-grpattr-test
-        minc2-hyper-test-2
-        minc2-hyper-test
-        minc2-label-test
-        minc2-multires-test
-        minc2-record-test
-        minc2-slice-test
-        minc2-valid-test
-        minc2-vector_dimension-test
-        minc2-volprops-test
-        minc2-read-rgb
-        minc2-read-metadata
-               )
-    add_custom_command(TARGET ${t} 
-      POST_BUILD COMMAND 
-        ${CMAKE_INSTALL_NAME_TOOL} -add_rpath "${_RPATH}"
-        $<TARGET_FILE:${t}>)
-    endforeach(t)
-ENDIF(APPLE)
