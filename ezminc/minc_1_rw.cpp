@@ -1399,8 +1399,8 @@ namespace minc
       _set_image_range=false;
     }
     
-    /*mark file as complete*/
-    CHECK_MINC_CALL(miattputstr(_mincid, _imgid, MIcomplete, MI_TRUE));
+    /*TODO:mark file as complete*/
+    /*CHECK_MINC_CALL(miattputstr(_mincid, _imgid, MIcomplete, MI_TRUE));*/
     
     minc_1_base::close();
   }
