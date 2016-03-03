@@ -213,6 +213,7 @@ struct Loop_Options {
    void *caller_data;
    Loop_Info *loop_info;
    int is_floating_type;
+   int is_labels;
    AllocateBufferFunction allocate_buffer_function;
 #if MINC2
    int v2format;
@@ -1070,10 +1071,18 @@ PRIVATE void setup_variables(int inmincid, int outmincid,
    }
 
    /* Create the image-min/max variables */
-   maxid = micreate_std_variable(outmincid, MIimagemax, NC_DOUBLE, 
+   if( loop_options->is_labels )
+   {
+      maxid = micreate_std_variable(outmincid, MIimagemax, NC_DOUBLE, 
+                                 0, NULL);
+      minid = micreate_std_variable(outmincid, MIimagemin, NC_DOUBLE, 
+                                 0, NULL);
+   } else {
+      maxid = micreate_std_variable(outmincid, MIimagemax, NC_DOUBLE, 
                                  out_ndims-out_nimgdims, outdim);
-   minid = micreate_std_variable(outmincid, MIimagemin, NC_DOUBLE, 
+      minid = micreate_std_variable(outmincid, MIimagemin, NC_DOUBLE, 
                                  out_ndims-out_nimgdims, outdim);
+   }
    set_ncopts(0);
    (void) micopy_all_atts(inmincid, ncvarid(inmincid, MIimagemax),
                           outmincid, maxid);
@@ -1226,8 +1235,16 @@ PRIVATE void setup_icvs(Loop_Options *loop_options,
    for (ifile=0; ifile < get_output_numfiles(loopfile_info); ifile++) {
       icvid = create_output_icvid(loopfile_info, ifile);
       (void) miicv_setint(icvid, MI_ICV_TYPE, NC_DOUBLE);
-      (void) miicv_setint(icvid, MI_ICV_DO_NORM, TRUE);
-      (void) miicv_setint(icvid, MI_ICV_USER_NORM, TRUE);
+      if( loop_options->is_labels )
+      {
+         (void) miicv_setint(icvid, MI_ICV_DO_NORM, FALSE);
+         (void) miicv_setint(icvid, MI_ICV_USER_NORM, FALSE);
+         (void) miicv_setint(icvid, MI_ICV_DO_RANGE, FALSE);
+         
+      } else {
+         (void) miicv_setint(icvid, MI_ICV_DO_NORM, TRUE);
+         (void) miicv_setint(icvid, MI_ICV_USER_NORM, TRUE);
+      }
    }
 }
 
@@ -1596,11 +1613,14 @@ PRIVATE void do_voxel_loop(Loop_Options *loop_options,
                global_maximum[ofile] = maximum;
 
             /* Write out the max and min */
-            (void) mivarput1(outmincid, maxid, block_cur, 
-                             NC_DOUBLE, NULL, &maximum);
-            (void) mivarput1(outmincid, minid, block_cur, 
-                             NC_DOUBLE, NULL, &minimum);
-
+            
+            if( ! loop_options->is_labels )
+            {
+               (void) mivarput1(outmincid, maxid, block_cur, 
+                              NC_DOUBLE, NULL, &maximum);
+               (void) mivarput1(outmincid, minid, block_cur, 
+                              NC_DOUBLE, NULL, &minimum);
+            }
             /* Write out the values */
             if (modify_vector_count)
                block_curcount[ndims-1] = output_vector_length;
@@ -1638,6 +1658,21 @@ PRIVATE void do_voxel_loop(Loop_Options *loop_options,
 
          (void) miset_valid_range(outmincid, imgid, valid_range);
 
+      }
+      if( loop_options->is_labels )
+      {
+         /*Have to write out global valid range and global image range*/
+         
+         if ((global_minimum[ofile] == DBL_MAX) && 
+             (global_maximum[ofile] == -DBL_MAX)) {
+            global_minimum[ofile] = 0.0;
+            global_maximum[ofile] = 0.0;
+         }
+         valid_range[0] = global_minimum[ofile];
+         valid_range[1] = global_maximum[ofile];
+         (void) mivarput1(outmincid, minid, 0, NC_DOUBLE, NULL, &valid_range[0]);
+         (void) mivarput1(outmincid, maxid, 0, NC_DOUBLE, NULL, &valid_range[1]);
+         (void) miset_valid_range(outmincid, imgid, valid_range);
       }
    }
 
@@ -2714,12 +2749,25 @@ MNCAPI Loop_Options *create_loop_options(void)
 
    loop_options->allocate_buffer_function = NULL;
 
+   loop_options->is_labels = FALSE; /* for backward compatibility*/
+   
 #if MINC2
    loop_options->v2format = FALSE; /* Use MINC 2.0 file format (HDF5)? */
 #endif /* MINC2 */
 
    /* Return the structure pointer */
    return loop_options;
+}
+
+MNCAPI void set_loop_labels(Loop_Options *loop_options, 
+                             int labels)
+{
+  loop_options->is_labels = labels;
+}
+
+MNCAPI int get_loop_labels(Loop_Options *loop_options)
+{
+  return loop_options->is_labels;
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -3468,3 +3516,4 @@ MNCAPI int get_info_whole_file(Loop_Info *loop_info)
 
 }
 
+/* kate: indent-mode cstyle; indent-width 3; replace-tabs on; */
