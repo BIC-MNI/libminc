@@ -1398,6 +1398,10 @@ namespace minc
       CHECK_MINC_CALL(miset_valid_range(_mincid, _imgid, _image_range));
       _set_image_range=false;
     }
+    
+    /*mark file as complete*/
+    CHECK_MINC_CALL(miattputstr(_mincid, _imgid, MIcomplete, MI_TRUE));
+    
     minc_1_base::close();
   }
 
