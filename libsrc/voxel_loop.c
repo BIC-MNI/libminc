@@ -1015,7 +1015,7 @@ PRIVATE void setup_variables(int inmincid, int outmincid,
             set_ncopts(0);
             for (ivar=0; ivar < 2; ivar++) {
                if (ivar == 1) 
-                  (void) strncat(dimname, "_width", MAX_NC_NAME);
+                  (void) strncat(dimname, "-width", MAX_NC_NAME);
                varlist[nvars] = ncvarid(inmincid, dimname);
                if (varlist[nvars] != MI_ERROR) {
                   (void) micopy_var_def(inmincid, varlist[nvars], outmincid);
@@ -1049,7 +1049,7 @@ PRIVATE void setup_variables(int inmincid, int outmincid,
          (void) strncpy(dimname, loop_options->loop_dimension, MAX_NC_NAME);
          varlist[nvars] = ncvarid(inmincid, dimname);
          if (varlist[nvars] != MI_ERROR) nvars++;
-         (void) strncat(dimname, "_width", MAX_NC_NAME);
+         (void) strncat(dimname, "-width", MAX_NC_NAME);
          varlist[nvars] = ncvarid(inmincid, dimname);
          if (varlist[nvars] != MI_ERROR) nvars++;
       }
