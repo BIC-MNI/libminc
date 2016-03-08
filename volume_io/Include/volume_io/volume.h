@@ -116,6 +116,7 @@ typedef  struct
 
     VIO_Real               *irregular_starts[VIO_MAX_DIMENSIONS];
     VIO_Real               *irregular_widths[VIO_MAX_DIMENSIONS];
+    VIO_BOOL               is_labels;
 } volume_struct;
 
 typedef  volume_struct  *VIO_Volume;

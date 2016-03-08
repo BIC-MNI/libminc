@@ -177,6 +177,7 @@ VIOAPI   VIO_Volume   create_volume(
     volume->real_range_set = FALSE;
     volume->real_value_scale = 1.0;
     volume->real_value_translation = 0.0;
+    volume->is_labels = FALSE;
 
     for_less( i, 0, VIO_N_DIMENSIONS )
         volume->spatial_axes[i] = -1;
@@ -366,6 +367,46 @@ VIOAPI  void  set_volume_type2(
         set_volume_voxel_range( volume, voxel_min, voxel_max );
     }
 }
+
+/* ----------------------------- MNI Header -----------------------------------
+@NAME       : set_volume_labels
+@INPUT      : volume
+              is_labels
+@OUTPUT     : 
+@RETURNS    : 
+@DESCRIPTION: Sets the data type flag to specify that volume contains discrete labels
+@METHOD     : 
+@GLOBALS    : 
+@CALLS      : 
+@CREATED    : 2013            Vladimir FONOV
+@MODIFIED   : 
+---------------------------------------------------------------------------- */
+VIOAPI  void  set_volume_labels(
+    VIO_Volume   volume,
+    VIO_BOOL     is_labels )
+{
+    volume->is_labels=is_labels;
+    /*TODO: add sanity check for floating point volumes (?)*/
+}
+
+/* ----------------------------- MNI Header -----------------------------------
+@NAME       : set_volume_labels
+@INPUT      : volume
+@OUTPUT     : is_labels
+@RETURNS    : 
+@DESCRIPTION: Gets the data type flag specifying that volume contains discrete labels 
+@METHOD     : 
+@GLOBALS    : 
+@CALLS      : 
+@CREATED    : 2013            Vladimir FONOV
+@MODIFIED   : 
+---------------------------------------------------------------------------- */
+VIOAPI  VIO_BOOL  get_volume_labels(
+    VIO_Volume   volume )
+{
+  return volume->is_labels;
+}
+
 
 
 VIOAPI mitype_t nc_type_to_minc2_type(

@@ -1926,6 +1926,13 @@ VIOAPI  void  set_volume_type2(
     VIO_Real     voxel_min,
     VIO_Real     voxel_max );
 
+VIOAPI  void  set_volume_labels(
+    VIO_Volume   volume,
+    VIO_BOOL     is_labels );
+
+VIOAPI  VIO_BOOL  get_volume_labels(
+    VIO_Volume   volume );
+
 VIOAPI  nc_type  get_volume_nc_data_type(
     VIO_Volume   volume,
     VIO_BOOL     *signed_flag );
