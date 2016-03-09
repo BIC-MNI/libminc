@@ -62,7 +62,7 @@ VIOAPI  VIO_Real  convert_value_to_voxel(
     VIO_Volume   volume,
     VIO_Real     value )
 {
-    if( volume->real_range_set )
+    if( volume->real_range_set && !volume->is_labels )
         return( (value - volume->real_value_translation) /
                 volume->real_value_scale );
     else

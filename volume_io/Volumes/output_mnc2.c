@@ -258,6 +258,7 @@ VIOAPI  Minc_file  initialize_minc2_output(
     {
         set_default_minc_output_options( &default_options );
         options = &default_options;
+        options->is_labels=volume_to_attach->is_labels;
     }
     
     /*TODO: provide some other compression ? */
@@ -293,6 +294,15 @@ VIOAPI  Minc_file  initialize_minc2_output(
         get_volume_real_range( volume_to_attach,
                                &file_voxel_min, 
                                &file_voxel_max );
+    } 
+    else if( options->is_labels ) 
+    {
+        get_volume_real_range( volume_to_attach,
+                               &file_voxel_min, 
+                               &file_voxel_max );
+        
+        options->global_image_range[0]=file_voxel_min;
+        options->global_image_range[1]=file_voxel_max;
     }
 
     file_minc_datatype = nc_type_to_minc2_type(file_nc_data_type ,
@@ -458,10 +468,10 @@ VIOAPI  Minc_file  initialize_minc2_output(
 
     miset_volume_valid_range(file->minc2id,file->valid_range[1],file->valid_range[0]);
     
-    if( file->image_range[0] < file->image_range[1] )
+    if( file->image_range[0] < file->image_range[1] || options->is_labels )
     {
       miset_slice_scaling_flag(file->minc2id, 0 );
-      miset_volume_range(file->minc2id,file->image_range[1],file->image_range[0]);
+      miset_volume_range(file->minc2id,file->image_range[1], file->image_range[0]);
     } else {
       get_volume_real_range( volume_to_attach, &file->image_range[0], &file->image_range[1] );
       /*miset_slice_scaling_flag(file->minc2id, 1 );*/
@@ -753,13 +763,16 @@ static  VIO_Status  check_minc2_output_variables(
         file->variables_written = TRUE;
 
         get_volume_voxel_range( volume, &voxel_min, &voxel_max );
+        
         if( voxel_min < voxel_max )
         {
           miset_volume_valid_range(file->minc2id,voxel_max,voxel_min);
         }
         else
           print_error( "Volume has invalid min and max voxel value\n" );
-
+        
+        if ( volume->is_labels )
+          miset_volume_range(file->minc2id,voxel_max,voxel_min);
     }
 
     return( VIO_OK );
@@ -918,11 +931,22 @@ static  VIO_Status  output_minc2_hyperslab(
     /*--- output the data to the file */
     status = VIO_OK;
     
-    if( miset_hyperslab_with_icv(file->minc2id,
-         vio_type_to_minc2_type(data_type),
-         long_file_start,long_file_count,void_ptr) <0 )
-      status = VIO_ERROR;
-
+    if( file->volume->is_labels)
+    {
+      if( miset_voxel_value_hyperslab(
+          file->minc2id,
+          vio_type_to_minc2_type(data_type),
+          long_file_start,long_file_count,void_ptr) < 0 )
+        status = VIO_ERROR;
+    } 
+    else 
+    {
+      if( miset_hyperslab_with_icv(
+          file->minc2id,
+          vio_type_to_minc2_type(data_type),
+          long_file_start,long_file_count,void_ptr) < 0 )
+        status = VIO_ERROR;
+    }
     if( !direct_from_array )
         delete_multidim_array( &buffer_array );
 
@@ -1160,8 +1184,8 @@ static  VIO_Status  output_the_volume2(
             this_count = 1;
         }
 
-        if( file_start[d] < 0 || file_start[d] + (long) this_count >
-            file->sizes_in_file[d] )
+        if(   file_start[d] < 0 || 
+            ( file_start[d] + (long) this_count ) > file->sizes_in_file[d] )
         {
             print_error( "output_the_volume2:  invalid minc file position.\n" );
             print_error( "    start[%d] = %ld     count[%d] = %d\n", d, file_start[d],
@@ -1195,7 +1219,7 @@ static  VIO_Status  output_the_volume2(
     }
 
     /*DUMB code for fake intrslice scaling*/
-    if( file->image_range[0] >= file->image_range[1] )
+    if( file->image_range[0] >= file->image_range[1] || volume->is_labels)
       get_volume_real_range( volume, &real_min, &real_max );
 
     /*--- now write entire volume in contiguous chunks (possibly only 1 req'd)*/
@@ -1215,7 +1239,7 @@ static  VIO_Status  output_the_volume2(
           local_count[d] = MIN( volume_count[vol_index] - file_indices[d], count[d] );
         }
         
-        if( file->image_range[0] >= file->image_range[1] )
+        if( file->image_range[0] >= file->image_range[1] && !volume->is_labels)
           miset_slice_range(file->minc2id,(const misize_t*)file_indices,file->n_file_dimensions,real_max,real_min);
         
         output_slab2( file, volume, to_volume_index, file_indices, local_count );

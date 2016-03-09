@@ -47,6 +47,7 @@ typedef  struct
     VIO_STR  dimension_names[VIO_MAX_DIMENSIONS];
     VIO_BOOL use_starts_set;
     VIO_BOOL use_volume_starts_and_steps;
+    VIO_BOOL is_labels;
 } minc_output_options;
 
 extern  VIO_STR   XYZ_dimension_names[];

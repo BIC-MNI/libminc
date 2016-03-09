@@ -2352,6 +2352,9 @@ VIOAPI  void  set_volume_voxel_range(
     VIO_Real  real_min = 0.0;
     VIO_Real  real_max = 0.0;
 
+    if( volume->real_range_set )
+        get_volume_real_range( volume, &real_min, &real_max );
+    
     if( voxel_min >= voxel_max ) /*VF: trying to fix the situation when whole volume have the same value all around*/
     {
         switch( get_volume_data_type( volume ) )
@@ -2383,9 +2386,6 @@ VIOAPI  void  set_volume_voxel_range(
             voxel_max = (VIO_Real) DBL_MAX;       break;
         }
     }
-
-    if( volume->real_range_set )
-        get_volume_real_range( volume, &real_min, &real_max );
 
     volume->voxel_min = voxel_min;
     volume->voxel_max = voxel_max;
@@ -2536,11 +2536,10 @@ VIOAPI  void  set_volume_real_range(
         }
         else
         {
-	    // FIXME: is scale = 0 correct??
+            /* FIXME: is scale = 0 correct??*/
             volume->real_value_scale = 0.0;
             volume->real_value_translation = real_min;
         }
-
         volume->real_range_set = TRUE;
     }
 
