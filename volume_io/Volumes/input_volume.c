@@ -180,6 +180,7 @@ VIOAPI  VIO_Status  start_volume_input(
 
         break;
 #endif /*HAVE_MINC1*/
+
 #ifdef HAVE_MINC2
       case  MNC2_FORMAT:
         input_info->minc_file = initialize_minc2_input( expanded_filename,

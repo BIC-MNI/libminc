@@ -330,6 +330,7 @@ VIOAPI  Minc_file  initialize_minc2_output(
     file->entire_file_written = FALSE;
     file->ignoring_because_cached = FALSE;
     file->src_img_var = MI_ERROR;
+    file->using_minc2_api = TRUE;
 
     file->filename = expand_filename( filename );
 
@@ -668,6 +669,8 @@ VIOAPI  VIO_Status  add_minc2_history(
         miset_attr_values(file->minc2id,MI_TYPE_STRING,"","history",new_history_length,new_history);
       }
       delete_string( new_history );
+    } else {
+      miset_attr_values(file->minc2id,MI_TYPE_STRING,"","history",strlen(history_string)+1,history_string);
     }
     
     return( VIO_OK );

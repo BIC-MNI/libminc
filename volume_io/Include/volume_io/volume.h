@@ -445,12 +445,13 @@ typedef  struct
     int                image_dims[MAX_VAR_DIMS];
     int                src_cdfid;
     int                src_img_var;
-
+    
 #ifdef HAVE_MINC2
     mihandle_t         minc2id;
 #else
     void*              minc2id; /*just in case*/
 #endif /*HAVE_MINC2*/
+    VIO_BOOL           using_minc2_api;
 } minc_file_struct;
 
 typedef  minc_file_struct  *Minc_file;

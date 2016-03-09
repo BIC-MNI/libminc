@@ -17,7 +17,9 @@
 #endif /*HAVE_CONFIG_H*/
 
 
-#include  <internal_volume_io.h>
+
+#include <internal_volume_io.h>
+#include <minc_config.h>
 
 #ifdef HAVE_MINC1
 #include  <minc_basic.h>
@@ -140,6 +142,7 @@ VIOAPI  Minc_file  initialize_minc_input_from_minc_id(
     file->cdfid = minc_id;
     file->file_is_being_read = TRUE;
     file->volume = volume;
+    file->using_minc2_api = FALSE;
 
     if( options == (minc_input_options *) NULL )
     {
@@ -1367,8 +1370,8 @@ VIOAPI  void  set_default_minc_input_options(
 {
     static  int     default_rgba_indices[4] = { 0, 1, 2, 3 };
     
-    options->prefer_minc2_api=FALSE;
-    /*mostly debugging*/
+    /*mostly for debugging*/
+    options->prefer_minc2_api=miget_cfg_bool(MICFG_MINC_PREFER_V2_API);
     
     set_minc_input_promote_invalid_to_zero_flag( options, TRUE );
     set_minc_input_vector_to_scalar_flag( options, TRUE );

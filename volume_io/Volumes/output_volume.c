@@ -230,7 +230,7 @@ VIOAPI  VIO_STR  *create_output_dim_names(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  VIO_Status   copy_volume_auxiliary_and_history(
-    Minc_file   minc_file,
+    Minc_file    minc_file,
     VIO_STR      filename,
     VIO_STR      original_filename,
     VIO_STR      history )
@@ -261,21 +261,28 @@ VIOAPI  VIO_Status   copy_volume_auxiliary_and_history(
     if( copy_original_file_data )
     {
 #ifdef HAVE_MINC1
-      status = copy_auxiliary_data_from_minc_file( minc_file,
+      if(!minc_file->using_minc2_api) status = copy_auxiliary_data_from_minc_file( minc_file,
                                                   original_filename,
                                                   history );
-#elif defined HAVE_MINC2
-      status = copy_auxiliary_data_from_minc2_file( minc_file,
+#endif
+                                                  
+#ifdef HAVE_MINC2
+      if(minc_file->using_minc2_api) status = copy_auxiliary_data_from_minc2_file( minc_file,
                                                   original_filename,
                                                   history );
-#endif       
+#endif
     }
     else if( history != NULL )
     {
+
 #ifdef HAVE_MINC1
-      status = add_minc_history( minc_file, history );
-#elif defined HAVE_MINC2
-      status = add_minc2_history( minc_file, history );
+            
+      if(!minc_file->using_minc2_api) 
+              status = add_minc_history( minc_file, history );
+#endif      
+#ifdef HAVE_MINC2
+      if(minc_file->using_minc2_api) 
+              status = add_minc2_history( minc_file, history );
 #endif       
     }
     
@@ -322,7 +329,7 @@ VIOAPI  VIO_Status  output_modified_volume(
     minc_output_options   *options )
 {
     VIO_Status           status;
-    Minc_file            minc_file;
+    Minc_file            minc_file=NULL;
     int                  n_dims, sizes[VIO_MAX_DIMENSIONS];
     VIO_Real             real_min, real_max;
     VIO_STR               *dim_names;
@@ -361,6 +368,23 @@ VIOAPI  VIO_Status  output_modified_volume(
         set_minc_output_use_volume_starts_and_steps_flag( &used_options, TRUE );
     }
 
+#if defined(HAVE_MINC1) && defined(HAVE_MINC2)
+    if(used_options.prefer_minc2_api) {
+#endif
+            
+#if defined(HAVE_MINC2)
+            minc_file = initialize_minc2_output( filename,
+                                        n_dims, dim_names, sizes,
+                                        file_nc_data_type, file_signed_flag,
+                                        file_voxel_min, file_voxel_max,
+                                        get_voxel_to_world_transform(volume),
+                                        volume, &used_options );
+#endif
+                                        
+#if defined(HAVE_MINC1) && defined(HAVE_MINC2)
+    } else {
+#endif
+    
 #ifdef HAVE_MINC1
     minc_file = initialize_minc_output( filename,
                                         n_dims, dim_names, sizes,
@@ -368,15 +392,12 @@ VIOAPI  VIO_Status  output_modified_volume(
                                         file_voxel_min, file_voxel_max,
                                         get_voxel_to_world_transform(volume),
                                         volume, &used_options );
-#elif defined HAVE_MINC2
-    minc_file = initialize_minc2_output( filename,
-                                        n_dims, dim_names, sizes,
-                                        file_nc_data_type, file_signed_flag,
-                                        file_voxel_min, file_voxel_max,
-                                        get_voxel_to_world_transform(volume),
-                                        volume, &used_options );
 #endif
 
+#if defined(HAVE_MINC1) && defined(HAVE_MINC2)
+    }
+#endif
+    
     if( minc_file == NULL )
         return( VIO_ERROR );
 
@@ -384,25 +405,30 @@ VIOAPI  VIO_Status  output_modified_volume(
                                                 original_filename, history );
 
     if( status == VIO_OK )
-#ifdef HAVE_MINC1
-        status = output_minc_volume( minc_file );
-#elif defined HAVE_MINC2
-        status = output_minc2_volume( minc_file );
-#else
-        print_error("Can't output file!");
+    {
+            
+#if defined(HAVE_MINC2)
+          if(minc_file->using_minc2_api) status = output_minc2_volume( minc_file );
 #endif
-
+           
+#if defined(HAVE_MINC1)
+          if(!minc_file->using_minc2_api) status = output_minc_volume( minc_file );
+#endif
+        
+    }
+    
     if( status == VIO_OK )
-#ifdef HAVE_MINC1
-        status = close_minc_output( minc_file );
-#elif defined HAVE_MINC2
-        status = close_minc2_output( minc_file );
-#else
-        print_error("Can't output file!");
+    {
+#if defined(HAVE_MINC1)
+            if(minc_file->using_minc2_api) status = close_minc2_output( minc_file );
 #endif
-
+            
+#if defined(HAVE_MINC1)
+            if(!minc_file->using_minc2_api)  status = close_minc_output( minc_file );
+#endif
+    }
+    
     delete_dimension_names( volume, dim_names );
-
     return( status );
 }
 

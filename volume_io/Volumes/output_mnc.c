@@ -17,7 +17,8 @@
 #endif /*HAVE_CONFIG_H*/
 
 
-#include  <internal_volume_io.h>
+#include <internal_volume_io.h>
+#include <minc_config.h>
 
 #ifdef HAVE_MINC1
 
@@ -415,6 +416,7 @@ VIOAPI  Minc_file  initialize_minc_output(
     file->entire_file_written = FALSE;
     file->ignoring_because_cached = FALSE;
     file->src_img_var = MI_ERROR;
+    file->using_minc2_api = FALSE;
 
     file->filename = expand_filename( filename );
 
@@ -1718,8 +1720,9 @@ VIOAPI  void  set_default_minc_output_options(
     options->use_starts_set = FALSE;
     
     options->is_labels  = FALSE;
-    options->prefer_minc2_api = FALSE;
     
+    /*mostly for debugging*/
+    options->prefer_minc2_api=miget_cfg_bool(MICFG_MINC_PREFER_V2_API);
 }
 
 /* ----------------------------- MNI Header -----------------------------------

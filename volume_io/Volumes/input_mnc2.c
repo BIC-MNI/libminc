@@ -95,6 +95,7 @@ static  Minc_file  initialize_minc_input_from_minc2_id(
     file->minc2id=minc_id;
     file->file_is_being_read = TRUE;
     file->volume = volume;
+    file->using_minc2_api = TRUE;
 
     if( options == (minc_input_options *) NULL )
     {

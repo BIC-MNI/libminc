@@ -26,6 +26,7 @@ static const char *_CONFIG_VAR[]=
       "MINC_MAX_MEMORY_KB",
       "MINC_FILE_CACHE_MB",
       "MINC_CHECKSUM",
+      "MINC_PREFER_V2_API"
   };
 
 /*settings cache*/
