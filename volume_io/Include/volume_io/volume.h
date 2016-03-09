@@ -48,6 +48,8 @@ typedef  struct
     VIO_BOOL use_starts_set;
     VIO_BOOL use_volume_starts_and_steps;
     VIO_BOOL is_labels;
+    /*Mostly for debugging*/
+    VIO_BOOL    prefer_minc2_api;
 } minc_output_options;
 
 extern  VIO_STR   XYZ_dimension_names[];
@@ -388,6 +390,8 @@ typedef  struct
     int         max_dimension_size_for_colour_data;
     int         rgba_indices[4];
     double      user_real_range[2];
+    /*mostly for debugging*/
+    VIO_BOOL    prefer_minc2_api;
 } minc_input_options;
 
 typedef  struct
@@ -479,6 +483,8 @@ typedef struct
     void                 *generic_slice_buffer;
     VIO_Real             min_value, max_value;
     void                 *header_info;
+    /*Mostly for debugging right now*/
+    VIO_BOOL             prefer_minc2_api; 
 } volume_input_struct;
 
 /* --------------------- filter types -------------------------------- */

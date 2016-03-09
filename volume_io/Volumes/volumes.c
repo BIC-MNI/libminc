@@ -2499,7 +2499,8 @@ VIOAPI  void  set_volume_real_range(
     VIO_Real    voxel_min, voxel_max;
 
     if( get_volume_data_type(volume) == VIO_FLOAT ||
-        get_volume_data_type(volume) == VIO_DOUBLE )
+        get_volume_data_type(volume) == VIO_DOUBLE ||
+        volume->is_labels )
     {
         /* as float and double use the voxel range */
         volume->real_range_set = FALSE;

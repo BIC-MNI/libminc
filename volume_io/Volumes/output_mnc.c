@@ -1718,6 +1718,8 @@ VIOAPI  void  set_default_minc_output_options(
     options->use_starts_set = FALSE;
     
     options->is_labels  = FALSE;
+    options->prefer_minc2_api = FALSE;
+    
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -1751,6 +1753,8 @@ VIOAPI  void  copy_minc_output_options(
                 dest->dimension_names[dim] = create_string(
                                                   src->dimension_names[dim] );
         }
+        dest->is_labels=src->is_labels;
+        dest->prefer_minc2_api=src->prefer_minc2_api;
     }
 }
 

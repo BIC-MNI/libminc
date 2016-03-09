@@ -1366,7 +1366,10 @@ VIOAPI  void  set_default_minc_input_options(
     minc_input_options  *options )
 {
     static  int     default_rgba_indices[4] = { 0, 1, 2, 3 };
-
+    
+    options->prefer_minc2_api=FALSE;
+    /*mostly debugging*/
+    
     set_minc_input_promote_invalid_to_zero_flag( options, TRUE );
     set_minc_input_vector_to_scalar_flag( options, TRUE );
     set_minc_input_vector_to_colour_flag( options, FALSE );
