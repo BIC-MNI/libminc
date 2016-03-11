@@ -112,9 +112,15 @@ VIOAPI  VIO_Status  start_volume_input(
     VIO_Status          status;
     int                 d;
     VIO_STR             expanded_filename;
-
+    minc_input_options  default_options;
     status = VIO_OK;
 
+    if( options == (minc_input_options *) NULL )
+    {
+        set_default_minc_input_options( &default_options );
+        options = &default_options;
+    }
+    
     if( create_volume_flag || *volume == (VIO_Volume) NULL )
     {
         if( n_dimensions < 1 || n_dimensions > VIO_MAX_DIMENSIONS )
@@ -156,20 +162,20 @@ VIOAPI  VIO_Status  start_volume_input(
 #if defined(HAVE_MINC1) && defined(HAVE_MINC2)
       if(options->prefer_minc2_api) {
 #endif
+
 #if defined(HAVE_MINC2)
         input_info->file_format = MNC2_FORMAT;
 #endif
+        
 #if defined(HAVE_MINC1) && defined(HAVE_MINC2)
       } else {
 #endif
-
 #ifdef HAVE_MINC1
         input_info->file_format = MNC_FORMAT;
 #endif
 #if defined(HAVE_MINC1) && defined(HAVE_MINC2)
       } 
 #endif
-
     }
     switch( input_info->file_format )
     {
