@@ -152,11 +152,24 @@ VIOAPI  VIO_Status  start_volume_input(
     }
 #endif /*LIBMINC_NIFTI_SUPPORT*/
     else {
-#ifdef HAVE_MINC1
-        input_info->file_format = MNC_FORMAT;
-#elif defined HAVE_MINC2
+
+#if defined(HAVE_MINC1) && defined(HAVE_MINC2)
+      if(options->prefer_minc2_api) {
+#endif
+#if defined(HAVE_MINC2)
         input_info->file_format = MNC2_FORMAT;
 #endif
+#if defined(HAVE_MINC1) && defined(HAVE_MINC2)
+      } else {
+#endif
+
+#ifdef HAVE_MINC1
+        input_info->file_format = MNC_FORMAT;
+#endif
+#if defined(HAVE_MINC1) && defined(HAVE_MINC2)
+      } 
+#endif
+
     }
     switch( input_info->file_format )
     {

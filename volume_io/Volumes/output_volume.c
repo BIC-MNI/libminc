@@ -276,7 +276,6 @@ VIOAPI  VIO_Status   copy_volume_auxiliary_and_history(
     {
 
 #ifdef HAVE_MINC1
-            
       if(!minc_file->using_minc2_api) 
               status = add_minc_history( minc_file, history );
 #endif      
