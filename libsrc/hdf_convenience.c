@@ -2343,7 +2343,8 @@ hdf_create(const char *path, int cmode, struct mi2opts *opts_ptr)
     } H5E_END_TRY;
     if (fd < 0) {
       fprintf(stderr, "Error creating HDF file '%s' with mode '%x', result %d\n", path, cmode, fd);
-      H5Eprint1(stderr);
+      if (cmode != H5F_ACC_EXCL || errno != EEXIST)
+        H5Eprint1(stderr);
       return (MI_ERROR);
     }
 

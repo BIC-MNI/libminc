@@ -88,6 +88,7 @@ struct midimension {
   char *comments;               /* Comment string */
   mihandle_t volume_handle;     /* Handle of associated volume */
   short world_index;            /* -1, MI2_X, MI2_Y, or MI2_Z */
+  midimalign_t align;           /* MI_DIMALIGN_CENTRE, MI_DIMALIGN_START */
 };
 
 /** \internal

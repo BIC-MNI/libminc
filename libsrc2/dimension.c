@@ -116,11 +116,15 @@ int micopy_dimension ( midimhandle_t dim_ptr, midimhandle_t *new_dim_ptr )
 
   //check to make sure string is not empty or null
   if ( dim_ptr->units == NULL  || *dim_ptr->units == '\0' ) {
-    handle->units = strdup ( "mm" );
+    if (dim_ptr->dim_class == MI_DIMCLASS_TIME)
+      handle->units = strdup("s");
+    else
+      handle->units = strdup ( "mm" );
   } else {
     handle->units = strdup ( dim_ptr->units );
   }
 
+  handle->align = dim_ptr->align;
   handle->width = dim_ptr->width;
 
   if ( dim_ptr->widths != NULL ) {
@@ -306,7 +310,15 @@ int micreate_dimension(const char *name, midimclass_t dimclass, midimattr_t attr
   }
 
   handle->length = length;
-  handle->units = strdup ( "mm" );
+
+  if (dimclass == MI_DIMCLASS_TIME) {
+    handle->align = MI_DIMALIGN_START;
+    handle->units = strdup( "s" );
+  }
+  else {
+    handle->align = MI_DIMALIGN_CENTRE;
+    handle->units = strdup ( "mm" );
+  }
   /* volume_handle is the only NULL value once the dimension is created.
    */
   handle->volume_handle = NULL;
@@ -1641,8 +1653,6 @@ int miset_dimension_widths ( midimhandle_t dimension,
     } else {
       dimension->widths[i] = widths[j];
     }
-
-    j++;
   }
 
   return ( MI_NOERROR );

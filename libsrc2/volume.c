@@ -767,6 +767,12 @@ int micreate_volume(const char *filename, int number_of_dimensions,
         */
         MI_CHECK_HDF_CALL_RET(status = H5Dwrite(dataset_width, H5T_NATIVE_DOUBLE, dataspace_id, fspc_id, H5P_DEFAULT, dimensions[i]->widths),"H5Dwrite")
         
+        miset_attr_at_loc(dataset_id, "dimorder", MI_TYPE_STRING,
+                          strlen(dimensions[i]->name), dimensions[i]->name);
+
+        miset_attr_at_loc(dataset_width, "dimorder", MI_TYPE_STRING,
+                          strlen(dimensions[i]->name), dimensions[i]->name);
+
         /* Create new attribute "length", with appropriate
           type (to hdf5) conversion.
           miset_attr_at_loc(..) is implemented at m2utils.c
@@ -823,7 +829,7 @@ int micreate_volume(const char *filename, int number_of_dimensions,
                       name);
 
     /* Create Dimension attribute "direction_cosines"  */
-    if(!dimension_is_vector)
+    if(dimensions[i]->dim_class == MI_DIMCLASS_SPATIAL)
       miset_attr_at_loc(dataset_id, "direction_cosines", MI_TYPE_DOUBLE,
                       3, dimensions[i]->direction_cosines);
 
@@ -840,6 +846,19 @@ int micreate_volume(const char *filename, int number_of_dimensions,
     if(!dimension_is_vector)
       miset_attr_at_loc(dataset_id, "start", MI_TYPE_DOUBLE,
                       1, &dimensions[i]->start);
+
+    if (!dimension_is_vector) {
+      const char *align_str;
+      if (dimensions[i]->align == MI_DIMALIGN_END)
+        align_str = "end___";
+      else if (dimensions[i]->align == MI_DIMALIGN_START)
+        align_str = "start_";
+      else
+        align_str = "centre";
+      miset_attr_at_loc(dataset_id, "alignment", MI_TYPE_STRING,
+                        strlen(align_str), align_str);
+    }
+                        
 
     /* Save units. */
     if(!dimension_is_vector)
