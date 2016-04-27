@@ -20,6 +20,8 @@ ELSE(Hdf5_INCLUDE_DIRS)
 
   SET(TRIAL_LIBRARY_PATHS
     $ENV{HDF5_HOME}/lib
+    /usr/lib/x86_64-linux-gnu/hdf5/serial
+    /usr/lib/x86_64-linux-gnu/hdf5/parallel
     /usr/apps/lib
     /usr/lib 
     /usr/local/lib
@@ -29,6 +31,8 @@ ELSE(Hdf5_INCLUDE_DIRS)
 
   SET(TRIAL_INCLUDE_PATHS
     $ENV{HDF5_HOME}/include
+    /usr/include/hdf5/serial 
+    /usr/include/hdf5/parallel
     /usr/apps/include
     /usr/include
     /opt/include
