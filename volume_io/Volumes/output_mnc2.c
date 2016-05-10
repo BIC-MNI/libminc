@@ -472,7 +472,7 @@ VIOAPI  Minc_file  initialize_minc2_output(
     if( file->image_range[0] < file->image_range[1] || options->is_labels )
     {
       miset_slice_scaling_flag(file->minc2id, 0 );
-      miset_volume_range(file->minc2id,file->image_range[1], file->image_range[0]);
+      miset_volume_range(file->minc2id, file->image_range[1], file->image_range[0]);
     } else {
       get_volume_real_range( volume_to_attach, &file->image_range[0], &file->image_range[1] );
       /*miset_slice_scaling_flag(file->minc2id, 1 );*/

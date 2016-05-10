@@ -1670,6 +1670,16 @@ PRIVATE void do_voxel_loop(Loop_Options *loop_options,
          }
          valid_range[0] = global_minimum[ofile];
          valid_range[1] = global_maximum[ofile];
+         if( valid_range[0] == valid_range[1] ) 
+         {
+            /* HACK:
+             * special case, the whole image contains the same value
+             * to make minc tools happy we have to artificially create some range...
+             * 
+             */
+            if(valid_range[1]>0) valid_range[0]-=1;
+            else valid_range[1]+=1;
+         }
          (void) mivarput1(outmincid, minid, 0, NC_DOUBLE, NULL, &valid_range[0]);
          (void) mivarput1(outmincid, maxid, 0, NC_DOUBLE, NULL, &valid_range[1]);
          (void) miset_valid_range(outmincid, imgid, valid_range);
