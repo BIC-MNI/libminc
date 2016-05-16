@@ -664,6 +664,10 @@ input_more_mgh_format_file(
     }
 
     status = input_next_slice( in_ptr );
+    if ( status != VIO_OK )
+    {
+        return FALSE;
+    }
 
     /* See if we need to apply scaling to this slice. This is only
      * needed if the volume voxel type is not the same as the file

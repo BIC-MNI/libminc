@@ -956,7 +956,7 @@ VIOAPI  VIO_Status  input_minc_hyperslab(
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-static  void  input_slab(
+static int input_slab(
     Minc_file   file,
     VIO_Volume  volume,
     int         to_volume[],
@@ -985,7 +985,7 @@ static  void  input_slab(
                       volume_start[0], volume_start[1], volume_start[2],
                       volume_start[3], volume_start[4] );
 
-    (void) input_minc_hyperslab( file,
+    return input_minc_hyperslab( file,
                                  get_multidim_data_type(&volume->array),
                                  get_multidim_n_dimensions(&volume->array),
                                  array_sizes, array_data_ptr, to_volume,
@@ -1062,7 +1062,11 @@ VIOAPI  VIO_BOOL  input_more_minc_file(
             }
         }
 
-        input_slab( file, volume, file->to_volume_index, file->indices, count );
+        if (input_slab( file, volume, file->to_volume_index, file->indices,
+                        count ) != VIO_OK)
+        {
+            return FALSE;
+        }
 
         /* --- advance to next slab */
 

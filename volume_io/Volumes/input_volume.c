@@ -407,6 +407,11 @@ VIOAPI  VIO_Status  input_volume(
                                     VIO_ROUND( (VIO_Real) FACTOR * amount_done));
         }
 
+        if (amount_done < 1.0)
+        {
+          status = VIO_ERROR;
+        }
+
         terminate_progress_report( &progress );
 
         delete_volume_input( &input_info );
