@@ -247,11 +247,11 @@ typedef void (*AllocateBufferFunction)
       Loop_Info *loop_info);
 
 /* Function declarations */
-MNCAPI void voxel_loop(int num_input_files, char *input_files[], 
-                       int num_output_files, char *output_files[], 
-                       char *arg_string, 
-                       Loop_Options *loop_options,
-                       VoxelFunction voxel_function, void *caller_data);
+MNCAPI int voxel_loop(int num_input_files, char *input_files[], 
+                      int num_output_files, char *output_files[], 
+                      char *arg_string, 
+                      Loop_Options *loop_options,
+                      VoxelFunction voxel_function, void *caller_data);
 MNCAPI Loop_Options *create_loop_options(void);
 MNCAPI void free_loop_options(Loop_Options *loop_options);
 MNCAPI void set_loop_clobber(Loop_Options *loop_options, 

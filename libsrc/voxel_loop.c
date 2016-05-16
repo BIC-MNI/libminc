@@ -268,8 +268,8 @@ PRIVATE void setup_variables(int inmincid, int outmincid,
 PRIVATE void update_history(int mincid, char *arg_string);
 PRIVATE void setup_icvs(Loop_Options *loop_options, 
                         Loopfile_Info *loopfile_info);
-PRIVATE void do_voxel_loop(Loop_Options *loop_options,
-                           Loopfile_Info *loopfile_info);
+PRIVATE int do_voxel_loop(Loop_Options *loop_options,
+                          Loopfile_Info *loopfile_info);
 PRIVATE void setup_looping(Loop_Options *loop_options, 
                            Loopfile_Info *loopfile_info,
                            int *ndims,
@@ -339,7 +339,7 @@ PRIVATE void set_info_loopfile_info(Loop_Info *loop_info,
                  See description in header file.
               caller_data - data that will be passed to voxel_function
 @OUTPUT     : (none)
-@RETURNS    : (nothing)
+@RETURNS    : non-zero if an error occurs.
 @DESCRIPTION: Routine to loop through the voxels of a file and call a function
               to operate on each voxel.
 @METHOD     : 
@@ -348,15 +348,16 @@ PRIVATE void set_info_loopfile_info(Loop_Info *loop_info,
 @CREATED    : January 10, 1994 (Peter Neelin)
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
-MNCAPI void voxel_loop(int num_input_files, char *input_files[], 
-                       int num_output_files, char *output_files[], 
-                       char *arg_string, 
-                       Loop_Options *loop_options,
-                       VoxelFunction voxel_function, void *caller_data)
+MNCAPI int voxel_loop(int num_input_files, char *input_files[], 
+                      int num_output_files, char *output_files[], 
+                      char *arg_string, 
+                      Loop_Options *loop_options,
+                      VoxelFunction voxel_function, void *caller_data)
 {
    Loopfile_Info *loopfile_info;
    int need_to_free_loop_options;
    int old_ncopts;
+   int status;
 
    //(void)fprintf(stderr, "About to loop, max_buffer is %d\n", loop_options->total_copy_space);
    
@@ -403,7 +404,7 @@ MNCAPI void voxel_loop(int num_input_files, char *input_files[],
    setup_icvs(loop_options, loopfile_info);
 
    /* Loop through the voxels */
-   do_voxel_loop(loop_options, loopfile_info);
+   status = do_voxel_loop(loop_options, loopfile_info);
 
    /* Clean up looping info */
    cleanup_loopfile_info(loopfile_info);
@@ -415,7 +416,8 @@ MNCAPI void voxel_loop(int num_input_files, char *input_files[],
 
    /* Restore ncopts */
    set_ncopts(old_ncopts);
-                 
+
+   return status;
 }
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -1253,7 +1255,7 @@ PRIVATE void setup_icvs(Loop_Options *loop_options,
 @INPUT      : loop_options - user options for looping
               loopfile_info - information on files used in loop
 @OUTPUT     : (none)
-@RETURNS    : (nothing)
+@RETURNS    : non-zero if an error occurs.
 @DESCRIPTION: Routine to loop through the voxels and do something to each one
 @METHOD     : 
 @GLOBALS    : 
@@ -1261,8 +1263,8 @@ PRIVATE void setup_icvs(Loop_Options *loop_options,
 @CREATED    : January 10, 1994 (Peter Neelin)
 @MODIFIED   : November 30, 1994 (P.N.)
 ---------------------------------------------------------------------------- */
-PRIVATE void do_voxel_loop(Loop_Options *loop_options,
-                           Loopfile_Info *loopfile_info)
+PRIVATE int do_voxel_loop(Loop_Options *loop_options,
+                          Loopfile_Info *loopfile_info)
 {
    long block_start[MAX_VAR_DIMS], block_end[MAX_VAR_DIMS];
    long block_incr[MAX_VAR_DIMS];
@@ -1291,6 +1293,8 @@ PRIVATE void do_voxel_loop(Loop_Options *loop_options,
    int dummy_index;
    int input_curfile;
    nc_type file_datatype;
+   int status_code;
+   int result_code = EXIT_SUCCESS;
 
    /* Get number of files, buffers, etc. */
    num_output_files = get_output_numfiles(loopfile_info);
@@ -1519,9 +1523,12 @@ PRIVATE void do_voxel_loop(Loop_Options *loop_options,
                /* Read buffer */
                ibuff = (loop_options->do_accumulate ? 0 : current_input);
                input_cur[loop_dim_index] = dim_index;
-               (void) miicv_get(input_icvid,
-                                input_cur, input_curcount, 
-                                input_buffers[ibuff]);
+               status_code = miicv_get(input_icvid,
+                                       input_cur, input_curcount, 
+                                       input_buffers[ibuff]);
+               if (status_code != MI_NOERROR) {
+                 result_code = EXIT_FAILURE;
+               }
                if (loop_options->do_accumulate) {
                   set_info_shape(loop_options->loop_info, 
                                  input_cur, input_curcount);
@@ -1742,7 +1749,7 @@ PRIVATE void do_voxel_loop(Loop_Options *loop_options,
       FREE(global_maximum);
    }
 
-   return;
+   return result_code;
 
 }
 
