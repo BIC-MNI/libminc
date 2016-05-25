@@ -841,11 +841,11 @@ static int input_slab(
                       volume_start[0], volume_start[1], volume_start[2],
                       volume_start[3], volume_start[4] );
 
-    input_minc2_hyperslab( file,
-                                 get_multidim_data_type(&volume->array),
-                                 get_multidim_n_dimensions(&volume->array),
-                                 array_sizes, array_data_ptr, to_volume,
-                                 file_start, file_count );
+    return input_minc2_hyperslab( file,
+                                  get_multidim_data_type(&volume->array),
+                                  get_multidim_n_dimensions(&volume->array),
+                                  array_sizes, array_data_ptr, to_volume,
+                                  file_start, file_count );
 }
 
 /* ----------------------------- MNI Header -----------------------------------
