@@ -1,8 +1,9 @@
 /* A test program to evaluate some of the MINC2 API's and features.
  */
 #include <stdio.h>
+#include <string.h>
 #include "minc2.h"
-
+#include "minc2_private.h"
 #define ND 3
 #define CX 100
 #define CY 100
@@ -17,6 +18,8 @@ static int test1(int do_real)
     mihandle_t hvol;
     double offsets[CX];
     misize_t coords[ND];
+    char temp1[128];
+    char temp2[128];
 
     for (i = 0; i < CX; i++) {
         offsets[i] = (double) i * (double) i;
@@ -127,6 +130,19 @@ static int test1(int do_real)
     r = mifree_volume_props(hprops);
     if (r < 0) {
         return (1);
+    }
+
+    miset_attr_values(hvol, MI_TYPE_STRING, MIimage, MIcomplete,
+                      sizeof(MI_TRUE), MI_TRUE);
+
+    miget_attr_values(hvol, MI_TYPE_STRING, MIimage, MIcomplete,
+                      sizeof(temp1), temp1);
+
+    miget_attribute(hvol, "/minc-2.0/image/0/image", MIcomplete,
+                    MI_TYPE_STRING, sizeof(temp2), temp2);
+
+    if (strcmp(temp1, "true_") || strcmp(temp2, "true_")) {
+      return (1);
     }
 
     r = miclose_volume(hvol);
@@ -250,6 +266,9 @@ static int test2()
             }
         }
     }
+
+    miset_attr_values(hvol, MI_TYPE_STRING, MIimage, MIcomplete, 
+                      sizeof(MI_TRUE), MI_TRUE);
 
     r = miclose_volume(hvol);
     if (r < 0) {

@@ -780,10 +780,15 @@ int miget_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
     return MI_LOG_ERROR(MI2_MSG_GENERIC,"HDF file is not open");
   }
 
-  if ( (!strcmp ( name, "history" ) || !strcmp(name,"ident") || !strcmp(name,"minc_version")) && ( *path==0 || !strcmp(path,"/")) ) {
-    strncpy ( fullpath, MI_ROOT_PATH "/" , sizeof ( fullpath ) );
-  } else {
-    strncpy ( fullpath, MI_ROOT_PATH "/" MI_INFO_NAME, sizeof ( fullpath ) );
+  if (!strcmp(path, MIimage)) {
+    sprintf(fullpath, MI_ROOT_PATH "/image/%d", vol->selected_resolution);
+  }
+  else {
+    if ( (!strcmp ( name, "history" ) || !strcmp(name,"ident") || !strcmp(name,"minc_version")) && ( *path==0 || !strcmp(path,"/")) ) {
+      strncpy ( fullpath, MI_ROOT_PATH "/" , sizeof ( fullpath ) );
+    } else {
+      strncpy ( fullpath, MI_ROOT_PATH "/" MI_INFO_NAME, sizeof ( fullpath ) );
+    }
   }
 
   if ( *path != '/' && *path!=0 ) {
@@ -915,10 +920,15 @@ int miset_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
     return MI_LOG_ERROR(MI2_MSG_GENERIC,"HDF file is not open");
   }
 
-  if ( (!strcmp ( name, "history" ) || !strcmp(name,"ident") || !strcmp(name,"minc_version")) && ( *path==0 || !strcmp(path,"/")) ) {
-    strncpy ( fullpath, MI_ROOT_PATH "/" , sizeof ( fullpath ) );
-  } else {
-    strncpy ( fullpath, MI_ROOT_PATH "/" MI_INFO_NAME, sizeof ( fullpath ) );
+  if (!strcmp(path, MIimage)) {
+    sprintf(fullpath, MI_ROOT_PATH "/image/%d", vol->selected_resolution);
+  }
+  else {
+    if ( (!strcmp ( name, "history" ) || !strcmp(name,"ident") || !strcmp(name,"minc_version")) && ( *path==0 || !strcmp(path,"/")) ) {
+      strncpy ( fullpath, MI_ROOT_PATH "/" , sizeof ( fullpath ) );
+    } else {
+      strncpy ( fullpath, MI_ROOT_PATH "/" MI_INFO_NAME, sizeof ( fullpath ) );
+    }
   }
   
   if ( *path != '/' && *path!=0 ) {
