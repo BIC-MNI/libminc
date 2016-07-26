@@ -216,7 +216,6 @@ VIOAPI  Minc_file  initialize_minc_input_from_minc_id(
     }
 
     n_vol_dims = get_volume_n_dimensions( volume );
-
     if( file->n_file_dimensions < n_vol_dims )
     {
         print_error( "Error: MINC file has only %d dims, volume requires %d.\n",
@@ -969,6 +968,11 @@ static int input_slab(
     int      file_count[VIO_MAX_DIMENSIONS];
     int      array_sizes[VIO_MAX_DIMENSIONS];
     void     *array_data_ptr;
+
+    for_less( ind, 0, VIO_MAX_DIMENSIONS )
+    {
+        volume_start[ind] = 0;
+    }
 
     for_less( file_ind, 0, file->n_file_dimensions )
     {
