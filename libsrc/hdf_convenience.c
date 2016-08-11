@@ -632,9 +632,6 @@ hdf_put_dimorder(struct m2_file *file, hid_t dst_id, int ndims,
     if (att_id >= 0) {
 	H5Awrite(att_id, typ_id, str_buf);
     }
-    else {
-      fprintf(stderr, "Failed to create dimorder %lx\n", dst_id);
-    }
   
     H5Aclose(att_id);
     H5Sclose(spc_id);
@@ -2421,8 +2418,7 @@ int
 hdf_close(int fd)
 {
     hdf_dim_commit(fd);         /* Make sure all dimensions were saved. */
-    hdf_id_del(fd);		/* Delete it from the list. */
-    return (MI_NOERROR);
+    return hdf_id_del(fd);      /* Delete it from the list. */
 }
 
 /* 
