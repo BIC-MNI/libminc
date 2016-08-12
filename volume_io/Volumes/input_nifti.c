@@ -26,8 +26,6 @@ nifti_find_data_range(nifti_image *nii_ptr,
                       VIO_Real *max_value_ptr)
 {
   size_t i, j;
-  double slope;
-  double inter;
   long int initial_offset = znztell(zfp);
   double data[CHUNK_SIZE / sizeof(double)];
   size_t n_voxels_per_chunk;
@@ -38,19 +36,8 @@ nifti_find_data_range(nifti_image *nii_ptr,
     return;
   }
 
-  *min_value_ptr = FLT_MAX;
-  *max_value_ptr = -FLT_MAX;
-
-  if (nii_ptr->scl_slope <= 0.0)
-  {
-    slope = 1.0;
-    inter = 0.0;
-  }
-  else
-  {
-    slope = nii_ptr->scl_slope;
-    inter = nii_ptr->scl_inter;
-  }
+  *min_value_ptr = DBL_MAX;
+  *max_value_ptr = -DBL_MAX;
 
   n_voxels_per_chunk = CHUNK_SIZE / nii_ptr->nbyper;
 
@@ -117,9 +104,6 @@ nifti_find_data_range(nifti_image *nii_ptr,
       }
     }
   }
-
-  *min_value_ptr = (*min_value_ptr * slope) + inter;
-  *max_value_ptr = (*max_value_ptr * slope) + inter;
 
   znzseek(zfp, initial_offset, SEEK_SET);
 }
@@ -340,6 +324,8 @@ initialize_nifti_format_input(VIO_STR             filename,
   znzFile           zfp;
   nc_type           file_nc_type;
   VIO_BOOL          signed_flag;
+  VIO_Real          min_voxel, max_voxel;
+  VIO_Real          min_real, max_real;
 
   /* Read in the NIfTI file header and get a znzFile handle to the data.
    */
@@ -507,23 +493,50 @@ initialize_nifti_format_input(VIO_STR             filename,
 
   set_rgb_volume_flag( volume, nii_ptr->datatype == DT_RGB24 );
 
-  /* If the data must be converted to byte, read the entire image file simply
-   * to find the max and min values. This allows us to set the value_scale and
-   * value_translation properly when we read the file.
+  /* Determine the voxel range of NIfTI data. */
+  /* TODO: Is this really needed? Could we just assume the file uses
+   * the full available range of the datatype without any significant
+   * consequences?
    */
-  if (get_volume_data_type(volume) != in_ptr->file_data_type &&
-      !is_an_rgb_volume( volume ))
-  {
-    VIO_Real original_min_value, original_max_value;
+  nifti_find_data_range(nii_ptr, zfp, &min_voxel, &max_voxel);
 
-    nifti_find_data_range(nii_ptr, zfp,
-                          &original_min_value,
-                          &original_max_value);
-    set_volume_voxel_range(volume, original_min_value, original_max_value);
+  /* Calculate the real range of the data, using the NIfTI slope and
+   * scale, if appropriate. 
+   */
+  if (nii_ptr->scl_slope >= 0)
+  {
+    min_real = (min_voxel * nii_ptr->scl_slope) + nii_ptr->scl_inter;
+    max_real = (max_voxel * nii_ptr->scl_slope) + nii_ptr->scl_inter;
+  }
+  else
+  {
+    min_real = min_voxel;
+    max_real = max_voxel;
   }
 
-  in_ptr->min_value = FLT_MAX;
-  in_ptr->max_value = -FLT_MAX;
+  /* As a special case, if we are converting the file to byte,
+   * we need to prepare to scale the voxels into the final range.
+   */
+  if (get_volume_data_type(volume) == VIO_UNSIGNED_BYTE &&
+      in_ptr->file_data_type != VIO_UNSIGNED_BYTE)
+  {
+    /* Set up the scaling for when we actually read the data.
+     */
+    in_ptr->min_value = min_voxel;
+    in_ptr->max_value = max_voxel;
+
+    min_voxel = 0;
+    max_voxel = UCHAR_MAX;
+  }
+  else
+  {
+    in_ptr->min_value = 0.0;
+    in_ptr->max_value = 1.0;
+  }
+
+  set_volume_voxel_range(volume, min_voxel, max_voxel);
+  set_volume_real_range(volume, min_real, max_real);
+
   in_ptr->slice_index = 0;
   in_ptr->volume_file = (FILE *) zfp;
   in_ptr->header_info = nii_ptr;
@@ -562,7 +575,6 @@ input_more_nifti_format_file(
   double         value_offset, value_scale;
   int            *inner_index;
   int            indices[VIO_MAX_DIMENSIONS];
-  VIO_Real       original_min_value, original_max_value;
   int            i;
   int            total_slices;
 
@@ -603,17 +615,11 @@ input_more_nifti_format_file(
       return FALSE;
     }
 
-    /* See if we need to apply scaling to this slice. This is only
-     * needed if the volume voxel type is not the same as the file
-     * voxel type. THIS IS ONLY REALLY LEGAL FOR BYTE VOLUME TYPES.
-     */
-    if (get_volume_data_type(volume) != in_ptr->file_data_type &&
-        !is_an_rgb_volume( volume ))
+    if (get_volume_data_type(volume) == VIO_UNSIGNED_BYTE &&
+        in_ptr->file_data_type != VIO_UNSIGNED_BYTE)
     {
-      get_volume_voxel_range(volume, &original_min_value, &original_max_value);
-
-      value_offset = original_min_value;
-      value_scale = (original_max_value - original_min_value) /
+      value_offset = in_ptr->min_value;
+      value_scale = (in_ptr->max_value - in_ptr->min_value) / 
         (VIO_Real) (NUM_BYTE_VALUES - 1);
     }
     else
@@ -716,54 +722,15 @@ input_more_nifti_format_file(
         switch (get_volume_data_type(volume))
         {
         case VIO_UNSIGNED_BYTE:
-          if (value < 0 || value > UCHAR_MAX)
-          {
-            print_error("clipping uint8 value\n");
-          }
-          break;
         case VIO_SIGNED_BYTE:
-          if (value < SCHAR_MIN || value > SCHAR_MAX)
-          {
-            print_error("clipping int8 value\n");
-          }
-          break;
         case VIO_UNSIGNED_SHORT:
-          if (value < 0 || value > USHRT_MAX)
-          {
-            print_error("clipping uint16 value\n");
-          }
-          break;
         case VIO_SIGNED_SHORT:
-          if (value < SHRT_MIN || value > SHRT_MAX)
-          {
-            print_error("clipping int16 value\n");
-          }
-          break;
         case VIO_UNSIGNED_INT:
-          if (value < 0 || value > UINT_MAX)
-          {
-            print_error("clipping uint32 value\n");
-          }
-          break;
         case VIO_SIGNED_INT:
-          if (value < INT_MIN || value > INT_MAX)
-          {
-            print_error("clipping int32 value\n");
-          }
+          value = VIO_ROUND( value );
           break;
-        case VIO_NO_DATA_TYPE:
-        case VIO_FLOAT:
-        case VIO_DOUBLE:
-        case VIO_MAX_DATA_TYPE:
+        default:
           break;
-        }
-        if (value > in_ptr->max_value)
-        {
-          in_ptr->max_value = value;
-        }
-        if (value < in_ptr->min_value)
-        {
-          in_ptr->min_value = value;
         }
         set_volume_voxel_value( volume,
                                 indices[VIO_X],
@@ -783,16 +750,6 @@ input_more_nifti_format_file(
 
   if (in_ptr->slice_index >= total_slices)
   {
-    set_volume_voxel_range( volume, in_ptr->min_value, in_ptr->max_value );
-
-    /* Make sure we scale the data up to the original real range,
-     * if appropriate.
-     */
-    if (get_volume_data_type(volume) != in_ptr->file_data_type)
-    {
-      set_volume_real_range(volume, original_min_value, original_max_value);
-    }
-
     return FALSE;
   }
   else
