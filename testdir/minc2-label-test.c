@@ -85,6 +85,7 @@ static int create_label_image ( void )
   if ( result != MI_ERROR ) {
     TESTRPT ( "Invalid return from miget_label_name", result );
   }
+  mifree_name(name);
 
   result = miget_label_value ( hvol, "White", &value );
   if ( result != MI_NOERROR ) {
@@ -270,6 +271,9 @@ main ( void )
   if (result != MI_NOERROR) {
     error_cnt++;
   }
+
+  free(buf);
+  free(dbuf);
     
   if ( error_cnt != 0 ) {
     fprintf ( stderr, "%d error%s reported\n",

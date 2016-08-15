@@ -51,6 +51,7 @@ static void create_test_file ( void )
   miset_voxel_value_hyperslab ( hvol, MI_TYPE_BYTE, start, count, buf );
 
   miclose_volume ( hvol );
+  free(buf);
 }
 
 int main ( void )
@@ -173,6 +174,9 @@ int main ( void )
     }
     printf ( " \n" );
   }
+
+  free(Atmp);
+  miclose_volume(vol);
 
   if ( error_cnt != 0 ) {
     fprintf ( stderr, "%d error%s reported\n",

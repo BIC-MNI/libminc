@@ -155,6 +155,7 @@ int main(void)
         TESTRPT("failed", r);
     }
 
+    mifree_volume_props(props);
     r = miclose_volume(vol);
     if (r < 0) {
         TESTRPT("failed", r);

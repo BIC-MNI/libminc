@@ -208,6 +208,7 @@ main(void)
         TESTRPT("conversion error", 0);
     }
 
+    miclose_volume(hvol);
     if (error_cnt == 0) {
         printf("No errors\n");
     }

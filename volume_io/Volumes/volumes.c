@@ -738,7 +738,13 @@ VIOAPI  VIO_BOOL  set_volume_n_dimensions(
 {
   if ( volume != NULL )
   {
-    return set_multidim_n_dimensions( &volume->array, n_dimensions );
+      /* avoid leak by deleting excess dimensions */
+      int i;
+      for_less(i, n_dimensions, get_multidim_n_dimensions( &volume->array ))
+      {
+          FREE( volume->dimension_names[i] );
+      }
+      return set_multidim_n_dimensions( &volume->array, n_dimensions );
   }
   return FALSE;
 }

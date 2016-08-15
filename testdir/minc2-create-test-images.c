@@ -70,6 +70,8 @@ static int create_2D_image ( void )
 
   r = miclose_volume ( hvol );
   if(r<0) return r;
+  free(buf);
+  free(offsets);
   return r;
 }
 
@@ -140,6 +142,7 @@ static int create_3D_image ( void )
   
   }
 
+  free(buf);
   r = miclose_volume ( hvol );
   return r;
 }
@@ -214,6 +217,7 @@ static int create_4D_image ( void )
     }
   }
 
+  free(buf);
   r = miclose_volume ( hvol );
   return r;
 }

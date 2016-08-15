@@ -127,6 +127,7 @@ int main( int ac, char* av[] )
               "general_inverse_transform_point() / inverted xfm" );
     }
 
+    delete_general_transform( &xfm );
     return 0;
 }
 

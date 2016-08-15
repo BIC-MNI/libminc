@@ -28,6 +28,8 @@ int main( int ac, char* av[] )
       return 2;
     }
 
+    delete_general_transform( &xfm );
+
     return 0;
 }
 

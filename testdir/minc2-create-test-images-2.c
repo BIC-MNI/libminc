@@ -88,6 +88,7 @@ static int create_real_as_int_image(void)
   
   r = miclose_volume(hvol);
   if( r!= MI_NOERROR )    TESTRPT("miclose_volume",r);
+  free(buf);
   return error_cnt;
 }
 
@@ -159,7 +160,7 @@ static int create_real_as_float_image(void)
   
   r = miclose_volume(hvol);
   if( r!= MI_NOERROR )    TESTRPT("miclose_volume",r);
-  
+  free(buf);
   return error_cnt;
 }
 
