@@ -91,7 +91,7 @@ static int
 test2(void)
 {
   VIO_multidim_array array = { 0 };
-  int sizes[TEST2_N_DIMENSIONS] = { 61, 67, 73, 51, 3 };
+  int sizes[TEST2_N_DIMENSIONS] = { 31, 61, 53, 41, 3 };
   int read_sizes[VIO_MAX_DIMENSIONS] = { 5, 5, 5, 5, 5 };
   int value;
   int i, j, k, t, v;
@@ -254,6 +254,8 @@ test3(VIO_Data_types data_type, int n_dimensions, int sizes[])
       }
     }
   } while (!carry);
+
+  delete_multidim_array(&array);
 
   printf("OK\n");
   return 0;
