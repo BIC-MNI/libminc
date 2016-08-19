@@ -5,7 +5,7 @@
 static int
 test1(void)
 {
-  VIO_multidim_array array = {0};
+  VIO_multidim_array array;
   int sizes[TEST1_N_DIMENSIONS] = { 1, 1, 1 };
   int read_sizes[VIO_MAX_DIMENSIONS] = { 5, 5, 5, 5, 5 };
   int i;
@@ -90,7 +90,7 @@ test1(void)
 static int
 test2(void)
 {
-  VIO_multidim_array array = { 0 };
+  VIO_multidim_array array;
   int sizes[TEST2_N_DIMENSIONS] = { 31, 61, 53, 41, 3 };
   int read_sizes[VIO_MAX_DIMENSIONS] = { 5, 5, 5, 5, 5 };
   int value;
@@ -184,7 +184,7 @@ test2(void)
 static int
 test3(VIO_Data_types data_type, int n_dimensions, int sizes[])
 {
-  VIO_multidim_array array = {0};
+  VIO_multidim_array array;
   int index[VIO_MAX_DIMENSIONS];
   int i;
   int n;
