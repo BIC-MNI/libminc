@@ -525,7 +525,7 @@ initialize_mgh_format_input(VIO_STR             filename,
    */
   in_ptr->axis_index_from_file[3] = 3;
 
-  mgh_header_to_linear_transform(&hdr, in_ptr, FALSE, &mnc_native_xform);
+  mgh_header_to_linear_transform(&hdr, in_ptr, TRUE, &mnc_native_xform);
 
   convert_transform_to_starts_and_steps(&mnc_native_xform,
                                         VIO_N_DIMENSIONS,
