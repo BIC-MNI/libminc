@@ -52,9 +52,6 @@ int main ( int argc, char **argv )
   midimhandle_t *dim;
   int           ndim;
   misize_t *sizes;
-  misize_t *start;
-  misize_t *count;
-  misize_t *howfar;
   double        *origin;
   double        *step;
   miclass_t      volume_class;
@@ -118,9 +115,6 @@ int main ( int argc, char **argv )
   /*Allocate memory buffers*/
   dim=  malloc(sizeof(midimhandle_t)*ndim);
   sizes=malloc(sizeof(misize_t)*ndim);
-  start=malloc(sizeof(misize_t)*ndim);
-  count=malloc(sizeof(misize_t)*ndim);
-  howfar=malloc(sizeof(misize_t)*ndim);
   origin=malloc(sizeof(double)*ndim);
   step=malloc(sizeof(double)*ndim);
   
@@ -226,7 +220,7 @@ int main ( int argc, char **argv )
     /*axial, z=const slice*/
     my_start[1]=0;my_count[1]=my_sizes[1];
     my_start[2]=0;my_count[2]=my_sizes[2];
-    my_start[3]=0;my_count[3]=1;/*my_sizes[3]/2*/
+    my_start[3]=my_sizes[3]/2;my_count[3]=1;
     f_axial=malloc(sizeof(float)*my_count[0]*my_count[1]*my_count[2]*my_count[3]);
 
     
@@ -496,8 +490,7 @@ int main ( int argc, char **argv )
   }
   /* close volume*/
   miclose_volume ( vol );
-  /*free(buffer);*/
-  free(count);free(howfar);free(start);free(sizes);free(origin);free(step);
+  free(sizes);free(origin);free(step);
 
   if ( error_cnt != 0 ) {
     fprintf ( stderr, "%d error%s reported\n",
