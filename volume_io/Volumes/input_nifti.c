@@ -498,7 +498,7 @@ initialize_nifti_format_input(VIO_STR             filename,
   /* Calculate the real range of the data, using the NIfTI slope and
    * scale, if appropriate.
    */
-  if (nii_ptr->scl_slope >= 0)
+  if (nii_ptr->scl_slope > 0)
   {
     min_real = (min_voxel * nii_ptr->scl_slope) + nii_ptr->scl_inter;
     max_real = (max_voxel * nii_ptr->scl_slope) + nii_ptr->scl_inter;
