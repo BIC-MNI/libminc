@@ -54,7 +54,7 @@ nifti_find_data_range(nifti_image *nii_ptr,
       n_bytes_to_read = CHUNK_SIZE;
     }
 
-    if (nifti_read_buffer(zfp, data, n_bytes_to_read, nii_ptr) != 
+    if (nifti_read_buffer(zfp, data, n_bytes_to_read, nii_ptr) !=
         n_bytes_to_read)
     {
       print_error("nifti_find_data_range: Read error.\n");
@@ -90,7 +90,7 @@ nifti_find_data_range(nifti_image *nii_ptr,
         tmp = (double) ((double *)data)[j];
         break;
       default:
-        fprintf(stderr, "NIfTI-1 data type %d not handled\n", 
+        fprintf(stderr, "NIfTI-1 data type %d not handled\n",
                 nii_ptr->datatype);
         return;
       }
@@ -111,14 +111,14 @@ nifti_find_data_range(nifti_image *nii_ptr,
 /**
  * Converts the fields in a nifti_image to the appropriate MINC attributes.
  */
-static void 
-nifti_image_to_minc_attributes(nifti_image *nii_ptr, 
+static void
+nifti_image_to_minc_attributes(nifti_image *nii_ptr,
                                int mnc_index_from_file[],
                                VIO_Real mnc_starts[],
-                               VIO_Real mnc_steps[], 
+                               VIO_Real mnc_steps[],
                                VIO_Real mnc_dircos[][VIO_N_DIMENSIONS])
 {
-  size_t i, j;
+  int i, j;
   VIO_Transform mnc_xform;
   VIO_General_transform mnc_linear_xform;
 
@@ -156,89 +156,59 @@ nifti_image_to_minc_attributes(nifti_image *nii_ptr,
   }
   else
   {
+    mat44 nii_xfm;
     if (nii_ptr->sform_code != NIFTI_XFORM_UNKNOWN)
     {
-      for (i = 0; i < 4; i++)
-      {
-        for (j = 0; j < 4; j++)
-        {
-          Transform_elem(mnc_xform, i, j) = nii_ptr->sto_xyz.m[i][j];
-        }
-      }
-    } 
+      nii_xfm = nii_ptr->sto_xyz;
+    }
     else
     {
-      for (i = 0; i < 4; i++)
+      nii_xfm = nii_ptr->qto_xyz;
+    }
+
+    for_less( i, 0, VIO_N_DIMENSIONS )
+    {
+      int spatial_axis = VIO_X;
+      float c_x = fabsf(nii_xfm.m[VIO_X][i]);
+      float c_y = fabsf(nii_xfm.m[VIO_Y][i]);
+      float c_z = fabsf(nii_xfm.m[VIO_Z][i]);
+      if (c_y > c_x && c_y > c_z)
       {
-        for (j = 0; j < 4; j++)
-        {
-          Transform_elem(mnc_xform, i, j) = nii_ptr->qto_xyz.m[i][j];
-        }
+        spatial_axis = VIO_Y;
+      }
+      if (c_z > c_x && c_z > c_y)
+      {
+        spatial_axis = VIO_Z;
+      }
+      mnc_index_from_file[i] = spatial_axis;
+    }
+    /* For the time axis, if present. */
+    mnc_index_from_file[3] = 3;
+
+    for (i = 0; i < VIO_N_DIMENSIONS; i++)
+    {
+      for (j = 0; j < 4; j++)
+      {
+        int volume_axis = (j < VIO_N_DIMENSIONS) ? mnc_index_from_file[j] : j;
+        Transform_elem(mnc_xform, i, volume_axis) = nii_xfm.m[i][j];
       }
     }
 
     create_linear_transform(&mnc_linear_xform, &mnc_xform);
-  
-    for_less (i, 0, 6)
-    {
-      switch (i)
-      {
-      case 0:
-        mnc_index_from_file[0] = VIO_X;
-        mnc_index_from_file[1] = VIO_Y;
-        mnc_index_from_file[2] = VIO_Z;
-        break;
-      case 1:
-        mnc_index_from_file[0] = VIO_X;
-        mnc_index_from_file[1] = VIO_Z;
-        mnc_index_from_file[2] = VIO_Y;
-        break;
-      case 2:
-        mnc_index_from_file[0] = VIO_Y;
-        mnc_index_from_file[1] = VIO_X;
-        mnc_index_from_file[2] = VIO_Z;
-        break;
-      case 3:
-        mnc_index_from_file[0] = VIO_Y;
-        mnc_index_from_file[1] = VIO_Z;
-        mnc_index_from_file[2] = VIO_X;
-        break;
-      case 4:
-        mnc_index_from_file[0] = VIO_Z;
-        mnc_index_from_file[1] = VIO_X;
-        mnc_index_from_file[2] = VIO_Y;
-        break;
-      case 5:
-        mnc_index_from_file[0] = VIO_Z;
-        mnc_index_from_file[1] = VIO_Y;
-        mnc_index_from_file[2] = VIO_X;
-        break;
-      }
-      /* For the time axis, if present. */
-      mnc_index_from_file[3] = 3;
 
-      convert_transform_to_starts_and_steps(&mnc_linear_xform,
-                                            VIO_N_DIMENSIONS,
-                                            NULL,
-                                            mnc_index_from_file,
-                                            mnc_starts,
-                                            mnc_steps,
-                                            mnc_dircos);
-      if( fabs( mnc_dircos[0][VIO_X] ) > fabs( mnc_dircos[0][VIO_Y] ) &&
-          fabs( mnc_dircos[0][VIO_X] ) > fabs( mnc_dircos[0][VIO_Z] ) &&
-          fabs( mnc_dircos[1][VIO_Y] ) > fabs( mnc_dircos[1][VIO_X] ) &&
-          fabs( mnc_dircos[1][VIO_Y] ) > fabs( mnc_dircos[1][VIO_Z] ) &&
-          fabs( mnc_dircos[2][VIO_Z] ) > fabs( mnc_dircos[2][VIO_X] ) &&
-          fabs( mnc_dircos[2][VIO_Z] ) > fabs( mnc_dircos[2][VIO_Y] ) )
-      {
-        break;
-      }
-    }
+    convert_transform_to_starts_and_steps(&mnc_linear_xform,
+                                          VIO_N_DIMENSIONS,
+                                          NULL,
+                                          mnc_index_from_file,
+                                          mnc_starts,
+                                          mnc_steps,
+                                          mnc_dircos);
   }
 
   /* Adjust start and step values if alternate units are specified.
    */
-  switch (nii_ptr->xyz_units) {
+  switch (nii_ptr->xyz_units)
+  {
   case NIFTI_UNITS_METER:
     for (i = 0; i < VIO_N_DIMENSIONS; i++)
     {
@@ -260,7 +230,8 @@ nifti_image_to_minc_attributes(nifti_image *nii_ptr,
   /* Store the start and step values for the time dimension, adjusting
    * the units as needed.
    */
-  switch (nii_ptr->time_units) {
+  switch (nii_ptr->time_units)
+  {
   case NIFTI_UNITS_MSEC:
     mnc_starts[3] = nii_ptr->toffset / 1000.0;
     mnc_steps[3] = nii_ptr->dt / 1000.0;
@@ -313,6 +284,8 @@ initialize_nifti_format_input(VIO_STR             filename,
                               volume_input_struct *in_ptr)
 {
   int               sizes[VIO_MAX_DIMENSIONS];
+  VIO_Real          steps[VIO_MAX_DIMENSIONS];
+  VIO_Real          starts[VIO_MAX_DIMENSIONS];
   long              n_voxels_in_slice;
   nc_type           desired_nc_type;
   int               axis;
@@ -448,43 +421,65 @@ initialize_nifti_format_input(VIO_STR             filename,
     return VIO_ERROR;
   }
 
+#if DEBUG
+  nifti_image_infodump(nii_ptr);
+#endif
+
   nifti_image_to_minc_attributes(nii_ptr, in_ptr->axis_index_from_file,
                                  mnc_starts, mnc_steps, mnc_dircos);
 
+  /* Put the various arrays in the correct order. */
   for_less( axis, 0, n_dimensions)
   {
-    int volume_axis = in_ptr->axis_index_from_file[axis];
-
-    sizes[volume_axis] = in_ptr->sizes_in_file[axis];
     if (axis < 3)
     {
-      /* DEBUG */
-      printf("%d %d size:%4d step:%6.3f start:%9.4f dc:[%7.4f %7.4f %7.4f]\n",
-             axis,
-             volume_axis,
-             sizes[volume_axis],
-             mnc_steps[volume_axis],
-             mnc_starts[volume_axis],
-             mnc_dircos[volume_axis][0], 
-             mnc_dircos[volume_axis][1], 
-             mnc_dircos[volume_axis][2]);
+      int volume_axis = in_ptr->axis_index_from_file[axis];
+      sizes[volume_axis] = in_ptr->sizes_in_file[axis];
+      steps[axis] = mnc_steps[volume_axis];
+      starts[axis] = mnc_starts[volume_axis];
 
-      set_volume_direction_cosine(volume, volume_axis, mnc_dircos[axis]);
+      set_volume_direction_cosine(volume, axis, mnc_dircos[volume_axis]);
     }
     else
     {
-      /* DEBUG */
-      printf("%d %d size:%4d step:%6.3f start:%9.4f\n",
-             axis,
-             volume_axis,
-             sizes[volume_axis],
-             mnc_steps[volume_axis],
-             mnc_starts[volume_axis]);
+      sizes[axis] = in_ptr->sizes_in_file[axis];
+      steps[axis] = mnc_steps[axis];
+      starts[axis] = mnc_starts[axis];
     }
   }
 
-  set_volume_separations( volume, mnc_steps );
-  set_volume_starts( volume, mnc_starts );
+#if DEBUG
+  for_less( axis, 0, n_dimensions )
+  {
+    if (axis < 3)
+    {
+      int volume_axis = in_ptr->axis_index_from_file[axis];
+
+      printf("%d %d size:%4d step:%6.3f start:%9.4f dc:[%7.4f %7.4f %7.4f]\n",
+             axis,
+             volume_axis,
+             sizes[axis],
+             mnc_steps[volume_axis],
+             mnc_starts[volume_axis],
+             mnc_dircos[volume_axis][0],
+             mnc_dircos[volume_axis][1],
+             mnc_dircos[volume_axis][2]);
+
+    }
+    else
+    {
+      printf("%d %d size:%4d step:%6.3f start:%9.4f\n",
+             axis,
+             axis,
+             sizes[axis],
+             mnc_steps[axis],
+             mnc_starts[axis]);
+    }
+  }
+#endif /* DEBUG */
+
+  set_volume_separations( volume, steps );
+  set_volume_starts( volume, starts );
 
   set_volume_type( volume, desired_nc_type, signed_flag, 0.0, 0.0 );
   set_volume_sizes( volume, sizes );
@@ -501,7 +496,7 @@ initialize_nifti_format_input(VIO_STR             filename,
   nifti_find_data_range(nii_ptr, zfp, &min_voxel, &max_voxel);
 
   /* Calculate the real range of the data, using the NIfTI slope and
-   * scale, if appropriate. 
+   * scale, if appropriate.
    */
   if (nii_ptr->scl_slope >= 0)
   {
@@ -619,7 +614,7 @@ input_more_nifti_format_file(
         in_ptr->file_data_type != VIO_UNSIGNED_BYTE)
     {
       value_offset = in_ptr->min_value;
-      value_scale = (in_ptr->max_value - in_ptr->min_value) / 
+      value_scale = (in_ptr->max_value - in_ptr->min_value) /
         (VIO_Real) (NUM_BYTE_VALUES - 1);
     }
     else
@@ -680,14 +675,14 @@ input_more_nifti_format_file(
         case DT_RGB24:
           /* The only RGB-valued NIfTI files I have found to date organize
            * the data in an unexpected manner. Each "slice" consists of three
-           * adjacent slices, each consisting of all of the of R, G, and B 
-           * values for the slice. This is different from what I expected, 
+           * adjacent slices, each consisting of all of the of R, G, and B
+           * values for the slice. This is different from what I expected,
            * which was to find the RGB triple in three adjacent bytes.
            *
            * Some comments I have seen suggest that the "adjacent"
            * byte format is also possible, so there may be a need to
            * allow the user to choose how RGB data is loaded (since there
-           * is probably no easy way to tell what one has, short of 
+           * is probably no easy way to tell what one has, short of
            * some complex calculation).
            *
            * One guess is that if the intent code is set to 'none',
@@ -716,7 +711,7 @@ input_more_nifti_format_file(
           handle_internal_error( "input_more_nifti_format_file" );
           break;
         }
-        
+
         value = (value - value_offset) / value_scale;
 
         switch (get_volume_data_type(volume))
