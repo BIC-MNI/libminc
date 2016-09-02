@@ -127,6 +127,7 @@ static int test1(struct testinfo *ip, struct dimdef *dims, int ndims)
   
   ip->test_attribute = ncattput(ip->fd, ip->test_group, "test", NC_CHAR, ip->attribute_size, ip->large_attribute);
   
+  
   return (0);
 }
 
@@ -293,6 +294,7 @@ int main(int argc, char **argv)
 
   free(info.name);		/* Free the temporary filename */
 
+  free(info.large_attribute);   /* free large_attribute*/
   return (errors);
 }
 
