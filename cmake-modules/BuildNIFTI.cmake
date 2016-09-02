@@ -51,6 +51,7 @@ SET(NIFTI_INCLUDE_DIR ${staging_prefix}/${install_prefix}/include/nifti )
 SET(ZNZ_LIBRARY       ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libznz.a )
 SET(ZNZ_INCLUDE_DIR   ${staging_prefix}/${install_prefix}/include/nifti )
 SET(NIFTI_FOUND ON)
+message("NIFTI_INCLUDE_DIR=${NIFTI_INCLUDE_DIR}")
 
 endmacro(build_nifti)
 
