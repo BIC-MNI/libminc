@@ -124,17 +124,18 @@ nifti_image_to_minc_attributes(nifti_image *nii_ptr,
 
   make_identity_transform(&mnc_xform);
 
+  /* Initialize with default indices. */
+  for (i = 0; i < VIO_MAX_DIMENSIONS; i++)
+  {
+    mnc_index_from_file[i] = i;
+  }
+
   if (nii_ptr->nifti_type == NIFTI_FTYPE_ANALYZE ||
       (nii_ptr->sform_code == NIFTI_XFORM_UNKNOWN &&
        nii_ptr->qform_code == NIFTI_XFORM_UNKNOWN))
   {
 
     print_error("No transform found in header, guessing.\n");
-
-    for (i = 0; i < VIO_MAX_DIMENSIONS; i++)
-    {
-      mnc_index_from_file[i] = i;
-    }
 
     Transform_elem(mnc_xform, 0, 0) *= nii_ptr->dx;
     Transform_elem(mnc_xform, 1, 1) *= nii_ptr->dy;
@@ -182,8 +183,6 @@ nifti_image_to_minc_attributes(nifti_image *nii_ptr,
       }
       mnc_index_from_file[i] = spatial_axis;
     }
-    /* For the time axis, if present. */
-    mnc_index_from_file[3] = 3;
 
     for (i = 0; i < VIO_N_DIMENSIONS; i++)
     {
@@ -245,6 +244,8 @@ nifti_image_to_minc_attributes(nifti_image *nii_ptr,
     mnc_steps[3] = nii_ptr->dt;
     break;
   }
+
+  delete_general_transform(&mnc_linear_xform);
 }
 
 /**
@@ -572,15 +573,14 @@ input_more_nifti_format_file(
   int            indices[VIO_MAX_DIMENSIONS];
   int            i;
   int            total_slices;
+  int            n_dimensions = get_volume_n_dimensions( volume );
 
-  total_slices = in_ptr->sizes_in_file[2];
-  if (get_volume_n_dimensions(volume) > 3)
-  {
-    /* If there is a time dimension, incorporate that into our slice
-     * count.
-     */
-    total_slices *= in_ptr->sizes_in_file[3];
-  }
+  for_less(i, 0, VIO_MAX_DIMENSIONS)
+    indices[i] = 0;
+
+  total_slices = 1;
+  for_less( i, 2, n_dimensions )
+    total_slices *= in_ptr->sizes_in_file[i];
 
   if ( in_ptr->slice_index < total_slices )
   {
@@ -628,17 +628,27 @@ input_more_nifti_format_file(
      */
     inner_index = &indices[in_ptr->axis_index_from_file[0]];
 
-    if (get_volume_n_dimensions(volume) > 3)
+    i = in_ptr->slice_index;
+
+    switch ( n_dimensions )
     {
+    case 5:
+      /* If a vector dimension is present, convert the slice index into
+       * a vector, time, and slice coordinate.
+       */
+      indices[in_ptr->axis_index_from_file[4]] = i / (in_ptr->sizes_in_file[3] * in_ptr->sizes_in_file[2]);
+      i %= (in_ptr->sizes_in_file[3] * in_ptr->sizes_in_file[2]);
+      /* fall through */
+    case 4:
       /* If a time dimension is present, convert the slice index into
        * both a time and slice coordinate using the number of slices.
        */
-      indices[in_ptr->axis_index_from_file[3]] = in_ptr->slice_index / in_ptr->sizes_in_file[2];
-      indices[in_ptr->axis_index_from_file[2]] = in_ptr->slice_index % in_ptr->sizes_in_file[2];
-    }
-    else
-    {
-      indices[in_ptr->axis_index_from_file[2]] = in_ptr->slice_index;
+      indices[in_ptr->axis_index_from_file[3]] = i / in_ptr->sizes_in_file[2];
+      i %= in_ptr->sizes_in_file[2];
+      /* fall through */
+    default:
+      indices[in_ptr->axis_index_from_file[2]] = i;
+      break;
     }
 
     for_less( i, 0, in_ptr->sizes_in_file[1] )
@@ -734,7 +744,6 @@ input_more_nifti_format_file(
                                 indices[3],
                                 indices[4],
                                 value);
-
       }
     }
 
@@ -743,12 +752,5 @@ input_more_nifti_format_file(
 
   *fraction_done = (VIO_Real) in_ptr->slice_index / total_slices;
 
-  if (in_ptr->slice_index >= total_slices)
-  {
-    return FALSE;
-  }
-  else
-  {
-    return TRUE;
-  }
+  return (in_ptr->slice_index < total_slices);
 }
