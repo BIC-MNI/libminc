@@ -41,6 +41,13 @@ nifti_find_data_range(nifti_image *nii_ptr,
 
   n_voxels_per_chunk = CHUNK_SIZE / nii_ptr->nbyper;
 
+  if ( nii_ptr->datatype == DT_RGB24 )
+  {
+    *min_value_ptr = 0;
+    *max_value_ptr = 0xffffffff;
+    return;
+  }
+
   for (i = 0; i < nii_ptr->nvox; i += n_voxels_per_chunk)
   {
     double tmp = 0.0;
@@ -128,6 +135,8 @@ nifti_image_to_minc_attributes(nifti_image *nii_ptr,
   for (i = 0; i < VIO_MAX_DIMENSIONS; i++)
   {
     mnc_index_from_file[i] = i;
+    mnc_starts[i] = 0;
+    mnc_steps[i] = 1;
   }
 
   if (nii_ptr->nifti_type == NIFTI_FTYPE_ANALYZE ||
@@ -569,11 +578,11 @@ input_more_nifti_format_file(
   int            data_ind = 0;
   double         value = 0;
   double         value_offset, value_scale;
-  int            *inner_index;
   int            indices[VIO_MAX_DIMENSIONS];
   int            i;
   int            total_slices;
   int            n_dimensions = get_volume_n_dimensions( volume );
+  int            vio_data_type = get_volume_data_type( volume );
 
   for_less(i, 0, VIO_MAX_DIMENSIONS)
     indices[i] = 0;
@@ -586,10 +595,17 @@ input_more_nifti_format_file(
   {
     size_t     n_bytes_per_slice;
     size_t     n_bytes_read;
+    int        sizes[VIO_MAX_DIMENSIONS] = {1, 1, 1, 1, 1};
+
+    sizes[in_ptr->axis_index_from_file[0]] = in_ptr->sizes_in_file[0];
+    sizes[in_ptr->axis_index_from_file[1]] = 1;
 
     n_bytes_per_slice = (in_ptr->sizes_in_file[0] *
                          in_ptr->sizes_in_file[1] *
                          nii_ptr->nbyper);
+
+    VIO_Real *temp_buffer = malloc(in_ptr->sizes_in_file[0] *
+                                   sizeof(VIO_Real));
 
     /* If the memory for the volume has not been allocated yet,
      * initialize that memory now.
@@ -610,7 +626,7 @@ input_more_nifti_format_file(
       return FALSE;
     }
 
-    if (get_volume_data_type(volume) == VIO_UNSIGNED_BYTE &&
+    if (vio_data_type == VIO_UNSIGNED_BYTE &&
         in_ptr->file_data_type != VIO_UNSIGNED_BYTE)
     {
       value_offset = in_ptr->min_value;
@@ -626,10 +642,7 @@ input_more_nifti_format_file(
 
     /* Set up the indices.
      */
-    inner_index = &indices[in_ptr->axis_index_from_file[0]];
-
     i = in_ptr->slice_index;
-
     switch ( n_dimensions )
     {
     case 5:
@@ -653,36 +666,79 @@ input_more_nifti_format_file(
 
     for_less( i, 0, in_ptr->sizes_in_file[1] )
     {
+      int temp_ind;
+
       indices[in_ptr->axis_index_from_file[1]] = i;
-      for_less( *inner_index, 0, in_ptr->sizes_in_file[0] )
-      {
-        switch ( nii_ptr->datatype )
+      indices[in_ptr->axis_index_from_file[0]] = 0;
+
+      switch ( nii_ptr->datatype ) {
+      case DT_UINT8:
+        for_less( temp_ind, 0, in_ptr->sizes_in_file[0] )
         {
-        case DT_UINT8:
           value = ((unsigned char *) data_ptr)[data_ind++];
-          break;
-        case DT_INT8:
-          value = ((char *) data_ptr)[data_ind++];
-          break;
-        case DT_UINT16:
+          value = (value - value_offset) / value_scale;
+          temp_buffer[temp_ind] = value;
+        }
+        break;
+      case DT_INT8:
+        for_less( temp_ind, 0, in_ptr->sizes_in_file[0] )
+        {
+          value = ((signed char *) data_ptr)[data_ind++];
+          value = (value - value_offset) / value_scale;
+          temp_buffer[temp_ind] = value;
+        }
+        break;
+      case DT_UINT16:
+        for_less( temp_ind, 0, in_ptr->sizes_in_file[0] )
+        {
           value = ((unsigned short *) data_ptr)[data_ind++];
-          break;
-        case DT_INT16:
+          value = (value - value_offset) / value_scale;
+          temp_buffer[temp_ind] = value;
+        }
+        break;
+      case DT_INT16:
+        for_less( temp_ind, 0, in_ptr->sizes_in_file[0] )
+        {
           value = ((short *) data_ptr)[data_ind++];
-          break;
-        case DT_UINT32:
+          value = (value - value_offset) / value_scale;
+          temp_buffer[temp_ind] = value;
+        }
+        break;
+      case DT_UINT32:
+        for_less( temp_ind, 0, in_ptr->sizes_in_file[0] )
+        {
           value = ((unsigned int *) data_ptr)[data_ind++];
-          break;
-        case DT_INT32:
+          value = (value - value_offset) / value_scale;
+          temp_buffer[temp_ind] = value;
+        }
+        break;
+      case DT_INT32:
+        for_less( temp_ind, 0, in_ptr->sizes_in_file[0] )
+        {
           value = ((int *) data_ptr)[data_ind++];
-          break;
-        case DT_FLOAT32:
+          value = (value - value_offset) / value_scale;
+          temp_buffer[temp_ind] = value;
+        }
+        break;
+      case DT_FLOAT32:
+        for_less( temp_ind, 0, in_ptr->sizes_in_file[0] )
+        {
           value = ((float *) data_ptr)[data_ind++];
-          break;
-        case DT_FLOAT64:
-          value = ((double *)data_ptr)[data_ind++];
-          break;
-        case DT_RGB24:
+          value = (value - value_offset) / value_scale;
+          temp_buffer[temp_ind] = value;
+        }
+        break;
+      case DT_FLOAT64:
+        for_less( temp_ind, 0, in_ptr->sizes_in_file[0] )
+        {
+          value = ((double *) data_ptr)[data_ind++];
+          value = (value - value_offset) / value_scale;
+          temp_buffer[temp_ind] = value;
+        }
+        break;
+      case DT_RGB24:
+        for_less( temp_ind, 0, in_ptr->sizes_in_file[0] )
+        {
           /* The only RGB-valued NIfTI files I have found to date organize
            * the data in an unexpected manner. Each "slice" consists of three
            * adjacent slices, each consisting of all of the of R, G, and B
@@ -716,38 +772,31 @@ input_more_nifti_format_file(
             value = (double) make_Colour( r, g, b );
             data_ind += 3;
           }
-          break;
-        default:
-          handle_internal_error( "input_more_nifti_format_file" );
-          break;
+          temp_buffer[temp_ind] = value;
         }
-
-        value = (value - value_offset) / value_scale;
-
-        switch (get_volume_data_type(volume))
-        {
-        case VIO_UNSIGNED_BYTE:
-        case VIO_SIGNED_BYTE:
-        case VIO_UNSIGNED_SHORT:
-        case VIO_SIGNED_SHORT:
-        case VIO_UNSIGNED_INT:
-        case VIO_SIGNED_INT:
-          value = VIO_ROUND( value );
-          break;
-        default:
-          break;
-        }
-        set_volume_voxel_value( volume,
-                                indices[VIO_X],
-                                indices[VIO_Y],
-                                indices[VIO_Z],
-                                indices[3],
-                                indices[4],
-                                value);
+        break;
+      default:
+        handle_internal_error( "input_more_nifti_format_file" );
+        break;
       }
+
+      set_volume_voxel_hyperslab( volume,
+                                  indices[VIO_X],
+                                  indices[VIO_Y],
+                                  indices[VIO_Z],
+                                  0,
+                                  0,
+                                  sizes[VIO_X],
+                                  sizes[VIO_Y],
+                                  sizes[VIO_Z],
+                                  1,
+                                  1,
+                                  temp_buffer );
     }
 
     in_ptr->slice_index++;      /* Advance to the next slice. */
+
+    free(temp_buffer);
   }
 
   *fraction_done = (VIO_Real) in_ptr->slice_index / total_slices;
