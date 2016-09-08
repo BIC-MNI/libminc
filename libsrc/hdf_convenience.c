@@ -2437,4 +2437,22 @@ hdf_access(const char *path)
     return (status > 0);        /* Return non-zero if success */
 }
 
+/*
+ * Flushes the hdf file to disk
+ */
+int 
+hdf_flush(int fd)
+{
+    struct m2_file *file;
+    if ((file = hdf_id_check(fd))!=NULL ) {
+        /* Commit the (entire) file to disk. */
+        if (H5Fflush(file->file_id, H5F_SCOPE_GLOBAL) < 0) {
+            return MI_ERROR;
+        }
+        return MI_NOERROR;
+    }
+    return MI_ERROR;
+}
+
+
 #endif /* MINC2 defined */
