@@ -460,7 +460,7 @@ typedef  minc_file_struct  *Minc_file;
 
 /* --- recognized file formats */
 
-typedef  enum  { MNC_FORMAT, FREE_FORMAT, MNC2_FORMAT, MGH_FORMAT, NII_FORMAT }       Volume_file_formats;
+typedef  enum  { MNC_FORMAT, FREE_FORMAT, MNC2_FORMAT, MGH_FORMAT, NII_FORMAT, NRRD_FORMAT }       Volume_file_formats;
 
 typedef struct
 {

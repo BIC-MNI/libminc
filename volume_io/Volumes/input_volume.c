@@ -22,6 +22,7 @@
 #ifdef LIBMINC_NIFTI_SUPPORT
 #include "input_mgh.h"
 #include "input_nifti.h"
+#include "input_nrrd.h"
 #endif /*LIBMINC_NIFTI_SUPPORT*/
 
 #ifdef HAVE_MINC1
@@ -156,6 +157,10 @@ VIOAPI  VIO_Status  start_volume_input(
              filename_extension_matches( expanded_filename, "hdr" )) {
         input_info->file_format = NII_FORMAT; /* NIfTI-1 */
     }
+    else if (filename_extension_matches( expanded_filename, "nhdr" ) ||
+             filename_extension_matches( expanded_filename, "nrrd" )) {
+        input_info->file_format = NRRD_FORMAT; /* NRRD */
+    }
 #endif /*LIBMINC_NIFTI_SUPPORT*/
     else {
 
@@ -227,6 +232,10 @@ VIOAPI  VIO_Status  start_volume_input(
         status = initialize_nifti_format_input( expanded_filename,
                                                 *volume, input_info );
         break;
+      case NRRD_FORMAT:
+        status = initialize_nrrd_format_input( expanded_filename,
+                                               *volume, input_info );
+        break;
 #endif /*LIBMINC_NIFTI_SUPPORT*/
       default:
         /*Unsupported file format*/
@@ -278,6 +287,9 @@ VIOAPI  void  delete_volume_input(
         break;
     case NII_FORMAT:
         delete_nifti_format_input ( input_info );
+        break;
+    case NRRD_FORMAT:
+        delete_nrrd_format_input ( input_info );
         break;
 #endif /*LIBMINC_NIFTI_SUPPORT*/
     }
@@ -333,6 +345,11 @@ VIOAPI  VIO_BOOL  input_more_of_volume(
     case NII_FORMAT:
         more_to_do = input_more_nifti_format_file( volume, input_info,
                                                    fraction_done );
+        break;
+
+    case NRRD_FORMAT:
+        more_to_do = input_more_nrrd_format_file( volume, input_info,
+                                                  fraction_done );
         break;
 #endif /*LIBMINC_NIFTI_SUPPORT*/
     }

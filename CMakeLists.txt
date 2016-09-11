@@ -177,6 +177,7 @@ IF(NIFTI_FOUND)
     SET(LIBMINC_NIFTI_SOURCES
       volume_io/Volumes/input_nifti.c
       volume_io/Volumes/input_mgh.c
+      volume_io/Volumes/input_nrrd.c
     )
 ENDIF(NIFTI_FOUND)
 
