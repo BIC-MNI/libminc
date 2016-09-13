@@ -20,6 +20,6 @@ extern int          miget_cfg_present(int);
 extern int          miget_cfg_bool(int);
 extern int          miget_cfg_int(int);
 extern const char * miget_cfg_str(int);
-extern double miget_cfg_double(int);
+extern double       miget_cfg_double(int);
 
 #endif /* __MINC_CONFIG_H__ */

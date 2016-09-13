@@ -29,9 +29,14 @@ static const char *_CONFIG_VAR[]=
       "MINC_PREFER_V2_API"
   };
 
+enum {
+ _MICFG_MAX_STRING_LENGTH=256
+};
+  
 /*settings cache*/
-static const char*_CONFIG_VAL[MICFG_COUNT]={(const char*)0};
-static int _CONFIG_PRESENT[MICFG_COUNT]={0};
+static char        _CONFIG_VAL[MICFG_COUNT][_MICFG_MAX_STRING_LENGTH];
+static int         _CONFIG_PRESENT[MICFG_COUNT]={0};
+static int         _CONFIG_INIT[MICFG_COUNT]={0};
 
 /** Simple function to read a user's .mincrc file, if present.
  */
@@ -78,26 +83,26 @@ const char * miget_cfg_str(int id)
 {
   if(id<0 || id>=MICFG_COUNT) return "";
   
-  if(!_CONFIG_VAL[id]) 
+  if(!_CONFIG_INIT[id]) 
   {
     const char *name=_CONFIG_VAR[id];
-    char buffer[256];
+    char buffer[_MICFG_MAX_STRING_LENGTH];
     char *var_ptr;
 
     if ((var_ptr = getenv(name)) != NULL) {
-        strncpy(buffer, var_ptr, sizeof(buffer) - 1);
+        strncpy(buffer, var_ptr, _MICFG_MAX_STRING_LENGTH - 1);
         _CONFIG_PRESENT[id]=1;
-    }
-    else {
-        if (!miread_cfg(name, buffer, sizeof(buffer))) {
+    }  else {
+        if (!miread_cfg(name, buffer, _MICFG_MAX_STRING_LENGTH-1)) {
           _CONFIG_PRESENT[id]=0;
           buffer[0]='\0';
         } else {
           _CONFIG_PRESENT[id]=1;
         }
     }
-    /*small memory leak here, unless we deallocate the settings cache*/
-    _CONFIG_VAL[id]=strdup(buffer);
+    strncpy(_CONFIG_VAL[id],buffer,_MICFG_MAX_STRING_LENGTH-1);
+    _CONFIG_VAL[id][_MICFG_MAX_STRING_LENGTH-1]='\0';
+    _CONFIG_INIT[id]=1;
   }
   return _CONFIG_VAL[id];
 }
