@@ -1805,12 +1805,21 @@ delete_nrrd_format_input(volume_input_struct   *in_ptr)
 {
   nrrd_header_t nrrd_ptr = (nrrd_header_t) in_ptr->header_info;
   FILE *fp = (FILE *) in_ptr->volume_file;
+  int i;
+
   if (nrrd_ptr->encoding == NRRD_ENCODING_GZIP)
   {
     gzclose(nrrd_ptr->gzfp);
     nrrd_ptr->gzfp = NULL;
   }
   fclose(fp);
+  for (i = 0; i < nrrd_ptr->dimension; i++)
+  {
+    if (nrrd_ptr->labels[i] != NULL)
+    {
+      free(nrrd_ptr->labels[i]);
+    }
+  }
   free(nrrd_ptr);
   free(in_ptr->generic_slice_buffer);
 }
