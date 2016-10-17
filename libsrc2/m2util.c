@@ -18,7 +18,7 @@
 #include "minc2.h"
 #include "minc2_private.h"
 
-#ifdef _MSC_VER
+#ifndef HAVE_RINT
 double rint(double v)
 {
   return floor(v+0.5);

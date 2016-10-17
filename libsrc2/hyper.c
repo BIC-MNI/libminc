@@ -1262,8 +1262,8 @@ int miget_hyperslab_with_icv(mihandle_t volume,           /**< A MINC 2.0 volume
  */
 int miset_hyperslab_with_icv(mihandle_t volume,        /**< A MINC 2.0 volume handle */
                          mitype_t buffer_data_type,    /**< Output datatype */
-                         const misize_t start[],  /**< Start coordinates  */
-                         const misize_t count[],  /**< Lengths of edges  */
+                         const misize_t start[],       /**< Start coordinates  */
+                         const misize_t count[],       /**< Lengths of edges  */
                          void *buffer)                 /**< Output memory buffer */
 {
   return  mirw_hyperslab_icv(MIRW_OP_WRITE,volume,buffer_data_type,start,count,buffer);
