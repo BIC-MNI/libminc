@@ -277,6 +277,7 @@ int micreate_volume_image(mihandle_t volume)
 {
   char dimorder[MI2_CHAR_LENGTH];
   int i;
+  int dimorder_len=0;
   hid_t dataspace_id;
   hid_t dset_id;
   hsize_t hdf_size[MI2_MAX_VAR_DIMS];
@@ -292,7 +293,7 @@ int micreate_volume_image(mihandle_t volume)
     /* Create the dimorder string, ordered comma-separated
       list of dimension names.
     */
-    strncat(dimorder, volume->dim_handles[i]->name, MI2_CHAR_LENGTH - 1);
+    strncat(dimorder, volume->dim_handles[i]->name, MI2_CHAR_LENGTH - 1 - strlen(dimorder)); /*as a replacement for strlcat*/
     if (i != volume->number_of_dims - 1) {
       strncat(dimorder, ",", MI2_CHAR_LENGTH - 1);
     }
@@ -329,7 +330,7 @@ int micreate_volume_image(mihandle_t volume)
 
     MI_CHECK_HDF_CALL_RET(dcpl_id = H5Pcreate(H5P_DATASET_CREATE),"H5Pcreate")
 
-    if (volume->has_slice_scaling) {
+    if (volume->has_slice_scaling && (volume->number_of_dims > 2) ) {
       /* TODO: Find the slowest-varying spatial dimension; that forms
       * the basis for the image-min and image-max variables.  Right
       * now this is an oversimplification!
@@ -347,7 +348,7 @@ int micreate_volume_image(mihandle_t volume)
         /* Create the dimorder string, ordered comma-separated
           list of dimension names.
         */
-        strncat(dimorder, volume->dim_handles[i]->name, MI2_CHAR_LENGTH - 1);
+        strncat(dimorder, volume->dim_handles[i]->name, MI2_CHAR_LENGTH - 1-strlen(dimorder));
         if (i != volume->number_of_dims - 1) {
           strncat(dimorder, ",", MI2_CHAR_LENGTH - 1);
         }
@@ -728,7 +729,7 @@ int micreate_volume(const char *filename, int number_of_dimensions,
 
     if(!dimension_is_vector )
       add_standard_minc_attributes(file_id,dataset_id);
-    /*vector dimension is a record*/
+      /*vector dimension is a record (?)*/
     
     /* Check for irregular dimension and make sure
       offset values are provided for this dimension
@@ -824,30 +825,29 @@ int micreate_volume(const char *filename, int number_of_dimensions,
       return (MI_ERROR);
     }
 
-    if(!dimension_is_vector)
-      miset_attr_at_loc(dataset_id, "class", MI_TYPE_STRING, strlen(name),
-                      name);
-
+    /* Save dimension length */
+    miset_attr_at_loc(dataset_id, "length", MI_TYPE_INT,
+                      1, &dimensions[i]->length);
+    
     /* Create Dimension attribute "direction_cosines"  */
     if(dimensions[i]->dim_class == MI_DIMCLASS_SPATIAL)
       miset_attr_at_loc(dataset_id, "direction_cosines", MI_TYPE_DOUBLE,
                       3, dimensions[i]->direction_cosines);
 
-    /* Save dimension length */
-    miset_attr_at_loc(dataset_id, "length", MI_TYPE_INT,
-                      1, &dimensions[i]->length);
-
-    /* Save step value. */
     if(!dimension_is_vector)
+    {
+      miset_attr_at_loc(dataset_id, "class", MI_TYPE_STRING, strlen(name),
+                      name);
+
+
+      /* Save step value. */
       miset_attr_at_loc(dataset_id, "step", MI_TYPE_DOUBLE,
                       1, &dimensions[i]->step);
 
-    /* Save start value. */
-    if(!dimension_is_vector)
+      /* Save start value. */
       miset_attr_at_loc(dataset_id, "start", MI_TYPE_DOUBLE,
                       1, &dimensions[i]->start);
 
-    if (!dimension_is_vector) {
       const char *align_str;
       if (dimensions[i]->align == MI_DIMALIGN_END)
         align_str = "end___";
@@ -857,19 +857,16 @@ int micreate_volume(const char *filename, int number_of_dimensions,
         align_str = "centre";
       miset_attr_at_loc(dataset_id, "alignment", MI_TYPE_STRING,
                         strlen(align_str), align_str);
-    }
-                        
 
-    /* Save units. */
-    if(!dimension_is_vector)
+      /* Save units. */
       miset_attr_at_loc(dataset_id, "units", MI_TYPE_STRING,
                       strlen(dimensions[i]->units), dimensions[i]->units);
 
-    /* Save sample width. */
-    if(!dimension_is_vector)
+      /* Save sample width. */
       miset_attr_at_loc(dataset_id, "width", MI_TYPE_DOUBLE,
                       1,  &dimensions[i]->width);
-
+    }
+    
     /* Save comments. If user has not specified
       any comments, do not add this attribute
     */
