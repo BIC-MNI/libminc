@@ -4,12 +4,13 @@
 #include <string.h>
 #include "minc2.h"
 #include "minc2_private.h"
-#define ND 3
-#define CX 100
-#define CY 100
-#define CZ 100
 
-static int test1(int do_real)
+#define ND 3
+#define CX 20
+#define CY 20
+#define CZ 20
+
+int test1(int do_real)
 {
     int i, j, k;
     int r;
@@ -157,7 +158,7 @@ static int test1(int do_real)
 #define CCY 20
 #define CCZ 20
 
-static int test2()
+int test2(void)
 {
     midimhandle_t hdim[ND];
     mihandle_t hvol;
@@ -282,22 +283,10 @@ int
 main(int argc, char **argv)
 {
     int errors;
-    int do_real = 0;
-
-    while (--argc > 0) {
-        char *argp = *++argv;
-        if (*argp == '-') {
-            argp++;
-            switch (*argp) {
-            case 'r':
-                do_real = 1;
-                break;
-            }
-        }
-    }
 
     errors = 0;
-    errors += test1(do_real);
+    errors += test1(0);
+    errors += test1(1);
     errors += test2();
 
     if (errors == 0) {
@@ -309,3 +298,4 @@ main(int argc, char **argv)
     return (errors);
 }
 
+/* kate: indent-mode cstyle; indent-width 2; replace-tabs on; */

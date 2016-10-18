@@ -14,11 +14,11 @@ static int error_cnt=0;
 
 #define CZ 142
 #define CY 245
-#define CX 10
+#define CX 100
 #define CU 5
 #define NDIMS 3
 
-static int create_2D_image ( void )
+static int create_2D_image ( const char *fname )
 {
   int r, i;
   midimhandle_t hdim[NDIMS - 1];
@@ -48,7 +48,7 @@ static int create_2D_image ( void )
   r = miset_dimension_starts ( hdim,  NDIMS - 1, start_values );
   if(r<0) return r;
 
-  r = micreate_volume ( "2D_image.mnc", NDIMS - 1 , hdim, MI_TYPE_SHORT,
+  r = micreate_volume ( fname, NDIMS - 1 , hdim, MI_TYPE_SHORT,
                         MI_CLASS_REAL, NULL, &hvol );
   if(r<0) return r;
 
@@ -75,7 +75,7 @@ static int create_2D_image ( void )
   return r;
 }
 
-static int create_3D_image ( void )
+static int create_3D_image ( const char *fname )
 {
   int r;
   double start_values[NDIMS] = { -6.96, -12.453,  -9.48};
@@ -108,7 +108,7 @@ static int create_3D_image ( void )
   r = miset_dimension_separations ( hdim, NDIMS, separations );
   if(r<0) return r;
   
-  r = micreate_volume ( "3D_image.mnc", NDIMS, hdim, MI_TYPE_USHORT,
+  r = micreate_volume ( fname, NDIMS, hdim, MI_TYPE_USHORT,
                         MI_CLASS_REAL, NULL, &hvol );
   if(r<0) return r;
   
@@ -147,11 +147,11 @@ static int create_3D_image ( void )
   return r;
 }
 
-static int create_4D_image ( void )
+static int create_4D_image ( const char *fname )
 {
   int r;
   double start_values[NDIMS + 1] = { -6.96, -12.453,  -9.48, 20.002};
-  double separations[NDIMS + 1] = {0.09, 0.09, 0.09, 1};
+  double separations[NDIMS + 1] =  {0.09, 0.09, 0.09, 1};
   midimhandle_t hdim[NDIMS + 1];
   mihandle_t hvol;
   unsigned char *buf = ( unsigned char * ) malloc ( CX * CU * CZ * CY * sizeof ( unsigned char ) );
@@ -166,7 +166,7 @@ static int create_4D_image ( void )
                            MI_DIMATTR_REGULARLY_SAMPLED, CX, &hdim[0] );
   if(r<0) return r;
 
-  r = micreate_dimension ( "user", MI_DIMCLASS_USER,
+  r = micreate_dimension ( "time", MI_DIMCLASS_USER,
                            MI_DIMATTR_REGULARLY_SAMPLED, CU, &hdim[1] );
   if(r<0) return r;
 
@@ -183,7 +183,7 @@ static int create_4D_image ( void )
   r = miset_dimension_separations ( hdim, NDIMS + 1, separations );
   if(r<0) return r;
 
-  r = micreate_volume ( "4D_image.mnc", NDIMS + 1, hdim, MI_TYPE_UBYTE,
+  r = micreate_volume ( fname, NDIMS + 1, hdim, MI_TYPE_UBYTE,
                         MI_CLASS_REAL, NULL, &hvol );
   if(r<0) return r;
 
@@ -222,18 +222,24 @@ static int create_4D_image ( void )
   return r;
 }
 
-int main ( void )
+int main ( int argc, char **argv )
 {
-  printf ( "Creating 2D image with IRREGULAR sample dimension!! (2D_image.mnc)\n" );
-  if(create_2D_image()<0) 
+  if(argc< 4)
+  {
+    fprintf(stderr,"Usage:%s <out 2d> <out 3d> <out 4d>\n",argv[0]);
+    return 1;
+  }
+  
+  printf ( "Creating 2D image with IRREGULAR sample dimension!! \n" );
+  if(create_2D_image(argv[1])<0) 
     TESTRPT("create_2D_image",0);
   
-  printf ( "Creating 3D image with slice scaling!! (3D_image.mnc)\n" );
-  if( create_3D_image()<0)
+  printf ( "Creating 3D image with slice scaling!! \n" );
+  if( create_3D_image(argv[2])<0)
     TESTRPT("create_3D_image",0);
   
-  printf ( "Creating 4D image with slice scaling!! (4D_image.mnc)\n" );
-  if(create_4D_image()<0)
+  printf ( "Creating 4D image with slice scaling!! \n" );
+  if(create_4D_image(argv[3])<0)
     TESTRPT("create_4D_image",0);
 
   if ( error_cnt != 0 ) {
@@ -246,3 +252,5 @@ int main ( void )
   return ( error_cnt );
 }
 
+
+/* kate: indent-mode cstyle; indent-width 2; replace-tabs on; */

@@ -16,7 +16,7 @@ __LINE__, msg, val))
 #define NDIMS 3
 
 
-static int create_real_as_int_image(void)
+static int create_real_as_int_image(const char* fname)
 {
   int r;
   int error_cnt=0;
@@ -52,7 +52,7 @@ static int create_real_as_int_image(void)
   r = miset_dimension_separations(hdim, NDIMS, separations);
   if( r!= MI_NOERROR )    TESTRPT("miset_dimension_separations",r);
   
-  r = micreate_volume("real_as_int_image.mnc", NDIMS, hdim, MI_TYPE_INT,
+  r = micreate_volume(fname, NDIMS, hdim, MI_TYPE_INT,
                       MI_CLASS_REAL, NULL, &hvol);
   if( r!= MI_NOERROR )    TESTRPT("micreate_volume",r);
   
@@ -93,7 +93,7 @@ static int create_real_as_int_image(void)
 }
 
 
-static int create_real_as_float_image(void)
+static int create_real_as_float_image(const char* fname)
 {
   int r;
   int error_cnt=0;
@@ -128,7 +128,7 @@ static int create_real_as_float_image(void)
   r = miset_dimension_separations(hdim, NDIMS, separations);
   if( r!= MI_NOERROR )    TESTRPT("miset_dimension_separations",r);
   
-  r = micreate_volume("real_as_float_image.mnc", NDIMS, hdim, MI_TYPE_FLOAT,
+  r = micreate_volume(fname, NDIMS, hdim, MI_TYPE_FLOAT,
                       MI_CLASS_REAL, NULL, &hvol);
   if( r!= MI_NOERROR )    TESTRPT("micreate_volume",r);
   
@@ -164,13 +164,20 @@ static int create_real_as_float_image(void)
   return error_cnt;
 }
 
-int main(void)
+int main(int argc, char **argv)
 {
   int r = 0;
-  printf("Creating 3D image REAL stored as INT w/ slice scaling!! (real_as_int_image.mnc)\n");
-  r +=create_real_as_int_image();
-  printf("Creating 3D image REAL stored as FLOAT w/ slice scaling!! (real_as_float_image.mnc)\n");
-  r +=create_real_as_float_image();
+  
+  if(argc< 3)
+  {
+    fprintf(stderr,"Usage:%s <out int> <out float>\n",argv[0]);
+    return 1;
+  }
+  
+  printf("Creating 3D image REAL stored as INT w/ slice scaling!!\n");
+  r +=create_real_as_int_image(argv[1]);
+  printf("Creating 3D image REAL stored as FLOAT w/ slice scaling!!\n");
+  r +=create_real_as_float_image(argv[2]);
   
   if (r != 0) {
     fprintf(stderr, "%d error%s reported\n",

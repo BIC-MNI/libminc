@@ -47,3 +47,5 @@ main(int argc, char **argv)
     return (0);
 }
 
+
+/* kate: indent-mode cstyle; indent-width 2; replace-tabs on; */
