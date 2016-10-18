@@ -16,9 +16,9 @@ addons:
       - libhdf5-serial-dev
 
 script: 
-        - cmake -DCMAKE_BUILD_TYPE=Release -DLIBMINC_MINC1_SUPPORT=OFF
+        - cmake -DCMAKE_BUILD_TYPE:STRING=Release -DLIBMINC_MINC1_SUPPORT:BOOL=OFF -DBUILD_TESTING:BOOL=ON
         - make
         - make test
-        - cmake -DCMAKE_BUILD_TYPE=Release -DLIBMINC_MINC1_SUPPORT=ON
+        - cmake -DCMAKE_BUILD_TYPE:STRING=Release -DLIBMINC_MINC1_SUPPORT:BOOL=ON -DBUILD_TESTING:BOOL=ON
         - make
         - make test
