@@ -384,4 +384,4 @@ int mi2log_message ( const char *file,int line, mi2msgcode_t code, ... )
   return ( MI_ERROR );  /* Just for convenience */
 }
 
-// kate: indent-mode cstyle; indent-width 2; replace-tabs on; 
+/* kate: indent-mode cstyle; indent-width 2; replace-tabs on; */

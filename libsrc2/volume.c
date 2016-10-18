@@ -1779,4 +1779,4 @@ int miget_slice_dimension_count(mihandle_t volume, midimclass_t dimclass,
 }
 
 
-// kate: indent-mode cstyle; indent-width 2; replace-tabs on; 
+/* kate: indent-mode cstyle; indent-width 2; replace-tabs on; */

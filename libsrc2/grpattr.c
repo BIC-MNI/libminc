@@ -1019,4 +1019,4 @@ int miadd_history_attr ( mihandle_t vol, size_t length, const void *values )
 
 }
 
-// kate: indent-mode cstyle; indent-width 2; replace-tabs on; 
+/* kate: indent-mode cstyle; indent-width 2; replace-tabs on; */

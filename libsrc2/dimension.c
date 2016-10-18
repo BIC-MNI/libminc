@@ -1658,4 +1658,4 @@ int miset_dimension_widths ( midimhandle_t dimension,
   return ( MI_NOERROR );
 }
 
-// kate: indent-mode cstyle; indent-width 2; replace-tabs on; 
+/* kate: indent-mode cstyle; indent-width 2; replace-tabs on; */

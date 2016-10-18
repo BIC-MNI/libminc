@@ -1334,4 +1334,4 @@ int miset_voxel_value_hyperslab(mihandle_t volume,
                             start, count, (void *) buffer);
 }
 
-// kate: indent-mode cstyle; indent-width 2; replace-tabs on; 
+/* kate: indent-mode cstyle; indent-width 2; replace-tabs on; */
