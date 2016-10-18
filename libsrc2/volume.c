@@ -348,9 +348,9 @@ int micreate_volume_image(mihandle_t volume)
         /* Create the dimorder string, ordered comma-separated
           list of dimension names.
         */
-        strncat(dimorder, volume->dim_handles[i]->name, MI2_CHAR_LENGTH - 1-strlen(dimorder));
-        if (i != volume->number_of_dims - 1) {
-          strncat(dimorder, ",", MI2_CHAR_LENGTH - 1);
+        strncat(dimorder, volume->dim_handles[i]->name, MI2_CHAR_LENGTH - 1 - strlen(dimorder));
+        if (i != ndims - 1) {
+          strncat(dimorder, ",", MI2_CHAR_LENGTH - 1 - strlen(dimorder));
         }
       }
     }
