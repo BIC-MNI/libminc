@@ -83,8 +83,8 @@
 
 #include <errno.h>
 #include <stdarg.h>
-#include <minc_private.h>
-#include <minc_error.h>
+#include "minc_private.h"
+#include "minc_error.h"
 
 struct mierror_entry {
     int level;
@@ -152,7 +152,8 @@ static struct mierror_entry mierror_table[] = {
     { MI_MSG_ERROR, "Invalid ICV coordinates"}, /* MI_MSG_ICVCOORDS */
     { MI_MSG_ERROR, "Illegal variable access operation" }, /* MI_MSG_BADOP */
     { MI_MSG_ERROR, "ncopts stack overflow" }, /* MI_MSG_NCOPTS_STACK_OVER */
-    { MI_MSG_ERROR, "ncopts stack underflow" } /* MI_MSG_NCOPTS_STACK_UNDER */
+    { MI_MSG_ERROR, "ncopts stack underflow" }, /* MI_MSG_NCOPTS_STACK_UNDER */
+    { MI_MSG_ERROR, "volume_io error" }, /* MI_MSG_VOLUME_IO */
 };
 
 SEMIPRIVATE int MI_save_routine_name(char *name)

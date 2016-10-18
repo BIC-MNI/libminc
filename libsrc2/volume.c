@@ -1462,10 +1462,11 @@ int miopen_volume(const char *filename, int mode, mihandle_t *volume)
     /* Get the Id of the copy of the dataspace of the dataset */
     space_id = H5Dget_space(dset_id);
     if (space_id >= 0) {
+      
       /* If the dimensionality of the image-max variable is one or
       * greater, we consider this volume to have slice-scaling enabled.
       */
-      if (H5Sget_simple_extent_ndims(space_id) >= 1) {
+      if ( H5Sget_simple_extent_ndims(space_id) >= 1) {
         handle->has_slice_scaling = TRUE;
       }
       H5Sclose(space_id);	/* Close the dataspace handle */
