@@ -211,6 +211,7 @@ SET(minc_common_SRCS
    libsrc/ParseArgv.c
    libsrc/restructure.c
    libsrc/minc_config.c
+   libsrc/minc_error.c
 )
 
 SET(minc_common_HEADERS
@@ -220,6 +221,7 @@ SET(minc_common_HEADERS
   libsrc/restructure.h
   volume_io/Include/volume_io.h
   libsrc/minc_config.h  
+  libsrc/minc_error.h
 )
 
 # some variables
@@ -227,7 +229,6 @@ SET(minc1_LIB_SRCS
    libsrc/dim_conversion.c
    libsrc/image_conversion.c
    libsrc/minc_convenience.c
-   libsrc/minc_error.c
    libsrc/nd_loop.c
    libsrc/netcdf_convenience.c
    libsrc/value_conversion.c
