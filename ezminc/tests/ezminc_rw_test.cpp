@@ -173,7 +173,8 @@ int main(int argc,char **argv)
   {
     if(argc>1) 
     {
-      chdir(argv[1]);
+      if(chdir(argv[1]))
+        REPORT_ERROR("Can't chdir!");
     }
     
     //no rounding expected

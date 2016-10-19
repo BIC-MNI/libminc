@@ -15,7 +15,6 @@
 #include "config.h"
 #endif /*HAVE_CONFIG_H*/
 
-#include "minc.h"
 #include "minc_error.h"
 
 #include  <internal_volume_io.h>

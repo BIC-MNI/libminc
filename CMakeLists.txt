@@ -192,6 +192,7 @@ CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake ${CMAKE_CURRENT_BINARY
 INCLUDE_DIRECTORIES(
    ${CMAKE_CURRENT_SOURCE_DIR}
    ${CMAKE_CURRENT_BINARY_DIR}
+   ${CMAKE_CURRENT_SOURCE_DIR}/libcommon
    ${CMAKE_CURRENT_SOURCE_DIR}/libsrc2
    ${CMAKE_CURRENT_SOURCE_DIR}/libsrc
    ${CMAKE_CURRENT_SOURCE_DIR}/volume_io/Include
@@ -204,27 +205,29 @@ IF(LIBMINC_NIFTI_SUPPORT)
         ${NIFTI_INCLUDE_DIR}
     )
 ENDIF(LIBMINC_NIFTI_SUPPORT)
-    
+
 SET(minc_common_SRCS
-   libsrc/time_stamp.c
-   libsrc/read_file_names.c
-   libsrc/ParseArgv.c
-   libsrc/restructure.c
-   libsrc/minc_config.c
-   libsrc/minc_error.c
+  libcommon/minc2_error.c
+  libcommon/minc_config.c
+  libcommon/minc_error.c
+  libcommon/ParseArgv.c
+  libcommon/read_file_names.c
+  libcommon/restructure.c
+  libcommon/time_stamp.c
 )
 
 SET(minc_common_HEADERS
-  libsrc/time_stamp.h
-  libsrc/ParseArgv.h 
-  libsrc/read_file_names.h
-  libsrc/restructure.h
-  volume_io/Include/volume_io.h
-  libsrc/minc_config.h  
-  libsrc/minc_error.h
+  libcommon/minc2_error.h
+  libcommon/minc_config.h
+  libcommon/minc_error.h
+  libcommon/ParseArgv.h
+  libcommon/read_file_names.h
+  libcommon/restructure.h
+  libcommon/time_stamp.h
+  
+  volume_io/Include/volume_io.h # VF: WTF?
 )
 
-# some variables
 SET(minc1_LIB_SRCS
    libsrc/dim_conversion.c
    libsrc/image_conversion.c
@@ -262,7 +265,6 @@ SET(minc2_LIB_SRCS
    libsrc2/valid.c
    libsrc2/volprops.c
    libsrc2/volume.c
-   libsrc2/minc2_error.c
    )
 
 SET(minc2_HEADERS
@@ -270,7 +272,6 @@ SET(minc2_HEADERS
   libsrc2/minc2_defs.h 
   libsrc2/minc2_structs.h 
   libsrc2/minc2_api.h 
-  libsrc2/minc2_error.h
 )
 
 # volume_io2
