@@ -223,7 +223,7 @@ VIOAPI  void  print_error( char format[], ... )
     va_end( ap );
 
     if( print_error_function[top_of_error_stack] == NULL )
-        milog_message(MI_MSG_VOLUME_IO,"%s", print_buffer);
+        MI_LOG_ERROR(MI_MSG_VOLUME_IO,"%s", print_buffer);
     else
         (*(print_error_function[top_of_error_stack])) ( print_buffer );
 }
@@ -246,7 +246,7 @@ VIOAPI  void   handle_internal_error( char  str[] )
 {
     /*print_error( "Internal error:  %s\n", str );
     abort_if_allowed();*/
-    milog_message(MI_MSG_VOLUME_IO,"Internal error:  %s", str);
+    MI_LOG_ERROR(MI_MSG_VOLUME_IO,"Internal error:  %s", str);
 }
 
 /* ----------------------------- MNI Header -----------------------------------

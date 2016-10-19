@@ -35,12 +35,19 @@
 #ifndef MINC_ERROR_H
 #define MINC_ERROR_H
 
-/* message levels */
+/* minc1 message levels */
 #define MI_MSG_FATAL 0
 #define MI_MSG_ERROR 1
 #define MI_MSG_WARNING 2
 #define MI_MSG_INFO 3
 #define MI_MSG_DEBUG 4
+
+/* minc2 message levels */
+#define MI2_MSG_FATAL 0
+#define MI2_MSG_ERROR 1
+#define MI2_MSG_WARNING 2
+#define MI2_MSG_INFO 3
+#define MI2_MSG_DEBUG 4
 
 #define MI_MSG_BASE (10000)
 
@@ -99,23 +106,9 @@ typedef enum mimsgcode {
     MI_MSG_BADOP,
     MI_MSG_NCOPTS_STACK_OVER,
     MI_MSG_NCOPTS_STACK_UNDER,
-    MI_MSG_VOLUME_IO
-} mimsgcode_t;
+    MI_MSG_VOLUME_IO,
 
-int milog_message(mimsgcode_t code, ...);
-
-
-/* minc2 message levels */
-#define MI2_MSG_FATAL 0
-#define MI2_MSG_ERROR 1
-#define MI2_MSG_WARNING 2
-#define MI2_MSG_INFO 3
-#define MI2_MSG_DEBUG 4
-
-#define MI2_MSG_BASE (10000)
-
-typedef enum mi2msgcode {
-    MI2_MSG_UNCMPFAIL = MI2_MSG_BASE,
+    MI2_MSG_UNCMPFAIL,
     MI2_MSG_NOWRITECMP,
     MI2_MSG_OPENFILE,
     MI2_MSG_CREATEFILE,
@@ -169,9 +162,11 @@ typedef enum mi2msgcode {
     MI2_MSG_BADOP,
     MI2_MSG_HDF5,
     MI2_MSG_GENERIC
-} mi2msgcode_t;
+} mimsgcode_t;
 
-int  mi2log_message(const char *file,int line, mi2msgcode_t code, ...);
+int milog_message(mimsgcode_t code, ...);
+int mi2log_message(const char *file,int line, mimsgcode_t code, ...);
+
 int  MI2_save_routine_name(char *name);
 int  MI2_return(void);
 int  MI2_return_error(void);
@@ -179,7 +174,7 @@ void MI2_log_pkg_error2(int p1, char *p2);
 void MI2_log_pkg_error3(int p1, char *p2, char *p3);
 void MI2_log_sys_error1(char *p1);
 void mi2log_init(const char *name);
-int mi2log_set_verbosity ( int lvl );
+int  mi2log_set_verbosity ( int lvl );
 
 #define MI_LOG_ERROR(code,...) mi2log_message(__FILE__,__LINE__,code , ##__VA_ARGS__ )
 #define MI_CHECK_HDF_CALL(var,call) {if((var)<0) MI_LOG_ERROR(MI2_MSG_HDF5,call);}

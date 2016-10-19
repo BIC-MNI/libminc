@@ -98,7 +98,7 @@ hdf_id_add(hid_t file_id)
         _m2_list = new;
     }
     else {
-      milog_message(MI_MSG_OUTOFMEM, sizeof(struct m2_file));
+      MI_LOG_ERROR(MI_MSG_OUTOFMEM, sizeof(struct m2_file));
       exit(-1);
     }
     return (new);
@@ -206,7 +206,7 @@ hdf_var_add(struct m2_file *file, const char *name, const char *path,
               new->dims[i] = dims[i];
             }
           } else {
-            milog_message(MI_MSG_OUTOFMEM, sizeof(hsize_t) * ndims);
+            MI_LOG_ERROR(MI_MSG_OUTOFMEM, sizeof(hsize_t) * ndims);
           }
       }
       else {
@@ -214,7 +214,7 @@ hdf_var_add(struct m2_file *file, const char *name, const char *path,
       }
       file->vars[new->id] = new;
     } else {
-      milog_message(MI_MSG_OUTOFMEM, sizeof (struct m2_var));
+      MI_LOG_ERROR(MI_MSG_OUTOFMEM, sizeof (struct m2_var));
       exit(-1);
     }
     return (new);
@@ -264,7 +264,7 @@ hdf_dim_add(struct m2_file *file, const char *name, long length)
 	file->dims[new->id] = new;
     }
     else {
-        milog_message(MI_MSG_OUTOFMEM, sizeof(struct m2_dim));
+        MI_LOG_ERROR(MI_MSG_OUTOFMEM, sizeof(struct m2_dim));
 	exit(-1);
     }
     return (new);
@@ -353,7 +353,7 @@ hdf_get_diminfo(hid_t dst_id, int *ndims, hsize_t dims[])
 
     spc_id = H5Dget_space(dst_id);
     if (spc_id < 0) {
-        milog_message(MI_MSG_SNH);
+        MI_LOG_ERROR(MI_MSG_SNH);
     }
     else {
 	*ndims = H5Sget_simple_extent_ndims(spc_id);
@@ -371,7 +371,7 @@ hdf_size(hid_t spc_id, hid_t typ_id)
     int spc_size = H5Sget_simple_extent_npoints(spc_id);
 
     if (typ_size <= 0 || spc_size <= 0) {
-	milog_message(MI_MSG_SNH);
+	MI_LOG_ERROR(MI_MSG_SNH);
 	return (-1);
     }
     return (typ_size * spc_size);
@@ -551,7 +551,7 @@ hdf_attinq(int fd, int varid, const char *attnm, nc_type *type_ptr,
           else if (typ_size == 4) 
             *type_ptr = NC_INT;
           else {
-            milog_message(MI_MSG_INTSIZE, typ_size);
+            MI_LOG_ERROR(MI_MSG_INTSIZE, typ_size);
           }
         }
         else if (typ_class == H5T_FLOAT) {
@@ -562,14 +562,14 @@ hdf_attinq(int fd, int varid, const char *attnm, nc_type *type_ptr,
             *type_ptr = NC_DOUBLE;
           }
           else {
-            milog_message(MI_MSG_FLTSIZE, typ_size);
+            MI_LOG_ERROR(MI_MSG_FLTSIZE, typ_size);
           }
         }
         else if (typ_class == H5T_STRING) {
           *type_ptr = NC_CHAR;
         }
         else {
-          milog_message(MI_MSG_TYPECLASS, typ_class);
+          MI_LOG_ERROR(MI_MSG_TYPECLASS, typ_class);
         }
       }
 
@@ -810,7 +810,7 @@ hdf_varinq(int fd, int varid, char *varnm_ptr, nc_type *type_ptr,
 	    else if (size == 4) 
 		*type_ptr = NC_INT;
 	    else {
-		milog_message(MI_MSG_INTSIZE, size);
+		MI_LOG_ERROR(MI_MSG_INTSIZE, size);
 		exit(-1);
 	    }
 	}
@@ -822,7 +822,7 @@ hdf_varinq(int fd, int varid, char *varnm_ptr, nc_type *type_ptr,
 		*type_ptr = NC_DOUBLE;
 	    }
 	    else {
-		milog_message(MI_MSG_FLTSIZE, size);
+		MI_LOG_ERROR(MI_MSG_FLTSIZE, size);
 		exit(-1);
 	    }
 	}
@@ -830,7 +830,7 @@ hdf_varinq(int fd, int varid, char *varnm_ptr, nc_type *type_ptr,
 	    *type_ptr = NC_CHAR;
 	}
 	else {
-	    milog_message(MI_MSG_TYPECLASS, class);
+	    MI_LOG_ERROR(MI_MSG_TYPECLASS, class);
 	    exit(-1);
 	}
     }
@@ -873,7 +873,7 @@ hdf_varinq(int fd, int varid, char *varnm_ptr, nc_type *type_ptr,
 int
 hdf_dimrename(int fd, int dimid, const char *new_name)
 {
-    milog_message(MI_MSG_NOTIMPL, "dimrename");
+    MI_LOG_ERROR(MI_MSG_NOTIMPL, "dimrename");
     return (MI_NOERROR);
 }
 
@@ -1103,10 +1103,10 @@ hdf_attput(int fd, int varid, const char *attnm, nc_type val_typ,
 
             new_type_id = H5Tcopy(var->ftyp_id);
             if (new_type_id < 0) {
-                milog_message(MI_MSG_SNH);
+                MI_LOG_ERROR(MI_MSG_SNH);
             }
             if (H5Tset_sign(new_type_id, (new_signed) ? H5T_SGN_2 : H5T_SGN_NONE) < 0) {
-                milog_message(MI_MSG_SNH);
+                MI_LOG_ERROR(MI_MSG_SNH);
             }
 
             new_plst_id = H5Dget_create_plist(var->dset_id);
@@ -1127,11 +1127,11 @@ hdf_attput(int fd, int varid, const char *attnm, nc_type val_typ,
             H5Sclose(var->fspc_id);
 
             if (H5Gunlink(file->file_id, var->path) < 0) {
-                milog_message(MI_MSG_SNH);
+                MI_LOG_ERROR(MI_MSG_SNH);
             }
 
             if (H5Gmove2(file->grp_id, temp, file->file_id, var->path) < 0) {
-                milog_message(MI_MSG_SNH);
+                MI_LOG_ERROR(MI_MSG_SNH);
             }
 
             var->dset_id = new_dset_id;
@@ -1171,7 +1171,7 @@ hdf_attput(int fd, int varid, const char *attnm, nc_type val_typ,
             ftyp_id = H5T_IEEE_F64LE;
             break;
         default:
-            milog_message(MI_MSG_BADTYPE, val_typ);
+            MI_LOG_ERROR(MI_MSG_BADTYPE, val_typ);
             return (MI_ERROR);
         }
 
@@ -1407,7 +1407,7 @@ hdf_vardef(int fd, const char *varnm, nc_type vartype, int ndims,
     } H5E_END_TRY;
 
     if (dst_id < 0) {
-        milog_message(MI_MSG_OPENDSET, varnm);
+        MI_LOG_ERROR(MI_MSG_OPENDSET, varnm);
         goto cleanup;
     }
 
@@ -1538,20 +1538,20 @@ hdf_varget(int fd, int varid, const long *start_ptr, const long *length_ptr,
     status = H5Sselect_hyperslab(fspc_id, H5S_SELECT_SET, fstart, NULL, count,
 				 NULL);
     if (status < 0) {
-        milog_message(MI_MSG_SNH);
+        MI_LOG_ERROR(MI_MSG_SNH);
 	goto cleanup;
     }
 
     mspc_id = H5Screate_simple(ndims, count, 0);
     if (mspc_id < 0) {
-        milog_message(MI_MSG_SNH);
+        MI_LOG_ERROR(MI_MSG_SNH);
 	goto cleanup;
     }
   }
 
   status = H5Dread(dst_id, typ_id, mspc_id, fspc_id, H5P_DEFAULT, val_ptr);
   if (status < 0) {
-      milog_message(MI_MSG_READDSET, var->path);
+      MI_LOG_ERROR(MI_MSG_READDSET, var->path);
   }
 
  cleanup:
@@ -1613,7 +1613,7 @@ hdf_varputg(int fd, int varid, const long *start,
 	/*
 	 * The variable is a scalar!
 	 */
-        milog_message(MI_MSG_SNH);
+        MI_LOG_ERROR(MI_MSG_SNH);
         goto cleanup;
     }
 
@@ -1717,14 +1717,14 @@ hdf_varputg(int fd, int varid, const long *start,
         status = H5Sselect_hyperslab(fspc_id, H5S_SELECT_SET, mystart, NULL, 
                                      iocount, NULL);
         if (status < 0) {
-            milog_message(MI_MSG_SNH);
+            MI_LOG_ERROR(MI_MSG_SNH);
             goto cleanup;
         }
 
         status = H5Dwrite(dst_id, typ_id, mspc_id, fspc_id, H5P_DEFAULT, 
                           value);
         if (status < 0) {
-            milog_message(MI_MSG_WRITEDSET, varp->path);
+            MI_LOG_ERROR(MI_MSG_WRITEDSET, varp->path);
             goto cleanup;
         }
 
@@ -1791,7 +1791,7 @@ hdf_vargetg(int fd, int varid, const long *start,
 	/*
 	 * The variable is a scalar!
 	 */
-        milog_message(MI_MSG_SNH);
+        MI_LOG_ERROR(MI_MSG_SNH);
 	return (MI_ERROR);
     }
 
@@ -1961,20 +1961,20 @@ hdf_varput(int fd, int varid, const long *start_ptr, const long *length_ptr,
     status = H5Sselect_hyperslab(fspc_id, H5S_SELECT_SET, fstart, NULL, count,
 				 NULL);
     if (status < 0) {
-        milog_message(MI_MSG_SNH);
+        MI_LOG_ERROR(MI_MSG_SNH);
         goto cleanup;
     }
 
     mspc_id = H5Screate_simple(ndims, count, NULL);
     if (mspc_id < 0) {
-        milog_message(MI_MSG_SNH);
+        MI_LOG_ERROR(MI_MSG_SNH);
       goto cleanup;
     }
   }
 
   status = H5Dwrite(dst_id, typ_id, mspc_id, fspc_id, H5P_DEFAULT, val_ptr);
   if (status < 0) {
-      milog_message(MI_MSG_WRITEDSET, var->path);
+      MI_LOG_ERROR(MI_MSG_WRITEDSET, var->path);
       goto cleanup;
   }
 
@@ -2059,7 +2059,7 @@ hdf_varsize(int fd, int varid, long *size_ptr)
     }
 
     if (var->ndims > MAX_VAR_DIMS) {
-        milog_message(MI_MSG_TOOMANYDIMS, MAX_VAR_DIMS);
+        MI_LOG_ERROR(MI_MSG_TOOMANYDIMS, MAX_VAR_DIMS);
         exit(-1);
     }
 
@@ -2169,7 +2169,7 @@ hdf_open_dsets(struct m2_file *file, hid_t grp_id, char *cpath, int is_dim)
 		hid_t spc_id;
 		spc_id = H5Dget_space(new_id);
 		if (spc_id < 0) {
-                    milog_message(MI_MSG_SNH);
+                    MI_LOG_ERROR(MI_MSG_SNH);
 		}
 		else {
 		    hsize_t dims[MAX_NC_DIMS];
@@ -2188,7 +2188,7 @@ hdf_open_dsets(struct m2_file *file, hid_t grp_id, char *cpath, int is_dim)
                         H5Aclose(att_id);
                     }
                     else {
-                        milog_message(MI_MSG_SNH);
+                        MI_LOG_ERROR(MI_MSG_SNH);
                         length = 0;
                     }
 
