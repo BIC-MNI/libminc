@@ -1091,8 +1091,8 @@ int miset_dimension_offsets ( midimhandle_t dimension,
   * \param dimension The dimension handle.
   * \param sampling_flag The flag to determine regular/irregular sampling dimensions.
   *
-  * This flag is true (non-zero) if the dimension is sampled at regular
-  * intervals, and false if the dimension is sampled irregularly.
+  * This flag is false (zero) if the dimension is sampled at regular
+  * intervals, and true if the dimension is sampled irregularly.
   * If a dimension has regular sampling, the miget_dimension_separation()
   * may be used to retrieve the sampling interval, and the
   * miget_dimension_start() may be used to retrieve the origin
