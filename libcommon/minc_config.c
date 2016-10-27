@@ -15,6 +15,14 @@
 
 #include "minc_config.h"
 
+#ifdef _MSC_VER
+#define snprintf _snprintf 
+#define vsnprintf _vsnprintf 
+#define strcasecmp _stricmp 
+#define strncasecmp _strnicmp 
+#endif
+
+
 static const char *_CONFIG_VAR[]=
   {
       "MINC_FORCE_V2",
