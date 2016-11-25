@@ -20,6 +20,8 @@
 #include  <internal_volume_io.h>
 
 
+static void calculate_volume_real_range(VIO_Volume volume,double *real_min,double *real_max);
+
 /* ----------------------------- MNI Header -----------------------------------
 @NAME       : get_file_dimension_names
 @INPUT      : filename
@@ -351,10 +353,16 @@ VIOAPI  VIO_Status  output_modified_volume(
         used_options.global_image_range[1] || volume->is_labels )
     {
         get_volume_real_range( volume, &real_min, &real_max );
+        
+        /*HACK: fixing condition when outputting floating-point volume with default range*/
+        if(real_min==-DBL_MAX || real_max==DBL_MAX)
+        {
+            calculate_volume_real_range(volume, &real_min, &real_max );
+            set_volume_real_range(volume,real_min,real_max);
+        }
+        
         set_minc_output_real_range( &used_options, real_min, real_max );
     }
-    
-
 
     /*--- if the user has not explicitly set the use_volume_starts_and_steps
           flag, let's set it if the transform is linear, to output the
@@ -466,4 +474,52 @@ VIOAPI  VIO_Status  output_volume(
                                     file_signed_flag,
                                     file_voxel_min, file_voxel_max,
                                     volume, NULL, history, options ) );
+}
+
+
+
+/* HACK
+ */
+static void calculate_volume_real_range(VIO_Volume volume,double *real_min,double *real_max)
+{
+    int               volume_sizes[VIO_MAX_DIMENSIONS];
+    int               v[VIO_MAX_DIMENSIONS];
+    int               ndim=get_volume_n_dimensions(volume);
+    int done=0;
+    
+    *real_min=DBL_MAX;
+    *real_max=-DBL_MAX;
+    
+    get_volume_sizes( volume, volume_sizes );
+    v[0]=v[1]=v[2]=v[3]=v[4]=0;
+    
+    do
+    {
+        int i;
+        double value = get_volume_voxel_value( volume,
+                                        v[0],
+                                        v[1],
+                                        v[2],
+                                        v[3],
+                                        v[4] );
+        if(value>*real_max) *real_max=value;
+        if(value<*real_min) *real_min=value;
+        
+        /*another hack*/
+        for(i=0;i<ndim;i++)
+        {
+            int j;
+            if(volume_sizes[i]==0) continue;
+            
+            v[i]++;
+            if(v[i]<volume_sizes[i]) 
+                break;
+            
+            if(i==(ndim-1)) {done=1;break;}
+            
+            for(j=0;j<=i;j++)
+                v[j]=0;
+        }
+    } while(!done);
+
 }
