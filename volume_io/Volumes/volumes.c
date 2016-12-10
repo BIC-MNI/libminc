@@ -2724,8 +2724,9 @@ VIOAPI  VIO_Volume  copy_volume_new_type(
     }
 
     get_volume_voxel_range( volume, &min_voxel, &max_voxel );
-    copy = copy_volume_definition( volume, new_data_type, new_signed_flag,
-                                   min_voxel, max_voxel );
+    copy = copy_volume_definition_no_alloc( volume,
+                                            new_data_type, new_signed_flag,
+                                            min_voxel, max_voxel );
     if( copy == NULL )
     {
         return( NULL );
@@ -2739,6 +2740,8 @@ VIOAPI  VIO_Volume  copy_volume_new_type(
 
     if (!volume_is_alloced( volume ))
         return copy;
+
+    alloc_volume_data( copy );
 
     GET_VOXEL_PTR( src, volume, 0, 0, 0, 0, 0 );
     GET_VOXEL_PTR( dst, copy, 0, 0, 0, 0, 0 );

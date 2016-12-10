@@ -71,6 +71,26 @@ test1(void)
     }
   }
 
+  v2 = copy_volume_new_type( v1, NC_SHORT, FALSE );
+
+  if (!volume_is_alloced( v1 ) && volume_is_alloced( v2 ))
+  {
+    ERROR;
+    return 1;
+  }
+
+  get_volume_sizes( v2, read_sizes );
+  for (i = 0; i < get_volume_n_dimensions( v2 ); i++)
+  {
+    if (read_sizes[i] != sizes[i])
+    {
+      ERROR;
+      return 1;
+    }
+  }
+
+  delete_volume( v2 );
+
   alloc_volume_data( v1 );
 
   srand(0);
@@ -151,6 +171,11 @@ test1(void)
    */
   v2 = copy_volume_new_type( v1, NC_INT, TRUE );
   if ( v2 == NULL )
+  {
+    ERROR;
+    return 1;
+  }
+  if (!volume_is_alloced( v2 ))
   {
     ERROR;
     return 1;
@@ -487,10 +512,18 @@ test3(void)
   return 0;
 }
 
+static void
+test_error( char *msg )
+{
+    fputs( msg, stderr );
+}
+
 int
 main(int argc, char **argv)
 {
   int errors = 0;
+
+  set_print_error_function( test_error );
 
   errors += test1();
   errors += test2();
