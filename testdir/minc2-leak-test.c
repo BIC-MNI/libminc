@@ -159,6 +159,7 @@ leak_loop(mihandle_t hvol, int n, int check_p)
        */
       if (delta_hwm * magic((double) i / n) > 100) {
         printf("MEMORY LEAK DETECTED: %f %d %d\n", delta_hwm, i, n);
+        free(buffer);
         return 1;
       }
       hwm = new_hwm;
