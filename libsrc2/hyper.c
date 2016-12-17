@@ -212,11 +212,6 @@ static int mirw_hyperslab_raw(int opcode,
     goto cleanup;
   }
 
-  MI_CHECK_HDF_CALL(fspc_id = H5Dget_space(dset_id),"H5Dget_space");
-  if (fspc_id < 0) {
-    goto cleanup;
-  }
-
   if (midatatype == MI_TYPE_UNKNOWN) {
     type_id = H5Tcopy(volume->mtype_id);
   } else {
@@ -562,6 +557,7 @@ static int mirw_hyperslab_icv(int opcode,
     }
     H5Sclose(scaling_mspc_id);
     H5Sclose(image_max_fspc_id);
+    H5Sclose(image_min_fspc_id);
   } else {
     slice_ndims=0;
     total_number_of_slices=1;

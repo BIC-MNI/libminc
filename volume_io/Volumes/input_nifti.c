@@ -54,7 +54,11 @@ nifti_find_data_range(nifti_image *nii_ptr,
     size_t n_bytes_to_read;
     if (i + n_voxels_per_chunk > nii_ptr->nvox)
     {
-      n_bytes_to_read = (nii_ptr->nvox - i) * nii_ptr->nbyper;
+      /* Final partial chunk. Adjust the counters to read only
+       * the bytes and voxels actually loaded.
+       */
+      n_voxels_per_chunk = nii_ptr->nvox - i;
+      n_bytes_to_read = n_voxels_per_chunk * nii_ptr->nbyper;
     }
     else
     {

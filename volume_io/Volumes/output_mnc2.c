@@ -1221,7 +1221,7 @@ static  VIO_Status  output_the_volume2(
       exit(1);
     }
 
-    /*DUMB code for fake intrslice scaling*/
+    /*DUMB code for fake interslice scaling*/
     if( file->image_range[0] >= file->image_range[1] || volume->is_labels)
       get_volume_real_range( volume, &real_min, &real_max );
 
