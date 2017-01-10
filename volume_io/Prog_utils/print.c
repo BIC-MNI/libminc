@@ -219,11 +219,11 @@ VIOAPI  void  print_error( char format[], ... )
     char     print_buffer[VIO_EXTREMELY_LARGE_STRING_SIZE];
 
     va_start( ap, format );
-    (void) vsprintf( print_buffer, format, ap );
+    vsprintf( print_buffer, format, ap );
     va_end( ap );
 
     if( print_error_function[top_of_error_stack] == NULL )
-        MI_LOG_ERROR(MI_MSG_VOLUME_IO,"%s", print_buffer);
+        MI_LOG_ERROR(MI_MSG_VOLUME_IO, print_buffer);
     else
         (*(print_error_function[top_of_error_stack])) ( print_buffer );
 }

@@ -176,7 +176,7 @@ static struct mierror_entry mierror_table[] = {
     { MI_MSG_ERROR, "Illegal variable access operation" }, /* MI_MSG_BADOP */
     { MI_MSG_ERROR, "ncopts stack overflow" }, /* MI_MSG_NCOPTS_STACK_OVER */
     { MI_MSG_ERROR, "ncopts stack underflow" }, /* MI_MSG_NCOPTS_STACK_UNDER */
-    { MI_MSG_ERROR, "volume_io error" }, /* MI_MSG_VOLUME_IO */
+    { MI_MSG_ERROR, "volume_io error: %s" }, /* MI_MSG_VOLUME_IO */
     { MI2_MSG_ERROR, "Cannot uncompress the file" }, /* MI2_MSG_UNCMPFAIL */
     { MI2_MSG_ERROR, "Can't write compressed file" }, /* MI2_MSG_NOWRITECMP */
     { MI2_MSG_ERROR, "Unable to open file '%s'" }, /* MI2_MSG_OPENFILE */
@@ -357,12 +357,12 @@ int mi2log_message ( const char *file,int line, mimsgcode_t code, ... )
   int r;
   va_list ap;
   va_start ( ap, code );
-  r= v_mi2log_message(file,line,code,ap);
+  r= v_mi2log_message(file, line, code, ap);
   va_end(ap);
   return r;
 }
 
-int v_mi2log_message(const char *file,int line, mimsgcode_t code, va_list ap)
+int v_mi2log_message(const char *file, int line, mimsgcode_t code, va_list ap)
 {
   int lvl;
   const char *fmt;
