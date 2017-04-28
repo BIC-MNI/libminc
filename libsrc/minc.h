@@ -174,6 +174,8 @@
 #include <netcdf.h>
 #endif
 
+#include <minc_common_defs.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */

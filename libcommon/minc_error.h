@@ -176,9 +176,37 @@ void MI2_log_sys_error1(char *p1);
 void mi2log_init(const char *name);
 int  mi2log_set_verbosity ( int lvl );
 
+int MI_save_routine_name(char *name);
+int MI_return(void);
+int MI_return_error(void);
+void MI_log_pkg_error2(int p1, char *p2);
+void MI_log_pkg_error3(int p1, char *p2, char *p3);
+void MI_log_sys_error1(char *p1);
+
+  
 #define MI_LOG_ERROR(code,...) mi2log_message(__FILE__, __LINE__, code, ##__VA_ARGS__ )
 #define MI_CHECK_HDF_CALL(var,call) {if((var)<0) MI_LOG_ERROR(MI2_MSG_HDF5,call);}
 #define MI_CHECK_HDF_CALL_RET(var,call) {if((var)<0) return MI_LOG_ERROR(MI2_MSG_HDF5,call);}
+
+
+/* Macros for logging errors. All routines should start with MI_SAVE_ROUTINE
+   and exit with MI_RETURN (which includes MI_RETURN_ERROR and 
+   MI_CHK_ERROR). All the macros except MI_CHK_ERROR are single line
+   commands. MI_CHK_ERROR is in a block and so should not be followed by
+   a ';' */
+#define MI_SAVE_ROUTINE_NAME(name) MI_save_routine_name(name)
+#define MI_RETURN(value) \
+   return( MI_return() ? (value) : (value) )
+#define MI_RETURN_ERROR(error) \
+   return( MI_return_error() ? (error) : (error) )
+#define MI_LOG_PKG_ERROR2(p1,p2) MI_log_pkg_error2(p1, p2)
+#define MI_LOG_PKG_ERROR3(p1,p2,p3) MI_log_pkg_error3(p1, p2, p3)
+#define MI_LOG_SYS_ERROR1(p1) MI_log_sys_error1(p1)
+#define MI_CHK_ERR(expr) {if ((expr)<0) MI_RETURN_ERROR(MI_ERROR);}
+
+/* NetCDF routine name variable (for error logging) */
+/*extern char *cdf_routine_name ;*/ /* defined in globdef.c */
+/*#define MI_NC_ROUTINE_VAR cdf_routine_name*/
 
 
 #endif /* MINC_ERROR_H not defined */

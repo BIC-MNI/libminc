@@ -85,3 +85,4 @@
 #endif //HAVE_CONFIG_H
 
 
+/*All code moved to minc_error*/

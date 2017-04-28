@@ -80,6 +80,7 @@
               software for any purpose.  It is provided "as is" without
               express or implied warranty.
 ---------------------------------------------------------------------------- */
+#include "minc_config.h"
 
 #include <errno.h>
 #include <stdarg.h>
@@ -89,11 +90,8 @@
 #include <stdlib.h>
 #include <ctype.h>
 
-#include "minc_private.h"
 #include "minc_error.h"
-
-#include "minc2.h"
-#include "minc2_private.h"
+#include "minc_common_defs.h"
 
 int v_mi2log_message(const char *file,int line, mimsgcode_t code, va_list ap);
 
