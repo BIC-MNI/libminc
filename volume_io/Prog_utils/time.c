@@ -32,6 +32,10 @@
 #include  <unistd.h>
 #endif
 
+#if HAVE_SYS_SELECT_H
+#include <sys/select.h>
+#endif
+
 #ifndef CLK_TCK
 #define CLK_TCK CLOCKS_PER_SEC
 #endif
