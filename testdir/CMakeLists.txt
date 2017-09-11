@@ -149,6 +149,7 @@ ADD_EXECUTABLE(minc2-vector_dimension-test minc2-vector_dimension-test.c)
 ADD_EXECUTABLE(minc2-volprops-test minc2-volprops-test.c)
 ADD_EXECUTABLE(minc2-read-rgb minc2-read-rgb.c)
 ADD_EXECUTABLE(minc2-read-metadata minc2-read-metadata.c)
+
 ADD_EXECUTABLE(minc2-leak-test minc2-leak-test.c)
 
 add_minc_test(minc2-convert-test          minc2-convert-test)
@@ -175,7 +176,6 @@ add_minc_test(minc2-grpattr-test          minc2-grpattr-test)
 add_minc_test(minc2-hyper-test-2          minc2-hyper-test-2)
 add_minc_test(minc2-hyper-test            minc2-hyper-test)
 add_minc_test(minc2-label-test            minc2-label-test)
-add_minc_test(minc2-leak-test             minc2-leak-test)
 #add_minc_test(minc2-m2stats minc2-m2stats)
 add_minc_test(minc2-multires-test         minc2-multires-test)
 add_minc_test(minc2-record-test           minc2-record-test)
@@ -197,6 +197,9 @@ add_minc_test(minc2-valid-test            minc2-valid-test
 )
 add_minc_test(minc2-vector_dimension-test minc2-vector_dimension-test)
 add_minc_test(minc2-volprops-test         minc2-volprops-test)
+
+add_minc_test(minc2-leak-test             minc2-leak-test)
+
 
 set_property(TEST minc2-slice-test APPEND PROPERTY DEPENDS minc2-create-test-images) 
 set_property(TEST minc2-slice-test APPEND PROPERTY DEPENDS minc2-create-test-images-2) 

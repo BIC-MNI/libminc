@@ -20,11 +20,11 @@
 
 #include  <sys/types.h>
 
-#if HAVE_CLOCK_GETTIME
-# include <time.h>
-#elif HAVE_GETTIMEOFDAY && HAVE_SYS_TIME_H
+#if HAVE_GETTIMEOFDAY && HAVE_SYS_TIME_H
 # include <sys/time.h>
-#else
+#endif 
+
+#if HAVE_TIME_H
 # include <time.h>
 #endif
 
@@ -36,9 +36,9 @@
 #include <sys/select.h>
 #endif
 
-#ifndef CLK_TCK
+/*#ifndef CLK_TCK
 #define CLK_TCK CLOCKS_PER_SEC
-#endif
+#endif*/
 
 #if !defined(HAVE_SLEEP)
 
@@ -65,7 +65,11 @@ void sleep(unsigned milliseconds)
 
 static VIO_Real  get_clock_ticks_per_second( void )
 {
-    return( (VIO_Real) CLOCKS_PER_SEC );
+#if defined(CLOCKS_PER_SEC)
+  return( (VIO_Real) CLOCKS_PER_SEC );
+#elif defined(CLK_TCK)
+  return (VIO_Real) CLK_TCK;
+#endif
 }
 
 /* ----------------------------- MNI Header -----------------------------------
