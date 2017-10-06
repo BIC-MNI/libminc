@@ -62,6 +62,12 @@
 #include "config.h"
 #endif /*HAVE_CONFIG_H*/
 
+#ifdef _MSC_VER
+#ifndef snprintf
+#define snprintf _snprintf
+#endif
+#endif
+
 #ifdef HAVE_STRING_H
 #include <string.h>
 #endif
