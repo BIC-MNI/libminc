@@ -62,16 +62,19 @@
 #include "config.h"
 #endif /*HAVE_CONFIG_H*/
 
-#ifdef _MSC_VER
-#ifndef snprintf
-#define snprintf _snprintf
-#endif
-#endif
-
 #ifdef HAVE_STRING_H
 #include <string.h>
 #endif
 #include <stdio.h>
+
+// MS Visual Studio 12 and below.
+// Defined after include of `stdio.h` in case it is already defined in that
+// header file.
+#if defined(_MSC_VER) && _MSC_VER <= 1800
+#ifndef snprintf
+#define snprintf _snprintf
+#endif
+#endif
 
 #include <time.h>
 #include <time_stamp.h>
