@@ -1120,7 +1120,11 @@ PRIVATE void setup_variables(int inmincid, int outmincid,
       }
       else {
          set_ncopts(0);
-         (void) ncattdel(outmincid, outimgid, MIvalid_range);  /*VF: why is this needed?*/
+#if MINC2 /*VF: HACK*/
+         if (loop_options->v2format) {
+            (void) ncattdel(outmincid, outimgid, MIvalid_range);  /*VF: needed for MINC v2 and not for MINC v1*/
+         } 
+#endif
          set_ncopts(NC_OPTS_VAL);
       }
    }
