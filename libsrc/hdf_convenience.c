@@ -13,9 +13,9 @@
 #define MI2_LENGTH "length"
 #define MI2_CLASS "class"
 
-/* So we build with 1.8.4 */  
-#ifndef H5F_LIBVER_18
-#define H5F_LIBVER_18 H5F_LIBVER_LATEST
+/* Make 1.8.x compatible files if building with 1.10.x */  
+#ifndef H5F_LIBVER_V18
+#define H5F_LIBVER_V18 H5F_LIBVER_LATEST
 #endif
 
 /************************************************************************
@@ -2340,8 +2340,8 @@ hdf_create(const char *path, int cmode, struct mi2opts *opts_ptr)
       cmode = H5F_ACC_TRUNC;
     }
 
-    /*VF use all the features of new HDF5 1.8*/
-    H5Pset_libver_bounds (fpid, H5F_LIBVER_18, H5F_LIBVER_18);
+    /* Limit file compatability to 1.8.x */
+    H5Pset_libver_bounds (fpid, H5F_LIBVER_V18, H5F_LIBVER_V18);
 
     H5E_BEGIN_TRY {
         file_id = H5Fcreate(path, cmode, H5P_DEFAULT, fpid);
