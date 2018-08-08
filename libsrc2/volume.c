@@ -117,6 +117,7 @@ static hid_t _hdf_open(const char *path, int mode)
   int ndims;*/
   
   prp_id = H5Pcreate(H5P_FILE_ACCESS);
+  H5Pset_libver_bounds(prp_id, H5F_LIBVER_V18, H5F_LIBVER_V18);
   H5Pset_cache(prp_id, 0, 2503, miget_cfg_present(MICFG_MINC_FILE_CACHE)?miget_cfg_int(MICFG_MINC_FILE_CACHE)*100000:_MI1_MAX_VAR_BUFFER_SIZE*10, 1.0);
   
   H5E_BEGIN_TRY {
@@ -219,7 +220,7 @@ static hid_t _hdf_create(const char *path, int cmode)
   fpid = H5Pcreate (H5P_FILE_ACCESS);
 
   /* Limit filetype to 1.8.x */
-  H5Pset_libver_bounds (fpid, H5F_LIBVER_V18, H5F_LIBVER_V18);
+  H5Pset_libver_bounds(fpid, H5F_LIBVER_V18, H5F_LIBVER_V18);
   
   H5Pset_cache(fpid, 0, 2503, miget_cfg_present(MICFG_MINC_FILE_CACHE)?miget_cfg_int(MICFG_MINC_FILE_CACHE)*100000:_MI1_MAX_VAR_BUFFER_SIZE*100, 1.0);
   
