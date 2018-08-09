@@ -33,7 +33,7 @@
 #include "minc2_private.h"
 
 /* Build with 1.8.x support if using 1.10.x */ 
-#ifndef H5F_LIBVER_V18
+#if (H5_VERS_MAJOR==1)&&(H5_VERS_MINOR<10)
 #define H5F_LIBVER_V18 H5F_LIBVER_LATEST
 #endif
 
