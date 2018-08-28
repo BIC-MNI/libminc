@@ -55,7 +55,8 @@ static int test1(struct testinfo *ip, struct dimdef *dims, int ndims)
   int varid;
   int stat;
   int i;
-  
+
+  printf("test1\n");
   /* Test case #1 - file creation 
    */
   ip->name = micreate_tempfile();
@@ -63,13 +64,15 @@ static int test1(struct testinfo *ip, struct dimdef *dims, int ndims)
     FUNC_ERROR("micreate_tempfile\n");
   }
 
+  printf("%s:%d\n",__FILE__,__LINE__);
   ip->fd = micreate(ip->name, NC_CLOBBER|MI2_CREATE_V1); /*Create MINC1 format*/
   if (ip->fd < 0) {
     FUNC_ERROR("micreate");
   }
-
+  printf("%s:%d\n",__FILE__,__LINE__);
   /* Have to use ncdimdef() here since there is no MINC equivalent.  Sigh. 
    */
+  printf("%s:%d\n",__FILE__,__LINE__);
   for (i = 0; i < ndims; i++) {
 
     /* Define the dimension 
@@ -97,6 +100,7 @@ static int test1(struct testinfo *ip, struct dimdef *dims, int ndims)
 
   /* Create the image-max variable.
    */
+  printf("%s:%d\n",__FILE__,__LINE__);
   ip->maxid = micreate_std_variable(ip->fd, (char*)MIimagemax, NC_DOUBLE, 0, NULL);
   if (ip->maxid < 0) {
     FUNC_ERROR("micreate_std_variable");
@@ -104,11 +108,13 @@ static int test1(struct testinfo *ip, struct dimdef *dims, int ndims)
 
   /* Create the image-min variable.
    */
+  printf("%s:%d\n",__FILE__,__LINE__);
   ip->minid = micreate_std_variable(ip->fd, (char*)MIimagemin, NC_DOUBLE, 0, NULL);
   if (ip->minid < 0) {
     FUNC_ERROR("micreate_std_variable");
   }
 
+  printf("%s:%d\n",__FILE__,__LINE__);
   ip->imgid = micreate_std_variable(ip->fd, (char*)MIimage, NC_FLOAT, ndims, ip->dim);
   if (ip->imgid < 0) {
     FUNC_ERROR("micreate_std_variable");
@@ -124,6 +130,7 @@ static int test2(struct testinfo *ip, struct dimdef *dims, int ndims)
   long coords[3];
   double flt;
 
+  printf("test2\n");
   stat = miattputdbl(ip->fd, ip->imgid, MIvalid_max, (XSIZE * 10000.0));
   if (stat < 0) {
     FUNC_ERROR("miattputdbl");
@@ -186,7 +193,9 @@ test3(struct testinfo *ip, struct dimdef *dims, int ndims)
   int i, j, k;
   int stat;
   int icv;
-  
+
+  printf("test3\n");
+
   total = 1;
   for (i = 0; i < ndims; i++) {
     total *= dims[i].length;
