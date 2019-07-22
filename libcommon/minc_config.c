@@ -20,7 +20,7 @@
 
 #include "minc_config.h"
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && _MSC_VER < 1900
 #define snprintf _snprintf 
 #define vsnprintf _vsnprintf 
 #define strcasecmp _stricmp 
