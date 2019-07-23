@@ -23,6 +23,9 @@
 #if defined(_MSC_VER) && _MSC_VER < 1900
 #define snprintf _snprintf 
 #define vsnprintf _vsnprintf 
+#endif
+
+#ifdef _MSC_VER
 #define strcasecmp _stricmp 
 #define strncasecmp _strnicmp 
 #endif
