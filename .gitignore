@@ -18,3 +18,6 @@ stamp-h1
 volume_io/Testing/example_modify
 volume_io/Testing/example_tags
 volume_io/Testing/example_volume_io
+# vscode specific
+build
+.vscode
