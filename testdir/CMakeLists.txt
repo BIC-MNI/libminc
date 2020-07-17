@@ -151,6 +151,7 @@ ADD_EXECUTABLE(minc2-read-rgb minc2-read-rgb.c)
 ADD_EXECUTABLE(minc2-read-metadata minc2-read-metadata.c)
 
 ADD_EXECUTABLE(minc2-leak-test minc2-leak-test.c)
+ADD_EXECUTABLE(minc2-float-voxel-test minc2-float-voxel-test.c)
 
 add_minc_test(minc2-convert-test          minc2-convert-test)
 add_minc_test(minc2-create-test-images    minc2-create-test-images 
@@ -200,6 +201,9 @@ add_minc_test(minc2-volprops-test         minc2-volprops-test)
 
 add_minc_test(minc2-leak-test             minc2-leak-test)
 
+add_minc_test(minc2-float-voxel-test      minc2-float-voxel-test
+                                          ${CMAKE_CURRENT_BINARY_DIR}/test-dbl.mnc
+                                          )
 
 set_property(TEST minc2-slice-test APPEND PROPERTY DEPENDS minc2-create-test-images) 
 set_property(TEST minc2-slice-test APPEND PROPERTY DEPENDS minc2-create-test-images-2) 
