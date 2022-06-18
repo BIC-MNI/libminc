@@ -206,13 +206,13 @@ int main (int argc, char *argv[])
      */
     {
     static char ext[] = "THIS IS A TEST";
-    sprintf(buf,"nifti_add_extension %s",write_image_filename[filenameindex]);
+    snprintf(buf,sizeof(buf),"nifti_add_extension %s",write_image_filename[filenameindex]);
     PrintTest(buf,
               nifti_add_extension(reference_image,
                                   ext,sizeof(ext),
                                   NIFTI_ECODE_COMMENT) == -1,
               NIFTITEST_FALSE,&Errors);
-    sprintf(buf,"valid_nifti_extension %s",write_image_filename[filenameindex]);
+    snprintf(buf,sizeof(buf),"valid_nifti_extension %s",write_image_filename[filenameindex]);
     PrintTest("valid_nifti_extensions",
               valid_nifti_extensions(reference_image) == 0,
               NIFTITEST_FALSE,&Errors);
@@ -253,7 +253,7 @@ int main (int argc, char *argv[])
      * fails to find one in a '.nii' or '.nii.gz' file.
      */
     int result = valid_nifti_extensions(reloaded_image);
-    sprintf(buf,"reload valid_nifti_extensions %s",write_image_filename[filenameindex]);
+    snprintf(buf,sizeof(buf),"reload valid_nifti_extensions %s",write_image_filename[filenameindex]);
       PrintTest(buf,
                 CompressedTwoFile ? result != 0 : result == 0,
                 NIFTITEST_FALSE,&Errors);
@@ -299,7 +299,7 @@ int main (int argc, char *argv[])
               NIFTITEST_FALSE,&Errors);
     {
     nifti_1_header x = nifti_convert_nim2nhdr(reference_image);
-    sprintf(buf,"nifti_hdr_looks_good %s",reference_image->fname);
+    snprintf(buf,sizeof(buf),"nifti_hdr_looks_good %s",reference_image->fname);
     PrintTest(buf,
               !nifti_hdr_looks_good(&x),
               NIFTITEST_FALSE,&Errors);
@@ -441,7 +441,7 @@ int main (int argc, char *argv[])
 #define nifti_datatype_test(constant,string)                            \
   {                                                                     \
   char buf[64];                                                         \
-  sprintf(buf,"nifti_datatype_string %s",string);                       \
+  snprintf(buf,sizeof(buf),"nifti_datatype_string %s",string);                       \
   PrintTest(                                                   \
             buf,                                                        \
             strcmp(nifti_datatype_string(constant),string) != 0,        \
@@ -468,7 +468,7 @@ int main (int argc, char *argv[])
 #define nifti_is_inttype_test(constant,rval)            \
   {                                                     \
   char buf[64];                                         \
-  sprintf(buf,"nifti_datatype_string %d",constant);     \
+  snprintf(buf,sizeof(buf),"nifti_datatype_string %d",constant);     \
   PrintTest(                                   \
             buf,                                        \
             nifti_is_inttype(constant) != rval,         \
@@ -495,7 +495,7 @@ int main (int argc, char *argv[])
 #define nifti_units_string_test(constant,string)                \
   {                                                             \
   char buf[64];                                                 \
-  sprintf(buf,"nifti_units_string_test %s",string);             \
+  snprintf(buf,sizeof(buf),"nifti_units_string_test %s",string);             \
   PrintTest(                                           \
             buf,                                                \
             strcmp(nifti_units_string(constant),string) != 0,   \
@@ -514,7 +514,7 @@ int main (int argc, char *argv[])
 #define nifti_intent_string_test(constant,string)               \
   {                                                             \
   char buf[64];                                                 \
-  sprintf(buf,"nifti_intent_string %s",string);                 \
+  snprintf(buf,sizeof(buf),"nifti_intent_string %s",string);                 \
   PrintTest(                                           \
             buf,                                                \
             strcmp(nifti_intent_string(constant),string) != 0,  \
@@ -560,7 +560,7 @@ int main (int argc, char *argv[])
 #define nifti_slice_string_test(constant,string)                \
   {                                                             \
   char buf[64];                                                 \
-  sprintf(buf,"nifti_slice_string_test %s",string);             \
+  snprintf(buf,sizeof(buf),"nifti_slice_string_test %s",string);             \
   PrintTest(                                           \
             buf,                                                \
             strcmp(nifti_slice_string(constant),string) != 0,   \
@@ -576,7 +576,7 @@ int main (int argc, char *argv[])
 #define nifti_orientation_string_test(constant,string)                  \
   {                                                                     \
   char buf[64];                                                         \
-  sprintf(buf,"nifti_orientation_string_test %s",string);               \
+  snprintf(buf,sizeof(buf),"nifti_orientation_string_test %s",string);               \
   PrintTest(                                                   \
             buf,                                                        \
             strcmp(nifti_orientation_string(constant),string) != 0,     \
@@ -595,7 +595,7 @@ int main (int argc, char *argv[])
   int nbyper;                                                   \
   int swapsize;                                                 \
   char buf[64];                                                 \
-  sprintf(buf,"nifti_datatype_sizes_test %d",constant);         \
+  snprintf(buf,sizeof(buf),"nifti_datatype_sizes_test %d",constant);         \
   nifti_datatype_sizes(constant,&nbyper,&swapsize);             \
   PrintTest(                                           \
             buf,                                                \

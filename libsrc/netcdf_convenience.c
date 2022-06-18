@@ -257,7 +257,7 @@ PRIVATE int execute_decompress_command(char *command, const char *infile,
    /* we now ignore header_only and always uncompress the whole
     * file as the previous "header only" hack that used to work
     * on MINC1 files doesn't work reliably with MINC2 */
-   (void) sprintf(whole_command, "exec %s %s > %s 2> /dev/null", 
+   (void) snprintf(whole_command, sizeof(whole_command), "exec %s %s > %s 2> /dev/null", 
                   command, infile, outfile);
    status = system(whole_command);
 

@@ -1056,7 +1056,7 @@ int miget_volume_voxel_count(mihandle_t volume, misize_t *number_of_voxels)
   /* Quickest way to do this is with the dataspace identifier of the
   * volume. Use the volume's current resolution.
   */
-  sprintf(path, MI_ROOT_PATH "/image/%d/image", volume->selected_resolution);
+  snprintf(path, sizeof(path), MI_ROOT_PATH "/image/%d/image", volume->selected_resolution);
   /* Open the dataset with the specified path
   */
   MI_CHECK_HDF_CALL_RET(dset_id = H5Dopen1(volume->hdf_id, path),"H5Dopen1");
@@ -1166,7 +1166,7 @@ static int _miget_irregular_spacing(mihandle_t hvol, midimhandle_t hdim)
   char path[MI2_CHAR_LENGTH];
   hssize_t n_points;
 
-  sprintf(path, MI_ROOT_PATH "/dimensions/%s", hdim->name);
+  snprintf(path, sizeof(path),MI_ROOT_PATH "/dimensions/%s", hdim->name);
   MI_CHECK_HDF_CALL_RET(dset_id = H5Dopen1(hvol->hdf_id, path),"H5Dopen1");
   MI_CHECK_HDF_CALL_RET(dspc_id = H5Dget_space(dset_id), "H5Dget_space");
 
@@ -1184,13 +1184,13 @@ static int _miget_irregular_spacing(mihandle_t hvol, midimhandle_t hdim)
                                          hdim->offsets), "H5Dread")
         
   H5Dclose(dset_id);
-  sprintf(path, MI_ROOT_PATH "/dimensions/%s-width", hdim->name);
+  snprintf(path, sizeof(path),MI_ROOT_PATH "/dimensions/%s-width", hdim->name);
   dset_id = H5Dopen1(hvol->hdf_id, path);
   if (dset_id < 0) {
     /* Unfortunately, the emulation library in MINC1 puts this variable
      * in the wrong place.
      */
-    sprintf(path, MI_ROOT_PATH "/info/%s-width", hdim->name);
+    snprintf(path, sizeof(path), MI_ROOT_PATH "/info/%s-width", hdim->name);
     dset_id = H5Dopen1(hvol->hdf_id, path);
     if (dset_id < 0) {
       return 0;
@@ -1217,7 +1217,7 @@ static int _miget_file_dimension(mihandle_t volume, const char *dimname,
   unsigned int len;
 
   /* Create a path with the dimension name */
-  sprintf(path, MI_ROOT_PATH "/dimensions/%s", dimname);
+  snprintf(path, sizeof(path), MI_ROOT_PATH "/dimensions/%s", dimname);
   /* Allocate space for the dimension handle */
   hdim = (midimhandle_t) malloc(sizeof (*hdim));
   /* Initialize everything to zero */
