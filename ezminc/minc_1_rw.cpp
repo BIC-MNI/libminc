@@ -659,9 +659,6 @@ namespace minc
   
   void minc_1_reader::close(void)
   {
-    
-    _have_temp_file=false;
-    
     minc_1_base::close();
     
     if(_have_temp_file)
@@ -669,6 +666,7 @@ namespace minc
       if(remove(_tempfile.c_str()))
         REPORT_ERROR ("Error removing temporary file");
     }
+    _have_temp_file=false;
   }
   
   minc_1_reader::~minc_1_reader()
@@ -806,8 +804,8 @@ namespace minc
   void minc_1_writer::open(const char *path,const char *imitate_file)
   {
     minc_1_reader rdr;
-    //open minc file in metadate mode
-    rdr.open(imitate_file,false,true);
+    //open minc file in metadate mode HACK: disable it
+    rdr.open(imitate_file,false,false);
     open(path,rdr);
     //copy_headers(rdr);
   }
