@@ -2,8 +2,8 @@ macro(build_hdf5 install_prefix)
 
 ExternalProject_Add(HDF5
         SOURCE_DIR HDF5
-        URL "http://www.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8.7/src/hdf5-1.8.7.tar.gz"
-        URL_MD5 "37711d4bcb72997e93d495f97c76c33a"
+        URL "https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8/hdf5-1.8.7/src/hdf5-1.8.7.tar.gz"
+        URL_HASH SHA256=0adbc0eacafecabeb3ad2ebe64f4ef7fdad4f33e12b5bbf6630a8c37a72db1a9
         BUILD_IN_SOURCE 1
         INSTALL_DIR     "${install_prefix}"
         BUILD_COMMAND   make 
