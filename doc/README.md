@@ -1,3 +1,3 @@
 # LibMINC documentation 
 
-LibMINC documentation resides at http://en.wikibooks.org/wiki/MINC
+LibMINC documentation resides at https://en.wikibooks.org/wiki/MINC
