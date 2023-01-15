@@ -1,12 +1,13 @@
 LINK_LIBRARIES(${LIBMINC_LIBRARIES})
+find_program (SH_PROGRAM sh)
 
 MACRO(minc_test cmd)
   # minc 1 version
   IF(HAVE_MINC1)
-    ADD_TEST(${cmd}-1 ${CMAKE_CURRENT_SOURCE_DIR}/run_test_cmake.sh ${CMAKE_CURRENT_BINARY_DIR}/${cmd} ${CMAKE_CURRENT_SOURCE_DIR}/${cmd}.out)
+    ADD_TEST(${cmd}-1 ${SH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/run_test_cmake.sh ${CMAKE_CURRENT_BINARY_DIR}/${cmd} ${CMAKE_CURRENT_SOURCE_DIR}/${cmd}.out)
   ENDIF(HAVE_MINC1)
   
-  ADD_TEST(${cmd}-2 ${CMAKE_CURRENT_SOURCE_DIR}/run_test2_cmake.sh ${CMAKE_CURRENT_BINARY_DIR}/${cmd} ${CMAKE_CURRENT_SOURCE_DIR}/${cmd}.out)
+  ADD_TEST(${cmd}-2 ${SH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/run_test2_cmake.sh ${CMAKE_CURRENT_BINARY_DIR}/${cmd} ${CMAKE_CURRENT_SOURCE_DIR}/${cmd}.out)
   
   IF(MINC_TEST_ENVIRONMENT)
    set_tests_properties( ${cmd}-1 PROPERTIES ENVIRONMENT "${MINC_TEST_ENVIRONMENT}")
