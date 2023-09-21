@@ -127,7 +127,7 @@ int main ( void )
   count[3] = 1;
   printf ( " FILE ORDER --> zspace, yspace, xspace, vector_dimension \n" );
   for ( i = 0; i < 3; i++ ) {
-    printf ( "Vector Componenet %d \n", i + 1 );
+    printf ( "Vector Component %d \n", i + 1 );
     coords[3] = i;
     r = miget_voxel_value_hyperslab ( vol, MI_TYPE_UBYTE, coords, count, Atmp );
     if ( r < 0 ) {
@@ -162,7 +162,7 @@ int main ( void )
 
   printf ( "APPARENT ORDER SET \n" );
   for ( i = 0; i < 3; i++ ) {
-    printf ( "Vector Componenet %d \n", i + 1 );
+    printf ( "Vector Component %d \n", i + 1 );
     coords[0] = i;
     r = miget_voxel_value_hyperslab ( vol, MI_TYPE_UBYTE, coords, count, Atmp );
     if ( r < 0 ) {

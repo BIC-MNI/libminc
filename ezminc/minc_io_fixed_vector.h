@@ -127,7 +127,7 @@ namespace minc
       return s;
     }
 	
-    //! \name fixed_vec arithmentic operations
+    //! \name fixed_vec arithmetic operations
     //@{
     fixed_vec<dim,I>& operator *=(const fixed_vec<dim,I>& b)
     {
@@ -211,7 +211,7 @@ namespace minc
         c[i]=b[i];
     }
 
-    //! assignement operator, copies contents
+    //! assignment operator, copies contents
     fixed_vec<dim,I>& operator=(const fixed_vec<dim,I>& b)
     {
       for(unsigned int i=0;i<dim;i++)
@@ -219,7 +219,7 @@ namespace minc
       return *this;
     }
 
-    //! assignement operator, copies contents, assumes that b have at least this size
+    //! assignment operator, copies contents, assumes that b have at least this size
     fixed_vec<dim,I>& operator=(const I* b)
     {
       for(unsigned int i=0;i<dim;i++)
@@ -227,7 +227,7 @@ namespace minc
       return *this;
     }
 
-    //! assignement operator, sets all elements to the same value
+    //! assignment operator, sets all elements to the same value
     fixed_vec<dim,I>& operator=(const I b)
     {
       for(unsigned int i=0;i<dim;i++) c[i]=b;
@@ -265,7 +265,7 @@ namespace minc
 	{
 		fixed_vec<dim,I> out=l;
 		out/=r;
-		return out; //this is not effecient  - no return value optimisation
+		return out; //this is not efficient  - no return value optimisation
 	}
   
 	//! element wise multiplication
@@ -273,7 +273,7 @@ namespace minc
 	{
 		fixed_vec<dim,I> out=l;
 		out*=r;
-		return out; //this is not effecient  - no return value optimisation
+		return out; //this is not efficient  - no return value optimisation
 	}
   
 	//! element wise addition
@@ -281,7 +281,7 @@ namespace minc
 	{
 		fixed_vec<dim,I> out=l;
 		out+=r;
-		return out; //this is not effecient  - no return value optimisation
+		return out; //this is not efficient  - no return value optimisation
 	}
 	
   //! element wise subtraction
@@ -289,15 +289,15 @@ namespace minc
 	{
 		fixed_vec<dim,I> out=l;
 		out-=r;
-		return out; //this is not effecient  - no return value optimisation
+		return out; //this is not efficient  - no return value optimisation
 	}
 	
-	//! devide all elements by a value
+	//! divide all elements by a value
 	template<int dim,class I> fixed_vec<dim,I> operator/(const fixed_vec<dim,I> &l,I r)
 	{
 		fixed_vec<dim,I> out=l;
 		out/=r;
-		return out; //this is not effecient  - no return value optimisation
+		return out; //this is not efficient  - no return value optimisation
 	}
 	
   //! multiply all elements by a value 
@@ -305,7 +305,7 @@ namespace minc
 	{
 		fixed_vec<dim,I> out=l;
 		out*=r;
-		return out; //this is not effecient  - no return value optimisation
+		return out; //this is not efficient  - no return value optimisation
 	}
 	
   //! add a value to all elements 
@@ -313,7 +313,7 @@ namespace minc
 	{
 		fixed_vec<dim,I> out=l;
 		out+=r;
-		return out; //this is not effecient  - no return value optimisation
+		return out; //this is not efficient  - no return value optimisation
 	}
 	
   //! subtract a value from all elements 
@@ -321,7 +321,7 @@ namespace minc
 	{
 		fixed_vec<dim,I> out=l;
 		out-=r;
-		return out; //this is not effecient  - no return value optimisation
+		return out; //this is not efficient  - no return value optimisation
 	}
 	
 	//! create 1d fixed_vec

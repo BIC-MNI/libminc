@@ -611,8 +611,8 @@ int micreate_volume(const char *filename, int number_of_dimensions,
   */
   if (volume_class != MI_CLASS_LABEL &&
       volume_class != MI_CLASS_UNIFORM_RECORD) {
-    size_t siz = H5Tget_size(handle->ftype_id);
-    char *tmp = calloc(1, siz);
+    size_t size = H5Tget_size(handle->ftype_id);
+    char *tmp = calloc(1, size);
     H5Pset_fill_value(hdf_plist, handle->ftype_id, tmp);
     free(tmp);
   }
@@ -784,7 +784,7 @@ int micreate_volume(const char *filename, int number_of_dimensions,
         */
         miset_attr_at_loc(dataset_width, "length", MI_TYPE_INT,
                           1, &dimensions[i]->length);
-        /* Close the specified datatset */
+        /* Close the specified dataset */
         H5Dclose(dataset_width);
         free(name);
       }
@@ -1376,7 +1376,7 @@ int miopen_volume(const char *filename, int mode, mihandle_t *volume)
          {
            if( (file_id = _hdf_open(temp_file, hdf_mode) ) >0)
            {
-            unlink( temp_file ); /*file will be deleted immedeately after closing...*/
+            unlink( temp_file ); /*file will be deleted immediately after closing...*/
             free( temp_file );
            } else {
             unlink( temp_file );
@@ -1403,7 +1403,7 @@ int miopen_volume(const char *filename, int mode, mihandle_t *volume)
     return MI_LOG_ERROR(MI2_MSG_OPENFILE,filename);
 #endif    
   }
-  /* Set some varibales associated with the volume handle */
+  /* Set some variables associated with the volume handle */
   handle->hdf_id = file_id;
   handle->mode = mode;
 

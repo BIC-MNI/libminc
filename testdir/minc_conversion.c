@@ -324,7 +324,7 @@ static void test4(struct testinfo *ip, struct dimdef *dims, int ndims)
   
   
   if(ndim!=3)
-    FUNC_ERROR("incorrect dimenions count");
+    FUNC_ERROR("incorrect dimensions count");
   
   
   r=miget_data_class(vol, &volume_class);

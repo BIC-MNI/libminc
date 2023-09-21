@@ -245,7 +245,7 @@ namespace minc
     //! read the minc history (:history attribute)
     std::string history(void) const;
     
-    //! retrive var id, if it exists, otherwise return MI_ERROR
+    //! retrieve var id, if it exists, otherwise return MI_ERROR
     int var_id(const char *var_name) const;
     
     //! get variable length
@@ -440,7 +440,7 @@ namespace minc
       //! close the minc file
       virtual void close(void);
       
-      //!write a single slice, size of the buffer should be more or equall to slab_len
+      //!write a single slice, size of the buffer should be more or equal to slab_len
       void write(void* slice);
   };
 }
