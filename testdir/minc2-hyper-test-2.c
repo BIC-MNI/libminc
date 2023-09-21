@@ -141,7 +141,7 @@ int main ( void )
   count[1] = howfar[1] - start[1];
   count[2] = howfar[2] - start[2];
 
-  /* Alocate memory for the hyperslab*/
+  /* Allocate memory for the hyperslab*/
   buffer = ( double * ) malloc ( count[0] * count[1] * count[2] * sizeof ( double ) );
   if ( buffer == NULL ) {
     fprintf ( stderr, "Error allocation memory.\n" );

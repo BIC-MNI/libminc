@@ -205,7 +205,7 @@ namespace minc
     }
   };
   
-  //! will attempt to laod the whole volume in T Z Y X V order into buffer, file should be prepared (setup_read_XXXX)
+  //! will attempt to load the whole volume in T Z Y X V order into buffer, file should be prepared (setup_read_XXXX)
   template<class T> void load_standard_volume(minc_1_reader& rw, T* volume)
   {
     std::vector<size_t> strides(MAX_VAR_DIMS,0);

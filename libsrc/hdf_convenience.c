@@ -2221,7 +2221,7 @@ hdf_open(const char *path, int mode)
     
     /*Set cachine parameters*/
     fpid=H5Pcreate( H5P_FILE_ACCESS );
-    /* Limit file compatability to 1.8.x */
+    /* Limit file compatibility to 1.8.x */
     H5Pset_libver_bounds (fpid, H5F_LIBVER_V18, H5F_LIBVER_V18);
     
     /*setup a bigger cache to work with typical chunking ( MI_MAX_VAR_BUFFER_SIZE )*/
@@ -2332,7 +2332,7 @@ hdf_create(const char *path, int cmode, struct mi2opts *opts_ptr)
 
     /*Set cachine parameters*/
     fpid = H5Pcreate (H5P_FILE_ACCESS);
-    /* Limit file compatability to 1.8.x */
+    /* Limit file compatibility to 1.8.x */
     H5Pset_libver_bounds (fpid, H5F_LIBVER_V18, H5F_LIBVER_V18);
     
     /*setup a bigger cache to work with typical chunking ( MI_MAX_VAR_BUFFER_SIZE )*/

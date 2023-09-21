@@ -47,8 +47,8 @@ static nifti_image * generate_reference_image( const char * write_image_filename
   reference_header.dim[3]=11;
   reference_header.dim[4]=7;
   reference_header.dim[5]=3;
-  reference_header.dim[6]=1; //This MUST be 1 anything else is invalid due to code that usees huristics to fix other possible problems;
-  reference_header.dim[7]=1; //This MUST be 1 anything else is invalid due to code that usees huristics to fix other possible problems;
+  reference_header.dim[6]=1; //This MUST be 1 anything else is invalid due to code that uses huristics to fix other possible problems;
+  reference_header.dim[7]=1; //This MUST be 1 anything else is invalid due to code that uses huristics to fix other possible problems;
   reference_header.intent_p1=10101010.101F;
   reference_header.intent_p2=987654321.0F;
   reference_header.intent_p3=-1234.0F;
