@@ -99,10 +99,10 @@ int main( int ac, char* av[] )
       {
         fprintf( stdout,"%.20lg,%.20lg,%.20lg,%.20lg,%.20lg,%.20lg,%.20lg,%.20lg,%.20lg\n",x,y,z,tx,ty,tz,ttx,tty,ttz);
       } else {
-        sprintf(line_c,"Line:%d Fwd ",line);
+        snprintf(line_c,sizeof(line_c),"Line:%d Fwd ",line);
         assert_equal_point( tx,ty,tz, a,b,c, line_c );
 
-        sprintf(line_c,"Line:%d Inv ",line);
+        snprintf(line_c,sizeof(line_c),"Line:%d Inv ",line);
         assert_equal_point( ttx,tty,ttz, ta,tb,tc, line_c );
       }
 

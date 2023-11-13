@@ -309,12 +309,12 @@ hdf_is_dimension_name(struct m2_file *file, const char *varnm)
  * may not yet exist in the file.
  */
 static hid_t
-hdf_path_from_name(struct m2_file *file, const char *varnm, char *varpath)
+hdf_path_from_name(struct m2_file *file, const char *varnm, char *varpath, size_t varpathlength)
 {
     if (!strcmp(varnm, MIimage) ||
       !strcmp(varnm, MIimagemax) ||
       !strcmp(varnm, MIimagemin)) {
-      sprintf(varpath, "/minc-2.0/image/%d/", file->resolution);
+      snprintf(varpath, varpathlength, "/minc-2.0/image/%d/", file->resolution);
     }
     else if (hdf_is_dimension_name(file, varnm)) {
       strcpy(varpath, "/minc-2.0/dimensions/");
@@ -1102,7 +1102,7 @@ hdf_attput(int fd, int varid, const char *attnm, nc_type val_typ,
             char temp[128];
             unsigned int i;
 
-            sprintf(temp, "junkXXXX");
+            snprintf(temp, sizeof(temp), "junkXXXX");
 
             new_type_id = H5Tcopy(var->ftyp_id);
             if (new_type_id < 0) {
@@ -1295,7 +1295,7 @@ hdf_vardef(int fd, const char *varnm, nc_type vartype, int ndims,
       return (MI_ERROR);
     }
 
-    if (hdf_path_from_name(file, varnm, varpath) < 0) {
+    if (hdf_path_from_name(file, varnm, varpath, sizeof(varpath)) < 0) {
       return (MI_ERROR);
     }
 

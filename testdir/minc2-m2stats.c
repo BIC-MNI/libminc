@@ -755,7 +755,7 @@ int main(int argc, char *argv[])
             if(All || PctT) {
                char     str[100];
 
-               (void)sprintf(str, "PctT [%3d%%]:       ", (int)(pctT * 100));
+               (void)snprintf(str, sizeof(str), "PctT [%3d%%]:       ", (int)(pctT * 100));
                print_result(str, stats->pct_T);
             }
             if(All || Entropy) {
