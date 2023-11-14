@@ -1,13 +1,29 @@
 LINK_LIBRARIES(${LIBMINC_LIBRARIES})
 
+
 MACRO(minc_test cmd)
   # minc 1 version
   IF(HAVE_MINC1)
-    ADD_TEST(${cmd}-1 ${CMAKE_CURRENT_SOURCE_DIR}/run_test_cmake.sh ${CMAKE_CURRENT_BINARY_DIR}/${cmd} ${CMAKE_CURRENT_SOURCE_DIR}/${cmd}.out)
+    ADD_TEST(NAME ${cmd}-1
+        COMMAND
+        ${CMAKE_COMMAND}
+          -DCMD=$<TARGET_FILE:${cmd}>
+          -DREF=${CMAKE_CURRENT_SOURCE_DIR}/${cmd}.out
+          -DOUT=${CMAKE_CURRENT_BINARY_DIR}/${cmd}.1.out
+          -P ${CMAKE_CURRENT_SOURCE_DIR}/run_test_minc.cmake
+        )
   ENDIF(HAVE_MINC1)
   
-  ADD_TEST(${cmd}-2 ${CMAKE_CURRENT_SOURCE_DIR}/run_test2_cmake.sh ${CMAKE_CURRENT_BINARY_DIR}/${cmd} ${CMAKE_CURRENT_SOURCE_DIR}/${cmd}.out)
-  
+  ADD_TEST(NAME ${cmd}-2
+  COMMAND
+  ${CMAKE_COMMAND}
+    -DCMD=$<TARGET_FILE:${cmd}>
+    -DMINC=-2
+    -DREF=${CMAKE_CURRENT_SOURCE_DIR}/${cmd}.out
+    -DOUT=${CMAKE_CURRENT_BINARY_DIR}/${cmd}.2.out
+    -P ${CMAKE_CURRENT_SOURCE_DIR}/run_test_minc.cmake
+  )
+
   IF(MINC_TEST_ENVIRONMENT)
    set_tests_properties( ${cmd}-1 PROPERTIES ENVIRONMENT "${MINC_TEST_ENVIRONMENT}")
   ENDIF(MINC_TEST_ENVIRONMENT)
@@ -17,10 +33,11 @@ MACRO(minc_test cmd)
   ENDIF(MINC_TEST_ENVIRONMENT)
 ENDMACRO(minc_test)
 
+
 MACRO(add_minc_test name cmd)
 
   ADD_TEST( ${name}
-      ${cmd} ${ARGV2} ${ARGV3} ${ARGV4} ${ARGV5} ${ARGV6} ${ARGV7} ${ARGV8} ${ARGV9} ${ARGV10} ${ARGV11}
+        ${cmd} ${ARGV2} ${ARGV3} ${ARGV4} ${ARGV5} ${ARGV6} ${ARGV7} ${ARGV8} ${ARGV9} ${ARGV10} ${ARGV11}
         ${ARGV12} ${ARGV13} ${ARGV14} ${ARGV15} ${ARGV16} ${ARGV17} ${ARGV18} ${ARGV19} ${ARGV20} ${ARGV21} ${ARGV22}
         ${ARGV23} ${ARGV24} ${ARGV25} ${ARGV26}
    )
@@ -54,7 +71,16 @@ IF(LIBMINC_MINC1_SUPPORT)
   minc_test(icv_fillvalue)
   minc_test(icv_range)
 
-  add_minc_test(arg_parse ${CMAKE_CURRENT_SOURCE_DIR}/run_test_arg_parse_cmake.sh ${CMAKE_CURRENT_BINARY_DIR}/test_arg_parse)
+  #add_minc_test(arg_parse ${CMAKE_CURRENT_SOURCE_DIR}/run_test_arg_parse_cmake.sh ${CMAKE_CURRENT_BINARY_DIR}/test_arg_parse)
+  ADD_TEST(NAME arg_parse
+    COMMAND
+    ${CMAKE_COMMAND}
+      -DCMD=$<TARGET_FILE:test_arg_parse>
+      -P ${CMAKE_CURRENT_SOURCE_DIR}/run_test_arg_parse.cmake
+  )
+  
+  set_tests_properties( arg_parse PROPERTIES ENVIRONMENT "${MINC_TEST_ENVIRONMENT}")
+
   add_minc_test(icv icv)
   add_minc_test(icv_vec icv_vec)
   add_minc_test(minc minc_tst)
