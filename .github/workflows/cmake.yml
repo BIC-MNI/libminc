@@ -67,7 +67,7 @@ jobs:
       run: |
         cmake -B ${{github.workspace}}/build \
           -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-          -DCMAKE_BUILD_TYPE=${{ matrix.config }} \        
+          -DCMAKE_BUILD_TYPE=${{ matrix.config }} \
           -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} \
           -DLIBMINC_MINC1_SUPPORT:BOOL=${{ matrix.build-params.WITH_MINC1 }} \
           -DBUILD_TESTING:BOOL=${{ matrix.build-params.tests }} \
