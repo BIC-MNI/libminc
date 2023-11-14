@@ -141,5 +141,9 @@ main(void){
   double outval;
   
   double error_count = create_and_test_image("test-dbl.mnc", &hvol, hdims, outval);
+
+  // clean up memory
+  if(miclose_volume ( hvol )>0) error_count++;
+
   return(error_count);
 }
