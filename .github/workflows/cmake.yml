@@ -33,7 +33,7 @@ jobs:
           - {static: OFF, WITH_MINC1: OFF, tests:  ON }
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v1
+      uses: actions/checkout@v4
       with:
         fetch-depth: 10
 
@@ -43,7 +43,6 @@ jobs:
         sudo apt update
         sudo apt install -y libhdf5-dev libnetcdf-dev ccache
 
-
     - name: Install dependencies (Linux)
       if: runner.os == 'macOS'
       run: |
@@ -51,7 +50,7 @@ jobs:
 
     - name: Cache Build
       id: cache-build
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: ~/.ccache
         key: ${{ runner.os }}-${{ matrix.config }}-${{ matrix.build-params.static }}-${{ matrix.build-params.WITH_MINC1 }}-cache
