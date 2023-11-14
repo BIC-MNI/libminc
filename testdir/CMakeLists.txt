@@ -1,5 +1,4 @@
 LINK_LIBRARIES(${LIBMINC_LIBRARIES})
-find_program (SH_PROGRAM sh)
 
 
 MACRO(minc_test cmd)
