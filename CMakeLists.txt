@@ -54,6 +54,8 @@ IF(NOT LIBMINC_EXTERNALLY_CONFIGURED)
   OPTION(LIBMINC_USE_NIFTI               "Build with NIfTI support" OFF)
   OPTION(LIBMINC_USE_SYSTEM_NIFTI        "Use system NIfTI-1 library" OFF)
 
+  OPTION(LIBMINC_USE_ASAN                "Build with Address Sanitizer" OFF)
+
   SET (LIBMINC_EXPORTED_TARGETS "LIBMINC-targets")
   SET (LIBMINC_INSTALL_BIN_DIR bin)
   SET (LIBMINC_INSTALL_LIB_DIR lib${LIB_SUFFIX})
@@ -108,6 +110,13 @@ IF(UNIX)
   SET(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   -fPIC")
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 ENDIF(UNIX)
+
+
+IF(LIBMINC_USE_ASAN)
+add_compile_options(-fno-omit-frame-pointer -fsanitize=address)
+add_link_options(-fno-omit-frame-pointer -fsanitize=address)
+ENDIF(LIBMINC_USE_ASAN)
+
 
 # check for prereqs
 INCLUDE(CheckFunctionExists)
