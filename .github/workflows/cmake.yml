@@ -25,7 +25,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04, macos-latest]
+        os: [ubuntu-20.04, macos-12]
         config: [Release]
         build-params: 
           - {static:  ON, WITH_MINC1:  ON, tests:  ON }
