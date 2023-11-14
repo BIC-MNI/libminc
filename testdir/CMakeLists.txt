@@ -190,9 +190,9 @@ add_minc_test(minc2-create-test-images-2  minc2-create-test-images-2
                                           ${CMAKE_CURRENT_BINARY_DIR}/3D_minc2_float.mnc 
                                           )
 
-add_minc_test(minc2-large-attribute-10k   minc2-large-attribute 10000)
-add_minc_test(minc2-large-attribute-100k  minc2-large-attribute 100000)
-add_minc_test(minc2-large-attribute-1m    minc2-large-attribute 1000000)
+add_minc_test(minc2-large-attribute-10k   minc2-large-attribute 10000   ${CMAKE_CURRENT_BINARY_DIR}/3D_attr_10000.mnc)
+add_minc_test(minc2-large-attribute-100k  minc2-large-attribute 100000  ${CMAKE_CURRENT_BINARY_DIR}/3D_attr_100000.mnc)
+add_minc_test(minc2-large-attribute-1m    minc2-large-attribute 1000000 ${CMAKE_CURRENT_BINARY_DIR}/3D_attr_1000000.mnc)
 
 add_minc_test(minc2-datatype-test         minc2-datatype-test  
                                           ${CMAKE_CURRENT_BINARY_DIR}/datatype_minc2.mnc)
