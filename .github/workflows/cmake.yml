@@ -2,48 +2,82 @@ name: CMake
 
 on:
   push:
-    branches: [ "master" ]
-  # pull_request:
-  #   branches: [ "master" ]
+    branches: 
+      - test-ci
+  pull_request:
+    branches: 
+      - test-ci
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
+  CTEST_OUTPUT_ON_FAILURE: ON
+  CTEST_PARALLEL_LEVEL: 2
 
 jobs:
-  build:
-    # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
-    # You can convert this to a matrix build if you need cross-platform coverage.
-    # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
-    runs-on: ubuntu-latest
+  ####################
+  # Linux / macOS
+  ####################
+  Unix:
+    name: ${{ matrix.os }} ${{ matrix.build-params.WITH_MINC1 == 'ON' && 'MINC_1_2' || 'MINC_1'}} ${{ matrix.build-params.tests == 'ON' && 'tests' || ''}} ${{ matrix.config }}
+    runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false
       matrix:
-        WITH_MINC1: ["OFF", "ON"]
-
+        os: [ubuntu-20.04, macos-latest]
+        config: [Release]
+        build-params: 
+          - {static:  ON, WITH_MINC1:  ON, tests:  ON }
+          - {static:  ON, WITH_MINC1:  ON, tests:  ON }
+          - {static: OFF, WITH_MINC1: OFF, tests:  ON }
     steps:
-    - uses: actions/checkout@v3
-    - name: Install dependencies
+    - name: Checkout repository
+      uses: actions/checkout@v1
+      with:
+        fetch-depth: 10
+
+    - name: Install dependencies  (Linux)
+      if: runner.os == 'Linux'
       run: |
         sudo apt update
-        sudo apt install -y libhdf5-dev libnetcdf-dev
+        sudo apt install -y libhdf5-dev libnetcdf-dev ccache
 
-    - name: Configure CMake with Minc 1 ${{matrix.WITH_MINC1}}
+
+    - name: Install dependencies (Linux)
+      if: runner.os == 'macOS'
+      run: |
+          HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache hdf5 netcdf
+
+    - name: Cache Build
+      id: cache-build
+      uses: actions/cache@v2
+      with:
+        path: ~/.ccache
+        key: ${{ runner.os }}-${{ matrix.config }}-${{ matrix.build-params.static }}-${{ matrix.build-params.WITH_MINC1 }}-cache
+
+    - name: Prepare ccache
+      run: |
+        ccache --max-size=1.0G
+        ccache -V && ccache --show-stats && ccache --zero-stats
+
+    - name: Configure CMake 
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
       run: |
-        minc_build_vars="-DLIBMINC_MINC1_SUPPORT:BOOL=${{matrix.with_minc1}} -DBUILD_TESTING:BOOL=ON"
-        cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} $minc_build_vars
+        cmake -B ${{github.workspace}}/build \
+          -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+          -DCMAKE_BUILD_TYPE=${{ matrix.config }} \        
+          -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} \
+          -DLIBMINC_MINC1_SUPPORT:BOOL=${{ matrix.build-params.WITH_MINC1 }} \
+          -DBUILD_TESTING:BOOL=${{ matrix.build-params.tests }} \
 
     - name: Build
       working-directory: ${{github.workspace}}/build
       # Build your program with the given configuration
-      run: make
+      run: make -j2; ccache --show-stats
 
     - name: Test
       working-directory: ${{github.workspace}}/build
-      # Execute tests defined by the CMake configuration.  
-      # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
-      run: make test
+      run: ctest --verbose
       
