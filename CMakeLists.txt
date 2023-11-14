@@ -7,12 +7,12 @@ PROJECT(LIBMINC)
 
 SET(LIBMINC_PACKAGE_VERSION_MAJOR 2)
 SET(LIBMINC_PACKAGE_VERSION_MINOR 4)
-SET(LIBMINC_PACKAGE_VERSION_PATCH 05)
+SET(LIBMINC_PACKAGE_VERSION_PATCH 06)
 
 SET(LIBMINC_SOVERSION "5.3.0")
 
 SET(LIBMINC_PACKAGE "libminc")
-SET(LIBMINC_PACKAGE_BUGREPORT "a.janke@gmail.com")
+SET(LIBMINC_PACKAGE_BUGREPORT "vladimir.fonov@gmail.com")
 
 SET(LIBMINC_PACKAGE_NAME    "libminc")
 SET(LIBMINC_PACKAGE_VERSION "${LIBMINC_PACKAGE_VERSION_MAJOR}.${LIBMINC_PACKAGE_VERSION_MINOR}.${LIBMINC_PACKAGE_VERSION_PATCH}")
@@ -113,8 +113,8 @@ ENDIF(UNIX)
 
 
 IF(LIBMINC_USE_ASAN)
-add_compile_options(-fno-omit-frame-pointer -fsanitize=address)
-add_link_options(-fno-omit-frame-pointer -fsanitize=address)
+  add_compile_options(-fno-omit-frame-pointer -fsanitize=address)
+  add_link_options(-fno-omit-frame-pointer -fsanitize=address)
 ENDIF(LIBMINC_USE_ASAN)
 
 
