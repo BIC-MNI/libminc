@@ -144,7 +144,7 @@ int main ( int argc, char **argv )
     miget_dimension_name(dim[i],&dname);
     miget_dimension_class(dim[i],&dclass);
     
-    printf("\t\tName: %s Origin:%f Step:%f Size:%lld class:%s\n",dname,origin[i],step[i],sizes[i],
+    printf("\t\tName: %s Origin:%f Step:%f Size:%llu class:%s\n",dname,origin[i],step[i],sizes[i],
             dclass==MI_DIMCLASS_SPATIAL?"Spatial":
             dclass==MI_DIMCLASS_TIME?"Time":
             dclass==MI_DIMCLASS_USER?"User":
