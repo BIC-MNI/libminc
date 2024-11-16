@@ -359,6 +359,7 @@ ParseArgv(int *argcPtr, char **argv, ArgvInfo *argTable, int flags)
          return TRUE;
       case ARGV_VERSION:
          PrintVersion(argTable);
+         exit(0);
          return FALSE;
       default:
          FPRINTF(stderr, "bad argument type %d in ArgvInfo",
@@ -539,5 +540,4 @@ static void PrintVersion(ArgvInfo *argTable)
         printf("HDF5   : %u.%u.%u\n", major, minor, release);
     }
 #endif
-    exit(0);
 }
