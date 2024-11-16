@@ -2209,7 +2209,7 @@ scaled_maximal_pivoting_gaussian_elimination_real ( int n,
 
 /** Computes the inverse of a square matrix.
 */
-int
+static int
 invert_4x4_matrix ( double matrix[4][4], /**< Input matrix */
                     double inverse[4][4] ) /**< Output (inverted) matrix */
 {
