@@ -25,8 +25,6 @@ double rint(double v); /*hack: defined in m2util.c*/
 #define VALID_MIN (0.0)
 #define REAL_MAX (1.0)
 #define REAL_MIN (-1.0)
-#define NORM_MAX (1.0)
-#define NORM_MIN (-1.0)
 
 static int
 create_and_test_image(const char *name, 
