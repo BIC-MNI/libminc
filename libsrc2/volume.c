@@ -281,7 +281,6 @@ int micreate_volume_image(mihandle_t volume)
 {
   char dimorder[MI2_CHAR_LENGTH];
   int i;
-  int dimorder_len=0;
   hid_t dataspace_id;
   hid_t dset_id;
   hsize_t hdf_size[MI2_MAX_VAR_DIMS];
