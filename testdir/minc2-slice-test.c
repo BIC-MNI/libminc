@@ -5,9 +5,6 @@
 #define CZ 142
 #define CY 245
 #define CX 100
-#define CU 5
-#define NDIMS 3
-
 
 int main ( int argc, char **argv )
 {

@@ -16,7 +16,6 @@ static int error_cnt=0;
 #define CZ 142
 #define CY 245
 #define CX 10
-#define CU 5
 #define NDIMS 3
 
 
