@@ -14,9 +14,7 @@
 
 #include <minc.h>
 
-#ifdef HAVE_STRING_H
 #include <string.h>
-#endif 
 
 #define TRUE 1
 #define FALSE 0
