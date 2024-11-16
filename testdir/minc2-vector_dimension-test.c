@@ -103,7 +103,7 @@ int main ( void )
   }
   printf ( "Dimension Size in file order : " );
   for ( i = 0; i < NDIMS; i++ ) {
-    printf ( " %lld ", lengths[i] );
+    printf ( " %llu ", lengths[i] );
   }
   printf ( " \n" );
 
