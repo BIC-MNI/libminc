@@ -14,7 +14,7 @@
 #include <unistd.h>
 #endif
 
-int main()
+int main(void)
 {
    char filename[256];
    int cdfid;
