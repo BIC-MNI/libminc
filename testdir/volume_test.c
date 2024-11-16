@@ -6,7 +6,7 @@
 
 #define ERROR fprintf(stderr, "ERROR in %s:%d\n", __func__, __LINE__)
 
-int
+static int
 test1(void)
 {
   VIO_Volume v1;
@@ -224,7 +224,7 @@ test1(void)
   return 0;
 }
 
-int
+static int
 test2(void)
 {
   VIO_Volume v1;
@@ -377,7 +377,7 @@ test2(void)
   return 0;
 }
 
-int
+static int
 test3(void)
 {
   VIO_Volume v1;

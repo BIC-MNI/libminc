@@ -10,7 +10,7 @@
 #define CY 20
 #define CZ 20
 
-int test1(int do_real)
+static int test1(int do_real)
 {
     int i, j, k;
     int r;
@@ -158,7 +158,7 @@ int test1(int do_real)
 #define CCY 20
 #define CCZ 20
 
-int test2(void)
+static int test2(void)
 {
     midimhandle_t hdim[ND];
     mihandle_t hvol;
