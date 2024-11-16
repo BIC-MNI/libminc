@@ -37,9 +37,7 @@ create_and_test_image(const char *name,
   misize_t start[NDIMS];
   misize_t count[NDIMS];
   double stmp2[CX][CY][CZ];
-  double dtemp;
   int i,j,k;
-  char *dimnames[] = {"zspace", "xspace", "yspace"};
   int error_cnt = 0;
 
   result = micreate_dimension("xspace", MI_DIMCLASS_SPATIAL, 
