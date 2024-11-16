@@ -26,7 +26,7 @@
 #include <unistd.h>
 #endif
 
-int main()
+int main(void)
 {
    int cdf, cdf2;
    int img;
