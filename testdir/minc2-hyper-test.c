@@ -297,7 +297,7 @@ create_and_test_image(const char *name,
 }
 
 static int
-test1()
+test1(void)
 {
     mihandle_t hvol;
     int result;
@@ -478,7 +478,7 @@ test1()
 }
 
 static int
-test2()
+test2(void)
 {
     mihandle_t hvol;
     int result;
@@ -600,7 +600,7 @@ test2()
 }
 
 static int
-test3()
+test3(void)
 {
     mihandle_t hvol;
     mivolumeprops_t hprops;
