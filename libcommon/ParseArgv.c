@@ -516,7 +516,7 @@ static void PrintVersion(ArgvInfo *argTable)
     {
         unsigned int major, minor, release;
         H5get_libversion(&major, &minor, &release);
-        printf("HDF5   : %d.%d.%d\n", major, minor, release);
+        printf("HDF5   : %u.%u.%u\n", major, minor, release);
     }
 #endif
     exit(0);

@@ -99,7 +99,7 @@ static int _generate_ident( char * id_str, size_t length )
 #endif
   strftime(time_str, sizeof(time_str), "%Y.%m.%d.%H.%M.%S", &tm_buf);
   
-  result = snprintf(id_str, length, "%s:%s:%s:%u:%u", 
+  result = snprintf(id_str, length, "%s:%s:%s:%u:%d", 
                     user_str, 
                     host_str, 
                     time_str, 
