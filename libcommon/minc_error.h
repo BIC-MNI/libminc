@@ -164,6 +164,9 @@ typedef enum mimsgcode {
     MI2_MSG_GENERIC
 } mimsgcode_t;
 
+void milog_init(const char *);
+int milog_set_verbosity(int);
+
 int milog_message(mimsgcode_t code, ...);
 int mi2log_message(const char *file,int line, mimsgcode_t code, ...);
 
