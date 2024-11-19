@@ -134,7 +134,7 @@ int
 main(void){
   mihandle_t hvol;
   midimhandle_t hdims[NDIMS];
-  double outval;
+  double outval = 0.0;
   
   int error_count = create_and_test_image("test-dbl.mnc", &hvol, hdims, outval);
 
