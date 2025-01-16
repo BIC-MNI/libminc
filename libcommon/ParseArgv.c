@@ -107,6 +107,16 @@ ParseLong(const char *argPtr, char **endPtr)
  *	Process an argv array according to a table of expected
  *	command-line options.  See the manual page for more details.
  *
+ * argcPtr: Number of arguments in argv.  Modified to hold # args left in argv
+ *          at end.
+ *
+ * argv: Array of arguments.  Modified to hold those that couldn't be processed
+ *       here.
+ *
+ * argTable: Array of option descriptions
+ *
+ * flags: Or'ed combination of various flag bits, such as ARGV_NO_DEFAULTS.
+ *
  * Results:
  *	The return value is a Boolean value with non-zero indicating an 
  *      error.  
@@ -310,8 +320,8 @@ ParseArgv(int *argcPtr, char **argv, ArgvInfo *argTable, int flags)
          }
          break;
       case ARGV_FUNC: {
-
-         int (*handlerProc)(void*, const char*, char*) = (int (*)(void*, const char*, char*))(uintptr_t)infoPtr->src;
+         typedef int (*handlerProcType)(void*, const char*, char*);
+         handlerProcType handlerProc = (handlerProcType)(uintptr_t)infoPtr->src;
 		
          if ((*handlerProc)(infoPtr->dst, infoPtr->key,
                             argv[srcIndex])) {
@@ -321,7 +331,8 @@ ParseArgv(int *argcPtr, char **argv, ArgvInfo *argTable, int flags)
          break;
       }
       case ARGV_GENFUNC: {
-         int (*handlerProc)(void*, const char*, int, char**) = (int (*)(void*, const char*, int, char**))(uintptr_t)infoPtr->src;
+         typedef int (*handlerProcType)(void*, const char*, int, char**);
+         handlerProcType handlerProc = (handlerProcType)(uintptr_t)infoPtr->src;
 
          argc = (*handlerProc)(infoPtr->dst, infoPtr->key,
                                argc, argv+srcIndex);
