@@ -318,7 +318,8 @@ ParseArgv(int *argcPtr, char **argv, ArgvInfo *argTable, int flags)
          }
          break;
       case ARGV_FUNC: {
-         int (*handlerProc)() =  (int (*)())(uintptr_t)infoPtr->src;
+         typedef int (*handlerProcType)(void*, const char*, char*);
+         handlerProcType handlerProc = (handlerProcType)(uintptr_t)infoPtr->src;
 		
          if ((*handlerProc)(infoPtr->dst, infoPtr->key,
                             argv[srcIndex])) {
@@ -328,7 +329,8 @@ ParseArgv(int *argcPtr, char **argv, ArgvInfo *argTable, int flags)
          break;
       }
       case ARGV_GENFUNC: {
-         int (*handlerProc)() = (int (*)())(uintptr_t)infoPtr->src;
+         typedef int (*handlerProcType)(void*, const char*, int, char**);
+         handlerProcType handlerProc = (handlerProcType)(uintptr_t)infoPtr->src;
 
          argc = (*handlerProc)(infoPtr->dst, infoPtr->key,
                                argc, argv+srcIndex);
