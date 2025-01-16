@@ -135,6 +135,12 @@ ParseLong(const char *argPtr, char **endPtr)
  *----------------------------------------------------------------------
  */
 
+/* argcPtr: Number of arguments in argv.  Modified to hold # args left
+            in argv at end. */
+/* argv: Array of arguments.  Modified to hold those that couldn't
+         be processed here. */
+/* argTable: Array of option descriptions */
+/* flags: Or'ed combination of various flag bits, such as ARGV_NO_DEFAULTS. */
 int
 ParseArgv(int *argcPtr, char **argv, ArgvInfo *argTable, int flags)
 {
