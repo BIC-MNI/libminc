@@ -320,13 +320,8 @@ ParseArgv(int *argcPtr, char **argv, ArgvInfo *argTable, int flags)
          }
          break;
       case ARGV_FUNC: {
-<<<<<<< HEAD
          typedef int (*handlerProcType)(void*, const char*, char*);
          handlerProcType handlerProc = (handlerProcType)(uintptr_t)infoPtr->src;
-=======
-
-         int (*handlerProc)(void*, const char*, char*) = (int (*)(void*, const char*, char*))(uintptr_t)infoPtr->src;
->>>>>>> Fixed clang -Wdeprecated-non-prototype warnings
 		
          if ((*handlerProc)(infoPtr->dst, infoPtr->key,
                             argv[srcIndex])) {
@@ -336,12 +331,8 @@ ParseArgv(int *argcPtr, char **argv, ArgvInfo *argTable, int flags)
          break;
       }
       case ARGV_GENFUNC: {
-<<<<<<< HEAD
          typedef int (*handlerProcType)(void*, const char*, int, char**);
          handlerProcType handlerProc = (handlerProcType)(uintptr_t)infoPtr->src;
-=======
-         int (*handlerProc)(void*, const char*, int, char**) = (int (*)(void*, const char*, int, char**))(uintptr_t)infoPtr->src;
->>>>>>> Fixed clang -Wdeprecated-non-prototype warnings
 
          argc = (*handlerProc)(infoPtr->dst, infoPtr->key,
                                argc, argv+srcIndex);
