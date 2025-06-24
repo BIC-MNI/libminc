@@ -75,7 +75,7 @@ macro(build_nifti install_prefix staging_prefix)
             -DCMAKE_SKIP_RPATH:BOOL=OFF
             -DCMAKE_SKIP_INSTALL_RPATH:BOOL=OFF
             -DMACOSX_RPATH:BOOL=ON
-            -DCMAKE_INSTALL_RPATH:PATH=${install_prefix}/lib${LIB_SUFFIX}
+            -DCMAKE_INSTALL_RPATH:PATH=${install_prefix}/${CMAKE_INSTALL_LIBDIR}
             -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
             "-DCMAKE_CXX_FLAGS_RELEASE:STRING=${NIFTI_CMAKE_CXX_FLAGS_RELEASE}"
             "-DCMAKE_C_FLAGS_RELEASE:STRING=${NIFTI_CMAKE_C_FLAGS_RELEASE}"
@@ -95,9 +95,9 @@ macro(build_nifti install_prefix staging_prefix)
     INSTALL_DIR ${staging_prefix}/${install_prefix}
   )
 
-set(NIFTI_LIBRARY     ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libniftiio.a )
+set(NIFTI_LIBRARY     ${staging_prefix}/${install_prefix}/${CMAKE_INSTALL_LIBDIR}/libniftiio.a )
 set(NIFTI_INCLUDE_DIR ${staging_prefix}/${install_prefix}/include/nifti )
-set(ZNZ_LIBRARY       ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libznz.a )
+set(ZNZ_LIBRARY       ${staging_prefix}/${install_prefix}/${CMAKE_INSTALL_LIBDIR}/libznz.a )
 set(ZNZ_INCLUDE_DIR   ${staging_prefix}/${install_prefix}/include/nifti )
 set(NIFTI_FOUND       ON)
 
