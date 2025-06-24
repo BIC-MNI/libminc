@@ -3,7 +3,7 @@
 # Andrew Janke - a.janke@gmail.com
 # Vladimir S. FONOV - vladimir.fonov@gmail.com
 
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.10...4.2)
 
 project(LIBMINC)
 
@@ -23,10 +23,6 @@ set(LIBMINC_PACKAGE_STRING  "${LIBMINC_PACKAGE_NAME} ${LIBMINC_PACKAGE_VERSION}"
 include(CTest)
 
 enable_testing()
-
-if( POLICY CMP0063 )
-  cmake_policy(SET CMP0063 NEW)
-endif()
 
 if(MINC_TOOLKIT_BUILD)
   set(LIBMINC_EXTERNALLY_CONFIGURED ON)

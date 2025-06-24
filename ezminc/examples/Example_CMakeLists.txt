@@ -1,8 +1,8 @@
 # Example CMakeLists.txt to work with minc&EZminc
 
+cmake_minimum_required(VERSION 2.8...4.0)
 
 project(EXAMPLE)
-cmake_minimum_required(VERSION 2.8)
 
 find_package(LIBMINC REQUIRED)
 include( ${LIBMINC_USE_FILE} )
