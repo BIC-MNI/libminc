@@ -1047,11 +1047,11 @@ static herr_t mi2_dbl_to_int ( hid_t src_id,
 
             t = rint ( * ( double * ) src_ptr );
 
-            if ( t > CHAR_MAX ) {
-              t = CHAR_MAX;
+            if ( t > SCHAR_MAX ) {
+              t = SCHAR_MAX;
             } else
-              if ( t < CHAR_MIN ) {
-                t = CHAR_MIN;
+              if ( t < SCHAR_MIN ) {
+                t = SCHAR_MIN;
               }
 
             * ( ( char * ) src_ptr ) = ( char ) t;
@@ -1214,11 +1214,11 @@ static herr_t mi2_dbl_to_int ( hid_t src_id,
 
             t = ( int ) ( * ( double * ) src_ptr );
 
-            if ( t > CHAR_MAX ) {
-              t = CHAR_MAX;
+            if ( t > SCHAR_MAX ) {
+              t = SCHAR_MAX;
             } else
-              if ( t < CHAR_MIN ) {
-                t = CHAR_MIN;
+              if ( t < SCHAR_MIN ) {
+                t = SCHAR_MIN;
               }
 
             * ( ( char * ) src_ptr ) = ( char ) t;
