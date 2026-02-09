@@ -11,8 +11,8 @@ ExternalProject_Add(HDF5
         CONFIGURE_COMMAND ./configure --prefix=${install_prefix}  --with-pic --disable-shared --disable-cxx --disable-f77 --disable-f90 --disable-examples --disable-hl --disable-docs
       )
 
-SET(HDF5_INCLUDE_DIR ${install_prefix}/include )
-SET(HDF5_LIBRARY  ${install_prefix}/lib/libhdf5.a )
+set(HDF5_INCLUDE_DIR ${install_prefix}/include )
+set(HDF5_LIBRARY  ${install_prefix}/lib/libhdf5.a )
 
 
-endmacro(build_hdf5)
+endmacro()

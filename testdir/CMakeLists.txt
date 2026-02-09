@@ -1,10 +1,10 @@
-LINK_LIBRARIES(${LIBMINC_LIBRARIES})
+link_libraries(${LIBMINC_LIBRARIES})
 
 
-MACRO(minc_test cmd)
+macro(minc_test cmd)
   # minc 1 version
-  IF(HAVE_MINC1)
-    ADD_TEST(NAME ${cmd}-1
+  if(HAVE_MINC1)
+    add_test(NAME ${cmd}-1
         COMMAND
         ${CMAKE_COMMAND}
           -DCMD=$<TARGET_FILE:${cmd}>
@@ -12,9 +12,9 @@ MACRO(minc_test cmd)
           -DOUT=${CMAKE_CURRENT_BINARY_DIR}/${cmd}.1.out
           -P ${CMAKE_CURRENT_SOURCE_DIR}/run_test_minc.cmake
         )
-  ENDIF(HAVE_MINC1)
+  endif()
   
-  ADD_TEST(NAME ${cmd}-2
+  add_test(NAME ${cmd}-2
   COMMAND
   ${CMAKE_COMMAND}
     -DCMD=$<TARGET_FILE:${cmd}>
@@ -24,45 +24,45 @@ MACRO(minc_test cmd)
     -P ${CMAKE_CURRENT_SOURCE_DIR}/run_test_minc.cmake
   )
 
-  IF(MINC_TEST_ENVIRONMENT)
+  if(MINC_TEST_ENVIRONMENT)
    set_tests_properties( ${cmd}-1 PROPERTIES ENVIRONMENT "${MINC_TEST_ENVIRONMENT}")
-  ENDIF(MINC_TEST_ENVIRONMENT)
+  endif()
   
-  IF(MINC_TEST_ENVIRONMENT)
+  if(MINC_TEST_ENVIRONMENT)
    set_tests_properties( ${cmd}-2 PROPERTIES ENVIRONMENT "${MINC_TEST_ENVIRONMENT}")
-  ENDIF(MINC_TEST_ENVIRONMENT)
-ENDMACRO(minc_test)
+  endif()
+endmacro()
 
 
-MACRO(add_minc_test name cmd)
+macro(add_minc_test name cmd)
 
-  ADD_TEST( ${name}
+  add_test( ${name}
         ${cmd} ${ARGV2} ${ARGV3} ${ARGV4} ${ARGV5} ${ARGV6} ${ARGV7} ${ARGV8} ${ARGV9} ${ARGV10} ${ARGV11}
         ${ARGV12} ${ARGV13} ${ARGV14} ${ARGV15} ${ARGV16} ${ARGV17} ${ARGV18} ${ARGV19} ${ARGV20} ${ARGV21} ${ARGV22}
         ${ARGV23} ${ARGV24} ${ARGV25} ${ARGV26}
    )
    
-   IF(MINC_TEST_ENVIRONMENT)
+   if(MINC_TEST_ENVIRONMENT)
     set_tests_properties( ${name} PROPERTIES ENVIRONMENT "${MINC_TEST_ENVIRONMENT}")
-   ENDIF(MINC_TEST_ENVIRONMENT)
+   endif()
    
-ENDMACRO(add_minc_test)
+endmacro()
 
 
-IF(LIBMINC_MINC1_SUPPORT)
+if(LIBMINC_MINC1_SUPPORT)
 
-  ADD_EXECUTABLE(minc_tst minc.c)
-  ADD_EXECUTABLE(icv icv.c)
-  ADD_EXECUTABLE(icv_vec icv_vec.c)
-  ADD_EXECUTABLE(icv_dim1 icv_dim1.c)
-  ADD_EXECUTABLE(icv_dim icv_dim.c)
-  ADD_EXECUTABLE(icv_fillvalue icv_fillvalue.c)
-  ADD_EXECUTABLE(icv_range icv_range.c)
-  ADD_EXECUTABLE(mincapi mincapi.c)
-  ADD_EXECUTABLE(minc_types minc_types.c)
-  ADD_EXECUTABLE(test_mconv test_mconv.c)
-  ADD_EXECUTABLE(minc_long_attr minc_long_attr.c)
-  ADD_EXECUTABLE(minc_conversion minc_conversion.c)
+  add_executable(minc_tst minc.c)
+  add_executable(icv icv.c)
+  add_executable(icv_vec icv_vec.c)
+  add_executable(icv_dim1 icv_dim1.c)
+  add_executable(icv_dim icv_dim.c)
+  add_executable(icv_fillvalue icv_fillvalue.c)
+  add_executable(icv_range icv_range.c)
+  add_executable(mincapi mincapi.c)
+  add_executable(minc_types minc_types.c)
+  add_executable(test_mconv test_mconv.c)
+  add_executable(minc_long_attr minc_long_attr.c)
+  add_executable(minc_conversion minc_conversion.c)
 
   # running tests
   minc_test(minc_types)
@@ -72,7 +72,7 @@ IF(LIBMINC_MINC1_SUPPORT)
   minc_test(icv_range)
 
   #add_minc_test(arg_parse ${CMAKE_CURRENT_SOURCE_DIR}/run_test_arg_parse_cmake.sh ${CMAKE_CURRENT_BINARY_DIR}/test_arg_parse)
-  ADD_TEST(NAME arg_parse
+  add_test(NAME arg_parse
     COMMAND
     ${CMAKE_COMMAND}
       -DCMD=$<TARGET_FILE:test_arg_parse>
@@ -90,29 +90,29 @@ IF(LIBMINC_MINC1_SUPPORT)
   add_minc_test(minc_long_attr_100k minc_long_attr 100000)
   add_minc_test(minc_long_attr_1m minc_long_attr 1000000)
   add_minc_test(minc_conversion minc_conversion)
-ENDIF(LIBMINC_MINC1_SUPPORT)
+endif()
 
 # Volume IO tests
-ADD_EXECUTABLE(volume_test volume_test.c)
-ADD_TEST(volume_test-1 volume_test)
+add_executable(volume_test volume_test.c)
+add_test(volume_test-1 volume_test)
 
-ADD_EXECUTABLE(multidim_test multidim_test.c)
-ADD_TEST(volume_multidim_test multidim_test)
+add_executable(multidim_test multidim_test.c)
+add_test(volume_multidim_test multidim_test)
 
-ADD_EXECUTABLE(test_xfm   vio_xfm_test/test-xfm.c)
-TARGET_LINK_LIBRARIES(test_xfm ${VOLUME_IO_LIBRARY} ${LIBMINC_LIBRARIES})
+add_executable(test_xfm   vio_xfm_test/test-xfm.c)
+target_link_libraries(test_xfm ${VOLUME_IO_LIBRARY} ${LIBMINC_LIBRARIES})
 
-ADD_EXECUTABLE(copy_xfm   vio_xfm_test/copy-xfm.c)
-TARGET_LINK_LIBRARIES(copy_xfm ${VOLUME_IO_LIBRARY} ${LIBMINC_LIBRARIES})
+add_executable(copy_xfm   vio_xfm_test/copy-xfm.c)
+target_link_libraries(copy_xfm ${VOLUME_IO_LIBRARY} ${LIBMINC_LIBRARIES})
 
-ADD_EXECUTABLE(create_grid_xfm create_grid_xfm.c)
-TARGET_LINK_LIBRARIES(create_grid_xfm ${VOLUME_IO_LIBRARY} ${LIBMINC_LIBRARIES})
+add_executable(create_grid_xfm create_grid_xfm.c)
+target_link_libraries(create_grid_xfm ${VOLUME_IO_LIBRARY} ${LIBMINC_LIBRARIES})
 
-ADD_EXECUTABLE(verify_xfm   vio_xfm_test/verify_xfm.c)
-TARGET_LINK_LIBRARIES(verify_xfm ${VOLUME_IO_LIBRARY} ${LIBMINC_LIBRARIES})
+add_executable(verify_xfm   vio_xfm_test/verify_xfm.c)
+target_link_libraries(verify_xfm ${VOLUME_IO_LIBRARY} ${LIBMINC_LIBRARIES})
 
-#ADD_TEST(create_grid_xfm create_grid_xfm)
-#ADD_TEST(test_speed test_speed)
+#add_test(create_grid_xfm create_grid_xfm)
+#add_test(test_speed test_speed)
 
 
 add_minc_test(test_xfm_1 test_xfm 10000 ${CMAKE_CURRENT_SOURCE_DIR}/vio_xfm_test/t1.xfm)
@@ -150,34 +150,34 @@ set_property(TEST verify_xfm_2 APPEND PROPERTY DEPENDS copy_xfm)
 
 
 #common tests
-ADD_EXECUTABLE(test_arg_parse test_arg_parse.c)
+add_executable(test_arg_parse test_arg_parse.c)
 add_minc_test(test_arg_parse test_arg_parse)
 
 
 #MINC2 tests
-ADD_EXECUTABLE(minc2-convert-test minc2-convert-test.c)
-ADD_EXECUTABLE(minc2-create-test-images-2 minc2-create-test-images-2.c)
-ADD_EXECUTABLE(minc2-create-test-images minc2-create-test-images.c)
-ADD_EXECUTABLE(minc2-datatype-test minc2-datatype-test.c)
-ADD_EXECUTABLE(minc2-large-attribute minc2-large-attribute.c)
-ADD_EXECUTABLE(minc2-dimension-test minc2-dimension-test.c)
-ADD_EXECUTABLE(minc2-full-test minc2-full-test.c)
-ADD_EXECUTABLE(minc2-grpattr-test minc2-grpattr-test.c)
-ADD_EXECUTABLE(minc2-hyper-test-2 minc2-hyper-test-2.c)
-ADD_EXECUTABLE(minc2-hyper-test minc2-hyper-test.c)
-ADD_EXECUTABLE(minc2-label-test minc2-label-test.c)
-#ADD_EXECUTABLE(minc2-m2stats minc2-m2stats.c)
-ADD_EXECUTABLE(minc2-multires-test minc2-multires-test.c)
-ADD_EXECUTABLE(minc2-record-test minc2-record-test.c)
-ADD_EXECUTABLE(minc2-slice-test minc2-slice-test.c)
-ADD_EXECUTABLE(minc2-valid-test minc2-valid-test.c)
-ADD_EXECUTABLE(minc2-vector_dimension-test minc2-vector_dimension-test.c)
-ADD_EXECUTABLE(minc2-volprops-test minc2-volprops-test.c)
-ADD_EXECUTABLE(minc2-read-rgb minc2-read-rgb.c)
-ADD_EXECUTABLE(minc2-read-metadata minc2-read-metadata.c)
+add_executable(minc2-convert-test minc2-convert-test.c)
+add_executable(minc2-create-test-images-2 minc2-create-test-images-2.c)
+add_executable(minc2-create-test-images minc2-create-test-images.c)
+add_executable(minc2-datatype-test minc2-datatype-test.c)
+add_executable(minc2-large-attribute minc2-large-attribute.c)
+add_executable(minc2-dimension-test minc2-dimension-test.c)
+add_executable(minc2-full-test minc2-full-test.c)
+add_executable(minc2-grpattr-test minc2-grpattr-test.c)
+add_executable(minc2-hyper-test-2 minc2-hyper-test-2.c)
+add_executable(minc2-hyper-test minc2-hyper-test.c)
+add_executable(minc2-label-test minc2-label-test.c)
+#add_executable(minc2-m2stats minc2-m2stats.c)
+add_executable(minc2-multires-test minc2-multires-test.c)
+add_executable(minc2-record-test minc2-record-test.c)
+add_executable(minc2-slice-test minc2-slice-test.c)
+add_executable(minc2-valid-test minc2-valid-test.c)
+add_executable(minc2-vector_dimension-test minc2-vector_dimension-test.c)
+add_executable(minc2-volprops-test minc2-volprops-test.c)
+add_executable(minc2-read-rgb minc2-read-rgb.c)
+add_executable(minc2-read-metadata minc2-read-metadata.c)
 
-ADD_EXECUTABLE(minc2-leak-test minc2-leak-test.c)
-ADD_EXECUTABLE(minc2-float-voxel-test minc2-float-voxel-test.c)
+add_executable(minc2-leak-test minc2-leak-test.c)
+add_executable(minc2-float-voxel-test minc2-float-voxel-test.c)
 
 add_minc_test(minc2-convert-test          minc2-convert-test)
 add_minc_test(minc2-create-test-images    minc2-create-test-images 

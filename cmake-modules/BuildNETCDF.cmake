@@ -12,7 +12,7 @@ ExternalProject_Add(NETCDF
   CONFIGURE_COMMAND ./configure --prefix=${install_prefix} --with-pic --disable-netcdf4 --disable-hdf4 --disable-dap --disable-shared --disable-cxx --disable-f77 --disable-f90 --disable-examples --enable-v2 --disable-docs
 )
 
-SET(NETCDF_LIBRARY ${install_prefix}/lib/libnetcdf.a )
-SET(NETCDF_INCLUDE_DIR ${install_prefix}/include )
+set(NETCDF_LIBRARY ${install_prefix}/lib/libnetcdf.a )
+set(NETCDF_INCLUDE_DIR ${install_prefix}/include )
 
-endmacro(build_netcdf)
+endmacro()
