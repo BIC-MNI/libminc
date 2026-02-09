@@ -12,7 +12,7 @@ macro(minc_test cmd)
           -DOUT=${CMAKE_CURRENT_BINARY_DIR}/${cmd}.1.out
           -P ${CMAKE_CURRENT_SOURCE_DIR}/run_test_minc.cmake
         )
-  endif(HAVE_MINC1)
+  endif()
   
   add_test(NAME ${cmd}-2
   COMMAND
@@ -26,12 +26,12 @@ macro(minc_test cmd)
 
   if(MINC_TEST_ENVIRONMENT)
    set_tests_properties( ${cmd}-1 PROPERTIES ENVIRONMENT "${MINC_TEST_ENVIRONMENT}")
-  endif(MINC_TEST_ENVIRONMENT)
+  endif()
   
   if(MINC_TEST_ENVIRONMENT)
    set_tests_properties( ${cmd}-2 PROPERTIES ENVIRONMENT "${MINC_TEST_ENVIRONMENT}")
-  endif(MINC_TEST_ENVIRONMENT)
-endmacro(minc_test)
+  endif()
+endmacro()
 
 
 macro(add_minc_test name cmd)
@@ -44,9 +44,9 @@ macro(add_minc_test name cmd)
    
    if(MINC_TEST_ENVIRONMENT)
     set_tests_properties( ${name} PROPERTIES ENVIRONMENT "${MINC_TEST_ENVIRONMENT}")
-   endif(MINC_TEST_ENVIRONMENT)
+   endif()
    
-endmacro(add_minc_test)
+endmacro()
 
 
 if(LIBMINC_MINC1_SUPPORT)
@@ -90,7 +90,7 @@ if(LIBMINC_MINC1_SUPPORT)
   add_minc_test(minc_long_attr_100k minc_long_attr 100000)
   add_minc_test(minc_long_attr_1m minc_long_attr 1000000)
   add_minc_test(minc_conversion minc_conversion)
-endif(LIBMINC_MINC1_SUPPORT)
+endif()
 
 # Volume IO tests
 add_executable(volume_test volume_test.c)

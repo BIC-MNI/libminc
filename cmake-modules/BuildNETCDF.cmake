@@ -15,4 +15,4 @@ ExternalProject_Add(NETCDF
 set(NETCDF_LIBRARY ${install_prefix}/lib/libnetcdf.a )
 set(NETCDF_INCLUDE_DIR ${install_prefix}/include )
 
-endmacro(build_netcdf)
+endmacro()

@@ -12,7 +12,7 @@ find_library(ZNZ_LIBRARY NAMES znz PATHS /usr/lib /usr/local/lib /usr/local/bic/
 
 if (NIFTI_INCLUDE_DIR AND NIFTI_LIBRARY AND ZNZ_INCLUDE_DIR AND ZNZ_LIBRARY)
    set(NIFTI_FOUND TRUE)
-endif (NIFTI_INCLUDE_DIR AND NIFTI_LIBRARY AND ZNZ_INCLUDE_DIR AND ZNZ_LIBRARY)
+endif ()
 
 
 if (NIFTI_FOUND)
@@ -21,9 +21,9 @@ if (NIFTI_FOUND)
       message(STATUS "Found NetCDF library: ${NIFTI_LIBRARY}")
       message(STATUS "Found znzlib headers: ${ZNZ_INCLUDE_DIR}")
       message(STATUS "Found znzlib library: ${ZNZ_LIBRARY}")
-   endif (NOT NIFTI_FIND_QUIETLY)
-else (NIFTI_FOUND)
+   endif ()
+else ()
    if (NIFTI_FIND_REQUIRED)
       message(FATAL_ERROR "Could not find NIfTI-1 I/O library")
-   endif (NIFTI_FIND_REQUIRED)
-endif (NIFTI_FOUND)
+   endif ()
+endif ()

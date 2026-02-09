@@ -8,16 +8,16 @@ find_library(NETCDF_LIBRARY NAMES netcdf PATHS /usr/lib /usr/local/lib /usr/loca
 
 if (NETCDF_INCLUDE_DIR AND NETCDF_LIBRARY)
    set(NETCDF_FOUND TRUE)
-endif (NETCDF_INCLUDE_DIR AND NETCDF_LIBRARY)
+endif ()
 
 
 if (NETCDF_FOUND)
    if (NOT NETCDF_FIND_QUIETLY)
       message(STATUS "Found NetCDF headers: ${NETCDF_INCLUDE_DIR}")
       message(STATUS "Found NetCDF library: ${NETCDF_LIBRARY}")
-   endif (NOT NETCDF_FIND_QUIETLY)
-else (NETCDF_FOUND)
+   endif ()
+else ()
    if (NETCDF_FIND_REQUIRED)
       message(FATAL_ERROR "Could not find NetCDF")
-   endif (NETCDF_FIND_REQUIRED)
-endif (NETCDF_FOUND)
+   endif ()
+endif ()

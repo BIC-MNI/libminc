@@ -10,4 +10,4 @@ add_executable(ezminc_rw_test2 minc_rw_test2.cpp)
 
 if(MINC_TEST_ENVIRONMENT)
  set_tests_properties( ezminc_rw_test PROPERTIES ENVIRONMENT "${MINC_TEST_ENVIRONMENT}")
-endif(MINC_TEST_ENVIRONMENT)
+endif()

@@ -15,4 +15,4 @@ set(HDF5_INCLUDE_DIR ${install_prefix}/include )
 set(HDF5_LIBRARY  ${install_prefix}/lib/libhdf5.a )
 
 
-endmacro(build_hdf5)
+endmacro()

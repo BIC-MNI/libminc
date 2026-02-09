@@ -101,5 +101,5 @@ set(ZNZ_LIBRARY       ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libzn
 set(ZNZ_INCLUDE_DIR   ${staging_prefix}/${install_prefix}/include/nifti )
 set(NIFTI_FOUND       ON)
 
-endmacro(build_nifti)
+endmacro()
 
