@@ -70,7 +70,7 @@ if(NOT LIBMINC_EXTERNALLY_CONFIGURED)
   find_package(ZLIB REQUIRED)
   set(HDF5_NO_FIND_PACKAGE_CONFIG_FILE ON)
   find_package(HDF5 REQUIRED COMPONENTS C )
-  
+
   if(LIBMINC_USE_NIFTI)
   if (LIBMINC_USE_SYSTEM_NIFTI)
     find_package(NIFTI)
@@ -82,7 +82,7 @@ if(NOT LIBMINC_EXTERNALLY_CONFIGURED)
   else()
   set(NIFTI_FOUND OFF)
   endif()
-  
+
   set(HAVE_ZLIB ON)
 else()
   #TODO: set paths for HDF5 etc
@@ -132,9 +132,9 @@ CHECK_FUNCTION_EXISTS(fork     HAVE_WORKING_FORK)
 CHECK_FUNCTION_EXISTS(vfork    HAVE_WORKING_VFORK)
 CHECK_FUNCTION_EXISTS(fdopen   HAVE_FDOPEN)
 CHECK_FUNCTION_EXISTS(strdup   HAVE_STRDUP)
-CHECK_FUNCTION_EXISTS(getpwnam HAVE_GETPWNAM) 
+CHECK_FUNCTION_EXISTS(getpwnam HAVE_GETPWNAM)
 CHECK_FUNCTION_EXISTS(select   HAVE_SELECT)
-CHECK_FUNCTION_EXISTS(strerror HAVE_STRERROR) 
+CHECK_FUNCTION_EXISTS(strerror HAVE_STRERROR)
 CHECK_FUNCTION_EXISTS(sysconf  HAVE_SYSCONF)
 CHECK_FUNCTION_EXISTS(system   HAVE_SYSTEM)
 
@@ -216,7 +216,7 @@ if(LIBMINC_MINC1_SUPPORT)
 endif()
 
 if(LIBMINC_BUILD_EZMINC)
-  set(LIBMINC_INCLUDE_DIRS_CONFIG    
+  set(LIBMINC_INCLUDE_DIRS_CONFIG
     ${CMAKE_CURRENT_SOURCE_DIR}/ezminc
   )
   include_directories(
@@ -297,8 +297,8 @@ set(minc1_LIB_SRCS
    )
 
 set(minc1_HEADERS
-  libsrc/minc.h 
-  libsrc/voxel_loop.h 
+  libsrc/minc.h
+  libsrc/voxel_loop.h
   libsrc/nd_loop.h
   libsrc/minc_compat.h
   libsrc/minc_simple.h
@@ -323,9 +323,9 @@ set(minc2_LIB_SRCS
 
 set(minc2_HEADERS
   libsrc2/minc2.h
-  libsrc2/minc2_defs.h 
-  libsrc2/minc2_structs.h 
-  libsrc2/minc2_api.h 
+  libsrc2/minc2_defs.h
+  libsrc2/minc2_structs.h
+  libsrc2/minc2_api.h
 )
 
 # volume_io2
@@ -369,7 +369,7 @@ set(volume_io_LIB_SRCS
 )
 
 if(LIBMINC_NIFTI_SUPPORT)
-    set(volume_io_LIB_SRCS 
+    set(volume_io_LIB_SRCS
         ${volume_io_LIB_SRCS}
         ${LIBMINC_NIFTI_SOURCES}
     )
@@ -378,19 +378,19 @@ endif()
 
 set(volume_io_HEADERS
     volume_io/Include/volume_io/alloc.h
-    volume_io/Include/volume_io/arrays.h 
-    volume_io/Include/volume_io/basic.h 
-    volume_io/Include/volume_io/def_math.h 
-    volume_io/Include/volume_io/files.h 
-    volume_io/Include/volume_io/geom_structs.h 
-    volume_io/Include/volume_io/geometry.h 
-    volume_io/Include/volume_io/multidim.h 
-    volume_io/Include/volume_io/progress.h 
-    volume_io/Include/volume_io/string_funcs.h 
-    volume_io/Include/volume_io/system_dependent.h 
-    volume_io/Include/volume_io/transforms.h 
-    volume_io/Include/volume_io/vol_io_prototypes.h 
-    volume_io/Include/volume_io/volume.h 
+    volume_io/Include/volume_io/arrays.h
+    volume_io/Include/volume_io/basic.h
+    volume_io/Include/volume_io/def_math.h
+    volume_io/Include/volume_io/files.h
+    volume_io/Include/volume_io/geom_structs.h
+    volume_io/Include/volume_io/geometry.h
+    volume_io/Include/volume_io/multidim.h
+    volume_io/Include/volume_io/progress.h
+    volume_io/Include/volume_io/string_funcs.h
+    volume_io/Include/volume_io/system_dependent.h
+    volume_io/Include/volume_io/transforms.h
+    volume_io/Include/volume_io/vol_io_prototypes.h
+    volume_io/Include/volume_io/volume.h
     volume_io/Include/volume_io/volume_cache.h
 )
 
@@ -404,7 +404,7 @@ else()
 endif()
 
 if(LIBMINC_NIFTI_SUPPORT)
-    set(NIFTI_LIBRARIES 
+    set(NIFTI_LIBRARIES
         ${NIFTI_LIBRARY} ${ZNZ_LIBRARY}
     )
     get_filename_component(NIFTI_LIBRARY_NAME "${NIFTI_LIBRARY}" NAME)
@@ -487,8 +487,8 @@ if(UNIX)
   endif()
 endif()
 
-set_target_properties(${LIBMINC_LIBRARY} 
- PROPERTIES 
+set_target_properties(${LIBMINC_LIBRARY}
+ PROPERTIES
   SOVERSION ${LIBMINC_SOVERSION})
 
 if(LIBMINC_MINC1_SUPPORT)
@@ -501,10 +501,10 @@ endif()
 
 if( LIBMINC_INSTALL_LIB_DIR )
   install(
-    TARGETS 
-      ${LIBMINC_LIBRARY} 
+    TARGETS
+      ${LIBMINC_LIBRARY}
     EXPORT
-      ${LIBMINC_EXPORTED_TARGETS} 
+      ${LIBMINC_EXPORTED_TARGETS}
     LIBRARY DESTINATION ${LIBMINC_INSTALL_LIB_DIR} COMPONENT libraries
     ARCHIVE DESTINATION ${LIBMINC_INSTALL_LIB_DIR} COMPONENT libraries
     RUNTIME DESTINATION ${LIBMINC_INSTALL_LIB_DIR} COMPONENT libraries
@@ -579,9 +579,9 @@ configure_file(UseLIBMINC.cmake.in
 if(LIBMINC_INSTALL_LIB_DIR AND NOT LIBMINC_INSTALL_NO_DEVELOPMENT)
   install(
     FILES
-     ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/Use${LIBMINC_EXTERNAL_LIB_PREFIX}LIBMINC.cmake 
+     ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/Use${LIBMINC_EXTERNAL_LIB_PREFIX}LIBMINC.cmake
      ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${LIBMINC_EXTERNAL_LIB_PREFIX}LIBMINCConfig.cmake
-    DESTINATION 
+    DESTINATION
      ${LIBMINC_INSTALL_LIB_DIR}/cmake
     COMPONENT Development)
 endif()

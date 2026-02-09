@@ -6,8 +6,8 @@ ExternalProject_Add(HDF5
         URL_HASH SHA256=0adbc0eacafecabeb3ad2ebe64f4ef7fdad4f33e12b5bbf6630a8c37a72db1a9
         BUILD_IN_SOURCE 1
         INSTALL_DIR     "${install_prefix}"
-        BUILD_COMMAND   make 
-        INSTALL_COMMAND make install 
+        BUILD_COMMAND   make
+        INSTALL_COMMAND make install
         CONFIGURE_COMMAND ./configure --prefix=${install_prefix}  --with-pic --disable-shared --disable-cxx --disable-f77 --disable-f90 --disable-examples --disable-hl --disable-docs
       )
 
