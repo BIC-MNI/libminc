@@ -1671,8 +1671,8 @@ void miinit_default_range(mitype_t mitype, double *valid_max, double *valid_min)
 {
   switch (mitype) {
   case MI_TYPE_BYTE:
-    *valid_min = (double)CHAR_MIN;
-    *valid_max = (double)CHAR_MAX;
+    *valid_min = (double)SCHAR_MIN;
+    *valid_max = (double)SCHAR_MAX;
     break;
   case MI_TYPE_SHORT:
     *valid_min = (double)SHRT_MIN;
