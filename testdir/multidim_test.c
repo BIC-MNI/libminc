@@ -105,7 +105,7 @@ test2(void)
     printf("%s: %d\n", __func__, __LINE__);
     return 1;
   }*/
-  
+
   create_empty_multidim_array(&array, 1, VIO_UNSIGNED_BYTE);
   if (multidim_array_is_alloced(&array))
   {
@@ -114,7 +114,7 @@ test2(void)
   }
 
   set_multidim_data_type(&array, VIO_SIGNED_INT);
-  
+
   set_multidim_n_dimensions(&array, TEST2_N_DIMENSIONS);
 
   set_multidim_sizes(&array, sizes);
@@ -155,16 +155,16 @@ test2(void)
 
   srand(0);
   for (i = 0; i < sizes[0]; i++)
-    for (j = 0; j < sizes[1]; j++) 
-      for (k = 0; k < sizes[2]; k++) 
+    for (j = 0; j < sizes[1]; j++)
+      for (k = 0; k < sizes[2]; k++)
         for (t = 0; t < sizes[3]; t++)
           for (v = 0; v < sizes[4]; v++)
             SET_MULTIDIM(array, i, j, k, t, v, rand());
 
   srand(0);
   for (i = 0; i < sizes[0]; i++)
-    for (j = 0; j < sizes[1]; j++) 
-      for (k = 0; k < sizes[2]; k++) 
+    for (j = 0; j < sizes[1]; j++)
+      for (k = 0; k < sizes[2]; k++)
         for (t = 0; t < sizes[3]; t++)
           for (v = 0; v < sizes[4]; v++)
           {
@@ -292,7 +292,7 @@ main(int argc, char **argv)
 
   if (errors == 0)
     printf("All tests completed without errors.\n");
-  else 
+  else
     printf("Detected %d error%s.\n", errors, errors == 1 ? "" : "s");
   return errors;
 }

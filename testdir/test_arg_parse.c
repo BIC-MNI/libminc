@@ -11,7 +11,7 @@ static long long_a = 0;
 static long long_b = 0;
 
 
-static ArgvInfo argTable[] = 
+static ArgvInfo argTable[] =
 {
     {"-const_a", ARGV_CONSTANT, (char *)1, (char *)&const_a, "const_a option"},
     {"-const_b", ARGV_CONSTANT, (char *)1, (char *)&const_b, "const_b option"},
@@ -31,7 +31,7 @@ int main (int argc, char *argv[])
 {
    ParseArgv(&argc, argv, argTable, 0);
 
-   printf( "const_a:%d const_b:%d int_a:%d int_b:%d long_a:%ld long_b:%ld\n", 
+   printf( "const_a:%d const_b:%d int_a:%d int_b:%d long_a:%ld long_b:%ld\n",
 	   const_a, const_b, int_a, int_b, long_a, long_b );
 
    return(0);

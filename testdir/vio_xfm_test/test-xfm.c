@@ -10,7 +10,7 @@
 
 #include <volume_io.h>
 
- 
+
 static VIO_Real tolerance = 1e-8;
 
 /*Windows compatibility hack*/
@@ -43,15 +43,15 @@ static void assert_equal_point( VIO_Real ex, VIO_Real ey, VIO_Real ez,
 			 VIO_Real ax, VIO_Real ay, VIO_Real az,
 			 const char* msg )
 {
-    if ( is_equal_real(ex,ax) && 
+    if ( is_equal_real(ex,ax) &&
 	 is_equal_real(ey,ay) &&
 	 is_equal_real(ez,az) )
 	return;
 
     printf( "%s failure.\n"
 	    "Expected: %f %f %f\n"
-	    "  Actual: %f %f %f\n", 
-	    msg, ex,ey,ez,  ax,ay,az ); 
+	    "  Actual: %f %f %f\n",
+	    msg, ex,ey,ez,  ax,ay,az );
 
     exit(3);
 }
@@ -113,7 +113,7 @@ int main( int ac, char* av[] )
         fprintf( stderr, "Failed to transform point %f,%f,%f \n", x,y,z );
         return 3;
       }
-        
+
       assert_equal_point( x,y,z, a,b,c,
               "general_transform_point() / inverted xfm" );
 
@@ -122,7 +122,7 @@ int main( int ac, char* av[] )
         fprintf( stderr, "Failed to invert transform point %f,%f,%f \n", x,y,z );
         return 3;
       }
-        
+
       assert_equal_point( tx,ty,tz, a,b,c,
               "general_inverse_transform_point() / inverted xfm" );
     }

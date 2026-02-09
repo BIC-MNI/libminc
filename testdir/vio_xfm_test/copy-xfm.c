@@ -22,7 +22,7 @@ int main( int ac, char* av[] )
       fprintf( stderr, "Failed to load transform '%s'\n", av[1] );
       return 2;
     }
-    
+
     if ( output_transform_file( av[2], "created by copy-xfm",&xfm ) != VIO_OK ) {
       fprintf( stderr, "Failed to save transform '%s'\n", av[2] );
       return 2;

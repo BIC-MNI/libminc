@@ -291,12 +291,12 @@ int main(int argc, char *argv[])
       fillvalue = 0.0;
    }
 
-   /* Check range options: not over-specified and put values 
+   /* Check range options: not over-specified and put values
       in vol_min/vol_max */
    verify_range_options(&vol_min, &vol_max, &vol_range, &vol_binvalue);
    num_ranges = vol_min.numvalues;
 
-   /* Check mask range options: not over-specified and put values 
+   /* Check mask range options: not over-specified and put values
       in mask_min/mask_max */
    verify_range_options(&mask_min, &mask_max, &mask_range, &mask_binvalue);
    num_masks = mask_min.numvalues;
@@ -475,7 +475,7 @@ int main(int argc, char *argv[])
        edges[1] = cy;
        edges[2] = cz;
 
-       miget_real_value_hyperslab(hvol, MI_TYPE_DOUBLE, 
+       miget_real_value_hyperslab(hvol, MI_TYPE_DOUBLE,
                                   coords, edges, buffer);
 
        for (y = 0; y < cy; y++) {
@@ -625,7 +625,7 @@ int main(int argc, char *argv[])
             if(hist_file != NULL) {
 
                (void)fprintf(FP, "# histogram for: %s\n", infiles[0]);
-	       (void)fprintf(FP, "#  mask file:    %s\n", 
+	       (void)fprintf(FP, "#  mask file:    %s\n",
 			     (infiles[1] != NULL) ? infiles[1] : "(null)");
                if(stats->vol_range[0] != -DBL_MAX || stats->vol_range[1] != DBL_MAX) {
                   (void)fprintf(FP, "#  volume range: %g  %g\n", stats->vol_range[0],
@@ -690,7 +690,7 @@ int main(int argc, char *argv[])
             (void)fprintf(stdout, "File:              %s\n", infiles[0]);
          }
          if(All && !quiet) {
-            (void)fprintf(stdout, "Mask file:         %s\n", 
+            (void)fprintf(stdout, "Mask file:         %s\n",
 			  (infiles[1] != NULL) ? infiles[1] : "(null)");
          }
          if(All && !quiet) {
@@ -796,7 +796,7 @@ void do_math(long index[], long num_voxels,
    double   mask_min, mask_max;
    Stats_Info *stats;
 
-   /* Loop through the voxels - a bit of optimization in case we 
+   /* Loop through the voxels - a bit of optimization in case we
       have a brain-dead compiler */
    if(mask_file != NULL) {
       for(irange = 0; irange < num_ranges; irange++) {
@@ -917,7 +917,7 @@ int get_minc_lengths(mihandle_t hvol, int *cx, int *cy, int *cz)
     char *name;
     unsigned int length;
 
-    miget_volume_dimensions(hvol, MI_DIMCLASS_ANY, MI_DIMATTR_ALL, 0, 
+    miget_volume_dimensions(hvol, MI_DIMCLASS_ANY, MI_DIMATTR_ALL, 0,
                             MI2_MAX_VAR_DIMS, dims);
 
     miget_volume_dimension_count(hvol, MI_DIMCLASS_ANY, MI_DIMATTR_ALL,
@@ -959,7 +959,7 @@ double get_minc_voxel_volume(mihandle_t hvol)
    miget_volume_dimensions(hvol, MI_DIMCLASS_SPATIAL,
                            MI_DIMATTR_ALL, 0, ndims, hdim);
 
-   
+
    /* Loop over them to get the total spatial volume */
    volume = 1.0;
    for (idim = 0; idim < ndims; idim++) {
@@ -1005,7 +1005,7 @@ void find_minc_spatial_dims(mihandle_t hvol, int space_to_dim[], int dim_to_spac
    /* Loop over them to find the spatial ones */
    for(idim = 0; idim < ndims; idim++) {
 
-      /* Get the name and check that this is a spatial dimension 
+      /* Get the name and check that this is a spatial dimension
        */
        miget_dimension_name(dim[idim], &dimname);
       if((dimname[0] == '\0') || (strcmp(&dimname[1], "space") != 0)) {
@@ -1035,7 +1035,7 @@ void find_minc_spatial_dims(mihandle_t hvol, int space_to_dim[], int dim_to_spac
 }
 
 /* Get the voxel to world transform (for column vectors) */
-void get_minc_voxel_to_world(mihandle_t hvol, 
+void get_minc_voxel_to_world(mihandle_t hvol,
                              double voxel_to_world[WORLD_NDIMS + 1][WORLD_NDIMS + 1])
 {
     extern void miget_voxel_to_world(mihandle_t hvol, double v2w[WORLD_NDIMS+1][WORLD_NDIMS+1]);
@@ -1132,11 +1132,11 @@ void transform_coord(double out_coord[],
 @OUTPUT     : (none)
 @RETURNS    : TRUE since nextarg is used.
 @DESCRIPTION: Gets a list (array) of double values.
-@METHOD     : 
-@GLOBALS    : 
-@CALLS      : 
+@METHOD     :
+@GLOBALS    :
+@CALLS      :
 @CREATED    : March 8, 1995 (Peter Neelin)
-@MODIFIED   : 
+@MODIFIED   :
 ---------------------------------------------------------------------------- */
 int get_double_list(char *dst, char *key, char *nextarg)
 {

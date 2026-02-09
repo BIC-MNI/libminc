@@ -15,7 +15,7 @@ int main(int argc,char **argv)
     minc_1_reader rdr;
     rdr.open(argv[1],true);
     rdr.setup_read_float();
-    
+
     minc_1_writer wrt;
     for(int i=0;i<3;i++)
     {
@@ -31,13 +31,13 @@ int main(int argc,char **argv)
       out.value(in.value()+c);
       c++;
     }
-    
+
 	} catch (const minc::generic_error & err) {
     std::cerr << "Got an error at:" << err.file () << ":" << err.line () << std::endl;
     std::cerr << err.msg()<<std::endl;
     return 1;
   }
-  
+
   return 0;
 }
 

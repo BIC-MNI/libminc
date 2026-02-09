@@ -30,8 +30,8 @@ extern void icv_tests(void);
 static struct dimdef {
   char * name;
   int length;
-} dimtab1[3] = { 
-  { MIxspace, XSIZE }, 
+} dimtab1[3] = {
+  { MIxspace, XSIZE },
   { MIyspace, YSIZE },
   { MIzspace, ZSIZE }
 };
@@ -49,7 +49,7 @@ struct testinfo {
   int attribute_size;
 };
 
-/* Test case 1 - file creation & definition. 
+/* Test case 1 - file creation & definition.
  */
 static int test1(struct testinfo *ip, struct dimdef *dims, int ndims)
 {
@@ -57,7 +57,7 @@ static int test1(struct testinfo *ip, struct dimdef *dims, int ndims)
   int stat;
   int i;
 
-  /* Test case #1 - file creation 
+  /* Test case #1 - file creation
    */
   ip->name = micreate_tempfile();
   if (ip->name == NULL) {
@@ -69,11 +69,11 @@ static int test1(struct testinfo *ip, struct dimdef *dims, int ndims)
     FUNC_ERROR("micreate");
   }
 
-  /* Have to use ncdimdef() here since there is no MINC equivalent.  Sigh. 
+  /* Have to use ncdimdef() here since there is no MINC equivalent.  Sigh.
    */
   for (i = 0; i < ndims; i++) {
 
-    /* Define the dimension 
+    /* Define the dimension
      */
     ip->dim[i] = ncdimdef(ip->fd, dims[i].name, dims[i].length);
     if (ip->dim[i] < 0) {
@@ -82,7 +82,7 @@ static int test1(struct testinfo *ip, struct dimdef *dims, int ndims)
 
     /* Create the dimension variable.
      */
-    varid = micreate_std_variable(ip->fd, dims[i].name, NC_DOUBLE, 0, 
+    varid = micreate_std_variable(ip->fd, dims[i].name, NC_DOUBLE, 0,
 				  &ip->dim[i]);
     if (varid < 0) {
       FUNC_ERROR("micreate_std_variable");
@@ -115,19 +115,19 @@ static int test1(struct testinfo *ip, struct dimdef *dims, int ndims)
   if (ip->imgid < 0) {
     FUNC_ERROR("micreate_std_variable");
   }
-  
+
   ip->test_group = ncvardef(ip->fd,(char*)"test",NC_INT,0,0);/* micreate_group_variable(ip->fd,(char*)"test");*/
   if(ip->test_group<0)
   {
     FUNC_ERROR("micreate_group_variable");
   }
-  
+
   ip->large_attribute=calloc(ip->attribute_size,sizeof(char));
   memset(ip->large_attribute,'X',ip->attribute_size-1);
-  
+
   ip->test_attribute = ncattput(ip->fd, ip->test_group, "test", NC_CHAR, ip->attribute_size, ip->large_attribute);
-  
-  
+
+
   return (0);
 }
 
@@ -157,7 +157,7 @@ static int test2(struct testinfo *ip, struct dimdef *dims, int ndims)
   if (stat < 0) {
     FUNC_ERROR("mivarput1");
   }
-    
+
   flt = XSIZE * 100000.0;
   stat = mivarput1(ip->fd, ip->maxid, coords, NC_FLOAT, MI_SIGNED, &flt);
   if (stat < 0) {
@@ -181,7 +181,7 @@ static int test2(struct testinfo *ip, struct dimdef *dims, int ndims)
       }
     }
   }
-  
+
   return (0);
 }
 
@@ -196,7 +196,7 @@ test3(struct testinfo *ip, struct dimdef *dims, int ndims)
   int *int_ptr;
   int i, j, k;
   int stat;
-  
+
   int varid;
   int att_length;
   nc_type att_datatype;
@@ -221,7 +221,7 @@ test3(struct testinfo *ip, struct dimdef *dims, int ndims)
   lengths[TST_Y] = dims[TST_Y].length;
   lengths[TST_Z] = dims[TST_Z].length;
 
-  stat = mivarget(ip->fd, ip->imgid, coords, lengths, NC_INT, MI_SIGNED, 
+  stat = mivarget(ip->fd, ip->imgid, coords, lengths, NC_INT, MI_SIGNED,
                   buf_ptr);
   if (stat < 0) {
     FUNC_ERROR("mivarget");
@@ -242,7 +242,7 @@ test3(struct testinfo *ip, struct dimdef *dims, int ndims)
   }
   free(buf_ptr);
 
-  
+
   varid = ncvarid(ip->fd, "test");
   if(varid<0)
     FUNC_ERROR("ncvarid");
@@ -263,12 +263,12 @@ test3(struct testinfo *ip, struct dimdef *dims, int ndims)
     FUNC_ERROR("Attribute contents mismath!");
 
   free(att);
-  
+
   return (0);
 }
 
 
-/* Test MINC API's 
+/* Test MINC API's
  */
 int main(int argc, char **argv)
 {

@@ -1,8 +1,8 @@
 /* ----------------------------- MNI Header -----------------------------------
-@NAME       : 
+@NAME       :
 @DESCRIPTION: simple N-dimensional vector that supports arithmetic operations
 @COPYRIGHT  :
-              Copyright 2006 Vladimir Fonov, McConnell Brain Imaging Centre, 
+              Copyright 2006 Vladimir Fonov, McConnell Brain Imaging Centre,
               Montreal Neurological Institute, McGill University.
               Permission to use, copy, modify, and distribute this
               software and its documentation for any purpose and without
@@ -27,7 +27,7 @@ namespace minc
   public:
     //! default constructor, does nothing (i.e data is uninitilized)
     fixed_vec() {}
-  
+
     //! constructor which sets all the elements to the same value
     explicit fixed_vec(I v)
     {
@@ -41,14 +41,14 @@ namespace minc
         for(unsigned int i=0;i<dim;i++)
             c[i]=v[i];
     }
-    
+
     //! conversion to the C array
     I* c_buf()
     {
       return c;
     }
-	
-    //! conversion to const C array 
+
+    //! conversion to const C array
     const I* c_buf() const
     {
       return c;
@@ -90,7 +90,7 @@ namespace minc
         if(c[i]>s) s=c[i];
       return s;
     }
-	
+
     //! find a minimum of elements
     I min(void) const
     {
@@ -99,7 +99,7 @@ namespace minc
         if(c[i]<s) s=c[i];
       return s;
     }
-	
+
     //! calculate sum of all elements
     I sum(void) const
     {
@@ -117,7 +117,7 @@ namespace minc
         s+=c[i]*c[i];
       return s;
     }
-    
+
     //! volume (product of all elements)
     I vol(void) const
     {
@@ -126,7 +126,7 @@ namespace minc
         s*=c[i];
       return s;
     }
-	
+
     //! \name fixed_vec arithmetic operations
     //@{
     fixed_vec<dim,I>& operator *=(const fixed_vec<dim,I>& b)
@@ -240,14 +240,14 @@ namespace minc
       for(int i=0;i<dim;i++) if(c[i]!=b[i]) return true;
       return false;
     }
-	
+
     //! equality operator, does element wise equality check
     bool operator==(const fixed_vec<dim,I>& b) const
     {
       for(int i=0;i<dim;i++) if(c[i]!=b[i]) return false;
       return true;
     }
-    
+
     //! reverse the order of elements
     void reverse(void)
     {
@@ -267,7 +267,7 @@ namespace minc
 		out/=r;
 		return out; //this is not efficient  - no return value optimisation
 	}
-  
+
 	//! element wise multiplication
 	template<int dim,class I> fixed_vec<dim,I> operator*(const fixed_vec<dim,I> &l,const fixed_vec<dim,I> &r)
 	{
@@ -275,7 +275,7 @@ namespace minc
 		out*=r;
 		return out; //this is not efficient  - no return value optimisation
 	}
-  
+
 	//! element wise addition
 	template<int dim,class I> fixed_vec<dim,I> operator+(const fixed_vec<dim,I> &l,const fixed_vec<dim,I> &r)
 	{
@@ -283,7 +283,7 @@ namespace minc
 		out+=r;
 		return out; //this is not efficient  - no return value optimisation
 	}
-	
+
   //! element wise subtraction
 	template<int dim,class I> fixed_vec<dim,I> operator-(const fixed_vec<dim,I> &l,const fixed_vec<dim,I> &r)
 	{
@@ -291,7 +291,7 @@ namespace minc
 		out-=r;
 		return out; //this is not efficient  - no return value optimisation
 	}
-	
+
 	//! divide all elements by a value
 	template<int dim,class I> fixed_vec<dim,I> operator/(const fixed_vec<dim,I> &l,I r)
 	{
@@ -299,31 +299,31 @@ namespace minc
 		out/=r;
 		return out; //this is not efficient  - no return value optimisation
 	}
-	
-  //! multiply all elements by a value 
+
+  //! multiply all elements by a value
 	template<int dim,class I> fixed_vec<dim,I> operator*(const fixed_vec<dim,I> &l,I r)
 	{
 		fixed_vec<dim,I> out=l;
 		out*=r;
 		return out; //this is not efficient  - no return value optimisation
 	}
-	
-  //! add a value to all elements 
+
+  //! add a value to all elements
 	template<int dim,class I> fixed_vec<dim,I> operator+(const fixed_vec<dim,I> &l,I r)
 	{
 		fixed_vec<dim,I> out=l;
 		out+=r;
 		return out; //this is not efficient  - no return value optimisation
 	}
-	
-  //! subtract a value from all elements 
+
+  //! subtract a value from all elements
 	template<int dim,class I> fixed_vec<dim,I> operator-(const fixed_vec<dim,I> &l,I r)
 	{
 		fixed_vec<dim,I> out=l;
 		out-=r;
 		return out; //this is not efficient  - no return value optimisation
 	}
-	
+
 	//! create 1d fixed_vec
 	template<class I> fixed_vec<1,I> IDX(I i)
 	{
@@ -331,7 +331,7 @@ namespace minc
 		d[0]=i;
 		return d;
 	}
-	
+
 	//! create 2d fixed_vec
 	template<class I> fixed_vec<2,I> IDX(I i,I j)
 	{
@@ -340,7 +340,7 @@ namespace minc
 		d[1]=j;
 		return d;
 	}
-	
+
 	//! create 3d fixed_vec
 	template<class I> fixed_vec<3,I> IDX(I i,I j,I k)
 	{
@@ -350,7 +350,7 @@ namespace minc
 		d[2]=k;
 		return d;
 	}
-	
+
 	//! create 4d fixed_vec
 	template<class I> fixed_vec<4,I> IDX(I i,I j,I k,I l)
 	{
@@ -361,21 +361,21 @@ namespace minc
 		d[3]=l;
 		return d;
 	}
-	
+
 	//!average value of a vector
 	template<class T,int d>T AVG(const fixed_vec<d,T> &v)
 	{
 		return v.sum()/d;
-	}	
-  
+	}
+
 	//!dot product of two vectors
   template<class T,int d>T dot(const fixed_vec<d,T> &v1,const fixed_vec<d,T> &v2)
   {
     T val=0;
     for(int i=0;i<d;i++) val+=v1[i]*v2[i];
     return val;
-  }	
-	
+  }
+
 }
 
 #endif //MINC_IO_FIXED_VECTOR_H

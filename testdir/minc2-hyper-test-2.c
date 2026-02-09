@@ -74,7 +74,7 @@ static void create_test_file ( void )
     max += 0.1;
     miset_slice_range ( hvol, start, 3, max, min );
   }
-  
+
   miclose_volume ( hvol );
   free(buf);
 }
@@ -197,4 +197,4 @@ int main ( void )
   return ( error_cnt );
 }
 
-// kate: indent-mode cstyle; indent-width 2; replace-tabs on; 
+// kate: indent-mode cstyle; indent-width 2; replace-tabs on;

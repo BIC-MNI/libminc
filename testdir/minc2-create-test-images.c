@@ -35,16 +35,16 @@ static int create_2D_image ( const char *fname )
 
   r = micreate_dimension ( "yspace", MI_DIMCLASS_USER, MI_DIMATTR_REGULARLY_SAMPLED, CY, &hdim[1] );
   if(r<0) return r;
-  
+
   for ( i = 0; i < CX; i++ ) {
     offsets[i] = ( i * i ) + 0.1;
   }
   r = miset_dimension_offsets ( hdim[0], CX, 0, offsets );
   if(r<0) return r;
-  
+
   r = miset_dimension_separation ( hdim[1], 0.06 );
   if(r<0) return r;
-  
+
   r = miset_dimension_starts ( hdim,  NDIMS - 1, start_values );
   if(r<0) return r;
 
@@ -93,33 +93,33 @@ static int create_3D_image ( const char *fname )
   r = micreate_dimension ( "yspace", MI_DIMCLASS_SPATIAL,
                            MI_DIMATTR_REGULARLY_SAMPLED, CY, &hdim[0] );
   if(r<0) return r;
-  
+
   r = micreate_dimension ( "xspace", MI_DIMCLASS_SPATIAL,
                            MI_DIMATTR_REGULARLY_SAMPLED, CX, &hdim[1] );
   if(r<0) return r;
-  
+
   r = micreate_dimension ( "zspace", MI_DIMCLASS_SPATIAL,
                            MI_DIMATTR_REGULARLY_SAMPLED, CZ, &hdim[2] );
   if(r<0) return r;
-  
+
   r = miset_dimension_starts ( hdim, NDIMS, start_values );
   if(r<0) return r;
-  
+
   r = miset_dimension_separations ( hdim, NDIMS, separations );
   if(r<0) return r;
-  
+
   r = micreate_volume ( fname, NDIMS, hdim, MI_TYPE_USHORT,
                         MI_CLASS_REAL, NULL, &hvol );
   if(r<0) return r;
-  
+
   /* set slice scaling flag to true */
   r = miset_slice_scaling_flag ( hvol, flag );
   if(r<0) return r;
-  
+
 
   r = micreate_volume_image ( hvol );
   if(r<0) return r;
-  
+
 
   for ( i = 0; i < CY * CX * CZ; i++ ) {
     buf[i] = ( unsigned short ) (i * 0.001);
@@ -130,7 +130,7 @@ static int create_3D_image ( const char *fname )
 
   r = miset_voxel_value_hyperslab ( hvol, MI_TYPE_USHORT, start, count, buf );
   if(r<0) return r;
-  
+
   /* Set random values to slice min and max for slice scaling*/
   start[0] = start[1] = start[2] = 0;
   for ( i = 0; i < CY; i++ ) {
@@ -139,7 +139,7 @@ static int create_3D_image ( const char *fname )
     max += 0.1;
     r = miset_slice_range ( hvol, start, NDIMS , max, min );
     if(r<0) return r;
-  
+
   }
 
   free(buf);
@@ -229,15 +229,15 @@ int main ( int argc, char **argv )
     fprintf(stderr,"Usage:%s <out 2d> <out 3d> <out 4d>\n",argv[0]);
     return 1;
   }
-  
+
   printf ( "Creating 2D image with IRREGULAR sample dimension!! \n" );
-  if(create_2D_image(argv[1])<0) 
+  if(create_2D_image(argv[1])<0)
     TESTRPT("create_2D_image",0);
-  
+
   printf ( "Creating 3D image with slice scaling!! \n" );
   if( create_3D_image(argv[2])<0)
     TESTRPT("create_3D_image",0);
-  
+
   printf ( "Creating 4D image with slice scaling!! \n" );
   if(create_4D_image(argv[3])<0)
     TESTRPT("create_4D_image",0);

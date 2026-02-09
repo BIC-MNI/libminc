@@ -26,14 +26,14 @@ static void assert_equal_point( VIO_Real ex, VIO_Real ey, VIO_Real ez,
 			 VIO_Real ax, VIO_Real ay, VIO_Real az,
 			 const char* msg )
 {
-    if ( is_equal_real(ex,ax) && 
+    if ( is_equal_real(ex,ax) &&
 	 is_equal_real(ey,ay) &&
 	 is_equal_real(ez,az) )
 	return;
 
     printf( "%s failure.\n"
 	    "Expected: %f %f %f\n"
-	    "  Actual: %f %f %f\n", 
+	    "  Actual: %f %f %f\n",
 	    msg, ex,ey,ez,  ax,ay,az );
 
     exit(3);

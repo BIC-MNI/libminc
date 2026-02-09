@@ -93,7 +93,7 @@ check_dims(mihandle_t vol, midimhandle_t dim[])
         TESTRPT("wrong number of dimensions", n);
     }
 
-    r = miget_volume_dimension_count(vol, MI_DIMCLASS_TIME, MI_DIMATTR_ALL, 
+    r = miget_volume_dimension_count(vol, MI_DIMCLASS_TIME, MI_DIMATTR_ALL,
                                      &n);
     if (r < 0) {
         TESTRPT("failed", r);
@@ -243,10 +243,10 @@ int main(void)
                 coords[3] = k;
 
                 voxel = (i*10000)+(j*100)+k;
-                r = miset_voxel_value_hyperslab(vol, 
+                r = miset_voxel_value_hyperslab(vol,
                                                 MI_TYPE_UINT,
                                                 coords,
-                                                count, 
+                                                count,
                                                 &voxel);
                 if (r < 0) {
                     TESTRPT("Error writing voxel", r);
@@ -286,7 +286,7 @@ int main(void)
         TESTRPT("wrong result", n);
     }
 
-    r = miget_volume_dimensions(vol, MI_DIMCLASS_ANY, 0, 
+    r = miget_volume_dimensions(vol, MI_DIMCLASS_ANY, 0,
                                 MI_DIMORDER_FILE, NDIMS, dim);
     for (i = 0; i < CT; i++) {
         r = miget_dimension_offsets(dim[0], 1, i, &offset);
@@ -357,7 +357,7 @@ int main(void)
     /** End of tests added 03-Aug-2004 **/
 
     if (error_cnt != 0) {
-        fprintf(stderr, "%d error%s reported\n", 
+        fprintf(stderr, "%d error%s reported\n",
                 error_cnt, (error_cnt == 1) ? "" : "s");
     }
     else {

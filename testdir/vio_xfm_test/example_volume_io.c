@@ -77,7 +77,7 @@ int  main()
         v3 = ROUND( voxel2[2] );
 
         /*--- check if voxel indices inside volume */
-     
+
         if( v1 >= 0 && v1 < sizes[0] &&
             v2 >= 0 && v2 < sizes[1] &&
             v3 >= 0 && v3 < sizes[2] )

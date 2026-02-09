@@ -30,13 +30,13 @@ int main(int argc,char **argv)
     wrt.open(argv[2],rdr.info(),3,NC_FLOAT,false);
     wrt.setup_write_float();
     save_non_standard_volume<float>(wrt,vol.c_buf());
-    
+
   } catch (const minc::generic_error & err) {
     std::cerr << "Got an error at:" << err.file () << ":" << err.line () << std::endl;
     std::cerr << err.msg()<<std::endl;
     return 1;
   }
-  
+
   return 0;
 }
 

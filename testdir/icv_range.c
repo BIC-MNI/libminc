@@ -37,9 +37,9 @@ int main(int argc, char **argv)
    static int valpresent[] = {TRUE, FALSE};
    static int dim[MAX_VAR_DIMS];
    static struct { long len; char *name;} diminfo[] = {
-      { 3, MIzspace }, 
-      { 1, MIyspace }, 
-      { 1, MIxspace } 
+      { 3, MIzspace },
+      { 1, MIyspace },
+      { 1, MIxspace }
    };
    static int numdims=sizeof(diminfo)/sizeof(diminfo[0]);
    static long coord[]={0,0,0};
@@ -74,7 +74,7 @@ int main(int argc, char **argv)
                          typenm[intype], typenm[outtype], boolnm[inorm],
                          boolnm[imax], boolnm[ival]);
                   cdfid=micreate(filename, NC_CLOBBER | cflag);
-                  for (i=0; i<numdims; i++) 
+                  for (i=0; i<numdims; i++)
                      dim[i]=ncdimdef(cdfid, diminfo[i].name, diminfo[i].len);
                   img=micreate_std_variable(cdfid, MIimage, outtypes[outtype],
                                             numdims, dim);

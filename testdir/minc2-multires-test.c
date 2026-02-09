@@ -44,7 +44,7 @@ int main(void)
     if (r < 0) {
         TESTRPT("failed", r);
     }
-  
+
     r = micreate_dimension("yspace",MI_DIMCLASS_SPATIAL,MI_DIMATTR_REGULARLY_SAMPLED, CY, &dim[1]);
     if (r < 0) {
         TESTRPT("failed", r);
@@ -53,7 +53,7 @@ int main(void)
     if (r < 0) {
         TESTRPT("failed", r);
     }
- 
+
     r = micreate_volume("tst-multi.mnc", NDIMS, dim, MI_TYPE_UINT, MI_CLASS_REAL,props,&vol);
     if (r < 0) {
         TESTRPT("failed", r);
@@ -65,7 +65,7 @@ int main(void)
     if (r < 0) {
         TESTRPT("failed", r);
     }
-  
+
     r = miget_volume_dimension_count(vol, MI_DIMCLASS_SPATIAL, MI_DIMATTR_ALL, &n);
     if (r < 0) {
         TESTRPT("failed", r);
@@ -81,7 +81,7 @@ int main(void)
                 coords[2] = k;
 
                 voxel = i*10000 + j*100 + k;
-                
+
                 r = miset_voxel_value_hyperslab(vol, MI_TYPE_UINT,
                                                 coords, count, &voxel);
                 if (r < 0) {
@@ -108,7 +108,7 @@ int main(void)
 
     {
         unsigned int buffer[CX/2][CY/2][CZ/2];
-    
+
         r = miget_voxel_value_hyperslab(vol, MI_TYPE_UINT,
                                         coords, count, buffer);
         if (r < 0) {
@@ -133,7 +133,7 @@ int main(void)
 
     {
         unsigned int buffer[CX/4][CY/4][CZ/4];
-    
+
         r = miget_voxel_value_hyperslab(vol, MI_TYPE_UINT,
                                         coords, count, buffer);
         if (r < 0) {
@@ -160,9 +160,9 @@ int main(void)
     if (r < 0) {
         TESTRPT("failed", r);
     }
-      
+
     if (error_cnt != 0) {
-        fprintf(stderr, "%d error%s reported\n", 
+        fprintf(stderr, "%d error%s reported\n",
                 error_cnt, (error_cnt == 1) ? "" : "s");
     }
     else {

@@ -188,4 +188,4 @@ int main ( void )
   return ( error_cnt );
 }
 
-// kate: indent-mode cstyle; indent-width 2; replace-tabs on; 
+// kate: indent-mode cstyle; indent-width 2; replace-tabs on;

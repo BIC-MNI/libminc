@@ -29,8 +29,8 @@ extern void icv_tests(void);
 static struct dimdef {
   char * name;
   int length;
-} dimtab1[3] = { 
-  { MIxspace, XSIZE }, 
+} dimtab1[3] = {
+  { MIxspace, XSIZE },
   { MIyspace, YSIZE },
   { MIzspace, ZSIZE }
 };
@@ -44,7 +44,7 @@ struct testinfo {
   int dim[3];
 };
 
-/* Test case 1 - file creation & definition. 
+/* Test case 1 - file creation & definition.
  */
 static int
 test1(struct testinfo *ip, struct dimdef *dims, int ndims)
@@ -54,7 +54,7 @@ test1(struct testinfo *ip, struct dimdef *dims, int ndims)
   int stat;
   int i;
 
-  /* Test case #1 - file creation 
+  /* Test case #1 - file creation
    */
   ip->name = micreate_tempfile();
   if (ip->name == NULL) {
@@ -66,26 +66,26 @@ test1(struct testinfo *ip, struct dimdef *dims, int ndims)
     FUNC_ERROR("micreate");
   }
 
-  /* Try to create another file of the same name - should fail. 
+  /* Try to create another file of the same name - should fail.
    */
   fd2 = micreate(ip->name, NC_NOCLOBBER);
   if (fd2 >= 0) {
     FUNC_ERROR("micreate");
   }
 
-  /* Try to open the file for write - should fail. 
+  /* Try to open the file for write - should fail.
    */
   /* VF: it doesn't fail!
   fd2 = miopen(ip->name, NC_WRITE);
   if (fd2 >= 0) {
     FUNC_ERROR("miopen");
-  } */   
+  } */
 
-  /* Have to use ncdimdef() here since there is no MINC equivalent.  Sigh. 
+  /* Have to use ncdimdef() here since there is no MINC equivalent.  Sigh.
    */
   for (i = 0; i < ndims; i++) {
 
-    /* Define the dimension 
+    /* Define the dimension
      */
     ip->dim[i] = ncdimdef(ip->fd, dims[i].name, dims[i].length);
     if (ip->dim[i] < 0) {
@@ -94,7 +94,7 @@ test1(struct testinfo *ip, struct dimdef *dims, int ndims)
 
     /* Create the dimension variable.
      */
-    varid = micreate_std_variable(ip->fd, dims[i].name, NC_DOUBLE, 0, 
+    varid = micreate_std_variable(ip->fd, dims[i].name, NC_DOUBLE, 0,
 				  &ip->dim[i]);
     if (varid < 0) {
       FUNC_ERROR("micreate_std_variable");
@@ -164,7 +164,7 @@ test2(struct testinfo *ip, struct dimdef *dims, int ndims)
   if (stat < 0) {
     FUNC_ERROR("mivarput1");
   }
-    
+
   flt = XSIZE * 100000.0;
   stat = mivarput1(ip->fd, ip->maxid, coords, NC_FLOAT, MI_SIGNED, &flt);
   if (stat < 0) {
@@ -223,7 +223,7 @@ test3(struct testinfo *ip, struct dimdef *dims, int ndims)
   lengths[TST_Y] = dims[TST_Y].length;
   lengths[TST_Z] = dims[TST_Z].length;
 
-  stat = mivarget(ip->fd, ip->imgid, coords, lengths, NC_INT, MI_SIGNED, 
+  stat = mivarget(ip->fd, ip->imgid, coords, lengths, NC_INT, MI_SIGNED,
 		  buf_ptr);
   if (stat < 0) {
     FUNC_ERROR("mivarget");
@@ -351,7 +351,7 @@ test4(struct testinfo *ip, struct dimdef *dims, int ndims)
       for (k = 0; k < dims[TST_Z].length; k++) {
 	float tmp = (i * 10000) + (j * 100) + k;
 	if (*flt_ptr != (float) tmp * 10.0) {
-	  fprintf(stderr, "2. Data error at (%d,%d,%d) %f != %f\n", 
+	  fprintf(stderr, "2. Data error at (%d,%d,%d) %f != %f\n",
 		  i,j,k, *flt_ptr, tmp);
 	  errors++;
 	}
@@ -365,7 +365,7 @@ test4(struct testinfo *ip, struct dimdef *dims, int ndims)
     FUNC_ERROR("miicv_detach");
   }
 
-  /* Try it again, to make certain we fail gracefully. 
+  /* Try it again, to make certain we fail gracefully.
    */
   stat = miicv_detach(icv);
   if (stat < 0) {
@@ -489,10 +489,10 @@ test5(struct testinfo *ip, struct dimdef *dims, int ndims)
 	int z;
 	int tmp;
 
-	if (j < YBOOST/2 || j >= dims[TST_Y].length + YBOOST/2) 
+	if (j < YBOOST/2 || j >= dims[TST_Y].length + YBOOST/2)
 	  continue;
 
-	if (k < ZBOOST/2 || k >= dims[TST_Z].length + ZBOOST/2) 
+	if (k < ZBOOST/2 || k >= dims[TST_Z].length + ZBOOST/2)
 	  continue;
 
 	x = i;
@@ -505,7 +505,7 @@ test5(struct testinfo *ip, struct dimdef *dims, int ndims)
 	tmp = (x * 10000) + (y * 100) + (z);
 
 	if (*int_ptr != (int) tmp) {
-	  fprintf(stderr, "3. Data error at (%d,%d,%d) %d != %d\n", 
+	  fprintf(stderr, "3. Data error at (%d,%d,%d) %d != %d\n",
 		  i,j,k, *int_ptr, tmp);
 	  errors++;
 	}
@@ -602,7 +602,7 @@ test6(struct testinfo *ip, struct dimdef *dims, int ndims)
 	tmp = (i * 10000) + (j * 100) + (k);
 
 	if (*int_ptr != (int) tmp) {
-	  fprintf(stderr, "4. Data error at (%d,%d,%d) %d != %d\n", 
+	  fprintf(stderr, "4. Data error at (%d,%d,%d) %d != %d\n",
 		  i,j,k, *int_ptr, tmp);
 	  errors++;
 	}
@@ -708,7 +708,7 @@ test7(struct testinfo *ip, struct dimdef *dims, int ndims)
 	/* Round tmp properly. */
 	tmp = (tmp + (rng / 2)) / rng;
 	if (*int_ptr != tmp) {
-	  fprintf(stderr, "5. Data error at (%d,%d,%d) %d != %d\n", 
+	  fprintf(stderr, "5. Data error at (%d,%d,%d) %d != %d\n",
 		  i,j,k, *int_ptr, tmp);
 	  errors++;
 	}
@@ -731,7 +731,7 @@ test7(struct testinfo *ip, struct dimdef *dims, int ndims)
   return (0);
 }
 
-/* Test MINC API's 
+/* Test MINC API's
  */
 int
 main(int argc, char **argv)
@@ -928,7 +928,7 @@ void icv_tests(void)
   if (stat >= 0) {
     FUNC_ERROR("miicv_setint");
   }
-  
+
   stat = miicv_setint(icv, MI_ICV_NUM_IMGDIMS, MI_MAX_IMGDIMS);
   if (stat < 0) {
     FUNC_ERROR("miicv_setint");

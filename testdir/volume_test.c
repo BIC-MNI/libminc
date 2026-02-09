@@ -1,5 +1,5 @@
 /* Long overdue tests for the basic volume functions.
- * This was written largely as a way for me to make certain that I 
+ * This was written largely as a way for me to make certain that I
  * got copy_volume_new_type() more-or-less correct [bert].
  */
 #include <volume_io.h>
@@ -60,7 +60,7 @@ test1(void)
     ERROR;
     return 1;
   }
-  
+
   get_volume_sizes( v1, read_sizes );
   for (i = 0; i < get_volume_n_dimensions( v1 ); i++)
   {
@@ -95,7 +95,7 @@ test1(void)
 
   srand(0);
   for (i = 0; i < sizes[0]; i++)
-    for (j = 0; j < sizes[1]; j++) 
+    for (j = 0; j < sizes[1]; j++)
       for (k = 0; k < sizes[2]; k++)
         for (t = 0; t < sizes[3]; t++)
           for (v = 0; v < sizes[4]; v++)
@@ -103,7 +103,7 @@ test1(void)
 
   srand(0);
   for (i = 0; i < sizes[0]; i++)
-    for (j = 0; j < sizes[1]; j++) 
+    for (j = 0; j < sizes[1]; j++)
       for (k = 0; k < sizes[2]; k++)
         for (t = 0; t < sizes[3]; t++)
           for (v = 0; v < sizes[4]; v++)
@@ -125,7 +125,7 @@ test1(void)
 
   srand(0);
   for (i = 0; i < sizes[0]; i++)
-    for (j = 0; j < sizes[1]; j++) 
+    for (j = 0; j < sizes[1]; j++)
       for (k = 0; k < sizes[2]; k++)
         for (t = 0; t < sizes[3]; t++)
           for (v = 0; v < sizes[4]; v++)
@@ -148,18 +148,18 @@ test1(void)
           }
 
   for (i = 0; i < sizes[0]; i++)
-    for (j = 0; j < sizes[1]; j++) 
+    for (j = 0; j < sizes[1]; j++)
       for (k = 0; k < sizes[2]; k++)
         for (t = 0; t < sizes[3]; t++)
           for (v = 0; v < sizes[4]; v++)
           {
             VIO_Real x1 = get_volume_voxel_value( v1, i, j, k, t, v );
             VIO_Real x2 = get_volume_voxel_value( v2, i, j, k, t, v );
-            
+
             if (x2 != (int)(x1 + 1) % 256)
             {
               ERROR;
-              fprintf(stderr, "%d %d %d %d %d: %f %f\n", 
+              fprintf(stderr, "%d %d %d %d %d: %f %f\n",
                       i, j, k, t, v, x1, x2 );
               return 1;
             }
@@ -181,18 +181,18 @@ test1(void)
     return 1;
   }
   for (i = 0; i < sizes[0]; i++)
-    for (j = 0; j < sizes[1]; j++) 
+    for (j = 0; j < sizes[1]; j++)
       for (k = 0; k < sizes[2]; k++)
         for (t = 0; t < sizes[3]; t++)
           for (v = 0; v < sizes[4]; v++)
           {
             VIO_Real x1 = get_volume_voxel_value( v1, i, j, k, t, v );
             VIO_Real x2 = get_volume_voxel_value( v2, i, j, k, t, v );
-            
+
             if ( x2 != x1 )
             {
               ERROR;
-              fprintf(stderr, "%d %d %d %d %d: %f %f\n", 
+              fprintf(stderr, "%d %d %d %d %d: %f %f\n",
                       i, j, k, t, v, x1, x2 );
               return 1;
             }
@@ -201,23 +201,23 @@ test1(void)
           }
 
   for (i = 0; i < sizes[0]; i++)
-    for (j = 0; j < sizes[1]; j++) 
+    for (j = 0; j < sizes[1]; j++)
       for (k = 0; k < sizes[2]; k++)
         for (t = 0; t < sizes[3]; t++)
           for (v = 0; v < sizes[4]; v++)
           {
             VIO_Real x1 = get_volume_voxel_value( v1, i, j, k, t, v );
             VIO_Real x2 = get_volume_voxel_value( v2, i, j, k, t, v );
-            
+
             if ( x2 != x1 * 1000 )
             {
               ERROR;
-              fprintf(stderr, "%d %d %d %d %d: %f %f\n", 
+              fprintf(stderr, "%d %d %d %d %d: %f %f\n",
                       i, j, k, t, v, x1, x2 );
               return 1;
             }
           }
-  
+
   delete_volume( v2 );
 
   delete_volume( v1 );
@@ -232,7 +232,7 @@ test2(void)
   int sizes[VIO_MAX_DIMENSIONS] = { 172, 256, 256, 3, 3 };
   int read_sizes[VIO_MAX_DIMENSIONS] = { 1, 1, 1, 1, 1 };
   int i, j, k;
-  char *dim_names[] = { 
+  char *dim_names[] = {
     MIzspace, MIyspace, MIxspace, MItime, MIvector_dimension
   };
 
@@ -288,7 +288,7 @@ test2(void)
     ERROR;
     return 1;
   }
-  
+
   get_volume_sizes( v1, read_sizes );
   for (i = 0; i < get_volume_n_dimensions( v1 ); i++)
   {
@@ -305,13 +305,13 @@ test2(void)
 
   srand(0);
   for (i = 0; i < sizes[0]; i++)
-    for (j = 0; j < sizes[1]; j++) 
+    for (j = 0; j < sizes[1]; j++)
       for (k = 0; k < sizes[2]; k++)
         set_volume_voxel_value( v1, i, j, k, 0, 0, rand() % 32768 );
 
   srand(0);
   for (i = 0; i < sizes[0]; i++)
-    for (j = 0; j < sizes[1]; j++) 
+    for (j = 0; j < sizes[1]; j++)
       for (k = 0; k < sizes[2]; k++)
       {
         VIO_Real x1 = get_volume_voxel_value( v1, i, j, k, 0, 0 ) ;
@@ -323,7 +323,7 @@ test2(void)
         if ( x1 != expected_value )
         {
           ERROR;
-          fprintf(stderr, "%d %d %d: %f %d\n", 
+          fprintf(stderr, "%d %d %d: %f %d\n",
                   i, j, k, x1, expected_value );
           return 1;
         }
@@ -337,7 +337,7 @@ test2(void)
   }
 
   for (i = 0; i < sizes[0]; i++)
-    for (j = 0; j < sizes[1]; j++) 
+    for (j = 0; j < sizes[1]; j++)
       for (k = 0; k < sizes[2]; k++)
       {
         VIO_Real x1 = get_volume_voxel_value( v1, i, j, k, 0, 0 ) ;
@@ -346,7 +346,7 @@ test2(void)
         if ( x1 != x2 )
         {
           ERROR;
-          fprintf(stderr, "%d %d %d: %f %f\n", 
+          fprintf(stderr, "%d %d %d: %f %f\n",
                   i, j, k, x1, x2 );
           return 1;
         }
@@ -354,9 +354,9 @@ test2(void)
         set_volume_voxel_value( v2, i, j, k, 0, 0, x1 * 1000.0 );
       }
 
-  
+
   for (i = 0; i < sizes[0]; i++)
-    for (j = 0; j < sizes[1]; j++) 
+    for (j = 0; j < sizes[1]; j++)
       for (k = 0; k < sizes[2]; k++)
       {
         VIO_Real x1 = get_volume_voxel_value( v1, i, j, k, 0, 0 ) ;
@@ -365,13 +365,13 @@ test2(void)
         if ( x1 * 1000.0 != x2 )
         {
           ERROR;
-          fprintf(stderr, "%d %d %d: %f %f\n", 
+          fprintf(stderr, "%d %d %d: %f %f\n",
                   i, j, k, x1, x2 );
           return 1;
         }
       }
 
-  
+
   delete_volume( v2 );
   delete_volume( v1 );
   return 0;
@@ -428,7 +428,7 @@ test3(void)
     ERROR;
     return 1;
   }
-  
+
   get_volume_sizes( v1, read_sizes );
   for (i = 0; i < get_volume_n_dimensions( v1 ); i++)
   {
@@ -445,12 +445,12 @@ test3(void)
 
   srand(0);
   for (i = 0; i < sizes[0]; i++)
-    for (j = 0; j < sizes[1]; j++) 
+    for (j = 0; j < sizes[1]; j++)
       set_volume_voxel_value( v1, i, j, 0, 0, 0, (double)rand()/RAND_MAX );
 
   srand(0);
   for (i = 0; i < sizes[0]; i++)
-    for (j = 0; j < sizes[1]; j++) 
+    for (j = 0; j < sizes[1]; j++)
     {
       VIO_Real x1 = get_volume_voxel_value( v1, i, j, 0, 0, 0 ) ;
       /* There is no range check even if we set the max and min voxel
@@ -476,7 +476,7 @@ test3(void)
   }
 
   for (i = 0; i < sizes[0]; i++)
-    for (j = 0; j < sizes[1]; j++) 
+    for (j = 0; j < sizes[1]; j++)
     {
       VIO_Real x1 = get_volume_voxel_value( v1, i, j, 0, 0, 0 ) ;
       VIO_Real x2 = get_volume_voxel_value( v2, i, j, 0, 0, 0 ) ;
@@ -491,9 +491,9 @@ test3(void)
       set_volume_voxel_value( v2, i, j, 0, 0, 0, x1 * 1000.0 );
     }
 
-  
+
   for (i = 0; i < sizes[0]; i++)
-    for (j = 0; j < sizes[1]; j++) 
+    for (j = 0; j < sizes[1]; j++)
     {
       VIO_Real x1 = get_volume_voxel_value( v1, i, j, 0, 0, 0 ) ;
       VIO_Real x2 = get_volume_voxel_value( v2, i, j, 0, 0, 0 ) ;
@@ -531,7 +531,7 @@ main(int argc, char **argv)
 
   if (errors != 0)
   {
-    fprintf(stderr, "%s exiting with %d error%s.\n", argv[0], errors, 
+    fprintf(stderr, "%s exiting with %d error%s.\n", argv[0], errors,
             errors == 1 ? "" : "s");
   }
   else

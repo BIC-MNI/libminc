@@ -211,7 +211,7 @@ main(int argc, char *argv[])
    /* Parse the command line */
    pname=argv[0];
    if (argc!=6) {
-      (void) fprintf(stderr, 
+      (void) fprintf(stderr,
          "Usage: %s <filename> <xsize> <ysize> <min> <max>\n", pname);
       return ERROR_STATUS;
    }
@@ -221,23 +221,23 @@ main(int argc, char *argv[])
    image_min=atof(argv[4]);
    image_max=atof(argv[5]);
 
-   test_icv_read(filename, xsize, ysize, image_min, image_max, 
+   test_icv_read(filename, xsize, ysize, image_min, image_max,
                  NC_BYTE, MI_UNSIGNED);
-   test_icv_read(filename, xsize, ysize, image_min, image_max, 
+   test_icv_read(filename, xsize, ysize, image_min, image_max,
                  NC_SHORT, MI_UNSIGNED);
-   test_icv_read(filename, xsize, ysize, image_min, image_max, 
+   test_icv_read(filename, xsize, ysize, image_min, image_max,
                  NC_INT, MI_UNSIGNED);
 
-   test_icv_read(filename, xsize, ysize, image_min, image_max, 
+   test_icv_read(filename, xsize, ysize, image_min, image_max,
                  NC_BYTE, MI_SIGNED);
-   test_icv_read(filename, xsize, ysize, image_min, image_max, 
+   test_icv_read(filename, xsize, ysize, image_min, image_max,
                  NC_SHORT, MI_SIGNED);
-   test_icv_read(filename, xsize, ysize, image_min, image_max, 
+   test_icv_read(filename, xsize, ysize, image_min, image_max,
                  NC_INT, MI_SIGNED);
 
-   test_icv_read(filename, xsize, ysize, image_min, image_max, 
+   test_icv_read(filename, xsize, ysize, image_min, image_max,
                  NC_FLOAT, MI_SIGNED);
-   test_icv_read(filename, xsize, ysize, image_min, image_max, 
+   test_icv_read(filename, xsize, ysize, image_min, image_max,
                  NC_DOUBLE, MI_SIGNED);
 
    return NORMAL_STATUS;

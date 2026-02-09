@@ -1,8 +1,8 @@
 /* ----------------------------- MNI Header -----------------------------------
-@NAME       : 
+@NAME       :
 @DESCRIPTION: Primitive C++ interface to minc files, uses MINC1 API only
 @COPYRIGHT  :
-              Copyright 2007 Vladimir Fonov, McConnell Brain Imaging Centre, 
+              Copyright 2007 Vladimir Fonov, McConnell Brain Imaging Centre,
               Montreal Neurological Institute, McGill University.
               Permission to use, copy, modify, and distribute this
               software and its documentation for any purpose and without
@@ -22,10 +22,10 @@
 
 #ifdef USE_MINC2
 #define MINC2 1
-#endif 
+#endif
 
 extern "C" {
-#include <minc.h> 
+#include <minc.h>
 }
 
 #include <typeinfo>
@@ -34,8 +34,8 @@ extern "C" {
 
 namespace minc
 {
-  
-  //! class for storing dimension information 
+
+  //! class for storing dimension information
   struct dim_info
   {
     enum dimensions {DIM_UNKNOWN=0,DIM_X,DIM_Y,DIM_Z,DIM_TIME,DIM_VEC} ;
@@ -51,10 +51,10 @@ namespace minc
     std::string name;
     dimensions  dim;
   };
-  
+
   //! collection of dimensions describing a minc file
   typedef std::vector<dim_info> minc_info;
-  
+
   //! minc file rw base class
   class minc_1_base
   {
@@ -82,19 +82,19 @@ namespace minc
     minc_info _info;
     bool _minc2;
   public:
-    
+
     //! get the minc handle
     int mincid(void) const  //this is not really a const ?
     {
       return _mincid;
     }
-    
+
     //! get the data type id (NC_BYTE,NC_INT etc)
     nc_type datatype(void) const
     {
       return _datatype;
     }
-    
+
     //! byte size of the volume elements
     unsigned int element_size(void) const
     {
@@ -107,43 +107,43 @@ namespace minc
         default:return 0;//maybe throw exception here?
       }
     }
-    
+
     //! is data stored in signed format
     bool is_signed(void) const
     {
       return _is_signed;
     }
-  
+
     //! constructor
 	  minc_1_base();
-    
+
     //! copy constructor
     minc_1_base(const minc_1_base& that);
 
     //! destructor, closes minc file
     virtual ~minc_1_base();
-    
+
     //! close the minc file
     virtual void close(void);
 
     //! is last slice was read?
-    bool last(void) const 
+    bool last(void) const
     {
       return _last;
     }
-    
+
     //! go to the beginning of file
     void begin(void)
     {
       fill(_cur.begin(),_cur.end(),0);
       _last=false;
     }
-    
-    //! advance to next slice 
+
+    //! advance to next slice
     bool next_slice(void)
     {
       if(_last) return !_last;
-        
+
       for(int i=_ndims-_slice_dimensions-1;i>=0;i--)
       {
         _cur[i]++;
@@ -151,51 +151,51 @@ namespace minc
           break;
         if(!i)
           _last=true;
-        else 
+        else
           _cur[i]=0;
       }
       return !_last;
     }
-    
+
     //! slice length in elements
     int slice_len(void) const
     {
       return _slab_len;
     }
-    
+
     //! number of dimensions
     int dim_no(void) const
     {
       return _ndims;
     }
-    
+
     //! get the dimension information
     const dim_info& dim(unsigned int n) const
     {
-      if(n>=static_cast<unsigned int>(_ndims)) 
+      if(n>=static_cast<unsigned int>(_ndims))
         REPORT_ERROR("Dimension is not defined");
       return _info[n];
     }
-    
+
     //! get the pointer to the dimension description array
     const minc_info& info(void) const
     {
       return _info;
     }
-    
+
     //! get the number of dimensions in one slice
     int slice_dimensions(void) const
     {
       return _slice_dimensions;
     }
-    
+
     //! get the current slice index
     const std::vector<long> & current_slice(void) const
     {
       return _cur;
     }
-    
-    //! get the normalized dimensions sizes 
+
+    //! get the normalized dimensions sizes
     //! ( 0 - vector_dimension, 1 - x, 2- y , 3 -z , 4 - time)
     int ndim(int i) const
     {
@@ -210,7 +210,7 @@ namespace minc
       if(j>=0) return _info[j].start;
       return 0.0;
     }
-    
+
     //! get normalized dimension spacing  (see ndim)
     double nspacing(int i) const
     {
@@ -218,7 +218,7 @@ namespace minc
       if(j>=0) return _info[j].step;
       return 0.0;
     }
-    
+
     //! get normalized dimension direction cosine component  (see ndim)
     double ndir_cos(int i,int j) const
     {
@@ -226,7 +226,7 @@ namespace minc
       if(k>=0) return _info[k].dir_cos[j];
       return 0.0;
     }
-    
+
     //! check if a normalized dimension has direction cosine information
     bool have_dir_cos(int i) const
     {
@@ -234,54 +234,54 @@ namespace minc
       if(k>=0) return _info[k].have_dir_cos;
       return false;
     }
-     
+
     //! map file dimensions into normalized dimensions
     int map_space(int i)
     {
       return _map_to_std[i];
     }
-    
+
     //metadate info handling function:
     //! read the minc history (:history attribute)
     std::string history(void) const;
-    
+
     //! retrieve var id, if it exists, otherwise return MI_ERROR
     int var_id(const char *var_name) const;
-    
+
     //! get variable length
     long var_length(const char *var_name) const;
-    
+
     //! get variable length
     long var_length(int var_id) const;
-    
+
     //! read the number of variables
     int var_number(void) const;
-    
+
     //! get the variable name number no
     std::string var_name(int no) const;
-    
+
     //! get the variable contents, given it's id
     std::vector<double> var_value_double(int varid) const;
-    
+
     //! get the variable contents, given it's name
     std::vector<double> var_value_double(const char *var_name) const;
-    
+
     //! get the number of attributes associated with variable
     int att_number(const char *var_name) const;
-    
+
     //! get the number of attributes associated with variable
     int att_number(int var_no) const;
-    
+
     //! get the attribute name, given the number
     std::string att_name(const char *var_name,int no) const;
     //! get the attribute name, given the number
     std::string att_name(int varid,int no) const;
-    
+
     //! get the string attribute value , given the name
     std::string att_value_string(const char *var_name,const char *att_name) const;
     //! get the string attribute value , given variable id
     std::string att_value_string(int varid,const char *att_name) const;
-    
+
     //! get the double attribute value , given the name
     std::vector<double> att_value_double(const char *var_name,const char *att_name) const;
     //! get the int attribute value , given the name
@@ -290,7 +290,7 @@ namespace minc
     std::vector<short> att_value_short(const char *var_name,const char *att_name) const;
     //! get the byte attribute value , given the variable id
     std::vector<unsigned char> att_value_byte(const char *var_name,const char *att_name) const;
-    
+
     //! get the double attribute value , given the variable id
     std::vector<double> att_value_double(int varid,const char *att_name) const;
     //! get the int attribute value , given the variable id
@@ -299,7 +299,7 @@ namespace minc
     std::vector<short> att_value_short(int varid,const char *att_name) const;
     //! get the byte attribute value , given the variable id
     std::vector<unsigned char> att_value_byte(int varid,const char *att_name) const;
-    
+
     //! enquire about attribute data type
     nc_type att_type(const char *var_name,const char *att_name) const;
     //! enquire about attribute data type
@@ -313,23 +313,23 @@ namespace minc
 
     //! return var_id for the given name (create one, if it doesn't exists)
     int create_var_id(const char *varname);
-    
+
     void insert(const char *varname,const char *attname,double val);
     void insert(const char *varname,const char *attname,const char* val);
     void insert(const char *varname,const char *attname,const std::vector<double> &val);
     void insert(const char *varname,const char *attname,const std::vector<int> &val);
     void insert(const char *varname,const char *attname,const std::vector<short> &val);
     void insert(const char *varname,const char *attname,const std::vector<unsigned char> &val);
-    
-    
+
+
     //! check if the file in MINC2 format
     bool is_minc2(void) const
     {
       return _minc2;
     }
-    
+
   };
-  
+
   //! minc file reader
   class minc_1_reader:public minc_1_base
   {
@@ -343,23 +343,23 @@ namespace minc
     public:
     //! copy constructor
     minc_1_reader(const minc_1_reader&);
-    
+
     //! default constructor
     minc_1_reader();
 
     //! close the minc file
     virtual void close(void);
-    
+
     //! destructor
     virtual ~minc_1_reader();
-    
+
     //! open a minc file
     //! \param path - path to existing  minc file
     //! \param positive_directions  - make all step sizes positive
     //! \param metadate_only - file is opened only for the purpose of reading metadata (will save memory)
     //! \param rw - file headers may be modified
     void open(const char *path,bool positive_directions=false,bool metadate_only=false,bool rw=false);
-    
+
     //! read single slice
     void read(void* slice);
     //! setup reading in float format
@@ -377,7 +377,7 @@ namespace minc
     //! setup reading in unsigned int format
     void setup_read_uint(bool normalized=false);
   };
-  
+
   //! minc file writer
   class minc_1_writer:public minc_1_base
   {
@@ -387,24 +387,24 @@ namespace minc
       bool _calc_min_max;
       bool _write_prepared;
     public:
-      //! open minc file for writing - will overwrite existing 
+      //! open minc file for writing - will overwrite existing
       //! \param path - path to minc file
       //! \param inf  - information about dimensions
       //! \param slice_dimensions - number of dimensions per slice (used for storage)
       //! \param datatype - storage datatype
       //! \param is_signed - check if datatype will be signed or not
       void open(const char *path,const minc_info& inf,int slice_dimensions,nc_type datatype,int is_signed=0);
-      
-      //! open minc file for writing - will overwrite existing 
+
+      //! open minc file for writing - will overwrite existing
       //! \param path - path to minc file
       //! \param imitate  - all information is copied from this opened minc file
       void open(const char *path,const minc_1_base& imitate);
-      
-      //! open minc file for writing - will overwrite existing 
+
+      //! open minc file for writing - will overwrite existing
       //! \param path - path to minc file
       //! \param imitate_file  - all information is copied from this existing minc file
       void open(const char *path,const char *imitate_file);
-    
+
       //! prepare for writing float array
       void setup_write_float(void);
       //! prepare for writing double array
@@ -419,27 +419,27 @@ namespace minc
       void setup_write_int(bool normalize=false);
       //! prepare for writing unsigned int array
       void setup_write_uint(bool normalize=false);
-    
+
       //! copy header from another minc file
       //! \param src - path to existing minc file
       void copy_headers(const minc_1_base& src);
-    
+
       //! append a line into minc history
       //! \param append_history - history line to append
       void append_history(const char *append_history);
-      
+
       //! default constructor
       minc_1_writer();
-      
+
       //! make a copy of another writer
       minc_1_writer(const minc_1_writer&);
-      
+
       //! destructor
       virtual ~minc_1_writer();
-      
+
       //! close the minc file
       virtual void close(void);
-      
+
       //!write a single slice, size of the buffer should be more or equal to slab_len
       void write(void* slice);
   };
