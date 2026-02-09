@@ -5,7 +5,7 @@ macro(build_nifti install_prefix staging_prefix)
   else()
     set(CMAKE_GEN "${CMAKE_GENERATOR}")
   endif()
-  
+
   set(CMAKE_EXTERNAL_PROJECT_ARGS
         -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
         -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
@@ -42,7 +42,7 @@ macro(build_nifti install_prefix staging_prefix)
         -DCMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO:STRING=${CMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO}
         -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
   )
-  
+
   if(APPLE)
     list(APPEND CMAKE_OSX_EXTERNAL_PROJECT_ARGS
       -DCMAKE_OSX_ARCHITECTURES:STRING=${CMAKE_OSX_ARCHITECTURES}
@@ -55,14 +55,14 @@ macro(build_nifti install_prefix staging_prefix)
 
   set(HDF_CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
   set(HDF_CMAKE_C_FLAGS_RELEASE   ${CMAKE_C_FLAGS_RELEASE})
-  
+
   set(HDF_CMAKE_CXX_FLAGS_DEBUG   ${CMAKE_CXX_FLAGS_DEBUG})
   set(HDF_CMAKE_C_FLAGS_DEBUG     ${CMAKE_C_FLAGS_DEBUG})
-  
+
   set(NIFTI_CMAKE_CXX_FLAGS "-fPIC ${CMAKE_CXX_FLAGS} -I${ZLIB_INCLUDE_DIR}")
   set(NIFTI_CMAKE_C_FLAGS   "-fPIC ${CMAKE_C_FLAGS} -I${ZLIB_INCLUDE_DIR}")
 
-  
+
   ExternalProject_Add(NIFTI
     SOURCE_DIR NIFTI
     BINARY_DIR NIFTI-build
@@ -90,7 +90,7 @@ macro(build_nifti install_prefix staging_prefix)
             -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
             -DZLIB_INCLUDE_DIR:PATH=${ZLIB_INCLUDE_DIR}
             -DZLIB_LIBRARY:FILEPATH=${ZLIB_LIBRARY}
-   
+
     INSTALL_COMMAND $(MAKE) install DESTDIR=${staging_prefix}
     INSTALL_DIR ${staging_prefix}/${install_prefix}
   )
