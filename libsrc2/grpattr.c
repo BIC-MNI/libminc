@@ -1019,4 +1019,153 @@ int miadd_history_attr ( mihandle_t vol, size_t length, const void *values )
 
 }
 
+
+int miget_variable_ndims(mihandle_t vol, 
+            const char *path,
+            const char *name)
+{
+  hid_t dset_id = -1;
+  hid_t fspc_id = -1;
+  int ndims = -1;
+  char _path[MI2_MAX_PATH];
+
+  snprintf(_path, MI2_MAX_PATH, MI_ROOT_PATH "/%s/%s", path, name);
+  
+  /* Open the dataset with the specified path
+  */
+  MI_CHECK_HDF_CALL(dset_id = H5Dopen1(vol->hdf_id, _path),"H5Dopen1");
+  if (dset_id < 0) {
+    return (MI_ERROR);
+  }
+
+  MI_CHECK_HDF_CALL(fspc_id = H5Dget_space(dset_id),"H5Dget_space");
+  if (fspc_id < 0) {
+    /*TODO: report can't get dataset*/
+    goto cleanup;
+  }
+
+  ndims = H5Sget_simple_extent_ndims(fspc_id);
+  if (ndims < 0) {
+      goto cleanup;
+  }
+
+cleanup:
+
+  if (fspc_id >= 0) {
+    H5Sclose(fspc_id);
+  }
+  if ( dset_id >=0 ) {
+    H5Dclose(dset_id);
+  }
+
+  return (ndims);
+}
+
+int miget_variable_dims(mihandle_t vol, 
+            const char *path,
+            const char *name,
+            hsize_t *dims)
+{
+  hid_t dset_id = -1;
+  hid_t fspc_id = -1;
+  int result = MI_ERROR;
+  char _path[MI2_MAX_PATH];
+  int ndims = -1;
+
+  snprintf(_path, MI2_MAX_PATH, MI_ROOT_PATH "/%s/%s", path, name);
+  
+  /* Open the dataset with the specified path
+  */
+  MI_CHECK_HDF_CALL(dset_id = H5Dopen1(vol->hdf_id, _path),"H5Dopen1");
+  if (dset_id < 0) {
+    return (MI_ERROR);
+  }
+
+  MI_CHECK_HDF_CALL(fspc_id = H5Dget_space(dset_id),"H5Dget_space");
+  if (fspc_id < 0) {
+    /*TODO: report can't get dataset*/
+    goto cleanup;
+  }
+
+  ndims = H5Sget_simple_extent_ndims(fspc_id);
+  if (ndims < 0) {
+      goto cleanup;
+  } else if (ndims==0) {
+    /* scalar variable */
+    dims[0] = 1;
+    result = MI_NOERROR;
+    goto cleanup;
+  } else {
+    MI_CHECK_HDF_CALL(H5Sget_simple_extent_dims(fspc_id, dims, NULL),"H5Sget_simple_extent_dims");
+    result = MI_NOERROR;
+  }
+cleanup:
+
+  if (fspc_id >= 0) {
+    H5Sclose(fspc_id);
+  }
+  if ( dset_id >=0 ) {
+    H5Dclose(dset_id);
+  }
+
+  return (result);
+}
+
+
+int miget_variable_type(mihandle_t vol, 
+            const char *path,
+            const char *name,
+            mitype_t *data_type)
+{
+  hid_t dset_id = -1;
+  hid_t type_id = -1;
+  int result = MI_ERROR;
+  char _path[MI2_MAX_PATH];
+
+  snprintf(_path, MI2_MAX_PATH, MI_ROOT_PATH "/%s/%s", path, name);
+  
+  /* Open the dataset with the specified path
+  */
+  MI_CHECK_HDF_CALL(dset_id = H5Dopen1(vol->hdf_id, _path),"H5Dopen1");
+  if (dset_id < 0) {
+    return (MI_ERROR);
+  }
+
+  MI_CHECK_HDF_CALL(type_id = H5Dget_type(dset_id),"H5Dget_type");
+  if (type_id < 0) {
+    goto cleanup;
+  }
+  
+  switch ( H5Tget_class ( type_id ) ) {
+  case H5T_FLOAT:
+
+    if ( H5Tget_size ( type_id ) == sizeof ( float ) ) {
+      *data_type = MI_TYPE_FLOAT;
+    } else {
+      *data_type = MI_TYPE_DOUBLE;
+    }
+
+    break;
+  case H5T_INTEGER:
+    *data_type = MI_TYPE_INT;
+    break;
+  default:
+    goto cleanup;
+  }
+  result = MI_NOERROR;
+
+cleanup:
+
+  if (type_id >= 0) {
+    H5Tclose(type_id);
+  }
+
+  if ( dset_id >=0 ) {
+    H5Dclose(dset_id);
+  }
+
+  return (result);
+}
+
+
 /* kate: indent-mode cstyle; indent-width 2; replace-tabs on; */

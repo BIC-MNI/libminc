@@ -1471,6 +1471,49 @@ int miget_number_of_defined_labels(mihandle_t volume, int *number_of_labels);
 */
 int miget_label_value_by_index(mihandle_t volume, int idx, int *value);
 
+
+/**
+ * Read variable number of dimensions
+*/
+int miget_variable_ndims(mihandle_t vol, 
+            const char *path,
+            const char *name);
+
+/**
+ * Read variable datatype
+*/
+int miget_variable_type(mihandle_t volume, const char *path, const char *name, mitype_t *data_type);
+
+/**
+ * Read variable dimensions
+*/
+int miget_variable_dims(mihandle_t vol, 
+            const char *path,
+            const char *name,
+            hsize_t *dims);
+
+/**
+ * Read variable contents without any conversion
+*/
+int miget_variable_raw( mihandle_t volume,
+                        const char *path,
+                        const char *name,                        
+                        mitype_t midatatype,
+                        const hsize_t hdf_start[],
+                        const hsize_t hdf_count[],
+                        void *buffer);
+
+/**
+ * Write variable contents without any conversion
+ */
+int miset_variable_raw( mihandle_t volume,
+                        const char *path,
+                        const char *name,
+                        mitype_t midatatype,
+                        const hsize_t hdf_start[],
+                        const hsize_t hdf_count[],
+                        void *buffer);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus defined */

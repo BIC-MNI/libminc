@@ -176,8 +176,9 @@ add_executable(minc2-volprops-test minc2-volprops-test.c)
 add_executable(minc2-read-rgb minc2-read-rgb.c)
 add_executable(minc2-read-metadata minc2-read-metadata.c)
 
-add_executable(minc2-leak-test minc2-leak-test.c)
-add_executable(minc2-float-voxel-test minc2-float-voxel-test.c)
+ADD_EXECUTABLE(minc2-leak-test minc2-leak-test.c)
+ADD_EXECUTABLE(minc2-float-voxel-test minc2-float-voxel-test.c)
+ADD_EXECUTABLE(minc2-read-variable minc2-read-variable.c)
 
 add_minc_test(minc2-convert-test          minc2-convert-test)
 add_minc_test(minc2-create-test-images    minc2-create-test-images 
@@ -196,7 +197,7 @@ add_minc_test(minc2-large-attribute-1m    minc2-large-attribute 1000000 ${CMAKE_
 
 add_minc_test(minc2-datatype-test         minc2-datatype-test  
                                           ${CMAKE_CURRENT_BINARY_DIR}/datatype_minc2.mnc)
-                                          
+
 add_minc_test(minc2-dimension-test        minc2-dimension-test)
 add_minc_test(minc2-full-test             minc2-full-test)
 add_minc_test(minc2-grpattr-test          minc2-grpattr-test)
@@ -213,7 +214,6 @@ add_minc_test(minc2-slice-test            minc2-slice-test
                                           ${CMAKE_CURRENT_BINARY_DIR}/3D_minc2_int.mnc 
                                           ${CMAKE_CURRENT_BINARY_DIR}/3D_minc2_float.mnc
                                           )
-                                          
 
 add_minc_test(minc2-valid-test            minc2-valid-test
                                           ${CMAKE_CURRENT_BINARY_DIR}/2D_minc2.mnc 
@@ -229,6 +229,10 @@ add_minc_test(minc2-leak-test             minc2-leak-test)
 
 add_minc_test(minc2-float-voxel-test      minc2-float-voxel-test
                                           ${CMAKE_CURRENT_BINARY_DIR}/test-dbl.mnc
+                                          )
+
+add_minc_test(minc2-read-variable         minc2-read-variable
+                                          ${CMAKE_CURRENT_SOURCE_DIR}/4d_dot.mnc
                                           )
 
 set_property(TEST minc2-slice-test APPEND PROPERTY DEPENDS minc2-create-test-images) 
