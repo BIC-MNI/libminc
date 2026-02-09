@@ -34,16 +34,16 @@ main(void)
         count[i] = 1;
     }
 
-    result = micreate_dimension("xspace", MI_DIMCLASS_SPATIAL, 
+    result = micreate_dimension("xspace", MI_DIMCLASS_SPATIAL,
                            MI_DIMATTR_REGULARLY_SAMPLED, CX, &hdim[0]);
 
-    result = micreate_dimension("yspace", MI_DIMCLASS_SPATIAL, 
+    result = micreate_dimension("yspace", MI_DIMCLASS_SPATIAL,
                            MI_DIMATTR_REGULARLY_SAMPLED, CY, &hdim[1]);
 
-    result = micreate_dimension("zspace", MI_DIMCLASS_SPATIAL, 
+    result = micreate_dimension("zspace", MI_DIMCLASS_SPATIAL,
                            MI_DIMATTR_REGULARLY_SAMPLED, CZ, &hdim[2]);
 
-    result = micreate_volume("tst-rec.mnc", NDIMS, hdim, MI_TYPE_UINT, 
+    result = micreate_volume("tst-rec.mnc", NDIMS, hdim, MI_TYPE_UINT,
                              MI_CLASS_UNIFORM_RECORD, NULL, &hvol);
     if (result < 0) {
 	TESTRPT("Unable to create test file", result);
@@ -89,7 +89,7 @@ main(void)
                 voxel.r = i;
                 voxel.g = j;
                 voxel.b = k;
-                
+
                 result = miset_voxel_value_hyperslab(hvol, MI_TYPE_UNKNOWN,
                                                      coords, count, &voxel);
                 if (result < 0) {
@@ -121,7 +121,7 @@ main(void)
     miclose_volume(hvol);
 
     if (error_cnt != 0) {
-	fprintf(stderr, "%d error%s reported\n", 
+	fprintf(stderr, "%d error%s reported\n",
 		error_cnt, (error_cnt == 1) ? "" : "s");
     }
     else {

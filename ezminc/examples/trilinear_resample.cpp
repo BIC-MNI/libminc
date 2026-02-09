@@ -2,7 +2,7 @@
 @NAME       :  trilinear_resample
 @DESCRIPTION:  an example of using trilinear resampling algorithm
 @COPYRIGHT  :
-              Copyright 2011 Vladimir Fonov, McConnell Brain Imaging Centre, 
+              Copyright 2011 Vladimir Fonov, McConnell Brain Imaging Centre,
               Montreal Neurological Institute, McGill University.
               Permission to use, copy, modify, and distribute this
               software and its documentation for any purpose and without
@@ -37,7 +37,7 @@ int main(int argc,char **argv)
     {"step",    required_argument,       0, 's'},
     {0, 0, 0, 0}
   };
-  
+
   for (;;) {
     /* getopt_long stores the option index here. */
     int option_index = 0;
@@ -69,7 +69,7 @@ int main(int argc,char **argv)
     show_usage (argv[0]);
     return 1;
   }
-  
+
   try
   {
     minc_1_reader rdr;
@@ -80,38 +80,38 @@ int main(int argc,char **argv)
     simple_volume<float> input_vol,output_vol;
     load_simple_volume<float>(rdr,input_vol);
     new_info=rdr.info();
-    
+
     minc::fixed_vec<3,float> old_step;
     minc::fixed_vec<3,float> old_start,new_start;
     minc::fixed_vec<3,int> new_len;
-    
+
     for(int i=1;i<4;i++)
     {
       old_step[i-1]=new_info[rdr.map_space(i)].step;
       old_start[i-1]=new_info[rdr.map_space(i)].start;
-      
+
       float len=(new_info[rdr.map_space(i)].length)*old_step[i-1];
-      
+
       new_info[rdr.map_space(i)].start-=old_step[i-1];
       new_info[rdr.map_space(i)].step=_step;
       new_info[rdr.map_space(i)].start+=_step/2;
       new_start[i-1]=new_info[rdr.map_space(i)].start;
-      
+
       new_len[i-1]=new_info[rdr.map_space(i)].length=ceil(fabs(len/_step));
     }
-    
+
     output_vol.resize(new_len);
-    
+
     for(int z=0;z<new_len[2];z++)
       for(int y=0;y<new_len[1];y++)
         for(int x=0;x<new_len[0];x++)
         {
           minc::fixed_vec<3,float> cc=IDX<float>(x*_step,y*_step,z*_step);
-          
+
           cc+=new_start;
           cc/=old_step;
           cc-=old_start;
-          
+
           output_vol.set(x,y,z,input_vol.interpolate(cc[0],cc[1],cc[2]));
         }
     minc_1_writer wrt;

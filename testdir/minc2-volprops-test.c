@@ -26,7 +26,7 @@ int main(int argc, char **argv)
   if (r < 0) {
     TESTRPT("failed", r);
   }
-  
+
   r = miset_props_multi_resolution(props, 1 , 2);
 
   if (r < 0) {
@@ -55,7 +55,7 @@ int main(int argc, char **argv)
   }
   else {
     printf("Got compression type %d \n", compression_type);
- }  
+ }
 
   r = miset_props_zlib_compression(props,4);
   if (r < 0) {
@@ -84,7 +84,7 @@ int main(int argc, char **argv)
       if (r < 0) {
 	  TESTRPT("failed", r);
       }
-      r = miget_props_blocking(props, &edge_count, edge_lengths, 
+      r = miget_props_blocking(props, &edge_count, edge_lengths,
 			       MI2_MAX_VAR_DIMS);
       if (r < 0) {
 	  TESTRPT("failed", r);
@@ -99,7 +99,7 @@ int main(int argc, char **argv)
   }
 
  if (error_cnt != 0) {
-    fprintf(stderr, "%d error%s reported\n", 
+    fprintf(stderr, "%d error%s reported\n",
 	    error_cnt, (error_cnt == 1) ? "" : "s");
   }
   else {

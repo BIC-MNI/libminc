@@ -27,11 +27,11 @@ double rint(double v); /*hack: defined in m2util.c*/
 #define REAL_MIN (-1.0)
 
 static int
-create_and_test_image(const char *name, 
-                      mihandle_t *hvol_ptr, 
+create_and_test_image(const char *name,
+                      mihandle_t *hvol_ptr,
                       midimhandle_t hdims[],
                       double outval)
-{    
+{
   mihandle_t hvol;
   int result;
   misize_t start[NDIMS];
@@ -40,35 +40,35 @@ create_and_test_image(const char *name,
   int i,j,k;
   int error_cnt = 0;
 
-  result = micreate_dimension("xspace", MI_DIMCLASS_SPATIAL, 
+  result = micreate_dimension("xspace", MI_DIMCLASS_SPATIAL,
                               MI_DIMATTR_REGULARLY_SAMPLED, CX, &hdims[0]);
   if (result < 0) {
     TESTRPT("Unable to create test volume", result);
     return error_cnt;
   }
 
-  result = micreate_dimension("yspace", MI_DIMCLASS_SPATIAL, 
+  result = micreate_dimension("yspace", MI_DIMCLASS_SPATIAL,
                               MI_DIMATTR_REGULARLY_SAMPLED, CY, &hdims[1]);
   if (result < 0) {
     TESTRPT("Unable to create test volume", result);
     return error_cnt;
   }
 
-  result = micreate_dimension("zspace", MI_DIMCLASS_SPATIAL, 
+  result = micreate_dimension("zspace", MI_DIMCLASS_SPATIAL,
                               MI_DIMATTR_REGULARLY_SAMPLED, CZ, &hdims[2]);
   if (result < 0) {
     TESTRPT("Unable to create test volume", result);
     return error_cnt;
   }
 
-  result = micreate_volume(name, NDIMS, hdims, MI_TYPE_DOUBLE, 
+  result = micreate_volume(name, NDIMS, hdims, MI_TYPE_DOUBLE,
                            MI_CLASS_REAL, NULL, &hvol);
   if (result < 0) {
     TESTRPT("Unable to create test volume", result);
     return error_cnt;
   }
 
-  result = miget_volume_dimensions(hvol, MI_DIMCLASS_ANY, MI_DIMATTR_ALL, 
+  result = miget_volume_dimensions(hvol, MI_DIMCLASS_ANY, MI_DIMATTR_ALL,
                                    MI_DIMORDER_FILE, NDIMS, hdims);
   if (result < 0) {
     TESTRPT("Unable to get volume dimensions", result);
@@ -109,9 +109,9 @@ create_and_test_image(const char *name,
     return error_cnt;
   }
 
-  
+
   misize_t test_vox[] = { (misize_t) CX/2, (misize_t) CY/2, (misize_t) CZ/2 };
-  
+
   result = miget_real_value(hvol, test_vox, NDIMS, &outval);
   if (result < 0) {
     TESTRPT("unable to read value", result);
@@ -135,7 +135,7 @@ main(void){
   mihandle_t hvol;
   midimhandle_t hdims[NDIMS];
   double outval = 0.0;
-  
+
   int error_count = create_and_test_image("test-dbl.mnc", &hvol, hdims, outval);
 
   // clean up memory

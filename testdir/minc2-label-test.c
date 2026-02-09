@@ -274,7 +274,7 @@ main ( void )
 
   free(buf);
   free(dbuf);
-    
+
   if ( error_cnt != 0 ) {
     fprintf ( stderr, "%d error%s reported\n",
               error_cnt, ( error_cnt == 1 ) ? "" : "s" );
@@ -284,4 +284,4 @@ main ( void )
   return ( error_cnt );
 }
 
-// kate: indent-mode cstyle; indent-width 2; replace-tabs on; 
+// kate: indent-mode cstyle; indent-width 2; replace-tabs on;

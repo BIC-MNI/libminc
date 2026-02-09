@@ -29,12 +29,12 @@ double rint(double v); /*hack: defined in m2util.c*/
 #define NORM_MIN (-1.0)
 
 static int
-create_and_test_image(const char *name, 
-                      mihandle_t *hvol_ptr, 
+create_and_test_image(const char *name,
+                      mihandle_t *hvol_ptr,
                       midimhandle_t hdims[],
                       unsigned short stemp[CZ][CX][CY],
                       unsigned short stmp2[CX][CY][CZ])
-{    
+{
   mihandle_t hvol;
   int result;
   misize_t start[NDIMS];
@@ -44,35 +44,35 @@ create_and_test_image(const char *name,
   char *dimnames[] = {"zspace", "xspace", "yspace"};
   int error_cnt = 0;
 
-  result = micreate_dimension("xspace", MI_DIMCLASS_SPATIAL, 
+  result = micreate_dimension("xspace", MI_DIMCLASS_SPATIAL,
                               MI_DIMATTR_REGULARLY_SAMPLED, CX, &hdims[0]);
   if (result < 0) {
     TESTRPT("Unable to create test volume", result);
     return error_cnt;
   }
 
-  result = micreate_dimension("yspace", MI_DIMCLASS_SPATIAL, 
+  result = micreate_dimension("yspace", MI_DIMCLASS_SPATIAL,
                               MI_DIMATTR_REGULARLY_SAMPLED, CY, &hdims[1]);
   if (result < 0) {
     TESTRPT("Unable to create test volume", result);
     return error_cnt;
   }
 
-  result = micreate_dimension("zspace", MI_DIMCLASS_SPATIAL, 
+  result = micreate_dimension("zspace", MI_DIMCLASS_SPATIAL,
                               MI_DIMATTR_REGULARLY_SAMPLED, CZ, &hdims[2]);
   if (result < 0) {
     TESTRPT("Unable to create test volume", result);
     return error_cnt;
   }
 
-  result = micreate_volume(name, NDIMS, hdims, MI_TYPE_UINT, 
+  result = micreate_volume(name, NDIMS, hdims, MI_TYPE_UINT,
                            MI_CLASS_REAL, NULL, &hvol);
   if (result < 0) {
     TESTRPT("Unable to create test volume", result);
     return error_cnt;
   }
 
-  result = miget_volume_dimensions(hvol, MI_DIMCLASS_ANY, MI_DIMATTR_ALL, 
+  result = miget_volume_dimensions(hvol, MI_DIMCLASS_ANY, MI_DIMATTR_ALL,
                                    MI_DIMORDER_FILE, NDIMS, hdims);
   if (result < 0) {
     TESTRPT("Unable to get volume dimensions", result);
@@ -112,13 +112,13 @@ create_and_test_image(const char *name,
     TESTRPT("unable to set hyperslab", result);
     return error_cnt;
   }
-    
+
   start[0] = start[1] = start[2] = 0;
   count[0] = CX;
   count[1] = CY;
   count[2] = CZ;
   result = miget_real_value_hyperslab(hvol, MI_TYPE_DOUBLE, start, count, dtemp);
-        
+
   printf("miget_real_value_hyperslab()\n");
 
   if (result < 0) {
@@ -213,7 +213,7 @@ create_and_test_image(const char *name,
    */
   printf("miget_voxel_hyperslab, reversed Z axis\n");
 
-  result = miset_dimension_apparent_voxel_order(hdims[2], 
+  result = miset_dimension_apparent_voxel_order(hdims[2],
                                                 MI_COUNTER_FILE_ORDER);
   if (result < 0) {
     TESTRPT("unable to set voxel order", result);
@@ -381,7 +381,7 @@ test1(void)
      */
     printf("read and write entire hyperslab:\n");
 
-    result = miget_voxel_value_hyperslab(hvol, MI_TYPE_USHORT, start, count, 
+    result = miget_voxel_value_hyperslab(hvol, MI_TYPE_USHORT, start, count,
                                          stemp);
     if (result < 0) {
         TESTRPT("Can't read hyperslab", result);
@@ -402,7 +402,7 @@ test1(void)
         }
     }
 
-    result = miset_voxel_value_hyperslab(hvol, MI_TYPE_USHORT, start, count, 
+    result = miset_voxel_value_hyperslab(hvol, MI_TYPE_USHORT, start, count,
                                          stemp);
     /* stemp has now been modified by the operation! */
 
@@ -427,7 +427,7 @@ test1(void)
         }
     }
 
-    result = miset_voxel_value_hyperslab(hvol, MI_TYPE_USHORT, start, count, 
+    result = miset_voxel_value_hyperslab(hvol, MI_TYPE_USHORT, start, count,
                                          stemp);
     if (result < 0) {
         TESTRPT("miset_voxel_value_hyperslab failed\n", result);
@@ -467,7 +467,7 @@ test1(void)
     }
 
     miclose_volume(hvol);
-    
+
     if (error_cnt == 0) {
         printf("No errors\n");
     }
@@ -490,7 +490,7 @@ test2(void)
     int i,j,k;
     midimhandle_t hdims[NDIMS];
     int error_cnt = 0;
-    
+
     error_cnt = create_and_test_image("tst-hyper-s.mnc", &hvol, hdims, stemp, stmp2);
 
     /*********************************************************************
@@ -555,7 +555,7 @@ test2(void)
             }
         }
     }
-    
+
     printf("miset_hyperslab_normalized()\n");
 
     result = miset_hyperslab_normalized(hvol, MI_TYPE_INT, start, count,
@@ -589,7 +589,7 @@ test2(void)
     }
 
     miclose_volume(hvol);
-    
+
     if (error_cnt == 0) {
         printf("No errors\n");
     }
@@ -617,14 +617,14 @@ test3(void)
     int error_cnt = 0;
 
     printf("Testing hyperslab operations with multi-resolution image.\n");
-    
-    result = micreate_dimension("xspace", MI_DIMCLASS_SPATIAL, 
+
+    result = micreate_dimension("xspace", MI_DIMCLASS_SPATIAL,
                                 MI_DIMATTR_REGULARLY_SAMPLED, CX, &hdims[0]);
 
-    result = micreate_dimension("yspace", MI_DIMCLASS_SPATIAL, 
+    result = micreate_dimension("yspace", MI_DIMCLASS_SPATIAL,
                                 MI_DIMATTR_REGULARLY_SAMPLED, CY, &hdims[1]);
 
-    result = micreate_dimension("zspace", MI_DIMCLASS_SPATIAL, 
+    result = micreate_dimension("zspace", MI_DIMCLASS_SPATIAL,
                                 MI_DIMATTR_REGULARLY_SAMPLED, CZ, &hdims[2]);
 
     result = minew_volume_props(&hprops);
@@ -639,7 +639,7 @@ test3(void)
         TESTRPT("Unable to create test volume", result);
     }
 
-    result = miget_volume_dimensions(hvol, MI_DIMCLASS_ANY, MI_DIMATTR_ALL, 
+    result = miget_volume_dimensions(hvol, MI_DIMCLASS_ANY, MI_DIMATTR_ALL,
                                      MI_DIMORDER_FILE, NDIMS, hdims);
     if (result < 0) {
         TESTRPT("Unable to get volume dimensions", result);
@@ -673,14 +673,14 @@ test3(void)
     if (result < 0) {
         TESTRPT("unable to set hyperslab", result);
     }
-    
-    
+
+
     start[0] = start[1] = start[2] = 0;
     count[0] = CX;
     count[1] = CY;
     count[2] = CZ;
     result = miget_real_value_hyperslab(hvol, MI_TYPE_DOUBLE, start, count, dtemp);
-        
+
     if (result < 0) {
         TESTRPT("Unable to read real value hyperslab", result);
     }
@@ -767,7 +767,7 @@ test3(void)
      *  - Z axis reversed
      */
 
-    result = miset_dimension_apparent_voxel_order(hdims[2], 
+    result = miset_dimension_apparent_voxel_order(hdims[2],
                                                   MI_COUNTER_FILE_ORDER);
     if (result < 0) {
         TESTRPT("unable to set voxel order", result);
@@ -907,7 +907,7 @@ test3(void)
             }
         }
     }
-    
+
     result = miset_hyperslab_normalized(hvol, MI_TYPE_INT, start, count,
                                         REAL_MIN, REAL_MAX, itemp);
     if (result < 0) {
@@ -941,28 +941,28 @@ test3(void)
     {
       TESTRPT("Can't select resolution depth 2.", result);
     }
-    
+
     result = miselect_resolution(hvol, 1);
     if (result != MI_NOERROR)
     {
       TESTRPT("Can't select resolution depth 1.", result);
     }
-    
+
 
     result = miselect_resolution(hvol, 0);
     if (result != MI_NOERROR)
     {
       TESTRPT("Can't select resolution depth 0.", result);
     }
-    
+
     result = miselect_resolution(hvol, 21);
     if (result != MI_ERROR)
     {
       TESTRPT("Selected resolution depth 21.", result);
     }
-    
+
     miclose_volume(hvol);
-    
+
     if (error_cnt == 0) {
         printf("No errors\n");
     }
@@ -972,7 +972,7 @@ test3(void)
     return (error_cnt);
 }
 
-int 
+int
 main(void)
 {
   int error_count = 0;

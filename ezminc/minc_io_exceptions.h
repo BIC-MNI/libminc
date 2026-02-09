@@ -1,8 +1,8 @@
 /* ----------------------------- MNI Header -----------------------------------
-@NAME       : 
+@NAME       :
 @DESCRIPTION: minc exceptions
 @COPYRIGHT  :
-              Copyright 2006 Vladimir Fonov, McConnell Brain Imaging Centre, 
+              Copyright 2006 Vladimir Fonov, McConnell Brain Imaging Centre,
               Montreal Neurological Institute, McGill University.
               Permission to use, copy, modify, and distribute this
               software and its documentation for any purpose and without

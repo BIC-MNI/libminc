@@ -15,7 +15,7 @@
 
 #ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
-#endif 
+#endif
 
 #include <sys/resource.h>
 
@@ -91,7 +91,7 @@ leak_loop(mihandle_t hvol, int n, int check_p)
   int i;
   misize_t count[N_DIMS];
   misize_t start[N_DIMS];
-  double *buffer;    
+  double *buffer;
   int result;
   int hwm = check_high_water_mark();
   int obj = H5Fget_obj_count(hvol->hdf_id, H5F_OBJ_ALL);
@@ -167,7 +167,7 @@ leak_loop(mihandle_t hvol, int n, int check_p)
       }
       hwm = new_hwm;
     }
-    /* ANY change in the number of object objects reported is a 
+    /* ANY change in the number of object objects reported is a
      * FATAL ERROR.
      */
     if (check_p && new_obj > obj) {
@@ -207,29 +207,29 @@ create_test_image ( const char *filename )
     r = micreate_dimension( dimnames[i], MI_DIMCLASS_SPATIAL,
                             MI_DIMATTR_REGULARLY_SAMPLED, DIM_LENGTH,
                             &hdim[i] );
-    if (r < 0) 
+    if (r < 0)
       return r;
   }
-  
+
   r = miset_dimension_starts( hdim, N_DIMS, starts );
   if (r < 0)
     return r;
-  
+
   r = miset_dimension_separations( hdim, N_DIMS, separations );
   if (r < 0)
     return r;
-  
+
   r = micreate_volume(filename, N_DIMS, hdim, MI_TYPE_USHORT,
                       MI_CLASS_REAL, NULL, &hvol );
-  if (r < 0) 
+  if (r < 0)
     return r;
-  
+
   r = miset_slice_scaling_flag ( hvol, 1 );
-  if (r < 0) 
+  if (r < 0)
     return r;
 
   r = micreate_volume_image ( hvol );
-  if (r < 0) 
+  if (r < 0)
     return r;
 
   buf = ( uint16_t * ) malloc ( nvoxels * sizeof ( uint16_t ) );
@@ -247,14 +247,14 @@ create_test_image ( const char *filename )
   if (r < 0) {
     return r;
   }
-  
+
   start[0] = start[1] = start[2] = 0;
   for ( i = 0; i < DIM_LENGTH; i++ ) {
     start[0] = i;
     min_real -= 17.0;
     max_real += 17.0;
     r = miset_slice_range( hvol, start, N_DIMS, max_real, min_real );
-    if (r < 0) 
+    if (r < 0)
       return r;
   }
   r = miclose_volume(hvol);
@@ -297,7 +297,7 @@ main(int argc, char *argv[])
     fprintf(stderr, "ERROR I can handle at most %d dimensions.\n", N_DIMS);
     return -1;
   }
-  result = miget_volume_dimensions(hvol, MI_DIMCLASS_ANY, MI_DIMATTR_ALL, 
+  result = miget_volume_dimensions(hvol, MI_DIMCLASS_ANY, MI_DIMATTR_ALL,
                                    MI_DIMORDER_FILE, ndims, dimensions);
   if (result != ndims) {
     fprintf(stderr, "ERROR getting volume dimensions (%d).\n", result);

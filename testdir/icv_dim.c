@@ -23,9 +23,9 @@ int main(int argc, char **argv)
 {
    int icv, cdfid, img, max, min, dimvar;
    static int dim[MAX_VAR_DIMS];
-   static struct { long len; char *name;} diminfo[] = { 
-      { 3, MIzspace }, 
-      { 9, MIyspace }, 
+   static struct { long len; char *name;} diminfo[] = {
+      { 3, MIzspace },
+      { 9, MIyspace },
       { 2, MIxspace }
    };
 /*   static struct { long len; char *name;} diminfo[]=
@@ -76,7 +76,7 @@ int main(int argc, char **argv)
       miattputdbl(cdfid, dimvar, MIstep, 0.8);
       miattputdbl(cdfid, dimvar, MIstart, 22.0);
    }
-   
+
    img=micreate_std_variable(cdfid, MIimage, NC_SHORT,
                              numdims, dim);
    max=micreate_std_variable(cdfid, MIimagemax, NC_DOUBLE, 1, dim);

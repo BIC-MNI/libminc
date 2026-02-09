@@ -10,7 +10,7 @@
 
 #include <volume_io.h>
 
- 
+
 static VIO_Real tolerance = 1e-8;
 
 
@@ -21,20 +21,20 @@ static int is_equal_real( VIO_Real e, VIO_Real a )
 
 /* Args: expected, actual.
  */
-static void assert_equal_point( 
+static void assert_equal_point(
        VIO_Real ex, VIO_Real ey, VIO_Real ez,
        VIO_Real ax, VIO_Real ay, VIO_Real az,
        const char* msg )
 {
-    if ( is_equal_real(ex,ax) && 
+    if ( is_equal_real(ex,ax) &&
       is_equal_real(ey,ay) &&
       is_equal_real(ez,az) )
     return;
 
     printf( "%s failure.\n"
       "Expected: %f %f %f\n"
-      "  Actual: %f %f %f\n", 
-      msg, ex,ey,ez,  ax,ay,az ); 
+      "  Actual: %f %f %f\n",
+      msg, ex,ey,ez,  ax,ay,az );
 
     exit(3);
 }
@@ -63,7 +63,7 @@ int main( int ac, char* av[] )
       fprintf( stderr, "Failed to load table '%s'\n", av[2] );
       return 2;
     }
-      
+
     /*Set the same seed number*/
     while (!feof(in)) {
       VIO_Real x,y,z;
@@ -73,10 +73,10 @@ int main( int ac, char* av[] )
       VIO_Real ta,tb,tc;
       int check=1;
       char line_c[1024];
-      
+
       check=fscanf(in,"%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg,%lg",&x,&y,&z,&a,&b,&c,&ta,&tb,&tc);
       if(check<=0) break;
-      
+
       if(check!=3 && check!=9)
       {
         fprintf( stderr,"Unexpected input file format at line %d , read %d values!\n",line,check);
@@ -88,7 +88,7 @@ int main( int ac, char* av[] )
         fprintf( stderr, "Failed to transform point %f,%f,%f \n", x,y,z );
         return 3;
       }
-      
+
       if(general_inverse_transform_point( &xfm,  x,y,z,  &ttx,&tty,&ttz ) != VIO_OK)
       {
         fprintf( stderr, "Failed to invert transform point %f,%f,%f \n", tx,ty,tz );
@@ -110,9 +110,9 @@ int main( int ac, char* av[] )
       fgetc(in);
     }
     fclose(in);
-    
+
     delete_general_transform(&xfm);
-    
+
     return 0;
 }
 

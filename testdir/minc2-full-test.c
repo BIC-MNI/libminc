@@ -38,7 +38,7 @@ static int test1(int do_real)
         return (1);
     }
 
-    r = micreate_dimension("xspace", MI_DIMCLASS_SPATIAL, 
+    r = micreate_dimension("xspace", MI_DIMCLASS_SPATIAL,
                            MI_DIMATTR_NOT_REGULARLY_SAMPLED, CX, &hdim[0]);
     if (r != 0) {
         fprintf(stderr, "unexpected error\n");
@@ -51,7 +51,7 @@ static int test1(int do_real)
         return (1);
     }
 
-    r = micreate_dimension("yspace", MI_DIMCLASS_SPATIAL, 
+    r = micreate_dimension("yspace", MI_DIMCLASS_SPATIAL,
                            MI_DIMATTR_REGULARLY_SAMPLED, CY, &hdim[1]);
     if (r < 0) {
         return (1);
@@ -62,7 +62,7 @@ static int test1(int do_real)
         return (1);
     }
 
-    r = micreate_dimension("zspace", MI_DIMCLASS_SPATIAL, 
+    r = micreate_dimension("zspace", MI_DIMCLASS_SPATIAL,
                            MI_DIMATTR_REGULARLY_SAMPLED, CZ, &hdim[2]);
     if (r < 0) {
         return (1);
@@ -168,13 +168,13 @@ static int test2(void)
     misize_t lengths[ND];
     mifcomplex_t fcmpl;
 
-    r = micreate_dimension("xspace", MI_DIMCLASS_SPATIAL, 
+    r = micreate_dimension("xspace", MI_DIMCLASS_SPATIAL,
                            MI_DIMATTR_REGULARLY_SAMPLED, CCX, &hdim[2]);
     if (r != 0) {
         return (1);
     }
 
-    r = micreate_dimension("yspace", MI_DIMCLASS_SPATIAL, 
+    r = micreate_dimension("yspace", MI_DIMCLASS_SPATIAL,
                            MI_DIMATTR_REGULARLY_SAMPLED, CCY, &hdim[1]);
 
     if (r < 0) {
@@ -186,7 +186,7 @@ static int test2(void)
         return (1);
     }
 
-    r = micreate_dimension("zspace", MI_DIMCLASS_SPATIAL, 
+    r = micreate_dimension("zspace", MI_DIMCLASS_SPATIAL,
                            MI_DIMATTR_REGULARLY_SAMPLED, CCZ, &hdim[0]);
     if (r < 0) {
         return (1);
@@ -204,7 +204,7 @@ static int test2(void)
         return (1);
     }
 
-    r = micreate_volume("cmpltest.mnc", 3, hdim, MI_TYPE_FCOMPLEX, 
+    r = micreate_volume("cmpltest.mnc", 3, hdim, MI_TYPE_FCOMPLEX,
                         MI_CLASS_COMPLEX, NULL, &hvol);
     if (r != 0) {
         fprintf(stderr, "error creating volume\n");
@@ -230,7 +230,7 @@ static int test2(void)
 
                 fcmpl.real = (i * 100) + j;
                 fcmpl.imag = k;
-                r = miset_voxel_value_hyperslab(hvol, 
+                r = miset_voxel_value_hyperslab(hvol,
                                                 MI_TYPE_FCOMPLEX,
                                                 coords,
                                                 lengths,
@@ -250,7 +250,7 @@ static int test2(void)
                 coords[1] = j;
                 coords[2] = k;
 
-                r = miget_voxel_value_hyperslab(hvol, 
+                r = miget_voxel_value_hyperslab(hvol,
                                                 MI_TYPE_FCOMPLEX,
                                                 coords,
                                                 lengths,
@@ -268,7 +268,7 @@ static int test2(void)
         }
     }
 
-    miset_attr_values(hvol, MI_TYPE_STRING, MIimage, MIcomplete, 
+    miset_attr_values(hvol, MI_TYPE_STRING, MIimage, MIcomplete,
                       sizeof(MI_TRUE), MI_TRUE);
 
     r = miclose_volume(hvol);

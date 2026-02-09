@@ -27,7 +27,7 @@ int main(int argc, char **argv)
    int icv, mincid, img, i;
    static int dim[MAX_VAR_DIMS];
    static struct { long len; char *name;} diminfo[] = {
-       { 4, MIyspace }, 
+       { 4, MIyspace },
        { 5, MIxspace}
    };
    static int numdims=sizeof(diminfo)/sizeof(diminfo[0]);

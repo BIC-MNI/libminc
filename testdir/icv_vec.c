@@ -51,8 +51,8 @@ test_icv_vector(int cflag, nc_type voxel_type)
 {
   int icv, cdfid, img, max, min, dimvar;
   int dim[N_DIM];
-  struct { 
-    long len; 
+  struct {
+    long len;
     const char *name;
   } diminfo[N_DIM];
   int numdims = N_DIM;
@@ -100,7 +100,7 @@ test_icv_vector(int cflag, nc_type voxel_type)
       miattputdbl(cdfid, dimvar, MIstart, 22.0);
     }
   }
-   
+
   img = micreate_std_variable(cdfid, MIimage, voxel_type, numdims, dim);
   miattputdbl(cdfid, img, MIvalid_max, VOXEL_MAX);
   miattputdbl(cdfid, img, MIvalid_min, VOXEL_MIN);
@@ -165,7 +165,7 @@ test_icv_vector(int cflag, nc_type voxel_type)
           iv = iv * (IMAGE_MAX - IMAGE_MIN) + IMAGE_MIN;
         }
         if (fabs(iv - dvalue[TIND(i, j, k)]) > 1e-8) {
-          fprintf(stdout, "Error on line %d, (%d,%d,%d): %8.7f %8.7f\n", 
+          fprintf(stdout, "Error on line %d, (%d,%d,%d): %8.7f %8.7f\n",
                   __LINE__, i, j, k, dvalue[TIND(i,j,k)], iv);
         }
       }
@@ -186,12 +186,12 @@ test_icv_vector(int cflag, nc_type voxel_type)
     fprintf(stdout, "ERROR bad return code at line %d!\n", __LINE__);
     error_count++;
   }
-  
+
   for (i=0; i < N_ELEMENTS; i++)
     dvalue[i] = 0;
   return_val = miicv_get(icv, coord, count, dvalue);
   if (return_val != MI_NOERROR) {
-    fprintf(stdout, "ERROR bad return code %d at line %d!\n", 
+    fprintf(stdout, "ERROR bad return code %d at line %d!\n",
             return_val, __LINE__);
     error_count++;
   }
@@ -283,7 +283,7 @@ test_icv_vector(int cflag, nc_type voxel_type)
           iv /= NV;
         }
         if (fabs(iv - dvalue[TINDS(i,j,k)]) > 1e-8) {
-          fprintf(stdout, "ERROR on line %d, (%d,%d,%d): %8.7f %8.7f\n", 
+          fprintf(stdout, "ERROR on line %d, (%d,%d,%d): %8.7f %8.7f\n",
                   __LINE__, i, j, k, dvalue[TINDS(i,j,k)], iv);
           error_count++;
           break;

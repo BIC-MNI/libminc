@@ -30,7 +30,7 @@ main(int argc, char **argv)
         if (r < 0) {
             TESTRPT("error getting valid maximum", r);
         }
-            
+
         r = miget_volume_valid_range(hvol, &max, &min);
         if (r < 0) {
             TESTRPT("error getting valid range", r);

@@ -1,14 +1,14 @@
 /* ----------------------------- MNI Header -----------------------------------
 @NAME       : test
-@INPUT      : 
-@OUTPUT     : 
-@RETURNS    : 
-@DESCRIPTION: 
-@METHOD     : 
-@GLOBALS    : 
-@CALLS      : 
-@CREATED    : 
-@MODIFIED   : 
+@INPUT      :
+@OUTPUT     :
+@RETURNS    :
+@DESCRIPTION:
+@METHOD     :
+@GLOBALS    :
+@CALLS      :
+@CREATED    :
+@MODIFIED   :
 ---------------------------------------------------------------------------- */
 #if HAVE_CONFIG_H
 #include "config.h"

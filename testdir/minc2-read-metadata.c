@@ -39,20 +39,20 @@ static int print_metadata(mihandle_t vol, const char * path,int ident)
 
         printf("%*s %s:\n",ident,"",group_name);
         strcpy(add_path,path);strcat(add_path,group_name);
-        
+
         print_metadata(vol,add_path,ident+2);
 
       }
      milist_finish(grplist);
     }
   else return r;
-    
+
   //printf("Printing attributes path:%s %d\n",path,ident);
   if((r=milist_start(vol, path, 1 , &attlist)) == MI_NOERROR)
   {
     char int_path[256];
     char attribute[256];
-    
+
     while( milist_attr_next(vol,attlist,int_path,sizeof(int_path),attribute,sizeof(attribute)) == MI_NOERROR )
     {
       mitype_t att_data_type;
@@ -61,7 +61,7 @@ static int print_metadata(mihandle_t vol, const char * path,int ident)
          miget_attr_length(vol,int_path,attribute,&att_length) == MI_NOERROR )
       {
         printf("%*s %s:%s type:%s length:%d\n",ident,"",int_path,attribute,get_type_name(att_data_type),(int)att_length);
-        
+
         switch(att_data_type)
         {
           case MI_TYPE_STRING:
@@ -122,8 +122,8 @@ static int print_metadata(mihandle_t vol, const char * path,int ident)
       }
     }
     milist_finish(attlist);
-  } 
-  
+  }
+
   return r;
 }
 
@@ -131,19 +131,19 @@ int main ( int argc, char **argv )
 {
   mihandle_t vol;
 
-  
+
   int           ndim;
   miclass_t      volume_class;
   mitype_t       volume_type;
-  
+
   int r = 0;
-  
+
   if(argc<2)
   {
     fprintf(stderr,"Usage: %s <input.mnc> \n",argv[0]);
     return 1;
   }
-  
+
   r = miopen_volume ( argv[1], MI2_OPEN_READ, &vol );
 
   if ( r < 0 ) {
@@ -153,26 +153,26 @@ int main ( int argc, char **argv )
   }
 
   printf("Volume %s info: \n",argv[1]);
-  
+
   r= miget_volume_dimension_count(vol,MI_DIMCLASS_ANY,MI_DIMATTR_ALL,&ndim);
-  
+
   if ( r < 0 ) {
     TESTRPT ( "failed to get image dimension count", r );
   }
-  
+
   r=miget_data_class(vol, &volume_class);
-  
+
   if ( r < 0 ) {
     TESTRPT ( "failed to get volume class", r );
   }
-  
+
   r=miget_data_type(vol, &volume_type);
-  
+
   if ( r < 0 ) {
     TESTRPT ( "failed to get volume type", r );
   }
-  
-  
+
+
   printf("\tNumber of dimensions:%d Data class:%s Data Type: %s\n",ndim,
          volume_class==MI_CLASS_REAL?"Real":
          volume_class==MI_CLASS_INT?"Int":
@@ -183,7 +183,7 @@ int main ( int argc, char **argv )
 
   /* go over metadata*/
   print_metadata(vol,"",0);
-  
+
   /* close volume*/
   miclose_volume ( vol );
   /*free(buffer);*/
@@ -198,4 +198,4 @@ int main ( int argc, char **argv )
   return ( error_cnt );
 }
 
-// kate: indent-mode cstyle; indent-width 2; replace-tabs on; 
+// kate: indent-mode cstyle; indent-width 2; replace-tabs on;

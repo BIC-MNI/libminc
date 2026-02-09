@@ -18,7 +18,7 @@ main(int argc, char **argv)
     /* Check each file.
      */
     while (--argc > 0) {
-	
+
 	++argv;
 
 	if (micreate_volume(*argv, 0, NULL, MI_TYPE_INT, 0, NULL, &volume) < 0) { /*type 0 is equivalent to H5T_INTEGER */
@@ -33,7 +33,7 @@ main(int argc, char **argv)
 		miget_data_type_size(volume, &mysize);
 		miget_data_class(volume, &myclass);
 		miget_space_name(volume, &myname);
-	    
+
 		mifree_name(myname);
 	    }
 

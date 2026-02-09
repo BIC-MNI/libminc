@@ -38,33 +38,33 @@ static int create_3D_image ( size_t attribute_size,char *test_file )
   r = micreate_dimension ( "yspace", MI_DIMCLASS_SPATIAL,
                            MI_DIMATTR_REGULARLY_SAMPLED, CY, &hdim[0] );
   if(r<0) return r;
-  
+
   r = micreate_dimension ( "xspace", MI_DIMCLASS_SPATIAL,
                            MI_DIMATTR_REGULARLY_SAMPLED, CX, &hdim[1] );
   if(r<0) return r;
-  
+
   r = micreate_dimension ( "zspace", MI_DIMCLASS_SPATIAL,
                            MI_DIMATTR_REGULARLY_SAMPLED, CZ, &hdim[2] );
   if(r<0) return r;
-  
+
   r = miset_dimension_starts ( hdim, NDIMS, start_values );
   if(r<0) return r;
-  
+
   r = miset_dimension_separations ( hdim, NDIMS, separations );
   if(r<0) return r;
-  
+
   r = micreate_volume ( test_file, NDIMS, hdim, MI_TYPE_USHORT,
                         MI_CLASS_REAL, NULL, &hvol );
   if(r<0) return r;
-  
+
   /* set slice scaling flag to true */
   r = miset_slice_scaling_flag ( hvol, flag );
   if(r<0) return r;
-  
+
 
   r = micreate_volume_image ( hvol );
   if(r<0) return r;
-  
+
 
   buf = ( unsigned short * ) malloc ( CX * CY * CZ * sizeof ( unsigned short ) );
   for ( i = 0; i < CY * CX * CZ; i++ ) {
@@ -76,7 +76,7 @@ static int create_3D_image ( size_t attribute_size,char *test_file )
 
   r = miset_voxel_value_hyperslab ( hvol, MI_TYPE_USHORT, start, count, buf );
   if(r<0) return r;
-  
+
   /* Set random values to slice min and max for slice scaling*/
   start[0] = start[1] = start[2] = 0;
   for ( i = 0; i < CY; i++ ) {
@@ -89,10 +89,10 @@ static int create_3D_image ( size_t attribute_size,char *test_file )
   attribute=malloc(attribute_size);
   memset(attribute,'Z',attribute_size-1);
   attribute[attribute_size-1]=0;
-  
+
   miset_attr_values(hvol,MI_TYPE_STRING,"test", "test",  attribute_size, attribute);
   miset_attr_values(hvol,MI_TYPE_STRING,"test", "test2", 6, "test2");
-  
+
   r = miclose_volume ( hvol );
   free(buf);
   free(attribute);
@@ -139,7 +139,7 @@ static int test_3D_image ( size_t attribute_size,char *test_file )
   }
   if(buf[length-1]!=0)
     TESTRPT("Attribute is not null terminated", r);
-  
+
   for(size_t i=0;i<(length-1);++i)
   {
     if(buf[i]!='Z')
@@ -164,14 +164,14 @@ int main ( int argc, char **argv )
     attribute_size=atoi(argv[1]);
   if(argc>2)
     test_file=argv[2];
-  
+
   printf ( "Creating 3D image with attribute %d ! (3D_image_a.mnc)\n", attribute_size );
   if( create_3D_image(attribute_size, test_file)<0)
     TESTRPT("create_3D_image",0);
 
   if( test_3D_image(attribute_size, test_file)<0)
     TESTRPT("test_3D_image",0);
-  
+
   if ( error_cnt != 0 ) {
     fprintf ( stderr, "%d error%s reported\n",
               error_cnt, ( error_cnt == 1 ) ? "" : "s" );

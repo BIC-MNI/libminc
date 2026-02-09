@@ -42,13 +42,13 @@ main(void)
     double r1, r2, r3;
     double cosines[3];
 
-    result = micreate_dimension("xspace", MI_DIMCLASS_SPATIAL, 
+    result = micreate_dimension("xspace", MI_DIMCLASS_SPATIAL,
                                 MI_DIMATTR_REGULARLY_SAMPLED, CX, &hdims[0]);
 
-    result = micreate_dimension("yspace", MI_DIMCLASS_SPATIAL, 
+    result = micreate_dimension("yspace", MI_DIMCLASS_SPATIAL,
                                 MI_DIMATTR_REGULARLY_SAMPLED, CY, &hdims[1]);
 
-    result = micreate_dimension("zspace", MI_DIMCLASS_SPATIAL, 
+    result = micreate_dimension("zspace", MI_DIMCLASS_SPATIAL,
                                 MI_DIMATTR_REGULARLY_SAMPLED, CZ, &hdims[2]);
 
 
@@ -103,18 +103,18 @@ main(void)
                 voxel[2] = coords[2];
 
                 miconvert_voxel_to_world(hvol, voxel, world);
-        
+
                 miconvert_world_to_voxel(hvol, world, new_voxel);
 
                 for (n = 0; n < 3; n++) {
                     if (!NEARLY_EQUAL(voxel[n], new_voxel[n])) {
-                        fprintf(stderr, "%d %f %f\n", 
+                        fprintf(stderr, "%d %f %f\n",
                                 n, voxel[n], new_voxel[n]);
                         TESTRPT("conversion error", 0);
                     }
                 }
 
-                v1 = (VALID_MAX * (voxel[0] + voxel[1] + voxel[2]) 
+                v1 = (VALID_MAX * (voxel[0] + voxel[1] + voxel[2])
                       / ((CX-1)+(CY-1)+(CZ-1)));
 
                 result = miset_voxel_value_hyperslab(hvol, MI_TYPE_DOUBLE,
@@ -201,8 +201,8 @@ main(void)
         TESTRPT("miconvert_voxel_to_world error", result);
     }
 
-    if (!NEARLY_EQUAL(world[MI2_X], -80.0) || 
-        !NEARLY_EQUAL(world[MI2_Y], 150.0) || 
+    if (!NEARLY_EQUAL(world[MI2_X], -80.0) ||
+        !NEARLY_EQUAL(world[MI2_Y], 150.0) ||
         !NEARLY_EQUAL(world[MI2_Z], 120.0)) {
         fprintf(stderr, "%f %f %f\n", world[0], world[1], world[2]);
         TESTRPT("conversion error", 0);
