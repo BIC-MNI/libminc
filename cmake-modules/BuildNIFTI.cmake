@@ -53,14 +53,14 @@ macro(build_nifti install_prefix staging_prefix)
 
   set_property(DIRECTORY PROPERTY EP_STEP_TARGETS configure build test)
 
-  SET(HDF_CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
-  SET(HDF_CMAKE_C_FLAGS_RELEASE   ${CMAKE_C_FLAGS_RELEASE})
+  set(HDF_CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
+  set(HDF_CMAKE_C_FLAGS_RELEASE   ${CMAKE_C_FLAGS_RELEASE})
   
-  SET(HDF_CMAKE_CXX_FLAGS_DEBUG   ${CMAKE_CXX_FLAGS_DEBUG})
-  SET(HDF_CMAKE_C_FLAGS_DEBUG     ${CMAKE_C_FLAGS_DEBUG})
+  set(HDF_CMAKE_CXX_FLAGS_DEBUG   ${CMAKE_CXX_FLAGS_DEBUG})
+  set(HDF_CMAKE_C_FLAGS_DEBUG     ${CMAKE_C_FLAGS_DEBUG})
   
-  SET(NIFTI_CMAKE_CXX_FLAGS "-fPIC ${CMAKE_CXX_FLAGS} -I${ZLIB_INCLUDE_DIR}")
-  SET(NIFTI_CMAKE_C_FLAGS   "-fPIC ${CMAKE_C_FLAGS} -I${ZLIB_INCLUDE_DIR}")
+  set(NIFTI_CMAKE_CXX_FLAGS "-fPIC ${CMAKE_CXX_FLAGS} -I${ZLIB_INCLUDE_DIR}")
+  set(NIFTI_CMAKE_C_FLAGS   "-fPIC ${CMAKE_C_FLAGS} -I${ZLIB_INCLUDE_DIR}")
 
   
   ExternalProject_Add(NIFTI
@@ -95,11 +95,11 @@ macro(build_nifti install_prefix staging_prefix)
     INSTALL_DIR ${staging_prefix}/${install_prefix}
   )
 
-SET(NIFTI_LIBRARY     ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libniftiio.a )
-SET(NIFTI_INCLUDE_DIR ${staging_prefix}/${install_prefix}/include/nifti )
-SET(ZNZ_LIBRARY       ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libznz.a )
-SET(ZNZ_INCLUDE_DIR   ${staging_prefix}/${install_prefix}/include/nifti )
-SET(NIFTI_FOUND       ON)
+set(NIFTI_LIBRARY     ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libniftiio.a )
+set(NIFTI_INCLUDE_DIR ${staging_prefix}/${install_prefix}/include/nifti )
+set(ZNZ_LIBRARY       ${staging_prefix}/${install_prefix}/lib${LIB_SUFFIX}/libznz.a )
+set(ZNZ_INCLUDE_DIR   ${staging_prefix}/${install_prefix}/include/nifti )
+set(NIFTI_FOUND       ON)
 
 endmacro(build_nifti)
 

@@ -1,6 +1,6 @@
-LINK_LIBRARIES(minc_io)
+link_libraries(minc_io)
 
-ADD_EXECUTABLE(trilinear_resample trilinear_resample.cpp)
-ADD_EXECUTABLE(volume_avg volume_avg.cpp)
-ADD_EXECUTABLE(volume_msq_dist volume_msq_dist.cpp)
-ADD_EXECUTABLE(create_grid_file create_grid_file.cpp)
+add_executable(trilinear_resample trilinear_resample.cpp)
+add_executable(volume_avg volume_avg.cpp)
+add_executable(volume_msq_dist volume_msq_dist.cpp)
+add_executable(create_grid_file create_grid_file.cpp)

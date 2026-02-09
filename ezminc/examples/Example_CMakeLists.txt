@@ -1,12 +1,12 @@
 # Example CMakeLists.txt to work with minc&EZminc
 
 
-PROJECT(EXAMPLE)
+project(EXAMPLE)
 cmake_minimum_required(VERSION 2.8)
 
-FIND_PACKAGE(LIBMINC REQUIRED)
-INCLUDE( ${LIBMINC_USE_FILE} )
+find_package(LIBMINC REQUIRED)
+include( ${LIBMINC_USE_FILE} )
 
-ADD_EXECUTABLE(trilinear_resample trilinear_resample.cpp)
+add_executable(trilinear_resample trilinear_resample.cpp)
 
 target_link_libraries(trilinear_resample ${EZMINC_LIBRARIES})
