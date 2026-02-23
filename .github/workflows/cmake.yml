@@ -31,10 +31,10 @@ jobs:
         config: [Release]
         build-params: 
           - {static:  ON, WITH_MINC1:  ON, tests:  ON, USE_NIFTI: OFF }
-          - {static:  ON, WITH_MINC1:  ON, tests:  ON, USE_NIFTI: OFF }
           - {static: OFF, WITH_MINC1: OFF, tests:  ON, USE_NIFTI: OFF }
           - {static:  ON, WITH_MINC1:  ON, tests:  ON, USE_NIFTI:  ON }
     steps:
+    - name: Checkout repository
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
