@@ -20,9 +20,19 @@ set(LIBMINC_PACKAGE_NAME    "libminc")
 set(LIBMINC_PACKAGE_VERSION "${LIBMINC_PACKAGE_VERSION_MAJOR}.${LIBMINC_PACKAGE_VERSION_MINOR}.${LIBMINC_PACKAGE_VERSION_PATCH}")
 set(LIBMINC_PACKAGE_STRING  "${LIBMINC_PACKAGE_NAME} ${LIBMINC_PACKAGE_VERSION}")
 
-include(CTest)
+# Determine if we are the top-level project (standalone build)
+# or being included via add_subdirectory/FetchContent
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+  set(LIBMINC_IS_TOP_LEVEL ON)
+else()
+  set(LIBMINC_IS_TOP_LEVEL OFF)
+endif()
 
-enable_testing()
+# Only include CTest / enable_testing when building standalone or tests are requested
+if(LIBMINC_IS_TOP_LEVEL)
+  include(CTest)
+  enable_testing()
+endif()
 
 include(GNUInstallDirs)
 
@@ -106,13 +116,6 @@ endif()
 if(CMAKE_BUILD_TYPE MATCHES Debug)
   set(DEBUG "1")
 endif()
-
-# add for building relocatable library
-if(UNIX)
-  set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   -fPIC")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
-endif()
-
 
 if(LIBMINC_USE_ASAN)
   add_compile_options(-fno-omit-frame-pointer -fsanitize=address)
@@ -202,29 +205,11 @@ CHECK_INCLUDE_FILES(pwd.h       HAVE_PWD_H)
 CHECK_INCLUDE_FILES(sys/select.h    HAVE_SYS_SELECT_H)
 
 
-add_definitions(-DHAVE_CONFIG_H)
-add_definitions(-DMINC2=1)
-if(NOT APPLE)
-add_definitions(-D_XOPEN_SOURCE=500)
-endif()
 # aliases
 set(VERSION "${LIBMINC_EXTERNAL_LIB_PREFIX}${LIBMINC_PACKAGE_VERSION}")
 set(HAVE_MINC1 ${LIBMINC_MINC1_SUPPORT})
 set(HAVE_MINC2 ON)
 set(MINC2 "1")
-
-if(LIBMINC_MINC1_SUPPORT)
- add_definitions(-DHAVE_MINC1=1)
-endif()
-
-if(LIBMINC_BUILD_EZMINC)
-  set(LIBMINC_INCLUDE_DIRS_CONFIG
-    ${CMAKE_CURRENT_SOURCE_DIR}/ezminc
-  )
-  include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/ezminc
-   )
-endif()
 
 if(NIFTI_FOUND)
     set(LIBMINC_NIFTI_SUPPORT ON)
@@ -240,27 +225,6 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake ${CMAKE_CURRENT_BINARY
 
 # others
 #configure_file(${CMAKE_CURRENT_SOURCE_DIR}/epm-header.in ${CMAKE_CURRENT_BINARY_DIR}/epm-header)
-
-# set the master INCLUDE directories
-include_directories(
-   ${CMAKE_CURRENT_SOURCE_DIR}
-   ${CMAKE_CURRENT_BINARY_DIR}
-   ${CMAKE_CURRENT_SOURCE_DIR}/libcommon
-   ${CMAKE_CURRENT_SOURCE_DIR}/libsrc2
-   ${CMAKE_CURRENT_SOURCE_DIR}/libsrc
-   ${CMAKE_CURRENT_SOURCE_DIR}/volume_io/Include
-   ${HDF5_INCLUDE_DIRS}
-   )
-
-if(LIBMINC_BUILD_EZMINC AND LIBMINC_MINC1_SUPPORT)
-  include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/ezminc )
-endif()
-
-if(LIBMINC_NIFTI_SUPPORT)
-    include_directories(
-        ${NIFTI_INCLUDE_DIR}
-    )
-endif()
 
 set(minc_common_SRCS
   libcommon/minc2_error.c
@@ -426,6 +390,7 @@ endif()
 get_filename_component(HDF5_LIBRARY_NAME "${HDF5_LIBRARY}" NAME)
 get_filename_component(ZLIB_LIBRARY_NAME "${ZLIB_LIBRARY}" NAME)
 
+# Backward-compat: keep flat library list variables populated
 set(LIBMINC_LIBRARIES        ${LIBMINC_LIBRARY} ${HDF5_LIBRARY} ${NIFTI_LIBRARIES} ${ZLIB_LIBRARY})
 set(LIBMINC_LIBRARIES_CONFIG ${LIBMINC_LIBRARY} ${HDF5_LIBRARY_NAME} ${NIFTI_LIBRARY_NAME} ${ZNZ_LIBRARY_NAME} ${ZLIB_LIBRARY_NAME})
 message("LIBMINC_LIBRARIES_CONFIG=${LIBMINC_LIBRARIES_CONFIG}")
@@ -452,20 +417,89 @@ endif()
 
 # Keep this variable for compatibility
 set(VOLUME_IO_LIBRARY  minc2)
-set(CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})
 
+# ============================================================================
+# Create the main minc2 library target
+# ============================================================================
 add_library(${LIBMINC_LIBRARY} ${LIBRARY_TYPE} ${minc_LIB_SRCS} ${minc_HEADERS} ${volume_io_LIB_SRCS} ${volume_io_HEADERS} )
+
+# Alias target for FetchContent / add_subdirectory consumers
+# Allows: target_link_libraries(myapp PRIVATE LIBMINC::minc2)
+add_library(LIBMINC::minc2 ALIAS ${LIBMINC_LIBRARY})
 
 if(NIFTI_FOUND AND NOT LIBMINC_USE_SYSTEM_NIFTI)
     add_dependencies(${LIBMINC_LIBRARY} NIFTI)
 endif()
 
+# --- Target-scoped compile definitions (replaces global add_definitions) ---
+target_compile_definitions(${LIBMINC_LIBRARY}
+  PRIVATE
+    HAVE_CONFIG_H
+)
+target_compile_definitions(${LIBMINC_LIBRARY}
+  PUBLIC
+    MINC2=1
+    $<$<BOOL:${LIBMINC_MINC1_SUPPORT}>:HAVE_MINC1=1>
+)
+if(NOT APPLE)
+  target_compile_definitions(${LIBMINC_LIBRARY}
+    PRIVATE
+      _XOPEN_SOURCE=500
+  )
+endif()
 
-target_link_libraries(${LIBMINC_LIBRARY} ${HDF5_LIBRARY} ${NIFTI_LIBRARIES} ${ZLIB_LIBRARY} ${RT_LIBRARY}) #
+# --- Target-scoped include directories (replaces global include_directories) ---
+# PUBLIC: headers that downstream consumers need (#include "minc2.h", <volume_io.h>, etc.)
+# PRIVATE: headers only needed to build the library itself
+# Note: HDF5 include dirs must be PUBLIC because public headers
+# (libsrc/minc.h and libsrc2/minc2.h) include <hdf5.h>.
+target_include_directories(${LIBMINC_LIBRARY}
+  PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/libcommon>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/libsrc2>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/volume_io/Include>
+    ${HDF5_INCLUDE_DIRS}
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+  PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}
+)
 
 if(LIBMINC_MINC1_SUPPORT)
-  include_directories(${NETCDF_INCLUDE_DIR})
-  target_link_libraries(${LIBMINC_LIBRARY} ${NETCDF_LIBRARY})
+  target_include_directories(${LIBMINC_LIBRARY}
+    PUBLIC
+      $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/libsrc>
+  )
+endif()
+
+if(LIBMINC_BUILD_EZMINC)
+  target_include_directories(${LIBMINC_LIBRARY}
+    PUBLIC
+      $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/ezminc>
+  )
+endif()
+
+if(LIBMINC_NIFTI_SUPPORT)
+  target_include_directories(${LIBMINC_LIBRARY}
+    PRIVATE
+      ${NIFTI_INCLUDE_DIR}
+  )
+endif()
+
+# --- Target-scoped link dependencies (with visibility) ---
+target_link_libraries(${LIBMINC_LIBRARY}
+  PRIVATE
+    ${HDF5_LIBRARY}
+    ${NIFTI_LIBRARIES}
+    ${RT_LIBRARY}
+  PUBLIC
+    ZLIB::ZLIB
+)
+
+if(LIBMINC_MINC1_SUPPORT)
+  # NetCDF include dir must be PUBLIC because libsrc/minc.h includes <netcdf.h>
+  target_include_directories(${LIBMINC_LIBRARY} PUBLIC ${NETCDF_INCLUDE_DIR})
+  target_link_libraries(${LIBMINC_LIBRARY} PRIVATE ${NETCDF_LIBRARY})
   get_filename_component(NETCDF_LIBRARY_NAME "${NETCDF_LIBRARY}" NAME)
 else()
   set(NETCDF_LIBRARY_NAME )
@@ -475,23 +509,58 @@ if(NOT LIBMINC_USE_SYSTEM_NIFTI AND NOT LIBMINC_EXTERNALLY_CONFIGURED AND NIFTI_
   add_dependencies(minc2 NIFTI)
 endif()
 
-export(TARGETS ${LIBMINC_LIBRARY} FILE "${LIBMINC_EXPORTED_TARGETS}.cmake")
-
 if(UNIX)
-  target_link_libraries(${LIBMINC_LIBRARY} m ${CMAKE_DL_LIBS} )
+  target_link_libraries(${LIBMINC_LIBRARY} PRIVATE m ${CMAKE_DL_LIBS})
 
   if(LIBMINC_BUILD_SHARED_LIBS)
     add_library(${LIBMINC_LIBRARY_STATIC} STATIC ${minc_LIB_SRCS} ${minc_HEADERS} ${volume_io_LIB_SRCS} ${volume_io_HEADERS} )
-    target_link_libraries(${LIBMINC_LIBRARY_STATIC} ${HDF5_LIBRARY} ${NIFTI_LIBRARIES} ${ZLIB_LIBRARY} ${RT_LIBRARY} m ${CMAKE_DL_LIBS} )
-    if(LIBMINC_MINC1_SUPPORT)
-      target_link_libraries(${LIBMINC_LIBRARY} ${NETCDF_LIBRARY})
+    # Apply the same target properties to the static variant
+    target_compile_definitions(${LIBMINC_LIBRARY_STATIC} PRIVATE HAVE_CONFIG_H)
+    target_compile_definitions(${LIBMINC_LIBRARY_STATIC} PUBLIC MINC2=1 $<$<BOOL:${LIBMINC_MINC1_SUPPORT}>:HAVE_MINC1=1>)
+    if(NOT APPLE)
+      target_compile_definitions(${LIBMINC_LIBRARY_STATIC} PRIVATE _XOPEN_SOURCE=500)
     endif()
+    target_include_directories(${LIBMINC_LIBRARY_STATIC}
+      PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/libcommon>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/libsrc2>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/volume_io/Include>
+        ${HDF5_INCLUDE_DIRS}
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+      PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_BINARY_DIR}
+    )
+    if(LIBMINC_MINC1_SUPPORT)
+      target_include_directories(${LIBMINC_LIBRARY_STATIC} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/libsrc>)
+      target_include_directories(${LIBMINC_LIBRARY_STATIC} PUBLIC ${NETCDF_INCLUDE_DIR})
+      target_link_libraries(${LIBMINC_LIBRARY_STATIC} PRIVATE ${NETCDF_LIBRARY})
+    endif()
+    if(LIBMINC_NIFTI_SUPPORT)
+      target_include_directories(${LIBMINC_LIBRARY_STATIC} PRIVATE ${NIFTI_INCLUDE_DIR})
+    endif()
+    target_link_libraries(${LIBMINC_LIBRARY_STATIC}
+      PRIVATE ${HDF5_LIBRARY} ${NIFTI_LIBRARIES} ${RT_LIBRARY} m ${CMAKE_DL_LIBS}
+      PUBLIC ZLIB::ZLIB
+    )
+    set_target_properties(${LIBMINC_LIBRARY_STATIC} PROPERTIES
+      POSITION_INDEPENDENT_CODE ON
+    )
   endif()
 endif()
 
+# Use POSITION_INDEPENDENT_CODE instead of global -fPIC flag manipulation
 set_target_properties(${LIBMINC_LIBRARY}
  PROPERTIES
-  SOVERSION ${LIBMINC_SOVERSION})
+  SOVERSION ${LIBMINC_SOVERSION}
+  POSITION_INDEPENDENT_CODE ON
+)
+
+# Scope INSTALL_RPATH to the target instead of global CMAKE_INSTALL_RPATH
+set_target_properties(${LIBMINC_LIBRARY}
+ PROPERTIES
+  INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}"
+)
 
 if(LIBMINC_MINC1_SUPPORT)
   set(LIBMINC_LIBRARIES        ${LIBMINC_LIBRARIES} ${NETCDF_LIBRARY} )
@@ -501,7 +570,24 @@ if(LIBMINC_MINC1_SUPPORT)
   set(LIBMINC_STATIC_LIBRARIES_CONFIG ${LIBMINC_STATIC_LIBRARIES_CONFIG} ${NETCDF_LIBRARY_NAME} )
 endif()
 
-if( LIBMINC_INSTALL_LIB_DIR )
+# ============================================================================
+# Install rules -- guarded so FetchContent/add_subdirectory consumers don't
+# install libminc into their own prefix.
+# LIBMINC_INSTALL_LIB_DIR is only set in standalone (non-externally-configured)
+# builds. For extra safety, also skip when not top-level.
+# ============================================================================
+if(LIBMINC_INSTALL_LIB_DIR AND LIBMINC_IS_TOP_LEVEL)
+  install(
+    TARGETS
+      ${LIBMINC_LIBRARY}
+    EXPORT
+      ${LIBMINC_EXPORTED_TARGETS}
+    LIBRARY DESTINATION ${LIBMINC_INSTALL_LIB_DIR} COMPONENT libraries
+    ARCHIVE DESTINATION ${LIBMINC_INSTALL_LIB_DIR} COMPONENT libraries
+    RUNTIME DESTINATION ${LIBMINC_INSTALL_LIB_DIR} COMPONENT libraries
+  )
+elseif(LIBMINC_INSTALL_LIB_DIR AND LIBMINC_EXTERNALLY_CONFIGURED)
+  # Toolkit build: install as before
   install(
     TARGETS
       ${LIBMINC_LIBRARY}
@@ -513,7 +599,7 @@ if( LIBMINC_INSTALL_LIB_DIR )
   )
 endif()
 
-if(LIBMINC_INSTALL_INCLUDE_DIR AND NOT LIBMINC_INSTALL_NO_DEVELOPMENT)
+if(LIBMINC_INSTALL_INCLUDE_DIR AND NOT LIBMINC_INSTALL_NO_DEVELOPMENT AND (LIBMINC_IS_TOP_LEVEL OR LIBMINC_EXTERNALLY_CONFIGURED))
   install(FILES   ${minc_HEADERS}      DESTINATION  ${LIBMINC_INSTALL_INCLUDE_DIR} COMPONENT headers )
   install(FILES   ${volume_io_HEADERS} DESTINATION  ${LIBMINC_INSTALL_INCLUDE_DIR}/volume_io COMPONENT headers)
 endif()
@@ -528,71 +614,100 @@ else()
 endif()
 
 
-# config for install dir
-set(LIBMINC_USE_FILE_CONFIG     "\${LIBMINC_INSTALL_PREFIX}/lib/cmake/Use${LIBMINC_EXTERNAL_LIB_PREFIX}LIBMINC.cmake" )
-set(LIBMINC_INCLUDE_DIRS_CONFIG "\${LIBMINC_INSTALL_PREFIX}/include" )
-set(LIBMINC_LIBRARY_DIRS_CONFIG "\${LIBMINC_INSTALL_PREFIX}/lib" )
-set(LIBMINC_STATIC_LIBRARIES_CONFIG   "" )
-set(VOLUME_IO_LIBRARY_STATIC "")
+# ============================================================================
+# Package config files -- only generated/installed for standalone or toolkit builds
+# ============================================================================
+if(LIBMINC_IS_TOP_LEVEL OR LIBMINC_EXTERNALLY_CONFIGURED)
 
-configure_file(LIBMINCConfig.cmake.in
-  ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${LIBMINC_EXTERNAL_LIB_PREFIX}LIBMINCConfig.cmake @ONLY )
+  # Guard export() to avoid polluting FetchContent consumer build dirs
+  export(TARGETS ${LIBMINC_LIBRARY} FILE "${LIBMINC_EXPORTED_TARGETS}.cmake")
 
-configure_file(UseLIBMINC.cmake.in
-  ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/Use${LIBMINC_EXTERNAL_LIB_PREFIX}LIBMINC.cmake @ONLY)
+  # config for install dir
+  set(LIBMINC_USE_FILE_CONFIG     "\${LIBMINC_INSTALL_PREFIX}/lib/cmake/Use${LIBMINC_EXTERNAL_LIB_PREFIX}LIBMINC.cmake" )
+  set(LIBMINC_INCLUDE_DIRS_CONFIG "\${LIBMINC_INSTALL_PREFIX}/include" )
+  set(LIBMINC_LIBRARY_DIRS_CONFIG "\${LIBMINC_INSTALL_PREFIX}/lib" )
+  set(LIBMINC_STATIC_LIBRARIES_CONFIG   "" )
+  set(VOLUME_IO_LIBRARY_STATIC "")
 
-# configure for build dir
-set(LIBMINC_USE_FILE_CONFIG  ${CMAKE_CURRENT_BINARY_DIR}/UseLIBMINC.cmake)
+  configure_file(LIBMINCConfig.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${LIBMINC_EXTERNAL_LIB_PREFIX}LIBMINCConfig.cmake @ONLY )
 
-set(LIBMINC_INCLUDE_DIRS_CONFIG
-  ${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_CURRENT_SOURCE_DIR}/libcommon
-  ${CMAKE_CURRENT_SOURCE_DIR}/libsrc2
-  ${CMAKE_CURRENT_SOURCE_DIR}/volume_io/Include
-)
-if(LIBMINC_MINC1_SUPPORT)
+  configure_file(UseLIBMINC.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/Use${LIBMINC_EXTERNAL_LIB_PREFIX}LIBMINC.cmake @ONLY)
+
+  # configure for build dir
+  set(LIBMINC_USE_FILE_CONFIG  ${CMAKE_CURRENT_BINARY_DIR}/UseLIBMINC.cmake)
+
   set(LIBMINC_INCLUDE_DIRS_CONFIG
-    ${LIBMINC_INCLUDE_DIRS_CONFIG}
-    ${CMAKE_CURRENT_SOURCE_DIR}/libsrc
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/libcommon
+    ${CMAKE_CURRENT_SOURCE_DIR}/libsrc2
+    ${CMAKE_CURRENT_SOURCE_DIR}/volume_io/Include
   )
+  if(LIBMINC_MINC1_SUPPORT)
+    set(LIBMINC_INCLUDE_DIRS_CONFIG
+      ${LIBMINC_INCLUDE_DIRS_CONFIG}
+      ${CMAKE_CURRENT_SOURCE_DIR}/libsrc
+    )
 
-  if(LIBMINC_BUILD_EZMINC)
-    set(LIBMINC_INCLUDE_DIRS_CONFIG ${LIBMINC_INCLUDE_DIRS_CONFIG}
-      ${CMAKE_CURRENT_SOURCE_DIR}/ezminc )
+    if(LIBMINC_BUILD_EZMINC)
+      set(LIBMINC_INCLUDE_DIRS_CONFIG ${LIBMINC_INCLUDE_DIRS_CONFIG}
+        ${CMAKE_CURRENT_SOURCE_DIR}/ezminc )
+    endif()
   endif()
-endif()
 
-set(LIBMINC_LIBRARY_DIRS_CONFIG        ${CMAKE_CURRENT_BINARY_DIR})
-set(LIBMINC_LIBRARIES_CONFIG           ${LIBMINC_LIBRARIES})
-set(LIBMINC_STATIC_LIBRARIES_CONFIG    ${LIBMINC_STATIC_LIBRARIES})
-set(EZMINC_LIBRARIES_CONFIG            ${EZMINC_LIBRARIES})
+  set(LIBMINC_LIBRARY_DIRS_CONFIG        ${CMAKE_CURRENT_BINARY_DIR})
+  set(LIBMINC_LIBRARIES_CONFIG           ${LIBMINC_LIBRARIES})
+  set(LIBMINC_STATIC_LIBRARIES_CONFIG    ${LIBMINC_STATIC_LIBRARIES})
+  set(EZMINC_LIBRARIES_CONFIG            ${EZMINC_LIBRARIES})
 
-if(LIBMINC_MINC1_SUPPORT)
-  set(LIBMINC_LIBRARY_DIRS_CONFIG  ${LIBMINC_LIBRARY_DIRS_CONFIG} ${CMAKE_CURRENT_BINARY_DIR}/ezminc)
-endif()
+  if(LIBMINC_MINC1_SUPPORT)
+    set(LIBMINC_LIBRARY_DIRS_CONFIG  ${LIBMINC_LIBRARY_DIRS_CONFIG} ${CMAKE_CURRENT_BINARY_DIR}/ezminc)
+  endif()
 
-configure_file(LIBMINCConfig.cmake.in
-  ${CMAKE_CURRENT_BINARY_DIR}/LIBMINCConfig.cmake @ONLY )
+  configure_file(LIBMINCConfig.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/LIBMINCConfig.cmake @ONLY )
 
-configure_file(UseLIBMINC.cmake.in
-  ${CMAKE_CURRENT_BINARY_DIR}/UseLIBMINC.cmake @ONLY)
+  configure_file(UseLIBMINC.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/UseLIBMINC.cmake @ONLY)
 
+  # Install config and use files
+  if(LIBMINC_INSTALL_LIB_DIR AND NOT LIBMINC_INSTALL_NO_DEVELOPMENT)
+    # Install the exported targets file with NAMESPACE
+    install(
+      EXPORT ${LIBMINC_EXPORTED_TARGETS}
+      NAMESPACE LIBMINC::
+      DESTINATION ${LIBMINC_INSTALL_LIB_DIR}/cmake
+      COMPONENT Development
+    )
 
-if(LIBMINC_INSTALL_LIB_DIR AND NOT LIBMINC_INSTALL_NO_DEVELOPMENT)
-  install(
-    FILES
-     ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/Use${LIBMINC_EXTERNAL_LIB_PREFIX}LIBMINC.cmake
-     ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${LIBMINC_EXTERNAL_LIB_PREFIX}LIBMINCConfig.cmake
-    DESTINATION
-     ${LIBMINC_INSTALL_LIB_DIR}/cmake
-    COMPONENT Development)
-endif()
+    set(_LIBMINC_CONFIG_INSTALL_FILES
+       ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/Use${LIBMINC_EXTERNAL_LIB_PREFIX}LIBMINC.cmake
+       ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${LIBMINC_EXTERNAL_LIB_PREFIX}LIBMINCConfig.cmake
+    )
+
+    # Install the FindNETCDF module so find_dependency(NETCDF) works from the config
+    if(LIBMINC_MINC1_SUPPORT)
+      list(APPEND _LIBMINC_CONFIG_INSTALL_FILES
+        ${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules/FindNETCDF.cmake
+      )
+    endif()
+
+    install(
+      FILES
+       ${_LIBMINC_CONFIG_INSTALL_FILES}
+      DESTINATION
+       ${LIBMINC_INSTALL_LIB_DIR}/cmake
+      COMPONENT Development)
+  endif()
+
+endif() # LIBMINC_IS_TOP_LEVEL OR LIBMINC_EXTERNALLY_CONFIGURED
 
 # testing
-if(BUILD_TESTING)
+if(BUILD_TESTING AND (LIBMINC_IS_TOP_LEVEL OR LIBMINC_EXTERNALLY_CONFIGURED))
   add_subdirectory(testdir)
 endif()
 
-if(NOT LIBMINC_EXTERNALLY_CONFIGURED)
+if(LIBMINC_IS_TOP_LEVEL AND NOT LIBMINC_EXTERNALLY_CONFIGURED)
   include(CPack)
 endif()

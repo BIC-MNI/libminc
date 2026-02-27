@@ -1,4 +1,4 @@
-link_libraries(minc_io ${LIBMINC_LIBRARIES})
+link_libraries(minc_io)
 
 add_executable(ezminc_rw_test ezminc_rw_test.cpp)
 #add_executable(ezminc_stats   ezminc_stats.cpp)

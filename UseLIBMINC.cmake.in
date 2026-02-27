@@ -1,3 +1,18 @@
+# UseLIBMINC.cmake — legacy "use file" for backward compatibility
+#
+# New code should use the imported targets instead:
+#   target_link_libraries(myapp PRIVATE LIBMINC::minc2)
+#   target_link_libraries(myapp PRIVATE LIBMINC::minc_io)  # for ezminc
+#
+# The targets automatically propagate include directories, compile
+# definitions, and transitive link dependencies.
+
+message(DEPRECATION
+  "UseLIBMINC.cmake is deprecated. "
+  "Prefer linking against the imported targets LIBMINC::minc2 (and LIBMINC::minc_io for ezminc) "
+  "which automatically propagate include directories, compile definitions, and link dependencies."
+)
+
 include_directories(${LIBMINC_INCLUDE_DIRS})
 
 if(HAVE_MINC1)

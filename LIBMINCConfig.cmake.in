@@ -1,28 +1,56 @@
-# LIBMINC CMake configuration file
+# LIBMINCConfig.cmake — installed package configuration
+#
+# Provides:
+#   Modern imported targets:
+#     LIBMINC::minc2   — the core minc2 + volume_io library
+#     LIBMINC::minc_io — the C++ ezminc wrapper (if built)
+#
+#   Legacy variables (backward compatibility):
+#     LIBMINC_FOUND
+#     LIBMINC_INCLUDE_DIRS
+#     LIBMINC_LIBRARY_DIRS
+#     LIBMINC_LIBRARIES
+#     VOLUME_IO_LIBRARIES
+#     EZMINC_LIBRARIES
+#     LIBMINC_STATIC_LIBRARIES
+#     VOLUME_IO_STATIC_LIBRARIES
+#     LIBMINC_USE_FILE
+#     HAVE_MINC1, HAVE_MINC2, HAVE_EZMINC
 
+cmake_minimum_required(VERSION 3.10)
+
+include(CMakeFindDependencyMacro)
 
 get_filename_component(LIBMINC_INSTALL_PREFIX "${CMAKE_CURRENT_LIST_DIR}/../../" ABSOLUTE)
-get_filename_component(LIBMINC_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH )
+get_filename_component(LIBMINC_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
 
+# ----- Feature flags (substituted at configure time) -----
 set(HAVE_MINC2    1)
 set(HAVE_EZMINC   @LIBMINC_MINC1_SUPPORT@)
 set(HAVE_MINC1    @LIBMINC_MINC1_SUPPORT@)
-
 set(LIBMINC_NIFTI_SUPPORT @LIBMINC_NIFTI_SUPPORT@)
 
-#set(NETCDF_INCLUDE_DIR "@NETCDF_INCLUDE_DIR@")
-#set(HDF5_INCLUDE_DIR   "@HDF5_INCLUDE_DIR@")
-#set(NIFTI_INCLUDE_DIR  "@NIFTI_INCLUDE_DIR@")
+# ----- Resolve transitive dependencies -----
+find_dependency(ZLIB REQUIRED)
 
-#set(NETCDF_LIBRARY     "@NETCDF_LIBRARY@")
-#set(HDF5_LIBRARY       "@HDF5_LIBRARY@")
-#set(ZLIB_LIBRARY       "@ZLIB_LIBRARY@")
-#set(ZLIB_LIBRARIES     "@ZLIB_LIBRARY@")
-#set(NIFTI_LIBRARIES    "@NIFTI_LIBRARIES@")
+set(HDF5_NO_FIND_PACKAGE_CONFIG_FILE ON)
+find_dependency(HDF5 REQUIRED COMPONENTS C)
 
-set(LIBMINC_INCLUDE_DIRS "@LIBMINC_INCLUDE_DIRS_CONFIG@") # ${LIBMINC_INSTALL_PREFIX}/include
-set(LIBMINC_LIBRARY_DIRS "@LIBMINC_LIBRARY_DIRS_CONFIG@") # ${LIBMINC_INSTALL_PREFIX}/lib
-set(LIBMINC_USE_FILE     "@LIBMINC_USE_FILE_CONFIG@") # ${LIBMINC_INSTALL_PREFIX}/lib/UseLIBMINC.cmake
+if(HAVE_MINC1)
+  # NetCDF is required when MINC1 support was enabled
+  list(APPEND CMAKE_MODULE_PATH "${LIBMINC_CMAKE_DIR}")
+  find_dependency(NETCDF REQUIRED)
+endif()
+
+# ----- Import the exported targets -----
+if(NOT TARGET LIBMINC::minc2)
+  include("${LIBMINC_CMAKE_DIR}/@LIBMINC_EXPORTED_TARGETS@.cmake")
+endif()
+
+# ----- Legacy variables (backward compatibility) -----
+set(LIBMINC_INCLUDE_DIRS "@LIBMINC_INCLUDE_DIRS_CONFIG@")
+set(LIBMINC_LIBRARY_DIRS "@LIBMINC_LIBRARY_DIRS_CONFIG@")
+set(LIBMINC_USE_FILE     "@LIBMINC_USE_FILE_CONFIG@")
 
 set(LIBMINC_LIBRARIES    "@LIBMINC_LIBRARIES_CONFIG@")
 set(VOLUME_IO_LIBRARIES  "@LIBMINC_LIBRARIES_CONFIG@")
@@ -31,10 +59,4 @@ set(EZMINC_LIBRARIES     "@EZMINC_LIBRARIES_CONFIG@")
 set(LIBMINC_STATIC_LIBRARIES    "@LIBMINC_STATIC_LIBRARIES_CONFIG@")
 set(VOLUME_IO_STATIC_LIBRARIES  "@LIBMINC_STATIC_LIBRARIES_CONFIG@")
 
-set( LIBMINC_FOUND 1 )
-
-# VF: disable for now  
-#if( NOT LIBMINC_TARGETS_IMPORTED AND NOT LIBMINC_BINARY_DIR )
-#  set( LIBMINC_TARGETS_IMPORTED 1 )
-#  include( "${LIBMINC_CMAKE_DIR}/@LIBMINC_EXPORTED_TARGETS@.cmake" )
-#endif()  
+set(LIBMINC_FOUND 1)

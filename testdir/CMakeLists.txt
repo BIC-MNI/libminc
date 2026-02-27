@@ -1,4 +1,7 @@
-link_libraries(${LIBMINC_LIBRARIES})
+link_libraries(${LIBMINC_LIBRARY})
+
+# Test sources include "config.h" which is generated in the root binary dir
+include_directories(${CMAKE_BINARY_DIR})
 
 
 macro(minc_test cmd)
@@ -100,16 +103,16 @@ add_executable(multidim_test multidim_test.c)
 add_test(volume_multidim_test multidim_test)
 
 add_executable(test_xfm   vio_xfm_test/test-xfm.c)
-target_link_libraries(test_xfm ${VOLUME_IO_LIBRARY} ${LIBMINC_LIBRARIES})
+target_link_libraries(test_xfm ${LIBMINC_LIBRARY})
 
 add_executable(copy_xfm   vio_xfm_test/copy-xfm.c)
-target_link_libraries(copy_xfm ${VOLUME_IO_LIBRARY} ${LIBMINC_LIBRARIES})
+target_link_libraries(copy_xfm ${LIBMINC_LIBRARY})
 
 add_executable(create_grid_xfm create_grid_xfm.c)
-target_link_libraries(create_grid_xfm ${VOLUME_IO_LIBRARY} ${LIBMINC_LIBRARIES})
+target_link_libraries(create_grid_xfm ${LIBMINC_LIBRARY})
 
 add_executable(verify_xfm   vio_xfm_test/verify_xfm.c)
-target_link_libraries(verify_xfm ${VOLUME_IO_LIBRARY} ${LIBMINC_LIBRARIES})
+target_link_libraries(verify_xfm ${LIBMINC_LIBRARY})
 
 #add_test(create_grid_xfm create_grid_xfm)
 #add_test(test_speed test_speed)
