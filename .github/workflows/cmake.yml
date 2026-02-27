@@ -64,6 +64,7 @@ jobs:
           -DCMAKE_C_COMPILER_LAUNCHER=ccache \
           -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
           -DCMAKE_BUILD_TYPE=${{ matrix.config }} \
+          -DLIBMINC_BUILD_SHARED_LIBS:BOOL=${{ matrix.build-params.static == 'ON' && 'OFF' || 'ON' }} \
           -DLIBMINC_MINC1_SUPPORT:BOOL=${{ matrix.build-params.WITH_MINC1 }} \
           -DLIBMINC_USE_NIFTI:BOOL=${{ matrix.build-params.USE_NIFTI }} \
           -DBUILD_TESTING:BOOL=${{ matrix.build-params.tests }} 
