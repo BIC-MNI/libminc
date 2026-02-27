@@ -66,8 +66,8 @@ macro(build_nifti install_prefix staging_prefix)
   ExternalProject_Add(NIFTI
     SOURCE_DIR NIFTI
     BINARY_DIR NIFTI-build
-    URL "https://downloads.sourceforge.net/project/niftilib/nifticlib/nifticlib_2_0_0/nifticlib-2.0.0.tar.gz"
-    URL_HASH SHA256=a3e988e6a32ec57833056f6b09f940c69e79829028da121ff2c5c6f7f94a7f88
+    URL "https://github.com/NIFTI-Imaging/nifti_clib/archive/refs/tags/v3.0.0.tar.gz"
+    URL_HASH SHA256=fe6cb1076974df01844f3f4dab1aa844953b3bc1d679126c652975158573d03d
     CMAKE_GENERATOR ${CMAKE_GEN}
     CMAKE_ARGS
             -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
@@ -90,6 +90,13 @@ macro(build_nifti install_prefix staging_prefix)
             -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
             -DZLIB_INCLUDE_DIR:PATH=${ZLIB_INCLUDE_DIR}
             -DZLIB_LIBRARY:FILEPATH=${ZLIB_LIBRARY}
+            -DGIT_REPO_VERSION:STRING=3.0.0
+            -DNIFTI_BUILD_APPLICATIONS:BOOL=OFF
+            -DNIFTI_BUILD_TESTING:BOOL=OFF
+            -DBUILD_TESTING:BOOL=OFF
+            -DUSE_NIFTI2_CODE:BOOL=OFF
+            -DUSE_NIFTICDF_CODE:BOOL=OFF
+            -DNIFTI_INSTALL_NO_DOCS:BOOL=ON
 
     INSTALL_COMMAND $(MAKE) install DESTDIR=${staging_prefix}
     INSTALL_DIR ${staging_prefix}/${install_prefix}
