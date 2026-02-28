@@ -458,7 +458,7 @@ target_include_directories(${LIBMINC_LIBRARY}
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/libcommon>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/libsrc2>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/volume_io/Include>
-    ${HDF5_INCLUDE_DIRS}
+    $<BUILD_INTERFACE:${HDF5_INCLUDE_DIRS}>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
   PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
@@ -498,7 +498,7 @@ target_link_libraries(${LIBMINC_LIBRARY}
 
 if(LIBMINC_MINC1_SUPPORT)
   # NetCDF include dir must be PUBLIC because libsrc/minc.h includes <netcdf.h>
-  target_include_directories(${LIBMINC_LIBRARY} PUBLIC ${NETCDF_INCLUDE_DIR})
+  target_include_directories(${LIBMINC_LIBRARY} PUBLIC $<BUILD_INTERFACE:${NETCDF_INCLUDE_DIR}>)
   target_link_libraries(${LIBMINC_LIBRARY} PRIVATE ${NETCDF_LIBRARY})
   get_filename_component(NETCDF_LIBRARY_NAME "${NETCDF_LIBRARY}" NAME)
 else()
@@ -525,7 +525,7 @@ if(UNIX)
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/libcommon>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/libsrc2>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/volume_io/Include>
-        ${HDF5_INCLUDE_DIRS}
+        $<BUILD_INTERFACE:${HDF5_INCLUDE_DIRS}>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
       PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
@@ -533,7 +533,7 @@ if(UNIX)
     )
     if(LIBMINC_MINC1_SUPPORT)
       target_include_directories(${LIBMINC_LIBRARY_STATIC} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/libsrc>)
-      target_include_directories(${LIBMINC_LIBRARY_STATIC} PUBLIC ${NETCDF_INCLUDE_DIR})
+      target_include_directories(${LIBMINC_LIBRARY_STATIC} PUBLIC $<BUILD_INTERFACE:${NETCDF_INCLUDE_DIR}>)
       target_link_libraries(${LIBMINC_LIBRARY_STATIC} PRIVATE ${NETCDF_LIBRARY})
     endif()
     if(LIBMINC_NIFTI_SUPPORT)
