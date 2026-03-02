@@ -179,8 +179,9 @@ add_executable(minc2-volprops-test minc2-volprops-test.c)
 add_executable(minc2-read-rgb minc2-read-rgb.c)
 add_executable(minc2-read-metadata minc2-read-metadata.c)
 
-add_executable(minc2-leak-test minc2-leak-test.c)
-add_executable(minc2-float-voxel-test minc2-float-voxel-test.c)
+ADD_EXECUTABLE(minc2-leak-test minc2-leak-test.c)
+ADD_EXECUTABLE(minc2-float-voxel-test minc2-float-voxel-test.c)
+ADD_EXECUTABLE(minc2-read-variable minc2-read-variable.c)
 
 add_minc_test(minc2-convert-test          minc2-convert-test)
 add_minc_test(minc2-create-test-images    minc2-create-test-images

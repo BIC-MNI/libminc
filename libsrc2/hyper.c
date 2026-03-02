@@ -1333,4 +1333,122 @@ int miset_voxel_value_hyperslab(mihandle_t volume,
                             start, count, (void *) buffer);
 }
 
+
+/** Read/write a hyperslab of data from/to the file without any scaling or
+ * normalization. Data is simply converted to/from the requested data type.
+ */
+static int mirw_variable_raw( const char *path,
+                              const char *name,
+                              int opcode,
+                              mihandle_t volume,
+                              mitype_t midatatype,
+                              const hsize_t hdf_start[],
+                              const hsize_t hdf_count[],
+                              void *buffer)
+{
+  hid_t dset_id = -1;
+  hid_t mspc_id = -1;
+  hid_t fspc_id = -1;
+  hid_t type_id = -1;
+  int   ndims = -1;
+  int result = MI_ERROR;
+  char _path[MI2_MAX_PATH];
+
+  snprintf(_path, MI2_MAX_PATH, MI_ROOT_PATH "/%s/%s", path, name);
+  
+  /* Open the dataset with the specified path
+  */
+  MI_CHECK_HDF_CALL(dset_id = H5Dopen1(volume->hdf_id, _path),"H5Dopen1");
+  if (dset_id < 0) {
+    return (MI_ERROR);
+  }
+
+  MI_CHECK_HDF_CALL(fspc_id = H5Dget_space(dset_id),"H5Dget_space");
+  if (fspc_id < 0) {
+    /*TODO: report can't get dataset*/
+    goto cleanup;
+  }
+
+  if (midatatype == MI_TYPE_UNKNOWN) {
+    /*type_id = H5Tcopy(volume->mtype_id);*/
+    MI_CHECK_HDF_CALL(type_id = H5Dget_type(dset_id),"H5Dget_type");
+    if (type_id < 0) {
+      goto cleanup;
+    }
+  } else {
+    type_id = mitype_to_hdftype(midatatype, TRUE);
+  }
+
+  ndims = H5Sget_simple_extent_ndims(fspc_id);
+  if (ndims < 0) {
+      goto cleanup;
+    }
+
+  if (ndims == 0) {
+    mspc_id = H5Screate(H5S_SCALAR);
+  } else {
+    MI_CHECK_HDF_CALL(mspc_id = H5Screate_simple(ndims, hdf_count, NULL),"H5Screate_simple");
+    if (mspc_id < 0) {
+      goto cleanup;
+    }
+  }
+
+  MI_CHECK_HDF_CALL(result = H5Sselect_hyperslab(fspc_id, H5S_SELECT_SET, hdf_start, NULL,
+                               hdf_count, NULL),"H5Sselect_hyperslab");
+  if (result < 0) {
+    goto cleanup;
+  }
+
+  /*miget_hyperslab_size_hdf(type_id, ndims, hdf_count, &buffer_size);*/
+  
+  if (opcode == MIRW_OP_READ) {
+    MI_CHECK_HDF_CALL(result = H5Dread(dset_id, type_id, mspc_id, fspc_id, H5P_DEFAULT,buffer),"H5Dread");
+  } else {
+    volume->is_dirty = TRUE; /* Mark as modified. */
+    MI_CHECK_HDF_CALL(result = H5Dwrite(dset_id, type_id, mspc_id, fspc_id, H5P_DEFAULT, buffer),"H5Dwrite");
+  }
+
+cleanup:
+
+  if (type_id >= 0) {
+    H5Tclose(type_id);
+  }
+  if (mspc_id >= 0) {
+    H5Sclose(mspc_id);
+  }
+  if (fspc_id >= 0) {
+    H5Sclose(fspc_id);
+  }
+  if ( dset_id >=0 ) {
+    H5Dclose(dset_id);
+  }
+  return (result);
+}
+
+int miget_variable_raw( mihandle_t volume,
+                        const char *path,
+                        const char *name,
+                        mitype_t midatatype,
+                        const hsize_t hdf_start[],
+                        const hsize_t hdf_count[],
+                        void *buffer)
+{
+  return mirw_variable_raw( path, name, MIRW_OP_READ, volume,
+                            midatatype, hdf_start, hdf_count, buffer);
+}
+
+
+int miset_variable_raw( mihandle_t volume,
+                        const char *path,
+                        const char *name,
+                        mitype_t midatatype,
+                        const hsize_t hdf_start[],
+                        const hsize_t hdf_count[],
+                        void *buffer)
+{
+  return mirw_variable_raw( path, name, MIRW_OP_WRITE, volume,
+                            midatatype, hdf_start, hdf_count, buffer);
+}
+
+
 /* kate: indent-mode cstyle; indent-width 2; replace-tabs on; */
