@@ -76,5 +76,5 @@ jobs:
 
     - name: Test
       working-directory: ${{github.workspace}}/build
-      run: ctest --verbose
+      run: ctest --parallel 4 --verbose
       
