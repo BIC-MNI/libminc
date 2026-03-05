@@ -487,19 +487,21 @@ if(LIBMINC_NIFTI_SUPPORT)
 endif()
 
 # --- Target-scoped link dependencies (with visibility) ---
+# Note: HDF5 must be PUBLIC because public headers (minc2.h) include <hdf5.h>
+# and downstream code (including tests) may call HDF5 functions directly.
 target_link_libraries(${LIBMINC_LIBRARY}
   PRIVATE
-    ${HDF5_LIBRARY}
     ${NIFTI_LIBRARIES}
     ${RT_LIBRARY}
   PUBLIC
+    ${HDF5_LIBRARY}
     ZLIB::ZLIB
 )
 
 if(LIBMINC_MINC1_SUPPORT)
-  # NetCDF include dir must be PUBLIC because libsrc/minc.h includes <netcdf.h>
+  # NetCDF must be PUBLIC because libsrc/minc.h includes <netcdf.h>
   target_include_directories(${LIBMINC_LIBRARY} PUBLIC $<BUILD_INTERFACE:${NETCDF_INCLUDE_DIR}>)
-  target_link_libraries(${LIBMINC_LIBRARY} PRIVATE ${NETCDF_LIBRARY})
+  target_link_libraries(${LIBMINC_LIBRARY} PUBLIC ${NETCDF_LIBRARY})
   get_filename_component(NETCDF_LIBRARY_NAME "${NETCDF_LIBRARY}" NAME)
 else()
   set(NETCDF_LIBRARY_NAME )
@@ -534,14 +536,14 @@ if(UNIX)
     if(LIBMINC_MINC1_SUPPORT)
       target_include_directories(${LIBMINC_LIBRARY_STATIC} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/libsrc>)
       target_include_directories(${LIBMINC_LIBRARY_STATIC} PUBLIC $<BUILD_INTERFACE:${NETCDF_INCLUDE_DIR}>)
-      target_link_libraries(${LIBMINC_LIBRARY_STATIC} PRIVATE ${NETCDF_LIBRARY})
+      target_link_libraries(${LIBMINC_LIBRARY_STATIC} PUBLIC ${NETCDF_LIBRARY})
     endif()
     if(LIBMINC_NIFTI_SUPPORT)
       target_include_directories(${LIBMINC_LIBRARY_STATIC} PRIVATE ${NIFTI_INCLUDE_DIR})
     endif()
     target_link_libraries(${LIBMINC_LIBRARY_STATIC}
-      PRIVATE ${HDF5_LIBRARY} ${NIFTI_LIBRARIES} ${RT_LIBRARY} m ${CMAKE_DL_LIBS}
-      PUBLIC ZLIB::ZLIB
+      PRIVATE ${NIFTI_LIBRARIES} ${RT_LIBRARY} m ${CMAKE_DL_LIBS}
+      PUBLIC ${HDF5_LIBRARY} ZLIB::ZLIB
     )
     set_target_properties(${LIBMINC_LIBRARY_STATIC} PROPERTIES
       POSITION_INDEPENDENT_CODE ON
@@ -663,9 +665,15 @@ if(LIBMINC_IS_TOP_LEVEL OR LIBMINC_EXTERNALLY_CONFIGURED)
   # contains the target name, CMake expands the imported target's interface
   # dependencies (which include ZLIB::ZLIB) alongside the explicit library paths
   # already in the list, causing duplicate zlib entries with wrong link order.
-  set(LIBMINC_LIBRARIES_CONFIG
-    ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}${LIBMINC_LIBRARY}${CMAKE_STATIC_LIBRARY_SUFFIX}
-    ${HDF5_LIBRARY} ${NIFTI_LIBRARIES} ${ZLIB_LIBRARY})
+  if(LIBMINC_BUILD_SHARED_LIBS)
+    set(LIBMINC_LIBRARIES_CONFIG
+      ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_SHARED_LIBRARY_PREFIX}${LIBMINC_LIBRARY}${CMAKE_SHARED_LIBRARY_SUFFIX}
+      ${HDF5_LIBRARY} ${NIFTI_LIBRARIES} ${ZLIB_LIBRARY})
+  else()
+    set(LIBMINC_LIBRARIES_CONFIG
+      ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}${LIBMINC_LIBRARY}${CMAKE_STATIC_LIBRARY_SUFFIX}
+      ${HDF5_LIBRARY} ${NIFTI_LIBRARIES} ${ZLIB_LIBRARY})
+  endif()
   set(LIBMINC_STATIC_LIBRARIES_CONFIG
     ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}${LIBMINC_LIBRARY_STATIC}${CMAKE_STATIC_LIBRARY_SUFFIX}
     ${HDF5_LIBRARY} ${NIFTI_LIBRARIES} ${ZLIB_LIBRARY})
@@ -679,9 +687,15 @@ if(LIBMINC_IS_TOP_LEVEL OR LIBMINC_EXTERNALLY_CONFIGURED)
   endif()
 
   if(LIBMINC_BUILD_EZMINC AND LIBMINC_MINC1_SUPPORT)
-    set(EZMINC_LIBRARIES_CONFIG
-      ${CMAKE_CURRENT_BINARY_DIR}/ezminc/${CMAKE_STATIC_LIBRARY_PREFIX}minc_io${CMAKE_STATIC_LIBRARY_SUFFIX}
-      ${LIBMINC_LIBRARIES_CONFIG})
+    if(LIBMINC_BUILD_SHARED_LIBS)
+      set(EZMINC_LIBRARIES_CONFIG
+        ${CMAKE_CURRENT_BINARY_DIR}/ezminc/${CMAKE_SHARED_LIBRARY_PREFIX}minc_io${CMAKE_SHARED_LIBRARY_SUFFIX}
+        ${LIBMINC_LIBRARIES_CONFIG})
+    else()
+      set(EZMINC_LIBRARIES_CONFIG
+        ${CMAKE_CURRENT_BINARY_DIR}/ezminc/${CMAKE_STATIC_LIBRARY_PREFIX}minc_io${CMAKE_STATIC_LIBRARY_SUFFIX}
+        ${LIBMINC_LIBRARIES_CONFIG})
+    endif()
   else()
     set(EZMINC_LIBRARIES_CONFIG "")
   endif()
