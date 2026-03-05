@@ -3,7 +3,7 @@
 # Andrew Janke - a.janke@gmail.com
 # Vladimir S. FONOV - vladimir.fonov@gmail.com
 
-cmake_minimum_required(VERSION 3.10...4.2)
+cmake_minimum_required(VERSION 3.10)
 
 project(LIBMINC)
 
@@ -43,6 +43,7 @@ endif()
 set(LIBMINC_BUILD_V2 ON)
 
 if(NOT LIBMINC_EXTERNALLY_CONFIGURED)
+  message("Configuring libminc")
   # Allowing User to configure parameters
   set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules")
 
@@ -84,20 +85,21 @@ if(NOT LIBMINC_EXTERNALLY_CONFIGURED)
   find_package(HDF5 REQUIRED COMPONENTS C )
 
   if(LIBMINC_USE_NIFTI)
-  if (LIBMINC_USE_SYSTEM_NIFTI)
-    find_package(NIFTI)
-  else()
-    include(ExternalProject)
-    include(BuildNIFTI)
-    build_nifti(${CMAKE_INSTALL_PREFIX} ${CMAKE_BINARY_DIR}/external)
-  endif()
-  else()
-  set(NIFTI_FOUND OFF)
+   if (LIBMINC_USE_SYSTEM_NIFTI)
+     find_package(NIFTI)
+   else()
+     include(ExternalProject)
+     include(BuildNIFTI)
+     build_nifti(${CMAKE_INSTALL_PREFIX} ${CMAKE_BINARY_DIR}/external)
+   endif()
+   else()
+    set(NIFTI_FOUND OFF)
   endif()
 
   set(HAVE_ZLIB ON)
 else()
   #TODO: set paths for HDF5 etc
+  message("libminc externally configured")
 endif()
 
 if(NOT DEFINED CMAKE_MACOSX_RPATH)
