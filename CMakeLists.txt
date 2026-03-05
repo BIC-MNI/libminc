@@ -489,10 +489,11 @@ endif()
 # --- Target-scoped link dependencies (with visibility) ---
 # Note: HDF5 must be PUBLIC because public headers (minc2.h) include <hdf5.h>
 # and downstream code (including tests) may call HDF5 functions directly.
+# Note: m, dl, and rt must be PUBLIC so that static-library consumers get them
+# on their link line (a static archive does not resolve these internally).
 target_link_libraries(${LIBMINC_LIBRARY}
   PRIVATE
     ${NIFTI_LIBRARIES}
-    ${RT_LIBRARY}
   PUBLIC
     ${HDF5_LIBRARY}
     ZLIB::ZLIB
@@ -512,7 +513,7 @@ if(NOT LIBMINC_USE_SYSTEM_NIFTI AND NOT LIBMINC_EXTERNALLY_CONFIGURED AND NIFTI_
 endif()
 
 if(UNIX)
-  target_link_libraries(${LIBMINC_LIBRARY} PRIVATE m ${CMAKE_DL_LIBS})
+  target_link_libraries(${LIBMINC_LIBRARY} PUBLIC m ${CMAKE_DL_LIBS} ${RT_LIBRARY})
 
   if(LIBMINC_BUILD_SHARED_LIBS)
     add_library(${LIBMINC_LIBRARY_STATIC} STATIC ${minc_LIB_SRCS} ${minc_HEADERS} ${volume_io_LIB_SRCS} ${volume_io_HEADERS} )
@@ -542,8 +543,8 @@ if(UNIX)
       target_include_directories(${LIBMINC_LIBRARY_STATIC} PRIVATE ${NIFTI_INCLUDE_DIR})
     endif()
     target_link_libraries(${LIBMINC_LIBRARY_STATIC}
-      PRIVATE ${NIFTI_LIBRARIES} ${RT_LIBRARY} m ${CMAKE_DL_LIBS}
-      PUBLIC ${HDF5_LIBRARY} ZLIB::ZLIB
+      PRIVATE ${NIFTI_LIBRARIES}
+      PUBLIC ${HDF5_LIBRARY} ZLIB::ZLIB m ${CMAKE_DL_LIBS} ${RT_LIBRARY}
     )
     set_target_properties(${LIBMINC_LIBRARY_STATIC} PROPERTIES
       POSITION_INDEPENDENT_CODE ON
