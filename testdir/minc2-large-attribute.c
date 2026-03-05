@@ -165,7 +165,7 @@ int main ( int argc, char **argv )
   if(argc>2)
     test_file=argv[2];
 
-  printf ( "Creating 3D image with attribute %d ! (3D_image_a.mnc)\n", attribute_size );
+  printf ( "Creating 3D image with attribute %d ! (%s)\n", attribute_size, test_file );
   if( create_3D_image(attribute_size, test_file)<0)
     TESTRPT("create_3D_image",0);
 

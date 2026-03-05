@@ -196,6 +196,16 @@ add_minc_test(minc2-create-test-images-2  minc2-create-test-images-2
                                           ${CMAKE_CURRENT_BINARY_DIR}/3D_minc2_float.mnc
                                           )
 
+add_minc_test(minc2-create-test-images-valid   minc2-create-test-images
+                                          ${CMAKE_CURRENT_BINARY_DIR}/2D_minc2_valid.mnc
+                                          ${CMAKE_CURRENT_BINARY_DIR}/3D_minc2_valid.mnc
+                                          ${CMAKE_CURRENT_BINARY_DIR}/4D_minc2_valid.mnc)
+
+add_minc_test(minc2-create-test-images-2-valid minc2-create-test-images-2
+                                          ${CMAKE_CURRENT_BINARY_DIR}/3D_minc2_int_valid.mnc
+                                          ${CMAKE_CURRENT_BINARY_DIR}/3D_minc2_float_valid.mnc
+                                          )
+
 add_minc_test(minc2-large-attribute-10k   minc2-large-attribute 10000   ${CMAKE_CURRENT_BINARY_DIR}/3D_attr_10000.mnc)
 add_minc_test(minc2-large-attribute-100k  minc2-large-attribute 100000  ${CMAKE_CURRENT_BINARY_DIR}/3D_attr_100000.mnc)
 add_minc_test(minc2-large-attribute-1m    minc2-large-attribute 1000000 ${CMAKE_CURRENT_BINARY_DIR}/3D_attr_1000000.mnc)
@@ -222,11 +232,11 @@ add_minc_test(minc2-slice-test            minc2-slice-test
 
 
 add_minc_test(minc2-valid-test            minc2-valid-test
-                                          ${CMAKE_CURRENT_BINARY_DIR}/2D_minc2.mnc
-                                          ${CMAKE_CURRENT_BINARY_DIR}/3D_minc2.mnc
-                                          ${CMAKE_CURRENT_BINARY_DIR}/3D_minc2_int.mnc
-                                          ${CMAKE_CURRENT_BINARY_DIR}/3D_minc2_float.mnc
-                                          ${CMAKE_CURRENT_BINARY_DIR}/4D_minc2.mnc
+                                          ${CMAKE_CURRENT_BINARY_DIR}/2D_minc2_valid.mnc
+                                          ${CMAKE_CURRENT_BINARY_DIR}/3D_minc2_valid.mnc
+                                          ${CMAKE_CURRENT_BINARY_DIR}/3D_minc2_int_valid.mnc
+                                          ${CMAKE_CURRENT_BINARY_DIR}/3D_minc2_float_valid.mnc
+                                          ${CMAKE_CURRENT_BINARY_DIR}/4D_minc2_valid.mnc
 )
 add_minc_test(minc2-vector_dimension-test minc2-vector_dimension-test)
 add_minc_test(minc2-volprops-test         minc2-volprops-test)
@@ -239,6 +249,6 @@ add_minc_test(minc2-float-voxel-test      minc2-float-voxel-test
 
 set_property(TEST minc2-slice-test APPEND PROPERTY DEPENDS minc2-create-test-images)
 set_property(TEST minc2-slice-test APPEND PROPERTY DEPENDS minc2-create-test-images-2)
-set_property(TEST minc2-valid-test APPEND PROPERTY DEPENDS minc2-create-test-images)
-set_property(TEST minc2-valid-test APPEND PROPERTY DEPENDS minc2-create-test-images-2)
+set_property(TEST minc2-valid-test APPEND PROPERTY DEPENDS minc2-create-test-images-valid)
+set_property(TEST minc2-valid-test APPEND PROPERTY DEPENDS minc2-create-test-images-2-valid)
 
