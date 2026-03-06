@@ -1,5 +1,5 @@
 if(LIBMINC_BUILD_V2)
-  add_definitions( -DMINC2 )
+  set(MINC_IO_DEFINITIONS MINC2)
 endif()
 
 
@@ -18,8 +18,9 @@ set( MINC_IO_SRC
     minc_1_simple_rw.cpp
   )
 
-include_directories( ${CMAKE_CURRENT_SOURCE_DIR})
 add_library( minc_io ${LIBRARY_TYPE} ${MINC_IO_HEADERS} ${MINC_IO_SRC})
+target_include_directories(minc_io PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_compile_definitions(minc_io PUBLIC ${MINC_IO_DEFINITIONS})
 target_link_libraries(minc_io ${LIBMINC_LIBRARIES})
 
 set_target_properties(minc_io

@@ -1,23 +1,15 @@
 # FindNetCDF.cmake module
 
+include(FindPackageHandleStandardArgs)
 
-find_path(NETCDF_INCLUDE_DIR netcdf.h /usr/include /usr/local/include /usr/local/bic/include)
+find_path(NETCDF_INCLUDE_DIR netcdf.h)
 
-find_library(NETCDF_LIBRARY NAMES netcdf PATHS /usr/lib /usr/local/lib /usr/local/bic/lib)
+find_library(NETCDF_LIBRARY NAMES netcdf)
 
+find_package_handle_standard_args(NETCDF
+  REQUIRED_VARS NETCDF_LIBRARY NETCDF_INCLUDE_DIR
+)
 
-if (NETCDF_INCLUDE_DIR AND NETCDF_LIBRARY)
-   set(NETCDF_FOUND TRUE)
-endif ()
-
-
-if (NETCDF_FOUND)
-   if (NOT NETCDF_FIND_QUIETLY)
-      message(STATUS "Found NetCDF headers: ${NETCDF_INCLUDE_DIR}")
-      message(STATUS "Found NetCDF library: ${NETCDF_LIBRARY}")
-   endif ()
-else ()
-   if (NETCDF_FIND_REQUIRED)
-      message(FATAL_ERROR "Could not find NetCDF")
-   endif ()
-endif ()
+if(NETCDF_FOUND)
+  mark_as_advanced(NETCDF_INCLUDE_DIR NETCDF_LIBRARY)
+endif()

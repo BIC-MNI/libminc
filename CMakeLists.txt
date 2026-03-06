@@ -3,9 +3,9 @@
 # Andrew Janke - a.janke@gmail.com
 # Vladimir S. FONOV - vladimir.fonov@gmail.com
 
-cmake_minimum_required(VERSION 3.10...4.2)
+cmake_minimum_required(VERSION 3.22...4.2)
 
-project(LIBMINC)
+project(LIBMINC LANGUAGES C CXX)
 
 set(LIBMINC_PACKAGE_VERSION_MAJOR 2)
 set(LIBMINC_PACKAGE_VERSION_MINOR 4)
@@ -34,7 +34,7 @@ set(LIBMINC_BUILD_V2 ON)
 
 if(NOT LIBMINC_EXTERNALLY_CONFIGURED)
   # Allowing User to configure parameters
-  set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules")
+  list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules")
 
   set(CPACK_GENERATOR TGZ)
   set(CPACK_PACKAGE_VERSION_MAJOR ${LIBMINC_PACKAGE_VERSION_MAJOR})
@@ -109,8 +109,7 @@ endif()
 
 # add for building relocatable library
 if(UNIX)
-  set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   -fPIC")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+  set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 endif()
 
 
@@ -202,10 +201,9 @@ CHECK_INCLUDE_FILES(pwd.h       HAVE_PWD_H)
 CHECK_INCLUDE_FILES(sys/select.h    HAVE_SYS_SELECT_H)
 
 
-add_definitions(-DHAVE_CONFIG_H)
-add_definitions(-DMINC2=1)
+set(MINC_COMPILE_DEFINITIONS HAVE_CONFIG_H MINC2=1)
 if(NOT APPLE)
-add_definitions(-D_XOPEN_SOURCE=500)
+  list(APPEND MINC_COMPILE_DEFINITIONS _XOPEN_SOURCE=500)
 endif()
 # aliases
 set(VERSION "${LIBMINC_EXTERNAL_LIB_PREFIX}${LIBMINC_PACKAGE_VERSION}")
@@ -214,14 +212,14 @@ set(HAVE_MINC2 ON)
 set(MINC2 "1")
 
 if(LIBMINC_MINC1_SUPPORT)
- add_definitions(-DHAVE_MINC1=1)
+ list(APPEND MINC_COMPILE_DEFINITIONS HAVE_MINC1=1)
 endif()
 
 if(LIBMINC_BUILD_EZMINC)
   set(LIBMINC_INCLUDE_DIRS_CONFIG
     ${CMAKE_CURRENT_SOURCE_DIR}/ezminc
   )
-  include_directories(
+  list(APPEND MINC_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/ezminc
    )
 endif()
@@ -242,22 +240,21 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake ${CMAKE_CURRENT_BINARY
 #configure_file(${CMAKE_CURRENT_SOURCE_DIR}/epm-header.in ${CMAKE_CURRENT_BINARY_DIR}/epm-header)
 
 # set the master INCLUDE directories
-include_directories(
+list(APPEND MINC_INCLUDE_DIRS
    ${CMAKE_CURRENT_SOURCE_DIR}
    ${CMAKE_CURRENT_BINARY_DIR}
    ${CMAKE_CURRENT_SOURCE_DIR}/libcommon
    ${CMAKE_CURRENT_SOURCE_DIR}/libsrc2
    ${CMAKE_CURRENT_SOURCE_DIR}/libsrc
    ${CMAKE_CURRENT_SOURCE_DIR}/volume_io/Include
-   ${HDF5_INCLUDE_DIRS}
    )
 
 if(LIBMINC_BUILD_EZMINC AND LIBMINC_MINC1_SUPPORT)
-  include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/ezminc )
+  list(APPEND MINC_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/ezminc)
 endif()
 
 if(LIBMINC_NIFTI_SUPPORT)
-    include_directories(
+    list(APPEND MINC_INCLUDE_DIRS
         ${NIFTI_INCLUDE_DIR}
     )
 endif()
@@ -456,6 +453,9 @@ set(CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})
 
 add_library(${LIBMINC_LIBRARY} ${LIBRARY_TYPE} ${minc_LIB_SRCS} ${minc_HEADERS} ${volume_io_LIB_SRCS} ${volume_io_HEADERS} )
 
+target_include_directories(${LIBMINC_LIBRARY} PUBLIC ${MINC_INCLUDE_DIRS} ${HDF5_INCLUDE_DIRS})
+target_compile_definitions(${LIBMINC_LIBRARY} PUBLIC ${MINC_COMPILE_DEFINITIONS})
+
 if(NIFTI_FOUND AND NOT LIBMINC_USE_SYSTEM_NIFTI)
     add_dependencies(${LIBMINC_LIBRARY} NIFTI)
 endif()
@@ -464,7 +464,7 @@ endif()
 target_link_libraries(${LIBMINC_LIBRARY} ${HDF5_LIBRARY} ${NIFTI_LIBRARIES} ${ZLIB_LIBRARY} ${RT_LIBRARY}) #
 
 if(LIBMINC_MINC1_SUPPORT)
-  include_directories(${NETCDF_INCLUDE_DIR})
+  target_include_directories(${LIBMINC_LIBRARY} PUBLIC ${NETCDF_INCLUDE_DIR})
   target_link_libraries(${LIBMINC_LIBRARY} ${NETCDF_LIBRARY})
   get_filename_component(NETCDF_LIBRARY_NAME "${NETCDF_LIBRARY}" NAME)
 else()
@@ -482,6 +482,8 @@ if(UNIX)
 
   if(LIBMINC_BUILD_SHARED_LIBS)
     add_library(${LIBMINC_LIBRARY_STATIC} STATIC ${minc_LIB_SRCS} ${minc_HEADERS} ${volume_io_LIB_SRCS} ${volume_io_HEADERS} )
+    target_include_directories(${LIBMINC_LIBRARY_STATIC} PUBLIC ${MINC_INCLUDE_DIRS} ${HDF5_INCLUDE_DIRS})
+    target_compile_definitions(${LIBMINC_LIBRARY_STATIC} PUBLIC ${MINC_COMPILE_DEFINITIONS})
     target_link_libraries(${LIBMINC_LIBRARY_STATIC} ${HDF5_LIBRARY} ${NIFTI_LIBRARIES} ${ZLIB_LIBRARY} ${RT_LIBRARY} m ${CMAKE_DL_LIBS} )
     if(LIBMINC_MINC1_SUPPORT)
       target_link_libraries(${LIBMINC_LIBRARY} ${NETCDF_LIBRARY})
