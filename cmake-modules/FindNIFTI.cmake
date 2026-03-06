@@ -1,29 +1,19 @@
 # FindNIFTI.cmake module
 
+include(FindPackageHandleStandardArgs)
 
-find_path(NIFTI_INCLUDE_DIR nifti1_io.h /usr/include /usr/local/include /usr/local/bic/include)
+find_path(NIFTI_INCLUDE_DIR nifti1_io.h)
 
-find_library(NIFTI_LIBRARY NAMES niftiio PATHS /usr/lib /usr/local/lib /usr/local/bic/lib)
+find_library(NIFTI_LIBRARY NAMES niftiio)
 
-find_path(ZNZ_INCLUDE_DIR znzlib.h /usr/include /usr/local/include /usr/local/bic/include)
+find_path(ZNZ_INCLUDE_DIR znzlib.h)
 
-find_library(ZNZ_LIBRARY NAMES znz PATHS /usr/lib /usr/local/lib /usr/local/bic/lib)
+find_library(ZNZ_LIBRARY NAMES znz)
 
+find_package_handle_standard_args(NIFTI
+  REQUIRED_VARS NIFTI_LIBRARY NIFTI_INCLUDE_DIR ZNZ_LIBRARY ZNZ_INCLUDE_DIR
+)
 
-if (NIFTI_INCLUDE_DIR AND NIFTI_LIBRARY AND ZNZ_INCLUDE_DIR AND ZNZ_LIBRARY)
-   set(NIFTI_FOUND TRUE)
-endif ()
-
-
-if (NIFTI_FOUND)
-   if (NOT NIFTI_FIND_QUIETLY)
-      message(STATUS "Found NetCDF headers: ${NIFTI_INCLUDE_DIR}")
-      message(STATUS "Found NetCDF library: ${NIFTI_LIBRARY}")
-      message(STATUS "Found znzlib headers: ${ZNZ_INCLUDE_DIR}")
-      message(STATUS "Found znzlib library: ${ZNZ_LIBRARY}")
-   endif ()
-else ()
-   if (NIFTI_FIND_REQUIRED)
-      message(FATAL_ERROR "Could not find NIfTI-1 I/O library")
-   endif ()
-endif ()
+if(NIFTI_FOUND)
+  mark_as_advanced(NIFTI_INCLUDE_DIR NIFTI_LIBRARY ZNZ_INCLUDE_DIR ZNZ_LIBRARY)
+endif()

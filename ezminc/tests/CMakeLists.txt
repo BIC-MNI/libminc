@@ -1,11 +1,11 @@
-link_libraries(minc_io ${LIBMINC_LIBRARIES})
-
 add_executable(ezminc_rw_test ezminc_rw_test.cpp)
+target_link_libraries(ezminc_rw_test minc_io ${LIBMINC_LIBRARIES})
 #add_executable(ezminc_stats   ezminc_stats.cpp)
 
 add_test(ezminc_rw_test ezminc_rw_test ${CMAKE_CURRENT_BINARY_DIR})
 
 add_executable(ezminc_rw_test2 minc_rw_test2.cpp)
+target_link_libraries(ezminc_rw_test2 minc_io ${LIBMINC_LIBRARIES})
 
 
 if(MINC_TEST_ENVIRONMENT)

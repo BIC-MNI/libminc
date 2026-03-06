@@ -1,6 +1,3 @@
-link_libraries(${LIBMINC_LIBRARIES})
-
-
 macro(minc_test cmd)
   # minc 1 version
   if(HAVE_MINC1)
@@ -64,6 +61,11 @@ if(LIBMINC_MINC1_SUPPORT)
   add_executable(minc_long_attr minc_long_attr.c)
   add_executable(minc_conversion minc_conversion.c)
 
+  foreach(_target minc_tst icv icv_vec icv_dim1 icv_dim icv_fillvalue icv_range
+                  mincapi minc_types test_mconv minc_long_attr minc_conversion)
+    target_link_libraries(${_target} ${LIBMINC_LIBRARIES})
+  endforeach()
+
   # running tests
   minc_test(minc_types)
   minc_test(icv_dim1)
@@ -94,9 +96,11 @@ endif()
 
 # Volume IO tests
 add_executable(volume_test volume_test.c)
+target_link_libraries(volume_test ${LIBMINC_LIBRARIES})
 add_test(volume_test-1 volume_test)
 
 add_executable(multidim_test multidim_test.c)
+target_link_libraries(multidim_test ${LIBMINC_LIBRARIES})
 add_test(volume_multidim_test multidim_test)
 
 add_executable(test_xfm   vio_xfm_test/test-xfm.c)
@@ -151,6 +155,7 @@ set_property(TEST verify_xfm_2 APPEND PROPERTY DEPENDS copy_xfm)
 
 #common tests
 add_executable(test_arg_parse test_arg_parse.c)
+target_link_libraries(test_arg_parse ${LIBMINC_LIBRARIES})
 add_minc_test(test_arg_parse test_arg_parse)
 
 
@@ -178,6 +183,15 @@ add_executable(minc2-read-metadata minc2-read-metadata.c)
 
 add_executable(minc2-leak-test minc2-leak-test.c)
 add_executable(minc2-float-voxel-test minc2-float-voxel-test.c)
+
+foreach(_target minc2-convert-test minc2-create-test-images-2 minc2-create-test-images
+                minc2-datatype-test minc2-large-attribute minc2-dimension-test
+                minc2-full-test minc2-grpattr-test minc2-hyper-test-2 minc2-hyper-test
+                minc2-label-test minc2-multires-test minc2-record-test minc2-slice-test
+                minc2-valid-test minc2-vector_dimension-test minc2-volprops-test
+                minc2-read-rgb minc2-read-metadata minc2-leak-test minc2-float-voxel-test)
+  target_link_libraries(${_target} ${LIBMINC_LIBRARIES})
+endforeach()
 
 add_minc_test(minc2-convert-test          minc2-convert-test)
 add_minc_test(minc2-create-test-images    minc2-create-test-images
