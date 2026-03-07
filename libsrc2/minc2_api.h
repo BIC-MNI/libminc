@@ -51,6 +51,27 @@ int midelete_attr(mihandle_t vol, const char *path, const char *name);
  */
 int midelete_group(mihandle_t vol, const char *path, const char *name);
 
+/** Create a scalar dataset (0-dimensional variable) for storing attributes.
+ * Scalar datasets are used to store DICOM group data as variables with
+ * attributes, rather than as empty groups.
+ * \ingroup mi2Group
+ * \param vol Handle to opened MINC volume
+ * \param path Path to the scalar dataset (e.g., "dicom_0x0008")
+ * \return MI_NOERROR on success, MI_ERROR on failure
+ */
+int micreate_scalar_dataset(mihandle_t vol, const char *path);
+
+/** Create a scalar dataset with a specific data type.
+ * Scalar datasets are used to store DICOM group data as variables with
+ * attributes, rather than as empty groups.
+ * \ingroup mi2Group
+ * \param vol Handle to opened MINC volume
+ * \param path Path to the scalar dataset
+ * \param data_type Data type for the scalar (e.g., MI_TYPE_INT, MI_TYPE_STRING)
+ * \return MI_NOERROR on success, MI_ERROR on failure
+ */
+int micreate_scalar_dataset_typed(mihandle_t vol, const char *path, mitype_t data_type);
+
 /**
  * Returns the length in bytes of the attribute \a name in the
  * group or dataset at \a path. For strings, this length will reflect
@@ -59,7 +80,7 @@ int midelete_group(mihandle_t vol, const char *path, const char *name);
  * \ingroup mi2Group
  */
 int miget_attr_length(mihandle_t vol, const char *path,
-                             const char *name, size_t *length);
+                              const char *name, size_t *length);
 
 /** Get the type of an attribute.
  * \ingroup mi2Group

@@ -483,13 +483,171 @@ int midelete_group ( mihandle_t vol, const char *path, const char *name )
   } H5E_END_TRY;
 
   /* Close the handles we created.
-   */
+    */
   H5Gclose ( hdf_grp );
 
   return ( hdf_result );
 }
 
-/** Get the length of a attribute
+/** Create a scalar dataset (0-dimensional variable) for storing attributes.
+ * This is needed for DICOM group variables which are stored as scalars
+ * with attributes, not as groups.
+ */
+int micreate_scalar_dataset ( mihandle_t vol, const char *path )
+{
+  hid_t hdf_file;
+  hid_t grp_info;
+  hid_t dataset_info;
+  hid_t dataspace_info;
+  char fullpath[256];
+
+  /* Get a handle to the actual HDF file */
+  hdf_file = vol->hdf_id;
+
+  if ( hdf_file < 0 ) {
+    return ( MI_ERROR );
+  }
+
+  /* Build full path to the PARENT group where scalar will reside */
+  snprintf ( fullpath, sizeof ( fullpath ), "%s/%s", MI_ROOT_PATH, MI_INFO_NAME );
+
+  /* Open the info group */
+  H5E_BEGIN_TRY {
+    grp_info = H5Gopen1 ( hdf_file, fullpath );
+  } H5E_END_TRY;
+
+  if ( grp_info < 0 ) {
+    return ( MI_ERROR );
+  }
+
+  /* Check if dataset already exists */
+  H5E_BEGIN_TRY {
+    dataset_info = H5Dopen1 ( grp_info, path );
+  } H5E_END_TRY;
+
+  if ( dataset_info >= 0 ) {
+    /* Already exists, just close and return success */
+    H5Dclose ( dataset_info );
+    H5Gclose ( grp_info );
+    return ( MI_NOERROR );
+  }
+
+  /* Create scalar dataspace (0-dimensional) */
+  dataspace_info = H5Screate ( H5S_SCALAR );
+
+  if ( dataspace_info < 0 ) {
+    H5Gclose ( grp_info );
+    return ( MI_ERROR );
+  }
+
+  /* Create the dataset with default INT type */
+  H5E_BEGIN_TRY {
+    dataset_info = H5Dcreate1 ( grp_info, path, H5T_STD_I32LE, 
+                                 dataspace_info, H5P_DEFAULT );
+  } H5E_END_TRY;
+
+  if ( dataset_info < 0 ) {
+    H5Sclose ( dataspace_info );
+    H5Gclose ( grp_info );
+    return ( MI_ERROR );
+  }
+
+  /* Add minimal attributes (mark it as a GROUP variable type) */
+  miset_attr_at_loc ( dataset_info, MIvartype, MI_TYPE_STRING, 
+                       strlen ( MI_GROUP ), MI_GROUP );
+
+  /* Cleanup */
+  H5Dclose ( dataset_info );
+  H5Sclose ( dataspace_info );
+  H5Gclose ( grp_info );
+
+  return ( MI_NOERROR );
+}
+
+/** Create a scalar dataset with explicit type.
+ * This allows specifying the data type for the scalar dataset.
+ */
+int micreate_scalar_dataset_typed ( mihandle_t vol, const char *path, mitype_t data_type )
+{
+  hid_t hdf_file;
+  hid_t grp_info;
+  hid_t dataset_info;
+  hid_t dataspace_info;
+  hid_t type_id;
+  char fullpath[256];
+
+  hdf_file = vol->hdf_id;
+
+  if ( hdf_file < 0 ) {
+    return ( MI_ERROR );
+  }
+
+  /* Build full path to the PARENT group where scalar will reside */
+  snprintf ( fullpath, sizeof ( fullpath ), "%s/%s", MI_ROOT_PATH, MI_INFO_NAME );
+
+  H5E_BEGIN_TRY {
+    grp_info = H5Gopen1 ( hdf_file, fullpath );
+  } H5E_END_TRY;
+
+  if ( grp_info < 0 ) {
+    return ( MI_ERROR );
+  }
+
+  /* Check if dataset already exists */
+  H5E_BEGIN_TRY {
+    dataset_info = H5Dopen1 ( grp_info, path );
+  } H5E_END_TRY;
+
+  if ( dataset_info >= 0 ) {
+    H5Dclose ( dataset_info );
+    H5Gclose ( grp_info );
+    return ( MI_NOERROR );
+  }
+
+  /* Convert MINC type to HDF5 type */
+  type_id = mitype_to_hdftype ( data_type, FALSE );
+
+  if ( type_id < 0 ) {
+    H5Gclose ( grp_info );
+    return ( MI_ERROR );
+  }
+
+  /* Create scalar dataspace */
+  dataspace_info = H5Screate ( H5S_SCALAR );
+
+  if ( dataspace_info < 0 ) {
+    H5Tclose ( type_id );
+    H5Gclose ( grp_info );
+    return ( MI_ERROR );
+  }
+
+  /* Create the dataset */
+  H5E_BEGIN_TRY {
+    dataset_info = H5Dcreate1 ( grp_info, path, type_id, 
+                                 dataspace_info, H5P_DEFAULT );
+  } H5E_END_TRY;
+
+  if ( dataset_info < 0 ) {
+    H5Sclose ( dataspace_info );
+    H5Tclose ( type_id );
+    H5Gclose ( grp_info );
+    return ( MI_ERROR );
+  }
+
+  /* Add type attribute */
+  miset_attr_at_loc ( dataset_info, MIvartype, MI_TYPE_STRING,
+                       strlen ( MI_GROUP ), MI_GROUP );
+
+  /* Cleanup */
+  H5Dclose ( dataset_info );
+  H5Sclose ( dataspace_info );
+  H5Tclose ( type_id );
+  H5Gclose ( grp_info );
+
+  return ( MI_NOERROR );
+}
+
+/** Get the length of an attribute
  */
 int miget_attr_length ( mihandle_t vol, const char *path, const char *name,
                     size_t *length )
