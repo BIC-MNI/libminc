@@ -1,5 +1,7 @@
 link_libraries(${LIBMINC_LIBRARY})
 
+ADD_DEFINITIONS(-DHAVE_CONFIG_H)
+
 # Test sources include "config.h" which is generated in the project binary dir
 # Use PROJECT_BINARY_DIR (set by libminc's project() call) instead of
 # CMAKE_BINARY_DIR, which points to the top-level build dir in a superbuild.
