@@ -1,4 +1,5 @@
 #include <volume_io.h>
+#include <string.h>
 
 #define TEST1_N_DIMENSIONS 3
 
@@ -13,6 +14,7 @@ test1(void)
 
   printf("test1()... ");
 
+  memset(&array, 0, sizeof(array));
   if (multidim_array_is_alloced(&array))
   {
     printf("%s: %d\n", __func__, __LINE__);

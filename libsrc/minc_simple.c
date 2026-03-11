@@ -955,7 +955,7 @@ minc_get_world_transform(int fd, double transform[4][4],
   int varid;
   int old_ncopts;
   int dims[MAX_VAR_DIMS];
-  int ndims;
+  int ndims = 0;
   char dimname[128];
 
   old_ncopts = get_ncopts();
