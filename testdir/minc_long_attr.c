@@ -116,7 +116,7 @@ static int test1(struct testinfo *ip, struct dimdef *dims, int ndims)
     FUNC_ERROR("micreate_std_variable");
   }
 
-  ip->test_group = ncvardef(ip->fd,(char*)"test",NC_INT,0,0);/* micreate_group_variable(ip->fd,(char*)"test");*/
+  ip->test_group = ncvardef(ip->fd,"test",NC_INT,0,0);/* micreate_group_variable(ip->fd,(char*)"test");*/
   if(ip->test_group<0)
   {
     FUNC_ERROR("micreate_group_variable");

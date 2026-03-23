@@ -101,7 +101,7 @@ static int test1(struct testinfo *ip, struct dimdef *dims, int ndims)
   /* Create the image-max variable.
    */
   printf("%s:%d\n",__FILE__,__LINE__);
-  ip->maxid = micreate_std_variable(ip->fd, (char*)MIimagemax, NC_DOUBLE, 0, NULL);
+  ip->maxid = micreate_std_variable(ip->fd, MIimagemax, NC_DOUBLE, 0, NULL);
   if (ip->maxid < 0) {
     FUNC_ERROR("micreate_std_variable");
   }
@@ -109,13 +109,13 @@ static int test1(struct testinfo *ip, struct dimdef *dims, int ndims)
   /* Create the image-min variable.
    */
   printf("%s:%d\n",__FILE__,__LINE__);
-  ip->minid = micreate_std_variable(ip->fd, (char*)MIimagemin, NC_DOUBLE, 0, NULL);
+  ip->minid = micreate_std_variable(ip->fd, MIimagemin, NC_DOUBLE, 0, NULL);
   if (ip->minid < 0) {
     FUNC_ERROR("micreate_std_variable");
   }
 
   printf("%s:%d\n",__FILE__,__LINE__);
-  ip->imgid = micreate_std_variable(ip->fd, (char*)MIimage, NC_FLOAT, ndims, ip->dim);
+  ip->imgid = micreate_std_variable(ip->fd, MIimage, NC_FLOAT, ndims, ip->dim);
   if (ip->imgid < 0) {
     FUNC_ERROR("micreate_std_variable");
   }
