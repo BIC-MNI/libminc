@@ -118,6 +118,11 @@ int main ( int argc, char **argv )
   origin=malloc(sizeof(double)*ndim);
   step=malloc(sizeof(double)*ndim);
 
+  if ( dim == NULL || sizes == NULL || origin == NULL || step == NULL ) {
+    free(dim); free(sizes); free(origin); free(step);
+    return 1;
+  }
+
   /* get the apparent dimensions and their sizes */
   r = miget_volume_dimensions ( vol, MI_DIMCLASS_ANY ,
                                 MI_DIMATTR_ALL, MI_DIMORDER_FILE,

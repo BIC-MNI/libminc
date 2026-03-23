@@ -1930,7 +1930,8 @@ alloc2d ( int n, int m )
     mat[i] = ( double * ) malloc ( m * sizeof ( double ) );
 
     if ( mat[i] == NULL ) {
-      free(mat);
+      while ( --i >= 0 ) free ( mat[i] );
+      free ( mat );
       return NULL;
     }
   }
