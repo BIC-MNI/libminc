@@ -311,6 +311,12 @@ void milog_init(const char *name)
     const char *fname_str = miget_cfg_str(MICFG_LOGFILE);
     int level = miget_cfg_int(MICFG_LOGLEVEL);
 
+    /* Close previously opened log file if re-initializing */
+    if (_MI_log.fp != NULL && _MI_log.fp != stderr && _MI_log.fp != stdout) {
+	fclose(_MI_log.fp);
+	_MI_log.fp = NULL;
+    }
+
     if (!strlen(fname_str)) {
 	_MI_log.fp = stderr;
     }
@@ -323,6 +329,10 @@ void milog_init(const char *name)
 	}
 	else {
 	    _MI_log.fp = fopen(fname_str, "w");
+	}
+	/* Fall back to stderr if fopen failed */
+	if (_MI_log.fp == NULL) {
+	    _MI_log.fp = stderr;
 	}
     }
 
@@ -381,7 +391,6 @@ int v_mi2log_message(const char *file, int line, mimsgcode_t code, va_list ap)
     }
     fprintf ( _MI2_log.fp, "%s:%d (from %s): ", file, line, minc_routine_name );
     vfprintf ( _MI2_log.fp, fmt, ap );
-    va_end ( ap );
     fprintf ( _MI2_log.fp, "\n" );
     fflush ( _MI2_log.fp );
   }
