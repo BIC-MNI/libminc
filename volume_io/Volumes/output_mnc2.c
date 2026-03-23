@@ -1120,7 +1120,7 @@ static  VIO_Status  output_the_volume2(
 {
     VIO_Status        status;
     int               d, n_volume_dims, sizes[VIO_MAX_DIMENSIONS];
-    int               slab_size, n_slab, this_count;
+    int               n_slab, this_count;
     int               vol_index, step, n_steps;
     int               to_volume_index[MAX_VAR_DIMS];
     int               to_file_index[VIO_MAX_DIMENSIONS];
@@ -1202,7 +1202,6 @@ static  VIO_Status  output_the_volume2(
        chunking dimensions for compression (for efficiency) */
 
     file->n_slab_dims = 0;
-    slab_size = 1;
     n_steps = 1;
 
     for( d = file->n_file_dimensions-1; d >= 0; d-- ) {
@@ -1211,7 +1210,6 @@ static  VIO_Status  output_the_volume2(
       if( to_volume_index[d] != INVALID_AXIS ) {
         count[d] = volume_count[to_volume_index[d]];
         file->n_slab_dims++;  /* integral number of complete dimensions */
-        slab_size *= count[d];
       }
     }
 

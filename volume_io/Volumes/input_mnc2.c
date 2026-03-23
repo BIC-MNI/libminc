@@ -157,7 +157,6 @@ static  Minc_file  initialize_minc_input_from_minc2_id(
     if(slice_scaling_flag)
     {
       int n_slice_dimensions=file->n_file_dimensions;
-      int slices_count=1;
       misize_t *slice_start;
 
       if(miget_slice_dimension_count(file->minc2id,
@@ -172,12 +171,6 @@ static  Minc_file  initialize_minc_input_from_minc2_id(
       }
       n_slice_dimensions=file->n_file_dimensions-n_slice_dimensions;
 
-
-      /*now iterate through all slices to find out global image intensity range*/
-      for_less(d,0,n_slice_dimensions)
-      {
-        slices_count*=dimension_size[d];
-      }
       slice_start=(misize_t *)calloc(n_slice_dimensions,sizeof(misize_t));
       miget_slice_range(file->minc2id,slice_start,n_slice_dimensions,&volume_max,&volume_min);
 
