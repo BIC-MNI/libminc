@@ -1183,6 +1183,7 @@ PRIVATE void update_history(int mincid, char *arg_string)
 
    /* Allocate a string and get the old history */
    string = MALLOC(att_length, char);
+   if (string == NULL) return;
    string[0] = '\0';
    (void) miattgetstr(mincid, NC_GLOBAL, MIhistory, att_length,
                       string);
@@ -2007,6 +2008,7 @@ PRIVATE Loopfile_Info *initialize_loopfile_info(int num_input_files,
 
    /* Allocate structure */
    loopfile_info = MALLOC(1, Loopfile_Info);
+   if (loopfile_info == NULL) return NULL;
 
    /* Save clobber info */
    if (loop_options->clobber) {
@@ -2732,6 +2734,7 @@ MNCAPI Loop_Options *create_loop_options(void)
 
    /* Allocate structure */
    loop_options = MALLOC(1, Loop_Options);
+   if (loop_options == NULL) return NULL;
 
    /* Fill in the defaults */
    loop_options->clobber = FALSE;
@@ -3227,6 +3230,7 @@ PRIVATE Loop_Info *create_loop_info(void)
 
    /* Allocate structure */
    loop_info = MALLOC(1, Loop_Info);
+   if (loop_info == NULL) return NULL;
 
    /* Fill in the defaults */
    initialize_loop_info(loop_info);

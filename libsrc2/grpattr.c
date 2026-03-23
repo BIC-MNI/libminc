@@ -95,6 +95,10 @@ int milist_start ( mihandle_t vol, const char *path, int flags,
   }
 
   frame = ( struct milistframe * ) malloc ( sizeof ( struct milistframe ) );
+  if ( frame == NULL ) {
+    free ( data );
+    return ( MI_ERROR );
+  }
   frame->next = NULL;
   frame->grp_id = grp_id;
   frame->att_idx = 0;
@@ -905,6 +909,9 @@ int miset_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
   if ( pch != NULL ) {
     slength = strlen ( path ) - ( pch - path );
     std_name = malloc ( slength + 1 );
+    if ( std_name == NULL ) {
+      goto cleanup;
+    }
 
     for ( i = 0; i < slength; i++ )
       std_name[i] = path[pch - path + 1 + i];
@@ -912,6 +919,9 @@ int miset_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
     std_name[slength] = '\0';
   } else {
     std_name = malloc ( strlen ( path ) + 1 );
+    if ( std_name == NULL ) {
+      goto cleanup;
+    }
     strcpy ( std_name, path );
   }
 

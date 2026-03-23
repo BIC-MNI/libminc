@@ -172,6 +172,11 @@ static  Minc_file  initialize_minc_input_from_minc2_id(
       n_slice_dimensions=file->n_file_dimensions-n_slice_dimensions;
 
       slice_start=(misize_t *)calloc(n_slice_dimensions,sizeof(misize_t));
+      if(slice_start==NULL)
+      {
+        print_error("Memory allocation failed for slice_start!\n");
+        return( (Minc_file) NULL );
+      }
       miget_slice_range(file->minc2id,slice_start,n_slice_dimensions,&volume_max,&volume_min);
 
       do

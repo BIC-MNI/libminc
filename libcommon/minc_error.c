@@ -317,7 +317,7 @@ void milog_init(const char *name)
 	_MI_log.fp = NULL;
     }
 
-    if (!strlen(fname_str)) {
+    if (fname_str == NULL || !strlen(fname_str)) {
 	_MI_log.fp = stderr;
     }
     else if (!strcmp(fname_str, "stdout") || !strcmp(fname_str, "-")) {

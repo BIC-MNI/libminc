@@ -284,6 +284,10 @@ int micreate_dimension(const char *name, midimclass_t dimclass, midimattr_t attr
 
   if ( attr & MI_DIMATTR_NOT_REGULARLY_SAMPLED ) {
     handle->widths = ( double * ) malloc ( length * sizeof ( double ) );
+    if ( handle->widths == NULL ) {
+      free ( handle );
+      return MI_ERROR;
+    }
 
     for ( i = 0; i < length; i++ ) {
 
