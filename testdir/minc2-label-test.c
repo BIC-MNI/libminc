@@ -156,6 +156,12 @@ main ( void )
   double *dbuf = ( double * ) malloc ( CX * CY * CZ * sizeof ( double ) );
   int result;
 
+  if ( buf == NULL || dbuf == NULL ) {
+    free ( buf );
+    free ( dbuf );
+    return 1;
+  }
+
   printf ( "Creating label image !! \n" );
   error_cnt += create_label_image();
 

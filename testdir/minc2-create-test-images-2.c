@@ -32,6 +32,9 @@ static int create_real_as_int_image(const char* fname)
 
   double min = -1.0;
   double max =  1.0;
+
+  if ( buf == NULL ) return -1;
+
   /*TODO: add error checks in this functions*/
   r = micreate_dimension("yspace", MI_DIMCLASS_SPATIAL,
                          MI_DIMATTR_REGULARLY_SAMPLED, CY, &hdim[0]);
@@ -110,6 +113,9 @@ static int create_real_as_float_image(const char* fname)
 
   double min = -1.0;
   double max =  1.0;
+
+  if ( buf == NULL ) return -1;
+
   r = micreate_dimension("yspace", MI_DIMCLASS_SPATIAL,
                          MI_DIMATTR_REGULARLY_SAMPLED, CY, &hdim[0]);
   if( r!= MI_NOERROR )    TESTRPT("micreate_dimension",r);

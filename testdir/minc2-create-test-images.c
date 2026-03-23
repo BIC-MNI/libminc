@@ -30,6 +30,12 @@ static int create_2D_image ( const char *fname )
   misize_t count[NDIMS - 1];
   misize_t start[NDIMS - 1];
 
+  if ( buf == NULL || offsets == NULL ) {
+    free ( buf );
+    free ( offsets );
+    return -1;
+  }
+
   r = micreate_dimension ( "xspace", MI_DIMCLASS_SPATIAL, MI_DIMATTR_NOT_REGULARLY_SAMPLED, CX, &hdim[0] );
   if(r<0) return r;
 
@@ -90,6 +96,9 @@ static int create_3D_image ( const char *fname )
 
   double min = -1.0;
   double max =  1.0;
+
+  if ( buf == NULL ) return -1;
+
   r = micreate_dimension ( "yspace", MI_DIMCLASS_SPATIAL,
                            MI_DIMATTR_REGULARLY_SAMPLED, CY, &hdim[0] );
   if(r<0) return r;
@@ -162,6 +171,9 @@ static int create_4D_image ( const char *fname )
 
   double min = -1.0;
   double max =  1.0;
+
+  if ( buf == NULL ) return -1;
+
   r = micreate_dimension ( "xspace", MI_DIMCLASS_SPATIAL,
                            MI_DIMATTR_REGULARLY_SAMPLED, CX, &hdim[0] );
   if(r<0) return r;

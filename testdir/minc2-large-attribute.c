@@ -67,6 +67,7 @@ static int create_3D_image ( size_t attribute_size, const char *test_file )
 
 
   buf = ( unsigned short * ) malloc ( CX * CY * CZ * sizeof ( unsigned short ) );
+  if ( buf == NULL ) return -1;
   for ( i = 0; i < CY * CX * CZ; i++ ) {
     buf[i] = ( unsigned short ) (i * 0.001);
   }

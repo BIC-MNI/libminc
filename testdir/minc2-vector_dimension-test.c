@@ -22,6 +22,8 @@ static void create_test_file ( void )
   misize_t count[NDIMS];
   misize_t start[NDIMS];
 
+  if ( buf == NULL ) return;
+
   micreate_dimension ( "zspace", MI_DIMCLASS_SPATIAL,
                            MI_DIMATTR_REGULARLY_SAMPLED, CZ, &hdim[0] );
 

@@ -37,6 +37,9 @@ static void create_test_file ( void )
 
   double min = -1.0;
   double max =  1.0;
+
+  if ( buf == NULL ) return;
+
   micreate_dimension ( "zspace", MI_DIMCLASS_SPATIAL,
                            MI_DIMATTR_REGULARLY_SAMPLED, CZ, &hdim[0] );
 
