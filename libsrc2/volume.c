@@ -470,6 +470,7 @@ int micreate_volume(const char *filename, int number_of_dimensions,
   hid_t dataset_width = -1;
   hid_t dataspace_id = -1;
   char *name;
+  const char *attr_str;
   size_t size;
   hsize_t hdf_size[MI2_MAX_VAR_DIMS];
   mihandle_t handle;
@@ -790,9 +791,9 @@ int micreate_volume(const char *filename, int number_of_dimensions,
     }
 
     if (dimensions[i]->attr & MI_DIMATTR_NOT_REGULARLY_SAMPLED) {
-      name = "irregular";
+      attr_str = "irregular";
     } else {
-      name = "regular__";
+      attr_str = "regular__";
     }
     /* Create attribute "spacing" and set its value to
       "regular__" or "irregular"
@@ -800,26 +801,26 @@ int micreate_volume(const char *filename, int number_of_dimensions,
 
     if(!dimension_is_vector)
       miset_attr_at_loc(dataset_id, "spacing", MI_TYPE_STRING,
-                      strlen(name), name);
+                      strlen(attr_str), attr_str);
 
     switch (dimensions[i]->dim_class) {
     case MI_DIMCLASS_SPATIAL:
-      name = "spatial";
+      attr_str = "spatial";
       break;
     case MI_DIMCLASS_TIME:
-      name = "time___";
+      attr_str = "time___";
       break;
     case MI_DIMCLASS_SFREQUENCY:
-      name = "sfreq__";
+      attr_str = "sfreq__";
       break;
     case MI_DIMCLASS_TFREQUENCY:
-      name = "tfreq__";
+      attr_str = "tfreq__";
       break;
     case MI_DIMCLASS_USER:
-      name = "user___";
+      attr_str = "user___";
       break;
     case MI_DIMCLASS_RECORD:
-      name = "record_";
+      attr_str = "record_";
       break;
     case MI_DIMCLASS_ANY:
     default:
@@ -841,8 +842,8 @@ int micreate_volume(const char *filename, int number_of_dimensions,
     {
       const char *align_str;
 
-      miset_attr_at_loc(dataset_id, "class", MI_TYPE_STRING, strlen(name),
-                      name);
+      miset_attr_at_loc(dataset_id, "class", MI_TYPE_STRING, strlen(attr_str),
+                      attr_str);
 
 
       /* Save step value. */
