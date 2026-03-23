@@ -610,8 +610,8 @@ int micreate_volume(const char *filename, int number_of_dimensions,
   */
   if (volume_class != MI_CLASS_LABEL &&
       volume_class != MI_CLASS_UNIFORM_RECORD) {
-    size_t size = H5Tget_size(handle->ftype_id);
-    char *tmp = calloc(1, size);
+    size_t fill_size = H5Tget_size(handle->ftype_id);
+    char *tmp = calloc(1, fill_size);
     H5Pset_fill_value(hdf_plist, handle->ftype_id, tmp);
     free(tmp);
   }
