@@ -486,6 +486,7 @@ int miset_apparent_dimension_order ( mihandle_t volume, int array_length,
    */
   if ( volume->dim_indices == NULL ) {
     volume->dim_indices = ( int * ) malloc ( volume->number_of_dims * sizeof ( int ) );
+    if ( volume->dim_indices == NULL ) return ( MI_ERROR );
     memset ( volume->dim_indices, -1, sizeof ( volume->number_of_dims ) );
   }
 
@@ -580,6 +581,7 @@ int miset_apparent_dimension_order_by_name ( mihandle_t volume, int array_length
    */
   if ( volume->dim_indices == NULL ) {
     volume->dim_indices = ( int * ) malloc ( volume->number_of_dims * sizeof ( int ) );
+    if ( volume->dim_indices == NULL ) return ( MI_ERROR );
     memset ( volume->dim_indices, -1, sizeof ( volume->number_of_dims ) );
   }
 

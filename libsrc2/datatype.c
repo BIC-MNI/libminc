@@ -94,9 +94,11 @@ int miget_space_name ( mihandle_t volume, char **name )
      */
     length = strlen ( MI_NATIVE );
     *name = malloc ( length + 1 );
+    if ( *name == NULL ) return ( MI_ERROR );
     strcpy ( *name, MI_NATIVE );
   } else {
     *name = malloc ( length + 1 );
+    if ( *name == NULL ) return ( MI_ERROR );
     result = miget_attr_values ( volume, MI_TYPE_STRING, path_list[i],
                                  "spacetype", length+1, *name );
   }

@@ -2031,6 +2031,7 @@ PRIVATE Loopfile_Info *initialize_loopfile_info(int num_input_files,
    /* Save input file names (just copy pointers, not strings) */
    if (num_input_files > 0) {
       loopfile_info->input_files = MALLOC(num_input_files, char *);
+      if (loopfile_info->input_files == NULL) { FREE(loopfile_info); return NULL; }
       for (ifile=0; ifile < num_input_files; ifile++)
          loopfile_info->input_files[ifile] = input_files[ifile];
    }
@@ -2040,6 +2041,7 @@ PRIVATE Loopfile_Info *initialize_loopfile_info(int num_input_files,
    /* Save output file names (just copy pointers, not strings) */
    if (num_output_files > 0) {
       loopfile_info->output_files = MALLOC(num_output_files, char *);
+      if (loopfile_info->output_files == NULL) { FREE(loopfile_info->input_files); FREE(loopfile_info); return NULL; }
       for (ifile=0; ifile < num_output_files; ifile++)
          loopfile_info->output_files[ifile] = output_files[ifile];
    }
@@ -2063,6 +2065,14 @@ PRIVATE Loopfile_Info *initialize_loopfile_info(int num_input_files,
    num_free_files -= num_files;
    loopfile_info->output_mincid = MALLOC(num_files, int);
    loopfile_info->output_icvid = MALLOC(num_files, int);
+   if (loopfile_info->output_mincid == NULL || loopfile_info->output_icvid == NULL) {
+      FREE(loopfile_info->output_mincid);
+      FREE(loopfile_info->output_icvid);
+      FREE(loopfile_info->input_files);
+      FREE(loopfile_info->output_files);
+      FREE(loopfile_info);
+      return NULL;
+   }
    for (ifile=0; ifile < num_files; ifile++) {
       loopfile_info->output_mincid[ifile] = MI_ERROR;
       loopfile_info->output_icvid[ifile] = MI_ERROR;
@@ -2086,6 +2096,16 @@ PRIVATE Loopfile_Info *initialize_loopfile_info(int num_input_files,
    num_free_files -= num_files;
    loopfile_info->input_mincid = MALLOC(num_files, int);
    loopfile_info->input_icvid = MALLOC(num_files, int);
+   if (loopfile_info->input_mincid == NULL || loopfile_info->input_icvid == NULL) {
+      FREE(loopfile_info->input_mincid);
+      FREE(loopfile_info->input_icvid);
+      FREE(loopfile_info->output_mincid);
+      FREE(loopfile_info->output_icvid);
+      FREE(loopfile_info->input_files);
+      FREE(loopfile_info->output_files);
+      FREE(loopfile_info);
+      return NULL;
+   }
    for (ifile=0; ifile < num_files; ifile++) {
       loopfile_info->input_mincid[ifile] = MI_ERROR;
       loopfile_info->input_icvid[ifile] = MI_ERROR;

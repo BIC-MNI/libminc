@@ -1220,6 +1220,7 @@ static int _miget_file_dimension(mihandle_t volume, const char *dimname,
   snprintf(path, sizeof(path), MI_ROOT_PATH "/dimensions/%s", dimname);
   /* Allocate space for the dimension handle */
   hdim = (midimhandle_t) malloc(sizeof (*hdim));
+  if (hdim == NULL) return (MI_ERROR);
   /* Initialize everything to zero */
   memset(hdim, 0, sizeof (*hdim));
 

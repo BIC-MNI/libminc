@@ -378,6 +378,10 @@ MNCAPI char *miexpand_file(const char *path, char *tempfile, int header_only,
    compfile = NULL;
    if ((first_ncerr == NC_SYSERR) && (compress_type == UNKNOWN)) {
       compfile = MALLOC(strlen(path) + max_compression_code_length + 2, char);
+      if (compfile == NULL) {
+         newfile = strdup(path);
+         MI_RETURN(newfile);
+      }
       for (iext=0; iext < complist_length; iext++) {
          (void) strcat(strcpy(compfile, path),
                        compression_code_list[iext].extension);
