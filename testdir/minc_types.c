@@ -33,8 +33,8 @@
 
 static struct {
    nc_type type;
-   char *sign;
-   char *ctype;
+   const char *sign;
+   const char *ctype;
 
 } types[]= { { NC_BYTE,   MI_UNSIGNED, "byte" },
 	     { NC_BYTE,   MI_SIGNED,   "byte" },
