@@ -86,3 +86,4 @@
 
 
 /*All code moved to minc_error*/
+typedef int minc2_error_empty_unit;
