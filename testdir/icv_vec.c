@@ -69,6 +69,8 @@ test_icv_vector(int cflag, nc_type voxel_type)
 
   if (ivalue == NULL || dvalue == NULL) {
     fprintf(stdout, "ERROR bad return code at line %d!\n", __LINE__);
+    free(ivalue);
+    free(dvalue);
     return 1;
   }
 

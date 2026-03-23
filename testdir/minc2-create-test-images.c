@@ -37,33 +37,33 @@ static int create_2D_image ( const char *fname )
   }
 
   r = micreate_dimension ( "xspace", MI_DIMCLASS_SPATIAL, MI_DIMATTR_NOT_REGULARLY_SAMPLED, CX, &hdim[0] );
-  if(r<0) return r;
+  if(r<0) goto cleanup;
 
   r = micreate_dimension ( "yspace", MI_DIMCLASS_USER, MI_DIMATTR_REGULARLY_SAMPLED, CY, &hdim[1] );
-  if(r<0) return r;
+  if(r<0) goto cleanup;
 
   for ( i = 0; i < CX; i++ ) {
     offsets[i] = ( i * i ) + 0.1;
   }
   r = miset_dimension_offsets ( hdim[0], CX, 0, offsets );
-  if(r<0) return r;
+  if(r<0) goto cleanup;
 
   r = miset_dimension_separation ( hdim[1], 0.06 );
-  if(r<0) return r;
+  if(r<0) goto cleanup;
 
   r = miset_dimension_starts ( hdim,  NDIMS - 1, start_values );
-  if(r<0) return r;
+  if(r<0) goto cleanup;
 
   r = micreate_volume ( fname, NDIMS - 1 , hdim, MI_TYPE_SHORT,
                         MI_CLASS_REAL, NULL, &hvol );
-  if(r<0) return r;
+  if(r<0) goto cleanup;
 
   /* set slice scaling flag to true */
   r = miset_slice_scaling_flag ( hvol, flag );
-  if(r<0) return r;
+  if(r<0) goto cleanup;
 
   r = micreate_volume_image ( hvol );
-  if(r<0) return r;
+  if(r<0) goto cleanup;
 
   for ( i = 0; i < CX * CY; i++ ) {
     buf[i] = ( short ) (i * 0.1);
@@ -72,10 +72,11 @@ static int create_2D_image ( const char *fname )
   count[0] = CX; count[1] = CY;
 
   r = miset_voxel_value_hyperslab ( hvol, MI_TYPE_SHORT, start, count, buf );
-  if(r<0) return r;
+  if(r<0) goto cleanup;
 
   r = miclose_volume ( hvol );
-  if(r<0) return r;
+
+cleanup:
   free(buf);
   free(offsets);
   return r;
@@ -101,34 +102,32 @@ static int create_3D_image ( const char *fname )
 
   r = micreate_dimension ( "yspace", MI_DIMCLASS_SPATIAL,
                            MI_DIMATTR_REGULARLY_SAMPLED, CY, &hdim[0] );
-  if(r<0) return r;
+  if(r<0) goto cleanup;
 
   r = micreate_dimension ( "xspace", MI_DIMCLASS_SPATIAL,
                            MI_DIMATTR_REGULARLY_SAMPLED, CX, &hdim[1] );
-  if(r<0) return r;
+  if(r<0) goto cleanup;
 
   r = micreate_dimension ( "zspace", MI_DIMCLASS_SPATIAL,
                            MI_DIMATTR_REGULARLY_SAMPLED, CZ, &hdim[2] );
-  if(r<0) return r;
+  if(r<0) goto cleanup;
 
   r = miset_dimension_starts ( hdim, NDIMS, start_values );
-  if(r<0) return r;
+  if(r<0) goto cleanup;
 
   r = miset_dimension_separations ( hdim, NDIMS, separations );
-  if(r<0) return r;
+  if(r<0) goto cleanup;
 
   r = micreate_volume ( fname, NDIMS, hdim, MI_TYPE_USHORT,
                         MI_CLASS_REAL, NULL, &hvol );
-  if(r<0) return r;
+  if(r<0) goto cleanup;
 
   /* set slice scaling flag to true */
   r = miset_slice_scaling_flag ( hvol, flag );
-  if(r<0) return r;
-
+  if(r<0) goto cleanup;
 
   r = micreate_volume_image ( hvol );
-  if(r<0) return r;
-
+  if(r<0) goto cleanup;
 
   for ( i = 0; i < CY * CX * CZ; i++ ) {
     buf[i] = ( unsigned short ) (i * 0.001);
@@ -138,7 +137,7 @@ static int create_3D_image ( const char *fname )
   count[0] = CY; count[1] = CX; count[2] = CZ;
 
   r = miset_voxel_value_hyperslab ( hvol, MI_TYPE_USHORT, start, count, buf );
-  if(r<0) return r;
+  if(r<0) goto cleanup;
 
   /* Set random values to slice min and max for slice scaling*/
   start[0] = start[1] = start[2] = 0;
@@ -147,12 +146,13 @@ static int create_3D_image ( const char *fname )
     min += 0.1;
     max += 0.1;
     r = miset_slice_range ( hvol, start, NDIMS , max, min );
-    if(r<0) return r;
-
+    if(r<0) goto cleanup;
   }
 
-  free(buf);
   r = miclose_volume ( hvol );
+
+cleanup:
+  free(buf);
   return r;
 }
 
@@ -176,35 +176,35 @@ static int create_4D_image ( const char *fname )
 
   r = micreate_dimension ( "xspace", MI_DIMCLASS_SPATIAL,
                            MI_DIMATTR_REGULARLY_SAMPLED, CX, &hdim[0] );
-  if(r<0) return r;
+  if(r<0) goto cleanup;
 
   r = micreate_dimension ( "time", MI_DIMCLASS_USER,
                            MI_DIMATTR_REGULARLY_SAMPLED, CU, &hdim[1] );
-  if(r<0) return r;
+  if(r<0) goto cleanup;
 
   r = micreate_dimension ( "zspace", MI_DIMCLASS_SPATIAL,
                            MI_DIMATTR_REGULARLY_SAMPLED, CZ, &hdim[2] );
-  if(r<0) return r;
+  if(r<0) goto cleanup;
 
   r = micreate_dimension ( "yspace", MI_DIMCLASS_SPATIAL,
                            MI_DIMATTR_REGULARLY_SAMPLED, CY, &hdim[3] );
-  if(r<0) return r;
+  if(r<0) goto cleanup;
 
   r = miset_dimension_starts ( hdim, NDIMS + 1, start_values );
-  if(r<0) return r;
+  if(r<0) goto cleanup;
   r = miset_dimension_separations ( hdim, NDIMS + 1, separations );
-  if(r<0) return r;
+  if(r<0) goto cleanup;
 
   r = micreate_volume ( fname, NDIMS + 1, hdim, MI_TYPE_UBYTE,
                         MI_CLASS_REAL, NULL, &hvol );
-  if(r<0) return r;
+  if(r<0) goto cleanup;
 
   /* set slice scaling flag to true */
   r = miset_slice_scaling_flag ( hvol, flag );
-  if(r<0) return r;
+  if(r<0) goto cleanup;
 
   r = micreate_volume_image ( hvol );
-  if(r<0) return r;
+  if(r<0) goto cleanup;
 
   for ( i = 0; i < CX * CU * CZ * CY; i++ ) {
     buf[i] = ( unsigned char ) i;
@@ -214,7 +214,7 @@ static int create_4D_image ( const char *fname )
   count[0] = CX; count[1] = CU; count[2] = CZ; count[3] = CY;
 
   r = miset_voxel_value_hyperslab ( hvol, MI_TYPE_UBYTE, start, count, buf );
-  if(r<0) return r;
+  if(r<0) goto cleanup;
   /* Set random values to slice min and max for slice scaling*/
   start[0] = start[1] = start[2] = start[3] = 0;
   for ( i = 0; i < CX; i++ ) {
@@ -225,12 +225,14 @@ static int create_4D_image ( const char *fname )
       min += -0.1;
       max += 0.1;
       r = miset_slice_range ( hvol, start, NDIMS + 1 , max, min );
-      if(r<0) return r;
+      if(r<0) goto cleanup;
     }
   }
 
-  free(buf);
   r = miclose_volume ( hvol );
+
+cleanup:
+  free(buf);
   return r;
 }
 

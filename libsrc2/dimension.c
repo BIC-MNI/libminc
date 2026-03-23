@@ -97,6 +97,7 @@ int micopy_dimension ( midimhandle_t dim_ptr, midimhandle_t *new_dim_ptr )
     handle->offsets = ( double * ) malloc ( dim_ptr->length * sizeof ( double ) );
 
     if ( handle->offsets == NULL ) {
+      free(handle->name);
       free(handle);
       return ( MI_ERROR );
     }
@@ -133,6 +134,10 @@ int micopy_dimension ( midimhandle_t dim_ptr, midimhandle_t *new_dim_ptr )
     handle->widths = ( double * ) malloc ( dim_ptr->length * sizeof ( double ) );
 
     if ( handle->widths == NULL ) {
+      free(handle->offsets);
+      free(handle->units);
+      free(handle->name);
+      free(handle);
       return ( MI_ERROR );
     }
 
@@ -275,6 +280,8 @@ int micreate_dimension(const char *name, midimclass_t dimclass, midimattr_t attr
     break;
   case MI_DIMCLASS_ANY:
   default:
+    free(handle->comments);
+    free(handle->name);
     free(handle);
     return MI_ERROR;
   }
@@ -285,6 +292,8 @@ int micreate_dimension(const char *name, midimclass_t dimclass, midimattr_t attr
   if ( attr & MI_DIMATTR_NOT_REGULARLY_SAMPLED ) {
     handle->widths = ( double * ) malloc ( length * sizeof ( double ) );
     if ( handle->widths == NULL ) {
+      free(handle->comments);
+      free(handle->name);
       free ( handle );
       return MI_ERROR;
     }
