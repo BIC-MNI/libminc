@@ -2273,7 +2273,8 @@ hdf_open(const char *path, int mode)
                     /* OK, it's compound type. */
                     struct m2_dim *dim = hdf_dim_add(file, MIvector_dimension,
                                                      H5Tget_nmembers(type_id));
-                    dim->is_fake = 1;
+                    if (dim != NULL)
+                        dim->is_fake = 1;
                     dims[ndims++] = H5Tget_nmembers(type_id);
                     is_compound = 1;
                 }
@@ -2283,7 +2284,8 @@ hdf_open(const char *path, int mode)
 
             var = hdf_var_add(file, MIimage, "/minc-2.0/image/0/image",
                               ndims, dims);
-            var->is_cmpd = is_compound;
+            if (var != NULL)
+                var->is_cmpd = is_compound;
 
             H5Dclose(dset_id);
         }
