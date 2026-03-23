@@ -279,7 +279,7 @@ hdf_dim_add(struct m2_file *file, const char *name, long length)
 static int
 hdf_is_dimension_name(struct m2_file *file, const char *varnm)
 {
-    static char *dimnms[MI2_STD_DIM_COUNT] = {
+    static const char *dimnms[MI2_STD_DIM_COUNT] = {
 	MIxspace,
 	MIyspace,
 	MIzspace,

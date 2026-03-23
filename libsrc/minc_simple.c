@@ -49,7 +49,7 @@
 #define MI_S_X 3
 #define MI_S_NDIMS 4
 
-static char *minc_dimnames[] = {
+static const char *minc_dimnames[] = {
     MItime,
     MIzspace,
     MIyspace,
@@ -951,7 +951,7 @@ minc_get_world_transform(int fd, double transform[4][4],
                          int spatial_axes[3])
 {
   int i, j;
-  char *dimensions[] = { MIxspace, MIyspace, MIzspace };
+  const char *dimensions[] = { MIxspace, MIyspace, MIzspace };
   int varid;
   int old_ncopts;
   int dims[MAX_VAR_DIMS];

@@ -176,7 +176,7 @@
 /* Private functions */
 PRIVATE int MI_icv_get_type(mi_icv_type *icvp, int cdfid, int varid);
 PRIVATE int MI_icv_get_vrange(mi_icv_type *icvp, int cdfid, int varid);
-PRIVATE double MI_get_default_range(char *what, nc_type datatype, int sign);
+PRIVATE double MI_get_default_range(const char *what, nc_type datatype, int sign);
 PRIVATE int MI_icv_get_norm(mi_icv_type *icvp, int cdfid, int varid);
 PRIVATE int MI_icv_access(int operation, mi_icv_type *icvp, long start[],
                           long count[], void *values);
@@ -1094,7 +1094,7 @@ PRIVATE int MI_icv_get_vrange(mi_icv_type *icvp, int cdfid, int varid)
 @CREATED    : August 10, 1992 (Peter Neelin)
 @MODIFIED   :
 ---------------------------------------------------------------------------- */
-PRIVATE double MI_get_default_range(char *what, nc_type datatype, int sign)
+PRIVATE double MI_get_default_range(const char *what, nc_type datatype, int sign)
 {
    double range[2];
 

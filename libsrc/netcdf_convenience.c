@@ -240,7 +240,7 @@ static int mi_h5_files = 0;
 @CREATED    : January 20, 1995 (Peter Neelin)
 @MODIFIED   :
 ---------------------------------------------------------------------------- */
-PRIVATE int execute_decompress_command(char *command, const char *infile,
+PRIVATE int execute_decompress_command(const char *command, const char *infile,
                                        char *outfile, int header_only)
 {
    char whole_command[1024];
@@ -303,7 +303,7 @@ MNCAPI char *miexpand_file(const char *path, char *tempfile, int header_only,
    FILE *fp;
    Compress_type compress_type;
    static struct {
-      char *extension;
+      const char *extension;
       Compress_type type;
    } compression_code_list[] = {
       {".bz", BZIPPED},
@@ -1807,7 +1807,7 @@ micreate_tempfile(void)
    * So I more-or-less emulate that behavior here.
    */
   const char pat_str[] = "/minc-XXXXXX";
-  char *tmpdir_ptr;
+  const char *tmpdir_ptr;
 
   if ((tmpdir_ptr = getenv("TMPDIR")) == NULL) {
     tmpdir_ptr = P_tmpdir;
