@@ -459,7 +459,7 @@ static  void  write_cache_block(
     int              file_start[VIO_MAX_DIMENSIONS];
     int              file_count[VIO_MAX_DIMENSIONS];
     int              volume_sizes[VIO_MAX_DIMENSIONS];
-    int              block_start[VIO_MAX_DIMENSIONS];
+    int              block_start[VIO_MAX_DIMENSIONS] = {0};
     void             *array_data_ptr;
 
     minc_file = (Minc_file) cache->minc_file;
@@ -1239,7 +1239,7 @@ static  VIO_cache_block_struct  *get_cache_block_for_voxel(
 {
     VIO_cache_block_struct   *block;
     VIO_cache_lookup_struct  *lookup0, *lookup1, *lookup2, *lookup3, *lookup4;
-    int                  block_index;
+    int                  block_index = 0;
     int                  block_start[VIO_MAX_DIMENSIONS];
     int                  n_dims, hash_index;
     VIO_volume_cache_struct  *cache;

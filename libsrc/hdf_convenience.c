@@ -356,6 +356,7 @@ hdf_get_diminfo(hid_t dst_id, int *ndims, hsize_t dims[])
 
     spc_id = H5Dget_space(dst_id);
     if (spc_id < 0) {
+        *ndims = 0;
         MI_LOG_ERROR(MI_MSG_SNH);
     }
     else {
