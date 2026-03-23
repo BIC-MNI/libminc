@@ -41,7 +41,7 @@ create_and_test_image(const char *name,
   misize_t count[NDIMS];
   double dtemp[CX][CY][CZ];
   int i,j,k;
-  char *dimnames[] = {"zspace", "xspace", "yspace"};
+  const char *dimnames[] = {"zspace", "xspace", "yspace"};
   int error_cnt = 0;
 
   result = micreate_dimension("xspace", MI_DIMCLASS_SPATIAL,
@@ -613,7 +613,7 @@ test3(void)
     int itemp[CZ][CX][CY];
     int i,j,k;
     midimhandle_t hdims[NDIMS];
-    char *dimnames[] = {"zspace", "xspace", "yspace"};
+    const char *dimnames[] = {"zspace", "xspace", "yspace"};
     int error_cnt = 0;
 
     printf("Testing hyperslab operations with multi-resolution image.\n");

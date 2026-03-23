@@ -162,7 +162,7 @@ int main ( int argc, char **argv )
   {
     /*Now we are going to work with the volume using apparent dimension order*/
     midimhandle_t my_dim[4];
-    static char *my_dimorder[] = {MIvector_dimension,MIxspace,MIyspace,MIzspace};
+    static const char *my_dimorder[] = {MIvector_dimension,MIxspace,MIyspace,MIzspace};
     misize_t my_sizes[4];
     misize_t my_start[4];
     misize_t my_count[4];
@@ -330,7 +330,7 @@ int main ( int argc, char **argv )
   } else if(ndim==3) {
     /*Now we are going to work with the volume using apparent dimension order*/
     midimhandle_t my_dim[3];
-    static char *my_dimorder[] = {MIxspace,MIyspace,MIzspace};
+    static const char *my_dimorder[] = {MIxspace,MIyspace,MIzspace};
     misize_t my_sizes[3];
     misize_t my_start[3];
     misize_t my_count[3];

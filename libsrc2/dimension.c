@@ -534,7 +534,7 @@ int miset_apparent_dimension_order ( mihandle_t volume, int array_length,
   * \ingroup mi2Dim
   */
 int miset_apparent_dimension_order_by_name ( mihandle_t volume, int array_length,
-    char **names )
+    const char **names )
 {
   int diff;
   int i = 0, j = 0, k = 0;

@@ -257,7 +257,7 @@ int miset_apparent_dimension_order(mihandle_t volume, int array_length, midimhan
   * all dimension names must be different or an error occurs.
   * \ingroup mi2Dim
   */
-int miset_apparent_dimension_order_by_name(mihandle_t volume, int array_length, char **names);
+int miset_apparent_dimension_order_by_name(mihandle_t volume, int array_length, const char **names);
 
 
 /**

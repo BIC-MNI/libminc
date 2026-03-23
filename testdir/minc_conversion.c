@@ -304,7 +304,7 @@ static void test4(struct testinfo *ip, struct dimdef *dims, int ndims)
   int r;
   /*Now we are going to work with the volume using apparent dimension order*/
   midimhandle_t my_dim[3];
-  static char *my_dimorder[] = {MIxspace,MIyspace,MIzspace};
+  static const char *my_dimorder[] = {MIxspace,MIyspace,MIzspace};
   misize_t my_sizes[3];
   misize_t my_start[3];
   misize_t my_count[3];
