@@ -23,9 +23,10 @@
 #define CHUNK_LENGTH 10
 
 /**
- * checks for maximum memory usage. units seem to be different between
- * os x and linux despite the documentation, but the code seems to work
- * either way.
+ * checks for maximum memory usage.
+ * ru_maxrss is in kilobytes on Linux but bytes on macOS/BSD.
+ * Normalize to kilobytes so the leak-detection threshold works
+ * on both platforms.
  */
 static int
 check_high_water_mark(void)
@@ -33,7 +34,11 @@ check_high_water_mark(void)
   struct rusage usage;
   if (getrusage(RUSAGE_SELF, &usage) < 0)
     return 0;
-  return (int)usage.ru_maxrss;
+#ifdef __APPLE__
+  return (int)(usage.ru_maxrss / 1024);  /* bytes -> KB */
+#else
+  return (int)usage.ru_maxrss;           /* already KB on Linux */
+#endif
 }
 
 static int
