@@ -30,7 +30,6 @@ int main(void)
   char pathbuf[256]="";
   char namebuf[256]="";
   char pathbuf1[1024]="";
-  int count=0;
 
   r = micreate_volume("tst-grpa.mnc", 0, NULL, MI_TYPE_UINT,
                       MI_CLASS_REAL, NULL, &hvol);
@@ -280,7 +279,6 @@ int main(void)
 
   r = milist_start(hvol, "/", 0, &hlist);
   if (r == MI_NOERROR) {
-    count++;
     while (milist_attr_next(hvol, hlist, pathbuf, sizeof(pathbuf),
                             namebuf, sizeof(namebuf)) == MI_NOERROR) {
       printf(" %s %s\n", pathbuf, namebuf);

@@ -52,7 +52,7 @@ static  Minc_file  initialize_minc_input_from_minc2_id(
 {
     minc_file_struct    *file;
     int                 n_vol_dims;
-    int                 i, slab_size, prev_sizes[MAX_VAR_DIMS];
+    int                 i, prev_sizes[MAX_VAR_DIMS];
     mitype_t            prev_minc_type;
     VIO_BOOL            different;
     VIO_BOOL            range_specified;
@@ -490,11 +490,9 @@ static  Minc_file  initialize_minc_input_from_minc2_id(
        chunking dimensions for compression */
 
     file->n_slab_dims = 0;
-    slab_size = 1;
 
     for( d = file->n_file_dimensions-1; d >= 0; d-- ) {
       if( file->to_volume_index[d] != INVALID_AXIS ) {
-        slab_size *= file->sizes_in_file[d];
         file->n_slab_dims++;  /* integral number of complete dimensions */
       }
     }
