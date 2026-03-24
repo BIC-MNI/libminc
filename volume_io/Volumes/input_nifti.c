@@ -615,6 +615,11 @@ input_more_nifti_format_file(
 
     VIO_Real *temp_buffer = malloc(in_ptr->sizes_in_file[0] *
                                    sizeof(VIO_Real));
+    if (temp_buffer == NULL)
+    {
+      print_error("Failed to allocate temp_buffer.\n");
+      return FALSE;
+    }
 
     /* If the memory for the volume has not been allocated yet,
      * initialize that memory now.
@@ -625,6 +630,7 @@ input_more_nifti_format_file(
       if (!volume_is_alloced(volume))
       {
         print_error("Failed to allocate volume.\n");
+        free(temp_buffer);
         return FALSE;
       }
     }
@@ -632,6 +638,7 @@ input_more_nifti_format_file(
     n_bytes_read = nifti_read_buffer(zfp, data_ptr, n_bytes_per_slice, nii_ptr);
     if (n_bytes_read < n_bytes_per_slice)
     {
+      free(temp_buffer);
       return FALSE;
     }
 
