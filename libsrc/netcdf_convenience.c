@@ -759,7 +759,7 @@ MNCAPI int miattget(int cdfid, int varid, const char *name, nc_type datatype,
 @MODIFIED   :
 ---------------------------------------------------------------------------- */
 MNCAPI int miattget_with_sign(int cdfid, int varid, const char *name,
-                              char *insign, nc_type datatype, char *outsign,
+                              const char *insign, nc_type datatype, char *outsign,
                               int max_length, void *value, int *att_length)
 {
    nc_type att_type;          /* Type of attribute */

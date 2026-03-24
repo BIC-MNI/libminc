@@ -280,7 +280,7 @@ void MI_log_pkg_error3(int p1, const char *p2, const char *p3)
 }
 void MI_log_sys_error1(const char *p1)
 {
-   char *message;
+   const char *message;
    int errnum = errno;
 
    (void) fprintf(stderr, "%s", minc_routine_name);

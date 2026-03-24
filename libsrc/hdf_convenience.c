@@ -2136,7 +2136,7 @@ herr_t hdf_copy_attr(hid_t in_id, const char *attr_name, void *op_data)
 }
 
 static int
-hdf_open_dsets(struct m2_file *file, hid_t grp_id, char *cpath, int is_dim)
+hdf_open_dsets(struct m2_file *file, hid_t grp_id, const char *cpath, int is_dim)
 {
     hsize_t nobjs;
     hsize_t idx;
