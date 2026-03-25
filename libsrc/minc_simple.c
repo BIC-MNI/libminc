@@ -49,7 +49,7 @@
 #define MI_S_X 3
 #define MI_S_NDIMS 4
 
-static char *minc_dimnames[] = {
+static const char *minc_dimnames[] = {
     MItime,
     MIzspace,
     MIyspace,
@@ -83,7 +83,7 @@ struct file_info {
 };
 
 static int
-minc_simple_to_nc_type(int minctype, nc_type *nctype, char **signstr)
+minc_simple_to_nc_type(int minctype, nc_type *nctype, const char **signstr)
 {
     switch (minctype) {
     case MINC_TYPE_CHAR:
@@ -215,7 +215,7 @@ minc_load_data(char *path, void *dataptr, int datatype,
 {
     int fd;                     /* MINC file descriptor */
     nc_type nctype;             /* netCDF type */
-    char *signstr;              /* MI_SIGNED or MI_UNSIGNED */
+    const char *signstr;              /* MI_SIGNED or MI_UNSIGNED */
     int length;
     int dim_id[MI_S_NDIMS];
     long dim_len[MI_S_NDIMS];
@@ -534,7 +534,7 @@ minc_save_start(char *path,     /* Path to the file */
     struct var_info *p_var;
     struct att_info *p_att;
     int var_id;                 /* netCDF ID for variable */
-    char *signstr;
+    const char *signstr;
     nc_type nctype;
 
     old_ncopts =get_ncopts();
@@ -788,7 +788,7 @@ minc_save_data(int fd, void *dataptr, int datatype,
                long ct, long cz, long cy, long cx)
 {
     nc_type nctype;
-    char *signstr;
+    const char *signstr;
     int i;
     int var_id;
     int var_ndims;
@@ -951,7 +951,7 @@ minc_get_world_transform(int fd, double transform[4][4],
                          int spatial_axes[3])
 {
   int i, j;
-  char *dimensions[] = { MIxspace, MIyspace, MIzspace };
+  const char *dimensions[] = { MIxspace, MIyspace, MIzspace };
   int varid;
   int old_ncopts;
   int dims[MAX_VAR_DIMS];

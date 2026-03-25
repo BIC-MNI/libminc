@@ -370,8 +370,8 @@ VIOAPI  Minc_file  initialize_minc_input_from_minc_id(
                     long start[1];
                     long count[1];
 
-                    irr_starts[d] = malloc(sizeof(VIO_Real) * file->sizes_in_file[d]);
-                    irr_widths[d] = malloc(sizeof(VIO_Real) * file->sizes_in_file[d]);
+                    irr_starts[d] = malloc(sizeof(VIO_Real) * (size_t)file->sizes_in_file[d]);
+                    irr_widths[d] = malloc(sizeof(VIO_Real) * (size_t)file->sizes_in_file[d]);
 
                     start[0] = 0;
                     count[0] = file->sizes_in_file[d];
@@ -610,10 +610,10 @@ VIOAPI  Minc_file  initialize_minc_input_from_minc_id(
     for( d = file->n_file_dimensions-1; d >= 0; d-- ) {
       if( file->to_volume_index[d] != INVALID_AXIS ) {
         if( MI_MAX_VAR_BUFFER_SIZE > file->sizes_in_file[d] * slab_size * unit_size && full_dim ) {
-          slab_size *= file->sizes_in_file[d];
+          slab_size *= (int)file->sizes_in_file[d];
           file->n_slab_dims++;  /* integral number of complete dimensions */
         } else {
-          slab_size *= MIN( file->sizes_in_file[d],
+          slab_size *= (int)MIN( file->sizes_in_file[d],
                             (long)( MI_MAX_VAR_BUFFER_SIZE / ( slab_size * unit_size ) ) );
           full_dim = 0;
         }

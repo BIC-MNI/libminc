@@ -79,7 +79,7 @@ miread_cfg(const char *name, char *buffer, int maxlen)
                     while (isspace(*tmp)) {
                         tmp++;
                     }
-                    strncpy(buffer, tmp, maxlen);
+                    strncpy(buffer, tmp, (size_t) maxlen);
                     result = 1;
                     break;
                 }

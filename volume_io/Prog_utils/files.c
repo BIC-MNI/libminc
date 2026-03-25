@@ -304,12 +304,12 @@ static  VIO_STR  create_backup_filename(
     {
         if( count == 0 )
         {
-            (void) snprintf( backup_filename, len, "%s.%s.bkp",
+            (void) snprintf( backup_filename, (size_t)len, "%s.%s.bkp",
                             expanded, date );
         }
         else
         {
-            (void) snprintf( backup_filename, len, "%s.%s.bkp_%d",
+            (void) snprintf( backup_filename, (size_t)len, "%s.%s.bkp_%d",
                             expanded, date, count );
         }
 
@@ -1246,7 +1246,7 @@ VIOAPI  VIO_STR  extract_directory(
     {
         ++slash_index;
 
-        directory = alloc_string( slash_index );
+        directory = alloc_string( (size_t)slash_index );
 
         for_less( i, 0, slash_index )
             directory[i] = expanded[i];
@@ -2442,7 +2442,7 @@ VIOAPI  VIO_Status  io_quoted_string(
         status = io_int( file, io_flag, format, &length );
 
         if( io_flag == READ_FILE )
-            *str = alloc_string( length );
+            *str = alloc_string( (size_t)length );
 
         if( status == VIO_OK )
         {

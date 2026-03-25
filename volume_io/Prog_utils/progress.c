@@ -219,7 +219,7 @@ static  void  show_one_line_progress(
 
         (void) flush_file( stdout );
 
-        progress->n_dots_so_far = n_dots;
+        progress->n_dots_so_far = (int)n_dots;
     }
 }
 

@@ -134,7 +134,7 @@ void restructure_array(size_t ndims,    /* Dimension count */
        * Found a cycle we have not yet performed.
        **/
 
-      offset_next = -1;   /* Initialize. */
+      offset_next = (size_t) -1;   /* Initialize. */
 
 #ifdef _DEBUG
       printf("%ld", offset_start);

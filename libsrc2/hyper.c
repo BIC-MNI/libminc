@@ -258,7 +258,7 @@ static int mirw_hyperslab_raw(int opcode,
       for (i = 0; i < ndims; i++) {
         icount[i] = count[i];
       }
-      restructure_array(ndims, buffer, icount, H5Tget_size(type_id),
+      restructure_array((size_t)ndims, buffer, icount, H5Tget_size(type_id),
                         volume->dim_indices, dir);
     }
   } else {
@@ -296,7 +296,7 @@ static int mirw_hyperslab_raw(int opcode,
 
       memcpy(temp_buffer,buffer,buffer_size);
 
-      restructure_array(ndims, temp_buffer, icount, H5Tget_size(type_id),
+      restructure_array((size_t)ndims, temp_buffer, icount, H5Tget_size(type_id),
                         imap, idir);
       MI_CHECK_HDF_CALL(result = H5Dwrite(dset_id, type_id, mspc_id, fspc_id, H5P_DEFAULT,
                       temp_buffer),"H5Dwrite");
@@ -433,7 +433,7 @@ static int mirw_hyperslab_icv(int opcode,
     goto cleanup;
   }
 
-  ndims = volume->number_of_dims;
+  ndims = (hsize_t)volume->number_of_dims;
 
   if (ndims == 0) {
     /* A scalar volume is possible but extremely unlikely, not to
@@ -445,7 +445,7 @@ static int mirw_hyperslab_icv(int opcode,
 
     n_different = mitranslate_hyperslab_origin(volume, start, count, hdf_start, hdf_count, dir);
 
-    mspc_id = H5Screate_simple(ndims, hdf_count, NULL);
+    mspc_id = H5Screate_simple((int)ndims, hdf_count, NULL);
 
     if (mspc_id < 0) {
       fprintf(stderr,"H5Screate_simple: Fail %s:%d\n",__FILE__,__LINE__);
@@ -453,7 +453,7 @@ static int mirw_hyperslab_icv(int opcode,
     }
   }
 
-  miget_hyperslab_size_hdf(buffer_type_id, ndims, hdf_count, &buffer_size);
+  miget_hyperslab_size_hdf(buffer_type_id, (int)ndims, hdf_count, &buffer_size);
 
   MI_CHECK_HDF_CALL(result = H5Sselect_hyperslab(fspc_id, H5S_SELECT_SET, hdf_start, NULL,
                                hdf_count, NULL),"H5Sselect_hyperslab");
@@ -496,7 +496,7 @@ static int mirw_hyperslab_icv(int opcode,
     }
 
     if ( (hsize_t)slice_ndims > ndims ) { /*Can this really happen?*/
-      slice_ndims = ndims;
+      slice_ndims = (int)ndims;
     }
 
     for ( j = 0; j < slice_ndims; j++ ) {
@@ -507,7 +507,7 @@ static int mirw_hyperslab_icv(int opcode,
         total_number_of_slices*=hdf_count[j];
     }
 
-    for (i = slice_ndims; i < ndims; i++ ) {
+    for (i = (hsize_t)slice_ndims; i < ndims; i++ ) {
       if(hdf_count[i]>1) /*avoid zero sized dimensions?*/
         image_slice_length*=hdf_count[i];
 
@@ -663,7 +663,7 @@ static int mirw_hyperslab_icv(int opcode,
       for (i = 0; i < ndims; i++) {
         icount[i] = count[i];
       }
-      restructure_array(ndims, buffer, icount, H5Tget_size(buffer_type_id),volume->dim_indices, dir);
+      restructure_array((size_t)ndims, buffer, icount, H5Tget_size(buffer_type_id),volume->dim_indices, dir);
       /*TODO: check if we managed to restructure the array*/
       result=0;
     }
@@ -677,7 +677,7 @@ static int mirw_hyperslab_icv(int opcode,
         icount[volume->dim_indices[i]] = count[i];
         idir[volume->dim_indices[i]] = dir[i];
         /* this one was correct the original way*/
-        imap[volume->dim_indices[i]] = i;
+        imap[volume->dim_indices[i]] = (int)i;
 
       }
     }
@@ -694,7 +694,7 @@ static int mirw_hyperslab_icv(int opcode,
       memcpy(temp_buffer,buffer,buffer_size);
 
       if (n_different != 0 )
-        restructure_array(ndims, temp_buffer, icount, H5Tget_size(buffer_type_id), imap, idir);
+        restructure_array((size_t)ndims, temp_buffer, icount, H5Tget_size(buffer_type_id), imap, idir);
 
       if(scaling_needed)
       {
@@ -811,7 +811,7 @@ cleanup:
       {\
         double _temp=(( (*_buffer_in) - voxel_offset) / voxel_range)*(image_slice_max_buffer[_i]-image_slice_min_buffer[_i]) + image_slice_min_buffer[_i] ;\
         _temp=(_temp-data_offset)/data_range;\
-        _temp=(_temp<0.0)?norm_min:(_temp>=1.0)?norm_max:(rint(_temp*norm_range)+norm_offset); \
+        _temp=(_temp<0.0)?(double)norm_min:(_temp>=1.0)?(double)norm_max:(rint(_temp*norm_range)+norm_offset); \
         *_buffer_out=(type_out)(_temp);\
         _buffer_in++;\
         _buffer_out++;\
@@ -922,7 +922,7 @@ static int mirw_hyperslab_normalized(int opcode,
     goto cleanup;
   }
 
-  ndims = volume->number_of_dims;
+  ndims = (hsize_t)volume->number_of_dims;
 
   if (ndims == 0) {
     /* A scalar volume is possible but extremely unlikely, not to
@@ -933,15 +933,15 @@ static int mirw_hyperslab_normalized(int opcode,
 
     n_different = mitranslate_hyperslab_origin(volume,start,count, hdf_start,hdf_count,dir);
 
-    MI_CHECK_HDF_CALL(mspc_id = H5Screate_simple(ndims, hdf_count, NULL),"H5Screate_simple");
+    MI_CHECK_HDF_CALL(mspc_id = H5Screate_simple((int)ndims, hdf_count, NULL),"H5Screate_simple");
 
     if (mspc_id < 0) {
       goto cleanup;
     }
   }
 
-  miget_hyperslab_size_hdf(volume_type_id,ndims,hdf_count,&buffer_size);
-  miget_hyperslab_size_hdf(buffer_type_id,ndims,hdf_count,&input_buffer_size);
+  miget_hyperslab_size_hdf(volume_type_id,(int)ndims,hdf_count,&buffer_size);
+  miget_hyperslab_size_hdf(buffer_type_id,(int)ndims,hdf_count,&input_buffer_size);
 
   MI_CHECK_HDF_CALL(result = H5Sselect_hyperslab(fspc_id, H5S_SELECT_SET, hdf_start, NULL,
                                hdf_count, NULL),"H5Sselect_hyperslab");
@@ -980,7 +980,7 @@ static int mirw_hyperslab_normalized(int opcode,
     }
 
     if ( (hsize_t)slice_ndims > ndims ) { /*Can this really happen?*/
-      slice_ndims = ndims;
+      slice_ndims = (int)ndims;
     }
 
     for ( j = 0; j < slice_ndims; j++ ) {
@@ -991,7 +991,7 @@ static int mirw_hyperslab_normalized(int opcode,
         total_number_of_slices*=hdf_count[j];
     }
 
-    for (i = slice_ndims; i < ndims; i++ ) {
+    for (i = (hsize_t)slice_ndims; i < ndims; i++ ) {
       if(hdf_count[i]>1) /*avoid zero sized dimensions?*/
         image_slice_length*=hdf_count[i];
 
@@ -1105,7 +1105,7 @@ static int mirw_hyperslab_normalized(int opcode,
       for (i = 0; i < ndims; i++) {
          icount[i] = count[i];
       }
-      restructure_array(ndims, buffer, icount, H5Tget_size(buffer_type_id),volume->dim_indices, dir);
+      restructure_array((size_t)ndims, buffer, icount, H5Tget_size(buffer_type_id),volume->dim_indices, dir);
       /*TODO: check if we managed to restructure the array*/
       result=0;
     }
@@ -1119,7 +1119,7 @@ static int mirw_hyperslab_normalized(int opcode,
         icount[volume->dim_indices[i]] = count[i];
         idir[volume->dim_indices[i]] = dir[i];
         /* this one was correct the original way*/
-        imap[volume->dim_indices[i]] = i;
+        imap[volume->dim_indices[i]] = (int)i;
 
       }
     }

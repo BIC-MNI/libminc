@@ -2627,8 +2627,8 @@ VIOAPI  VIO_Volume   copy_volume_definition_no_alloc(
     for_less( c, 0, get_volume_n_dimensions(volume) )
     {
         if (is_volume_dimension_irregular(volume, c)) {
-            VIO_Real *irr_starts = malloc(sizeof(VIO_Real) * sizes[c]);
-            VIO_Real *irr_widths = malloc(sizeof(VIO_Real) * sizes[c]);
+            VIO_Real *irr_starts = malloc(sizeof(VIO_Real) * (size_t)sizes[c]);
+            VIO_Real *irr_widths = malloc(sizeof(VIO_Real) * (size_t)sizes[c]);
             get_volume_irregular_starts( volume, c, sizes[c], irr_starts);
             set_volume_irregular_starts( volume, c, sizes[c], irr_starts);
 
@@ -2816,35 +2816,35 @@ VIOAPI  VIO_Volume  copy_volume_new_type(
         case NC_BYTE:
             if (new_signed_flag)
             {
-                ((signed char *) dst)[i] = value;
+                ((signed char *) dst)[i] = (signed char)value;
             }
             else
             {
-                ((unsigned char *) dst)[i] = value;
+                ((unsigned char *) dst)[i] = (unsigned char)value;
             }
             break;
         case NC_SHORT:
             if (new_signed_flag)
             {
-                ((signed short *) dst)[i] = value;
+                ((signed short *) dst)[i] = (signed short)value;
             }
             else
             {
-                ((unsigned short *) dst)[i] = value;
+                ((unsigned short *) dst)[i] = (unsigned short)value;
             }
             break;
         case NC_INT:
             if (new_signed_flag)
             {
-                ((signed int *) dst)[i] = value;
+                ((signed int *) dst)[i] = (signed int)value;
             }
             else
             {
-                ((unsigned int *) dst)[i] = value;
+                ((unsigned int *) dst)[i] = (unsigned int)value;
             }
             break;
         case NC_FLOAT:
-            ((float *) dst)[i] = value;
+            ((float *) dst)[i] = (float)value;
             break;
         case NC_DOUBLE:
             ((double *) dst)[i] = value;
@@ -2939,7 +2939,7 @@ set_volume_irregular_starts(VIO_Volume volume, int idim, long count, VIO_Real *s
         count = volume->array.sizes[idim];
     }
 
-    volume->irregular_starts[idim] = malloc(count * sizeof (VIO_Real));
+    volume->irregular_starts[idim] = malloc((size_t)count * sizeof (VIO_Real));
     if (volume->irregular_starts[idim] == NULL) {
         return (0);
     }
@@ -2972,7 +2972,7 @@ set_volume_irregular_widths(VIO_Volume volume, int idim, long count, VIO_Real *w
         count = volume->array.sizes[idim];
     }
 
-    volume->irregular_widths[idim] = malloc(count * sizeof (VIO_Real));
+    volume->irregular_widths[idim] = malloc((size_t)count * sizeof (VIO_Real));
     if (volume->irregular_widths[idim] == NULL) {
         return (0);
     }

@@ -776,7 +776,7 @@ VIOAPI  VIO_Status  add_minc_history(
 
     /* Allocate a string and get the old history */
 
-    new_history = alloc_string( old_att_length );
+    new_history = alloc_string( (size_t)old_att_length );
     new_history[0] = (char) 0;
 
     (void) miattgetstr( file->cdfid, NC_GLOBAL, MIhistory, old_att_length+1,
@@ -1470,7 +1470,7 @@ static  VIO_Status  output_the_volume(
                           (long)( MI_MAX_VAR_BUFFER_SIZE / ( slab_size * unit_size ) ) );
           n_steps *= (int)( ( volume_count[to_volume_index[d]] + count[d] - 1 ) / count[d] );
         }
-        slab_size *= count[d];
+        slab_size *= (int)count[d];
       }
     }
 

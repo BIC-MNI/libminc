@@ -412,12 +412,12 @@ int miget_volume_dimensions ( mihandle_t volume, midimclass_t class, midimattr_t
     return ( MI_ERROR );
   }
 
-  number_of_dims = volume->number_of_dims;
+  number_of_dims = (hsize_t) volume->number_of_dims;
 
   if ( (hsize_t)( array_length ) > number_of_dims ) {
     max_dims = number_of_dims;
   } else {
-    max_dims = array_length;
+    max_dims = (hsize_t) array_length;
   }
 
   /* Go through each dimension separately and figure out
@@ -481,7 +481,7 @@ int miset_apparent_dimension_order ( mihandle_t volume, int array_length,
   /* Allocated space for dimensions indices, if not already done.
    */
   if ( volume->dim_indices == NULL ) {
-    volume->dim_indices = ( int * ) malloc ( volume->number_of_dims * sizeof ( int ) );
+    volume->dim_indices = ( int * ) malloc ( (size_t) volume->number_of_dims * sizeof ( int ) );
     memset ( volume->dim_indices, -1, sizeof ( volume->number_of_dims ) );
   }
 
@@ -575,7 +575,7 @@ int miset_apparent_dimension_order_by_name ( mihandle_t volume, int array_length
   /* Allocated space for dimensions indices, if not already done.
    */
   if ( volume->dim_indices == NULL ) {
-    volume->dim_indices = ( int * ) malloc ( volume->number_of_dims * sizeof ( int ) );
+    volume->dim_indices = ( int * ) malloc ( (size_t) volume->number_of_dims * sizeof ( int ) );
     memset ( volume->dim_indices, -1, sizeof ( volume->number_of_dims ) );
   }
 
@@ -629,6 +629,7 @@ int miset_apparent_dimension_order_by_name ( mihandle_t volume, int array_length
 int miset_apparent_record_dimension_flag ( mihandle_t volume, int record_flag )
 {
   midimhandle_t handle;
+  (void)record_flag;
 
   if ( volume == NULL ) {
     return ( MI_ERROR );
@@ -1031,7 +1032,7 @@ int miget_dimension_offsets( midimhandle_t dimension, misize_t array_length,
       /* For regularly sampled dimensions, the step value
        * is added to each value to get the next value.
        */
-      offsets[j] = dimension->start + ( i * dimension->step );
+      offsets[j] = dimension->start + ( (double) i * dimension->step );
     }
   } else {
     for ( i = start_position, j = 0; i < end_position ; i++, j++ ) {
@@ -1131,9 +1132,9 @@ int miset_dimension_sampling_flag ( midimhandle_t dimension, miboolean_t samplin
 
   if ( sampling_flag ) {
     dimension->attr |= MI_DIMATTR_NOT_REGULARLY_SAMPLED;
-    dimension->attr &= ~MI_DIMATTR_REGULARLY_SAMPLED;
+    dimension->attr &= ~(midimattr_t)MI_DIMATTR_REGULARLY_SAMPLED;
   } else {
-    dimension->attr &= ~MI_DIMATTR_NOT_REGULARLY_SAMPLED;
+    dimension->attr &= ~(midimattr_t)MI_DIMATTR_NOT_REGULARLY_SAMPLED;
     dimension->attr |= MI_DIMATTR_REGULARLY_SAMPLED;
   }
 
@@ -1351,20 +1352,20 @@ int miget_dimension_start ( midimhandle_t dimension, mivoxel_order_t voxel_order
     *start_ptr = dimension->start;
   } else { // L.B March 16/2011, Properly reflect voxel ordering
     if ( dimension->flipping_order == MI_COUNTER_FILE_ORDER ) {
-      *start_ptr = dimension->start + ( dimension->step * ( dimension->length - 1 ) );
+      *start_ptr = dimension->start + ( dimension->step * (double)( dimension->length - 1 ) );
     } else
       if ( dimension->flipping_order == MI_POSITIVE ) {
         if ( dimension->step > 0 ) {
           *start_ptr = dimension->start;
         } else {
-          *start_ptr = dimension->start + ( dimension->step * ( dimension->length - 1 ) );
+          *start_ptr = dimension->start + ( dimension->step * (double)( dimension->length - 1 ) );
         }
       } else
         if ( dimension->flipping_order == MI_NEGATIVE ) {
           if ( dimension->step < 0 ) {
             *start_ptr = dimension->start;
           } else {
-            *start_ptr = dimension->start + ( dimension->step * ( dimension->length - 1 ) );
+            *start_ptr = dimension->start + ( dimension->step * (double)( dimension->length - 1 ) );
           }
         }
   }

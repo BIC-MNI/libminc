@@ -1903,10 +1903,6 @@ VIOAPI mitype_t nc_type_to_minc2_type(
     nc_type  nc_data_type,
     VIO_BOOL signed_flag );
 
-VIOAPI VIO_Data_types  minc2_type_to_vio_type(
-    mitype_t    minc_data_type);
-
-
 VIOAPI   VIO_Volume   create_volume(
     int         n_dimensions,
     VIO_STR     dimension_names[],

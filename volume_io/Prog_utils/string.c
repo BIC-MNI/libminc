@@ -37,7 +37,7 @@ VIOAPI  VIO_STR  create_string(
     if( initial == NULL )
         initial = empty_string;
 
-    str = alloc_string( string_length(initial) );
+    str = alloc_string( (size_t) string_length(initial) );
 
     (void) strcpy( str, initial );
 
@@ -232,7 +232,7 @@ VIOAPI    VIO_STR   strip_outer_blanks(
     if( first_non_blank > last_non_blank )
         last_non_blank = first_non_blank - 1;
 
-    stripped = alloc_string( last_non_blank - first_non_blank + 1 );
+    stripped = alloc_string( (size_t)(last_non_blank - first_non_blank + 1) );
 
     for_inclusive( i, first_non_blank, last_non_blank )
         stripped[i-first_non_blank] = str[i];

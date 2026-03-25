@@ -16,6 +16,8 @@
 int  miget_record_name(mihandle_t volume,
                   char **name)
 {
+    (void)volume;
+    (void)name;
     return (MI_NOERROR);
 }
 
@@ -54,7 +56,7 @@ int miget_record_field_name(mihandle_t volume,
      * the memory for the string using malloc(), so we can return the
      * pointer directly without any further manipulations.
      */
-    *name = H5Tget_member_name(volume->ftype_id, index);
+    *name = H5Tget_member_name(volume->ftype_id, (unsigned int) index);
     if (*name == NULL) {
         return (MI_ERROR);
     }
@@ -88,7 +90,7 @@ int miset_record_field_name(mihandle_t volume,
 
     /* Calculate the offset of the new member.
      */
-    offset = index * H5Tget_size(ftype_id);
+    offset = (size_t) index * H5Tget_size(ftype_id);
 
     /* If the offset plus the size of the member is larger than the
      * current size of the structure, increase the size of the structure.

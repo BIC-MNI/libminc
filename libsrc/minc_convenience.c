@@ -310,7 +310,7 @@ MNCAPI int miget_valid_range(int cdfid, int imgid, double valid_range[])
    int length;
    nc_type datatype;
    int is_signed;
-   char *att_sign;
+   const char *att_sign;
    double temp;
 
    MI_SAVE_ROUTINE_NAME("miget_valid_range");
@@ -408,7 +408,7 @@ MNCAPI int miset_valid_range(int cdfid, int imgid, const double valid_range[])
    nc_type datatype;
    int is_signed;
    int status;
-   char *attname;
+   const char *attname;
    float fval[2];
 
    MI_SAVE_ROUTINE_NAME("miset_valid_range");
@@ -678,7 +678,7 @@ MNCAPI int miattget_pointer(int cdfid, int varid, const char *name)
    /* Character string to hold attribute */
    char pointer_string[MAX_NC_NAME+sizeof(MI_VARATT_POINTER_PREFIX)];
    int index;           /* Index into string */
-   char *prefix_string=MI_VARATT_POINTER_PREFIX;  /* Prefix string */
+   const char *prefix_string=MI_VARATT_POINTER_PREFIX;  /* Prefix string */
    int ptrvarid;        /* Id of variable pointed to by name */
 
    MI_SAVE_ROUTINE_NAME("miattget_pointer");

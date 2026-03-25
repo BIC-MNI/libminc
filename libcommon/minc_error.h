@@ -177,21 +177,21 @@ int milog_set_verbosity(int);
 int milog_message(mimsgcode_t code, ...);
 int mi2log_message(const char *file,int line, mimsgcode_t code, ...);
 
-int  MI2_save_routine_name(char *name);
+int  MI2_save_routine_name(const char *name);
 int  MI2_return(void);
 int  MI2_return_error(void);
-void MI2_log_pkg_error2(int p1, char *p2);
-void MI2_log_pkg_error3(int p1, char *p2, char *p3);
-void MI2_log_sys_error1(char *p1);
+void MI2_log_pkg_error2(int p1, const char *p2);
+void MI2_log_pkg_error3(int p1, const char *p2, const char *p3);
+void MI2_log_sys_error1(const char *p1);
 void mi2log_init(const char *name);
 int  mi2log_set_verbosity ( int lvl );
 
-int MI_save_routine_name(char *name);
+int MI_save_routine_name(const char *name);
 int MI_return(void);
 int MI_return_error(void);
-void MI_log_pkg_error2(int p1, char *p2);
-void MI_log_pkg_error3(int p1, char *p2, char *p3);
-void MI_log_sys_error1(char *p1);
+void MI_log_pkg_error2(int p1, const char *p2);
+void MI_log_pkg_error3(int p1, const char *p2, const char *p3);
+void MI_log_sys_error1(const char *p1);
 
 #ifdef __cplusplus
 }

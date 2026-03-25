@@ -141,16 +141,16 @@ static  Minc_file  initialize_minc_input_from_minc2_id(
                             MI_DIMORDER_FILE, file->n_file_dimensions,
                             file_dims);
 
-    miget_dimension_sizes(file_dims, file->n_file_dimensions, dimension_size);
-    miget_dimension_separations(file_dims, MI_ORDER_FILE, file->n_file_dimensions, file_step);
-    miget_dimension_starts(file_dims, MI_ORDER_FILE, file->n_file_dimensions, file_start);
+    miget_dimension_sizes(file_dims, (misize_t)file->n_file_dimensions, dimension_size);
+    miget_dimension_separations(file_dims, MI_ORDER_FILE, (misize_t)file->n_file_dimensions, file_step);
+    miget_dimension_starts(file_dims, MI_ORDER_FILE, (misize_t)file->n_file_dimensions, file_start);
 
     for_less( d, 0, file->n_file_dimensions )
     {
       miget_dimension_name(file_dims[d], &dim_name);
       file->dim_names[d] = create_string( dim_name );
       free(dim_name);
-      file->sizes_in_file[d] = dimension_size[d];
+      file->sizes_in_file[d] = (long)dimension_size[d];
     }
 
     /*calculate global volume range, to satisfy volume_io*/
@@ -176,10 +176,10 @@ static  Minc_file  initialize_minc_input_from_minc2_id(
       /*now iterate through all slices to find out global image intensity range*/
       for_less(d,0,n_slice_dimensions)
       {
-        slices_count*=dimension_size[d];
+        slices_count*=(int)dimension_size[d];
       }
-      slice_start=(misize_t *)calloc(n_slice_dimensions,sizeof(misize_t));
-      miget_slice_range(file->minc2id,slice_start,n_slice_dimensions,&volume_max,&volume_min);
+      slice_start=(misize_t *)calloc((size_t)n_slice_dimensions,sizeof(misize_t));
+      miget_slice_range(file->minc2id,slice_start,(size_t)n_slice_dimensions,&volume_max,&volume_min);
 
       do
       {
@@ -200,7 +200,7 @@ static  Minc_file  initialize_minc_input_from_minc2_id(
 
           if(d==n_slice_dimensions) break;/*all dimensions are finished*/
 
-          miget_slice_range(file->minc2id,slice_start,n_slice_dimensions,&slice_max,&slice_min);
+          miget_slice_range(file->minc2id,slice_start,(size_t)n_slice_dimensions,&slice_max,&slice_min);
           if(volume_max<slice_max) volume_max=slice_max;
           if(volume_min>slice_min) volume_min=slice_min;
       } while(1);
@@ -369,8 +369,8 @@ static  Minc_file  initialize_minc_input_from_minc2_id(
         {
           int j;
 
-          irr_starts[d] = malloc(sizeof(VIO_Real) * file->sizes_in_file[d]);
-          irr_widths[d] = malloc(sizeof(VIO_Real) * file->sizes_in_file[d]);
+          irr_starts[d] = malloc(sizeof(VIO_Real) * (size_t)file->sizes_in_file[d]);
+          irr_widths[d] = malloc(sizeof(VIO_Real) * (size_t)file->sizes_in_file[d]);
 
           miget_dimension_widths(file_dims[d],MI_ORDER_FILE,(misize_t)file->sizes_in_file[d],0,irr_widths[d]);
 
@@ -496,7 +496,7 @@ static  Minc_file  initialize_minc_input_from_minc2_id(
 
     for( d = file->n_file_dimensions-1; d >= 0; d-- ) {
       if( file->to_volume_index[d] != INVALID_AXIS ) {
-        slab_size *= file->sizes_in_file[d];
+        slab_size *= (int)file->sizes_in_file[d];
         file->n_slab_dims++;  /* integral number of complete dimensions */
       }
     }
@@ -704,7 +704,7 @@ static  VIO_Status   input_minc2_hyperslab(
       if( file->converting_to_colour )
       {
           used_start[n_file_dims] = 0;
-          used_count[n_file_dims] = file->sizes_in_file[n_file_dims];
+          used_count[n_file_dims] = (misize_t)file->sizes_in_file[n_file_dims];
           tmp_sizes[n_tmp_dims] = (int) used_count[n_file_dims];
 
           create_multidim_array( &rgb_array, n_tmp_dims+1, tmp_sizes, VIO_FLOAT );

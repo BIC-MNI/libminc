@@ -37,7 +37,7 @@ static int miswap4(unsigned int tmp)
     t = x[1];
     x[1] = x[2];
     x[2] = t;
-    return (tmp);
+    return (int) tmp;
 }
 
 /**
@@ -196,7 +196,7 @@ int miget_label_value_by_index(mihandle_t volume, int idx, int *value)
   }
 
   H5E_BEGIN_TRY {
-    result = H5Tget_member_value(volume->mtype_id,idx,value);
+    result = H5Tget_member_value(volume->mtype_id, (unsigned int) idx, value);
   } H5E_END_TRY;
 
   MI_CHECK_HDF_CALL_RET(result,"H5Tget_member_value");

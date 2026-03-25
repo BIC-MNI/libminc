@@ -69,7 +69,7 @@ static int mirw_slice_minmax ( int opcode, mihandle_t volume,
     return ( MI_ERROR );
   }
 
-  ndims = H5Sget_simple_extent_ndims ( fspc_id );
+  ndims = (misize_t) H5Sget_simple_extent_ndims ( fspc_id );
   if ( ndims > array_length ) {
     ndims = array_length;
   }

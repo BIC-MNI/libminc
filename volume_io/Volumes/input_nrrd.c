@@ -678,9 +678,9 @@ nrrd_print_header(FILE *fp, nrrd_header_t nrrd_ptr)
   if (nrrd_ptr->space != 0)
     fprintf(fp, "space: %s\n", nrrd_space_to_str(nrrd_ptr->space));
   fprintf(fp, "space origin: (%g,%g,%g)\n",
-          nrrd_ptr->space_origin[0],
-          nrrd_ptr->space_origin[1],
-          nrrd_ptr->space_origin[2]);
+          (double)nrrd_ptr->space_origin[0],
+          (double)nrrd_ptr->space_origin[1],
+          (double)nrrd_ptr->space_origin[2]);
   fprintf(fp, "sizes: ");
   for (i = 0; i < nrrd_ptr->dimension; i++)
   {
@@ -691,9 +691,9 @@ nrrd_print_header(FILE *fp, nrrd_header_t nrrd_ptr)
   for (i = 0; i < nrrd_ptr->dimension; i++)
   {
     fprintf(fp, "(%g,%g,%g) ",
-            nrrd_ptr->space_directions[i][0],
-            nrrd_ptr->space_directions[i][1],
-            nrrd_ptr->space_directions[i][2]);
+            (double)nrrd_ptr->space_directions[i][0],
+            (double)nrrd_ptr->space_directions[i][1],
+            (double)nrrd_ptr->space_directions[i][2]);
   }
   fprintf(fp, "\n");
   fprintf(fp, "kinds: ");
@@ -717,7 +717,7 @@ nrrd_print_header(FILE *fp, nrrd_header_t nrrd_ptr)
     fprintf(fp, "spacings: ");
     for (i = 0; i < nrrd_ptr->dimension; i++)
     {
-      fprintf(fp, "%g ", nrrd_ptr->spacings[i]);
+      fprintf(fp, "%g ", (double)nrrd_ptr->spacings[i]);
     }
     fprintf(fp, "\n");
   }
@@ -769,7 +769,7 @@ nrrd_read_buffer(nrrd_header_t nrrd_ptr, unsigned char *data_ptr,
   switch (nrrd_ptr->encoding)
   {
   case NRRD_ENCODING_RAW:
-    n_bytes_read = fread(data_ptr, 1, n_bytes, fp);
+    n_bytes_read = (int)fread(data_ptr, 1, (size_t)n_bytes, fp);
     break;
 
   case NRRD_ENCODING_ASCII:
@@ -785,19 +785,19 @@ nrrd_read_buffer(nrrd_header_t nrrd_ptr, unsigned char *data_ptr,
       {
       case NRRD_TYPE_UINT8:
         if ((n_converted = fscanf(fp, "%u", &uvalue)) == 1)
-          ((unsigned char *) data_ptr)[i] = uvalue;
+          ((unsigned char *) data_ptr)[i] = (unsigned char)uvalue;
         break;
       case NRRD_TYPE_INT8:
         if ((n_converted = fscanf(fp, "%d", &ivalue)) == 1)
-          ((signed char *) data_ptr)[i] = ivalue;
+          ((signed char *) data_ptr)[i] = (signed char)ivalue;
         break;
       case NRRD_TYPE_UINT16:
         if ((n_converted = fscanf(fp, "%u", &uvalue)) == 1)
-          ((unsigned short *) data_ptr)[i] = uvalue;
+          ((unsigned short *) data_ptr)[i] = (unsigned short)uvalue;
         break;
       case NRRD_TYPE_INT16:
         if ((n_converted = fscanf(fp, "%d", &ivalue)) == 1)
-          ((short *) data_ptr)[i] = ivalue;
+          ((short *) data_ptr)[i] = (short)ivalue;
         break;
       case NRRD_TYPE_UINT32:
         if ((n_converted = fscanf(fp, "%u", &uvalue)) == 1)
@@ -840,7 +840,7 @@ nrrd_read_buffer(nrrd_header_t nrrd_ptr, unsigned char *data_ptr,
         return -1;
       }
     }
-    n_bytes_read = gzread(nrrd_ptr->gzfp, data_ptr, n_bytes);
+    n_bytes_read = gzread(nrrd_ptr->gzfp, data_ptr, (unsigned int)n_bytes);
     break;
 
   default:
@@ -1042,7 +1042,7 @@ nrrd_read_header(FILE *fp, nrrd_header_t nrrd_ptr)
      */
     if (!strcasecmp("dimension", line))
     {
-      nrrd_ptr->dimension = strtol(str_ptr, NULL, 10);
+      nrrd_ptr->dimension = (int)strtol(str_ptr, NULL, 10);
       if (nrrd_ptr->dimension > NRRD_MAX_DIMS)
       {
         print_error("Too many NRRD dimensions: %d\n", nrrd_ptr->dimension);
@@ -1235,7 +1235,7 @@ nrrd_read_header(FILE *fp, nrrd_header_t nrrd_ptr)
             print_error("Too many size entries!\n");
             return VIO_ERROR;
           }
-          nrrd_ptr->sizes[i] = strtol(num_ptr, NULL, 10);
+          nrrd_ptr->sizes[i] = (int)strtol(num_ptr, NULL, 10);
           i++;
         } while ((num_ptr = strtok(NULL, " ")) != NULL);
       }
@@ -1561,7 +1561,7 @@ initialize_nrrd_format_input(VIO_STR             filename,
     return VIO_ERROR;
   }
 
-  if ((nrrd_ptr = calloc(sizeof(struct nrrd_header), 1)) == NULL)
+  if ((nrrd_ptr = calloc(1, sizeof(struct nrrd_header))) == NULL)
   {
     fclose(fp);
     return VIO_ERROR;
@@ -1586,7 +1586,7 @@ initialize_nrrd_format_input(VIO_STR             filename,
       char *str_ptr = strrchr(filename, '/');
       if (str_ptr != NULL)
       {
-        int n_chars = str_ptr - filename + 1;
+        size_t n_chars = (size_t)(str_ptr - filename + 1);
         memcpy(pathname, filename, n_chars);
         pathname[n_chars] = 0;
         strcat(pathname, nrrd_ptr->data_file);
@@ -1713,7 +1713,7 @@ initialize_nrrd_format_input(VIO_STR             filename,
   {
     int volume_axis = in_ptr->axis_index_from_file[axis];
 
-    sizes[volume_axis] = in_ptr->sizes_in_file[axis];
+    sizes[volume_axis] = (int)in_ptr->sizes_in_file[axis];
 
     if (volume_axis >= 0 && volume_axis < 3)
     {
@@ -1798,7 +1798,7 @@ initialize_nrrd_format_input(VIO_STR             filename,
   in_ptr->slice_index = 0;
   in_ptr->volume_file = (FILE *) fp;
   in_ptr->header_info = nrrd_ptr;
-  in_ptr->generic_slice_buffer = malloc(n_voxels_in_slice *
+  in_ptr->generic_slice_buffer = malloc((size_t)n_voxels_in_slice *
                                         nrrd_type_to_size(nrrd_ptr->type));
   if (in_ptr->generic_slice_buffer == NULL)
   {
@@ -1854,7 +1854,7 @@ input_more_nrrd_format_file(VIO_Volume          volume,
   for_less(i, 0, VIO_MAX_DIMENSIONS)
     indices[i] = 0;
 
-  total_slices = in_ptr->sizes_in_file[n_dimensions - 1];
+  total_slices = (int)in_ptr->sizes_in_file[n_dimensions - 1];
 
   if ( in_ptr->slice_index < total_slices )
   {
@@ -1864,7 +1864,7 @@ input_more_nrrd_format_file(VIO_Volume          volume,
     n_bytes_per_slice = nrrd_type_to_size(nrrd_ptr->type);
     for_less (i, 0, n_dimensions - 1)
     {
-      n_bytes_per_slice *= in_ptr->sizes_in_file[i];
+      n_bytes_per_slice *= (int)in_ptr->sizes_in_file[i];
     }
 
     /* If the memory for the volume has not been allocated yet,
@@ -1907,7 +1907,7 @@ input_more_nrrd_format_file(VIO_Volume          volume,
 
     indices[in_ptr->axis_index_from_file[n_dimensions - 1]] = in_ptr->slice_index;
 
-    j_max = (n_dimensions > 3) ? in_ptr->sizes_in_file[2] : 1;
+    j_max = (n_dimensions > 3) ? (int)in_ptr->sizes_in_file[2] : 1;
     for_less( j, 0, j_max )
     {
       if (n_dimensions > 3)
@@ -1938,10 +1938,10 @@ input_more_nrrd_format_file(VIO_Volume          volume,
             value = ((int32_t *) data_ptr)[data_ind++];
             break;
           case NRRD_TYPE_UINT64:
-            value = ((uint64_t *) data_ptr)[data_ind++];
+            value = (double)((uint64_t *) data_ptr)[data_ind++];
             break;
           case NRRD_TYPE_INT64:
-            value = ((int64_t *) data_ptr)[data_ind++];
+            value = (double)((int64_t *) data_ptr)[data_ind++];
             break;
           case NRRD_TYPE_FLOAT32:
             value = ((float *) data_ptr)[data_ind++];

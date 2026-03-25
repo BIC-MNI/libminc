@@ -254,7 +254,7 @@ static void trilinear_interpolate_rgb(
           }
           else
           {
-            coefs[c] = outside_value;
+            coefs[c] = (unsigned int)outside_value;
           }
 
           in_rgb[c][0] = get_Colour_r( coefs[c] );
@@ -302,7 +302,7 @@ static void trilinear_interpolate_rgb(
 
       /*--- if the value is desired, interpolate in 1D to get the value */
 
-      out_rgb[i] = c0 + w * dw;
+      out_rgb[i] = (int)(c0 + w * dw);
       if (out_rgb[i] > 255) {
         out_rgb[i] = 255;
       }

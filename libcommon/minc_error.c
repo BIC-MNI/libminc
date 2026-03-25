@@ -97,7 +97,7 @@ int v_mi2log_message(const char *file,int line, mimsgcode_t code, va_list ap);
 
 struct mierror_entry {
     int level;
-    char *msgfmt;
+    const char *msgfmt;
 };
 
 
@@ -115,7 +115,7 @@ static struct {
 /* MINC routine name variable, call depth counter (for keeping track of
    minc routines calling minc routines) and variable for keeping track
    of callers ncopts. All of these are for error logging. */
-static char *minc_routine_name = "MINC";
+static const char *minc_routine_name = "MINC";
 static int minc_call_depth = 0;
 static int minc_trash_var = 0;
 
@@ -232,7 +232,7 @@ static struct mierror_entry mierror_table[] = {
 };
 
 
-int MI_save_routine_name(char *name)
+int MI_save_routine_name(const char *name)
 {
    /* no idea what peter was up to here */
    /* minc_trash_var = (((minc_call_depth++)==0) ? MI_save_routine_name(name) : * MI_NOERROR)) */
@@ -264,23 +264,25 @@ int MI_return_error(void)
    }
    return( TRUE );
 }
-void MI_log_pkg_error2(int p1, char *p2)
+void MI_log_pkg_error2(int p1, const char *p2)
 {
+  (void)p1;
   (void) fprintf(stderr, "%s: ", minc_routine_name);
   (void) fprintf(stderr, "%s", p2);
   (void) fputc('\n', stderr);
   (void) fflush(stderr);
 }
-void MI_log_pkg_error3(int p1, char *p2, char *p3)
+void MI_log_pkg_error3(int p1, const char *p2, const char *p3)
 {
+  (void)p1;
   (void) fprintf(stderr, "%s: ", minc_routine_name);
   (void) fprintf(stderr, p2, p3);
   (void) fputc('\n', stderr);
   (void) fflush(stderr);
 }
-void MI_log_sys_error1(char *p1)
+void MI_log_sys_error1(const char *p1)
 {
-   char *message;
+   const char *message;
    int errnum = errno;
 
    (void) fprintf(stderr, "%s", minc_routine_name);
@@ -398,7 +400,7 @@ int v_mi2log_message(const char *file, int line, mimsgcode_t code, va_list ap)
 
 /*MINC2 error reporting*/
 
-int MI2_save_routine_name ( char *name )
+int MI2_save_routine_name ( const char *name )
 {
   return MI_save_routine_name(name);
 }
@@ -413,17 +415,17 @@ int MI2_return_error ( void )
   return MI_return_error();
 }
 
-void MI2_log_pkg_error2 ( int p1, char *p2 )
+void MI2_log_pkg_error2 ( int p1, const char *p2 )
 {
   MI_log_pkg_error2(p1,p2);
 }
 
-void MI2_log_pkg_error3 ( int p1, char *p2, char *p3 )
+void MI2_log_pkg_error3 ( int p1, const char *p2, const char *p3 )
 {
   MI_log_pkg_error3(p1,p2,p3);
 }
 
-void MI2_log_sys_error1 ( char *p1 )
+void MI2_log_sys_error1 ( const char *p1 )
 {
   MI_log_sys_error1(p1);
 }

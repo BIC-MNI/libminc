@@ -1541,7 +1541,10 @@ VIOAPI  void   set_volume_cache_debugging(
     VIO_Volume   volume,
     int      output_every )
 {
-#ifdef  CACHE_DEBUGGING
+#ifndef CACHE_DEBUGGING
+    (void)volume;
+    (void)output_every;
+#else
     if( output_every >= 1 )
     {
         volume->cache.debugging_on = TRUE;

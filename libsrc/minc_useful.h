@@ -148,10 +148,6 @@
 
 /* --------- environment variables -------------------------- */
 
-#ifdef sun
-char  *getenv();         /* on suns, this declaration is not in stdlib.h */
-#endif
-
 #define  ENV_EXISTS( env ) ( getenv(env) != (char *) 0 )
 
 /* --------- string macros -------------------------- */

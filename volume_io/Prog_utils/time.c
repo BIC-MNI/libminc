@@ -125,7 +125,7 @@ VIOAPI  VIO_Real  current_realtime_seconds( void )
       current_seconds = first_seconds;
     }
     else {
-      current_seconds = ts.tv_sec + (ts.tv_nsec / 1.0e9);
+      current_seconds = (double)ts.tv_sec + ((double)ts.tv_nsec / 1.0e9);
     }
 #elif HAVE_GETTIMEOFDAY
     struct timeval tv;

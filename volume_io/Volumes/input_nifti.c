@@ -155,12 +155,12 @@ nifti_image_to_minc_attributes(nifti_image *nii_ptr,
 
     print_error("No transform found in header, guessing.\n");
 
-    Transform_elem(mnc_xform, 0, 0) *= nii_ptr->dx;
-    Transform_elem(mnc_xform, 1, 1) *= nii_ptr->dy;
-    Transform_elem(mnc_xform, 2, 2) *= nii_ptr->dz;
-    Transform_elem(mnc_xform, 0, 3) = -(nii_ptr->dx * nii_ptr->nx) / 2;
-    Transform_elem(mnc_xform, 1, 3) = -(nii_ptr->dy * nii_ptr->ny) / 2;
-    Transform_elem(mnc_xform, 2, 3) = -(nii_ptr->dz * nii_ptr->nz) / 2;
+    Transform_elem(mnc_xform, 0, 0) *= (double)nii_ptr->dx;
+    Transform_elem(mnc_xform, 1, 1) *= (double)nii_ptr->dy;
+    Transform_elem(mnc_xform, 2, 2) *= (double)nii_ptr->dz;
+    Transform_elem(mnc_xform, 0, 3) = -((double)nii_ptr->dx * (double)nii_ptr->nx) / 2;
+    Transform_elem(mnc_xform, 1, 3) = -((double)nii_ptr->dy * (double)nii_ptr->ny) / 2;
+    Transform_elem(mnc_xform, 2, 3) = -((double)nii_ptr->dz * (double)nii_ptr->nz) / 2;
 
     create_linear_transform(&mnc_linear_xform, &mnc_xform);
 

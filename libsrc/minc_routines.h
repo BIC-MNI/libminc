@@ -89,8 +89,8 @@ SEMIPRIVATE int MI_convert_type(long number_of_values,
 SEMIPRIVATE mi_icv_type *MI_icv_chkid(int icvid);
 
 #if MINC2
-extern int hdf_var_declare(int fd, char *varnm, char *varpath, int ndims,
-                           hsize_t *sizes);
+extern int hdf_var_declare(int fd, const char *varnm, const char *varpath,
+                           int ndims, hsize_t *sizes);
 
 extern int hdf_create(const char *path, int cmode, struct mi2opts *opts_ptr);
 extern int hdf_open(const char *path, int mode);

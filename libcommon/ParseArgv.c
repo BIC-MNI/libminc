@@ -246,7 +246,7 @@ ParseArgv(int *argcPtr, char **argv, ArgvInfo *argTable, int flags)
                char *endPtr;
 
                *(((int *) infoPtr->dst)+i) =
-                  ParseLong(argv[srcIndex], &endPtr);
+                  (int) ParseLong(argv[srcIndex], &endPtr);
                if ((endPtr == argv[srcIndex]) || (*endPtr != 0)) {
                   FPRINTF(stderr,
                   "expected integer argument for \"%s\" but got \"%s\"",
@@ -444,7 +444,7 @@ PrintUsage(ArgvInfo *argTable, int flags)
          FPRINTF(stderr, "\n %s:", infoPtr->key);
          /* Write out padding after the key, followed by the help text.
           */
-         numSpaces = width + 1 - strlen(infoPtr->key);
+         numSpaces = (int) (width + 1 - strlen(infoPtr->key));
          FPRINTF(stderr, "%*s %s", numSpaces, "", infoPtr->help);
          switch (infoPtr->type) {
          case ARGV_INT: {

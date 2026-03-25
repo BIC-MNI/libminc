@@ -34,7 +34,7 @@ struct milistdata {
 };
 
 static void
-full_path_for_attr(char *fullpath, int length, const char *path,
+full_path_for_attr(char *fullpath, size_t length, const char *path,
                    const char *name, mihandle_t vol)
 {
   if (!strcmp(path, MIimage)) {
@@ -59,7 +59,7 @@ full_path_for_attr(char *fullpath, int length, const char *path,
 }
 
 static void
-full_path_for_group(char *fullpath, int length, const char *path)
+full_path_for_group(char *fullpath, size_t length, const char *path)
 {
   strncpy(fullpath, MI_ROOT_PATH "/" MI_INFO_NAME, length);
 
@@ -121,7 +121,7 @@ milist_recursion ( milisthandle_t handle, char *path )
     H5E_BEGIN_TRY {
 
       r = H5Gget_objtype_by_idx ( data->frame_ptr->grp_id,
-      data->frame_ptr->grp_idx );
+      (hsize_t) data->frame_ptr->grp_idx );
     } H5E_END_TRY;
     r--;
 
@@ -154,7 +154,7 @@ milist_recursion ( milisthandle_t handle, char *path )
         size_t l;
 
         H5Gget_objname_by_idx ( data->frame_ptr->grp_id,
-                                data->frame_ptr->grp_idx - 1,
+                                (hsize_t) (data->frame_ptr->grp_idx - 1),
                                 tmp, sizeof ( tmp ) );
         frame = malloc ( sizeof ( struct milistframe ) );
 
@@ -195,7 +195,7 @@ milist_attr_op ( hid_t loc_id, const char *attr_name, void *op_data )
   struct milistdata *data = ( struct milistdata * ) op_data;
   (void)loc_id;/*to remove unused variable warning*/
 
-  strncpy ( data->name_ptr, attr_name, data->name_len );
+  strncpy ( data->name_ptr, attr_name, (size_t) data->name_len );
   return ( 1 );
 }
 
@@ -207,6 +207,7 @@ int milist_attr_next ( mihandle_t vol, milisthandle_t handle,
 {
   struct milistdata *data = ( struct milistdata * ) handle;
   herr_t r;
+  (void)vol;
 
   data->name_ptr = name;
   data->name_len = maxname;
@@ -220,7 +221,7 @@ int milist_attr_next ( mihandle_t vol, milisthandle_t handle,
     } H5E_END_TRY;
 
     if ( r > 0 ) {
-      strncpy ( path, data->frame_ptr->relpath, maxpath );
+      strncpy ( path, data->frame_ptr->relpath, (size_t) maxpath );
       return ( MI_NOERROR );
     } else {
 
@@ -311,8 +312,8 @@ int milist_grp_next ( milisthandle_t handle, char *path, int maxpath )
     } H5E_END_TRY;
 
     if ( r > 0 ) {
-      strncpy ( path, data->frame_ptr->relpath, maxpath );
-      strncpy ( data->frame_ptr->relpath, tmp, maxpath );
+      strncpy ( path, data->frame_ptr->relpath, (size_t) maxpath );
+      strncpy ( data->frame_ptr->relpath, tmp, (size_t) maxpath );
       return ( MI_NOERROR );
     } else {
       return ( MI_ERROR );
@@ -903,11 +904,11 @@ int miset_attr_values ( mihandle_t vol, mitype_t data_type, const char *path,
   pch = strrchr ( path, '/' );
 
   if ( pch != NULL ) {
-    slength = strlen ( path ) - ( pch - path );
+    slength = strlen ( path ) - (size_t) ( pch - path );
     std_name = malloc ( slength + 1 );
 
     for ( i = 0; i < slength; i++ )
-      std_name[i] = path[pch - path + 1 + i];
+      std_name[i] = path[(size_t)(pch - path) + 1 + i];
 
     std_name[slength] = '\0';
   } else {

@@ -112,7 +112,7 @@ int miconvert_voxel_to_real(mihandle_t volume,
 
     /* get image min/max
      */
-    miget_slice_range(volume, coords, ncoords, &slice_max, &slice_min);
+    miget_slice_range(volume, coords, (size_t) ncoords, &slice_max, &slice_min);
 
     /* Calculate the actual conversion.
      */
@@ -261,7 +261,7 @@ int miset_real_value(mihandle_t volume,
         return (MI_ERROR);
     }
 
-    miconvert_real_to_voxel(volume, coords, ndims, value, &voxel);
+    miconvert_real_to_voxel(volume, coords, (size_t) ndims, value, &voxel);
     return (miset_voxel_value(volume, coords, ndims, voxel));
 }
 
@@ -278,6 +278,9 @@ miconvert_world_origin_to_start( mihandle_t volume,
                                  double world[3],
                                  double starts[3])
 {
+    (void)volume;
+    (void)world;
+    (void)starts;
     fprintf(stderr, "miconvert_world_origin_to_start: Not implemented.\n");
     return (MI_NOERROR);
 }
@@ -294,6 +297,9 @@ miconvert_spatial_frequency_origin_to_start( mihandle_t volume,
                                              double world[3],
                                              double starts[3])
 {
+    (void)volume;
+    (void)world;
+    (void)starts;
     fprintf(stderr, "miconvert_spatial_frequency_origin_to_start: Not implemented.\n");
     return (MI_NOERROR);
 }
@@ -458,6 +464,7 @@ int
 miset_spatial_frequency_origin(mihandle_t volume,
                                double world[3])
 {
+    (void)world;
     if ((volume->mode & MI2_OPEN_RDWR) == 0) {
         return (MI_ERROR);
     }
@@ -480,6 +487,7 @@ int miget_voxel_value(mihandle_t volume,
     int result;
     misize_t count[MI2_MAX_VAR_DIMS];
     int i;
+    (void)ndims;
 
     for (i = 0; i < volume->number_of_dims; i++) {
         count[i] = 1;
@@ -533,7 +541,7 @@ int miget_volume_real_range(mihandle_t volume, double real_range[2])
 
     H5Sclose(spc_id);
 
-    buffer = malloc(n * sizeof(double));
+    buffer = malloc((size_t) n * sizeof(double));
     if (buffer == NULL) {
         return (MI_ERROR);
     }
@@ -559,7 +567,7 @@ int miget_volume_real_range(mihandle_t volume, double real_range[2])
 
     H5Sclose(spc_id);
 
-    buffer = malloc(n * sizeof(double));
+    buffer = malloc((size_t) n * sizeof(double));
     if (buffer == NULL) {
         return (MI_ERROR);
     }

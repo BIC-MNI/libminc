@@ -100,6 +100,8 @@ static  VIO_Status  output_world_transform(
     double              dir_cosines[VIO_MAX_DIMENSIONS][VIO_N_DIMENSIONS];
     int                 dim, axis, spatial_axes[VIO_N_DIMENSIONS];
 
+    (void)space_type;
+
     /*--- set all starts/steps/dir_cosines to default */
 
     for_less( dim, 0, file->n_file_dimensions )
@@ -556,6 +558,8 @@ VIOAPI  VIO_Status  copy_auxiliary_data_from_open_minc2_file(
 {
     VIO_Status  status;
 
+    (void)minc_id;
+
     /*TODO: convert this to MINC2*/
 
 #if 0
@@ -872,8 +876,8 @@ static  VIO_Status  output_minc2_hyperslab(
 
     for( file_ind = n_file_dims-1;  file_ind >= 0;  --file_ind )
     {
-        long_file_start[file_ind] = (long) file_start[file_ind];
-        long_file_count[file_ind] = (long) file_count[file_ind];
+        long_file_start[file_ind] = (misize_t) file_start[file_ind];
+        long_file_count[file_ind] = (misize_t) file_count[file_ind];
         ind = to_array[file_ind];
         if( ind != INVALID_AXIS )
         {
@@ -1211,7 +1215,7 @@ static  VIO_Status  output_the_volume2(
       if( to_volume_index[d] != INVALID_AXIS ) {
         count[d] = volume_count[to_volume_index[d]];
         file->n_slab_dims++;  /* integral number of complete dimensions */
-        slab_size *= count[d];
+        slab_size *= (int)count[d];
       }
     }
 
@@ -1243,7 +1247,7 @@ static  VIO_Status  output_the_volume2(
         }
 
         if( file->image_range[0] >= file->image_range[1] && !volume->is_labels)
-          miset_slice_range(file->minc2id,(const misize_t*)file_indices,file->n_file_dimensions,real_max,real_min);
+          miset_slice_range(file->minc2id,(const misize_t*)file_indices,(size_t)file->n_file_dimensions,real_max,real_min);
 
         output_slab2( file, volume, to_volume_index, file_indices, local_count );
 

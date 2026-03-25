@@ -50,7 +50,7 @@ char **read_file_names(char *filelist, int *num_files)
 
    /* Allocate an initial array and NULL-terminate it */
    array_size = FILE_NAME_ALLOC_SIZE;
-   files = malloc(sizeof(*files) * array_size);
+   files = malloc(sizeof(*files) * (size_t) array_size);
    if (files == NULL) {
       (void) fprintf(stderr, "Error allocating memory\n");
       (void) fclose(fp);
@@ -73,7 +73,7 @@ char **read_file_names(char *filelist, int *num_files)
       /* Make room for names if needed */
       while (nfiles >= array_size-1) {
          array_size += FILE_NAME_ALLOC_SIZE;
-         files = realloc(files, sizeof(*files) * array_size);
+         files = realloc(files, sizeof(*files) * (size_t) array_size);
          if (files == NULL) {
             (void) fprintf(stderr, "Error allocating memory\n");
             (void) fclose(fp);

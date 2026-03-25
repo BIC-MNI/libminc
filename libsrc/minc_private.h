@@ -87,5 +87,4 @@
 #include  "minc_routines.h"
 #include  "minc_config.h"
 #include  "minc_error.h"
-#include  "minc_config.h"
 #endif

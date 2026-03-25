@@ -303,7 +303,7 @@ MNCAPI char *miexpand_file(const char *path, char *tempfile, int header_only,
    FILE *fp;
    Compress_type compress_type;
    static struct {
-      char *extension;
+      const char *extension;
       Compress_type type;
    } compression_code_list[] = {
       {".bz", BZIPPED},
@@ -637,7 +637,7 @@ MNCAPI int micreate(const char *path, int cmode)
 
 #else
 
-MNCAPI int micreate(char *path, int cmode)
+MNCAPI int micreate(const char *path, int cmode)
 {
     int fd;
 
@@ -755,7 +755,8 @@ MNCAPI int miattget(int cdfid, int varid, const char *name, nc_type datatype,
 @MODIFIED   :
 ---------------------------------------------------------------------------- */
 MNCAPI int miattget_with_sign(int cdfid, int varid, const char *name,
-                              char *insign, nc_type datatype, char *outsign,
+                              const char *insign, nc_type datatype,
+                              const char *outsign,
                               int max_length, void *value, int *att_length)
 {
    nc_type att_type;          /* Type of attribute */

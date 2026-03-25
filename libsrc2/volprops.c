@@ -130,13 +130,13 @@ int miget_volume_props(mihandle_t volume, mivolumeprops_t *props)
       free(handle);
       return (MI_ERROR);
     }
-    handle->edge_lengths = (int *)malloc(handle->edge_count*sizeof(int));
+    handle->edge_lengths = (int *)malloc((size_t) handle->edge_count*sizeof(int));
     if (handle->edge_lengths == NULL) {
       free(handle);
       return (MI_ERROR);
     }
     for (i = 0; i < handle->edge_count; i++) {
-      handle->edge_lengths[i] = dims[i];
+      handle->edge_lengths[i] = (int) dims[i];
     }
     /* Get the number of filters in the pipeline */
     nfilters = H5Pget_nfilters(hdf_plist);
@@ -148,12 +148,12 @@ int miget_volume_props(mihandle_t volume, mivolumeprops_t *props)
     else {
       for (i = 0; i < nfilters; i++) {
         cd_nelmts = MI2_MAX_CD_ELEMENTS;
-        fcode = H5Pget_filter1(hdf_plist, i, &flags, &cd_nelmts,
+        fcode = H5Pget_filter1(hdf_plist, (unsigned int) i, &flags, &cd_nelmts,
                                cd_values, sizeof(fname), fname);
         switch (fcode) {
           case H5Z_FILTER_DEFLATE:
             handle->compression_type = MI_COMPRESS_ZLIB;
-            handle->zlib_level = cd_values[0];
+            handle->zlib_level = (int) cd_values[0];
             break;
           case H5Z_FILTER_SHUFFLE:
             break;
@@ -429,7 +429,7 @@ int miset_props_blocking(mivolumeprops_t props, int edge_count, const int *edge_
 
   props->edge_count = edge_count;
   if (edge_count != 0) {
-    props->edge_lengths = (int *) malloc(edge_count*sizeof(int));
+    props->edge_lengths = (int *) malloc((size_t) edge_count*sizeof(int));
     if (props->edge_lengths == NULL) {
       return (MI_ERROR);
     }

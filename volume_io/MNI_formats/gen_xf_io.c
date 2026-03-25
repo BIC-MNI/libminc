@@ -183,8 +183,8 @@ static  void  output_one_transform(
 /*        if( ! transform->displacement_volume_file )
         {*/
           volume_filename_length = string_length(prefix_filename) + 100;
-          volume_filename = alloc_string( volume_filename_length );
-          snprintf( volume_filename, volume_filename_length, "%s_grid_%d.mnc", prefix_filename,
+          volume_filename = alloc_string( (size_t)volume_filename_length );
+          snprintf( volume_filename, (size_t)volume_filename_length, "%s_grid_%d.mnc", prefix_filename,
                         *volume_count );
 
           transform->displacement_volume_file = volume_filename;

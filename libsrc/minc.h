@@ -505,7 +505,8 @@ MNCAPI int miopen(const char *path, int mode);
 MNCAPI int micreate(const char *path, int cmode);
 MNCAPI int miclose(int cdfid);
 MNCAPI int miattget_with_sign(int cdfid, int varid, const char *name,
-                              char *insign, nc_type datatype, char *outsign,
+                              const char *insign, nc_type datatype,
+                              const char *outsign,
                               int max_length, void *value, int *att_length);
 MNCAPI int miattget(int cdfid, int varid, const char *name, nc_type datatype,
                     int max_length, void *value, int *att_length);
