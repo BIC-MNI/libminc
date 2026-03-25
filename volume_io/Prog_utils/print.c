@@ -114,7 +114,7 @@ VIOAPI  void  pop_print_function( void )
 ---------------------------------------------------------------------------- */
 
 /* VARARGS */
-VIOAPI  void  print( VIO_STR format, ... )
+VIOAPI  void  print( const char *format, ... )
 {
     va_list  ap;
     char     print_buffer[VIO_EXTREMELY_LARGE_STRING_SIZE];
@@ -213,7 +213,7 @@ VIOAPI  void  pop_print_error_function( void )
 ---------------------------------------------------------------------------- */
 
 /* VARARGS */
-VIOAPI  void  print_error( char format[], ... )
+VIOAPI  void  print_error( const char format[], ... )
 {
     va_list  ap;
     char     print_buffer[VIO_EXTREMELY_LARGE_STRING_SIZE];
@@ -242,7 +242,7 @@ VIOAPI  void  print_error( char format[], ... )
 @MODIFIED   :
 ---------------------------------------------------------------------------- */
 
-VIOAPI  void   handle_internal_error( char  str[] )
+VIOAPI  void   handle_internal_error( const char  str[] )
 {
     /*print_error( "Internal error:  %s\n", str );
     abort_if_allowed();*/

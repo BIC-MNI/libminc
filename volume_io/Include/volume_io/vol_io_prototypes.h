@@ -6,7 +6,7 @@
 
 /*transforms*/
 
-VIOAPI  VIO_STR  get_default_transform_file_suffix( void );
+VIOAPI  const char *get_default_transform_file_suffix( void );
 
 VIOAPI  VIO_Status  output_transform(
     FILE                *file,
@@ -179,7 +179,7 @@ VIOAPI  void  output_comments(
     FILE       *file,
     const char *comments );
 
-VIOAPI  VIO_STR  get_default_tag_file_suffix( void );
+VIOAPI  const char *get_default_tag_file_suffix( void );
 
 VIOAPI  VIO_Status  initialize_tag_file_output(
     FILE      *file,
@@ -696,8 +696,8 @@ VIOAPI  VIO_STR  expand_filename(
     const char  *filename );
 
 VIOAPI  VIO_BOOL filename_extension_matches(
-    VIO_STR   filename,
-    VIO_STR   extension );
+    const char   *filename,
+    const char   *extension );
 
 VIOAPI  VIO_STR  remove_directories_from_filename(
     VIO_STR  filename );
@@ -716,7 +716,7 @@ VIOAPI  VIO_Status  open_file(
 
 VIOAPI  VIO_Status  open_file_with_default_suffix(
     const char         *filename,
-    VIO_STR            default_suffix,
+    const char         *default_suffix,
     VIO_IO_types       io_type,
     VIO_File_formats   file_format,
     FILE               **file );
@@ -943,7 +943,7 @@ VIOAPI  void  push_print_function( void );
 
 VIOAPI  void  pop_print_function( void );
 
-VIOAPI  void  print( VIO_STR format, ... );
+VIOAPI  void  print( const char *format, ... );
 
 VIOAPI  void  set_print_error_function( void  (*function) ( char [] ) );
 
@@ -951,9 +951,9 @@ VIOAPI  void  push_print_error_function( void );
 
 VIOAPI  void  pop_print_error_function( void );
 
-VIOAPI  void  print_error( char format[], ... ) VIO_FORMAT_FUNCTION(printf, 1, 2);
+VIOAPI  void  print_error( const char format[], ... ) VIO_FORMAT_FUNCTION(printf, 1, 2);
 
-VIOAPI  void   handle_internal_error( char  str[] );
+VIOAPI  void   handle_internal_error( const char  str[] );
 
 VIOAPI  void  abort_if_allowed( void );
 
@@ -961,7 +961,7 @@ VIOAPI  void  initialize_progress_report(
     VIO_progress_struct *progress,
     VIO_BOOL          one_line_only,
     int               n_steps,
-    VIO_STR            title );
+    const char         *title );
 
 VIOAPI  void  update_progress_report(
     VIO_progress_struct   *progress,
@@ -980,8 +980,8 @@ VIOAPI  void  delete_string(
     VIO_STR   string );
 
 VIOAPI  VIO_STR  concat_strings(
-    VIO_STR   str1,
-    VIO_STR   str2 );
+    const char   *str1,
+    const char   *str2 );
 
 VIOAPI  void  replace_string(
     VIO_STR   *string,
@@ -993,7 +993,7 @@ VIOAPI  void  concat_char_to_string(
 
 VIOAPI  void  concat_to_string(
     VIO_STR   *string,
-    VIO_STR   str2 );
+    const char   *str2 );
 
 VIOAPI  int  string_length(
     const char   *string );
@@ -1015,28 +1015,28 @@ VIOAPI  char  get_upper_case(
     char   ch );
 
 VIOAPI  VIO_BOOL string_ends_in(
-    VIO_STR   string,
-    VIO_STR   ending );
+    const char   *string,
+    const char   *ending );
 
 VIOAPI    VIO_STR   strip_outer_blanks(
-    VIO_STR  str );
+    const char  *str );
 
 VIOAPI  int  find_character(
-    VIO_STR    string,
+    const char    *string,
     char      ch );
 
 VIOAPI  void  make_string_upper_case(
     VIO_STR    string );
 
 VIOAPI  VIO_BOOL blank_string(
-    VIO_STR   string );
+    const char   *string );
 
 VIOAPI  VIO_Real  current_cpu_seconds( void );
 
 VIOAPI  VIO_Real  current_realtime_seconds( void );
 
 VIOAPI  VIO_STR  format_time(
-    VIO_STR   format,
+    const char   *format,
     VIO_Real     seconds );
 
 VIOAPI  void  print_time(

@@ -172,7 +172,7 @@
 #define NC_OPTS_VAL NC_VERBOSE | NC_FATAL
 
 /* Epsilon for coordinate comparisons */
-#define COORD_EPSILON (FLT_EPSILON * 10.0)
+#define COORD_EPSILON ((double)FLT_EPSILON * 10.0)
 
 /* Typedefs */
 typedef struct Loopfile_Info Loopfile_Info;
@@ -464,7 +464,7 @@ PRIVATE int get_loop_dim_size(int inmincid, Loop_Options *loop_options)
 
    /* Return appropriate value */
    if (found)
-      return dim_length;
+      return (int)dim_length;
    else
       return 1;
 }
@@ -967,7 +967,7 @@ PRIVATE void setup_variables(int inmincid, int outmincid,
                              &in_ndims, indim, NULL, loop_options);
 
    /* Get the length of the input vector dimension */
-   input_vector_length = get_vector_length(inmincid, loop_options);
+   input_vector_length = (int)get_vector_length(inmincid, loop_options);
    if (loop_options->convert_input_to_scalar && (input_vector_length > 0)) {
       input_vector_length = 0;
       in_ndims--;
@@ -1179,7 +1179,7 @@ PRIVATE void update_history(int mincid, char *arg_string)
                  &att_length) == MI_ERROR) ||
        (datatype != NC_CHAR))
       att_length = 0;
-   att_length += strlen(arg_string) + 1;
+   att_length += (int)strlen(arg_string) + 1;
 
    /* Allocate a string and get the old history */
    string = MALLOC(att_length, char);
@@ -1303,12 +1303,12 @@ PRIVATE int do_voxel_loop(Loop_Options *loop_options,
    num_extra_buffers = loop_options->num_extra_buffers;
    num_output_buffers = num_output_files + num_extra_buffers;
    input_vector_length =
-      get_vector_length(get_input_mincid(loopfile_info, 0), loop_options);
+      (int)get_vector_length(get_input_mincid(loopfile_info, 0), loop_options);
    if ((input_vector_length == 0) || (loop_options->convert_input_to_scalar))
       input_vector_length = 1;
    if (num_output_files > 0) {
       output_vector_length =
-         get_vector_length(get_output_mincid(loopfile_info, 0), NULL);
+         (int)get_vector_length(get_output_mincid(loopfile_info, 0), NULL);
       if (output_vector_length == 0) output_vector_length = 1;
    }
    else
@@ -1342,11 +1342,11 @@ PRIVATE int do_voxel_loop(Loop_Options *loop_options,
    if (loop_options->allocate_buffer_function != NULL) {
       loop_options->allocate_buffer_function
          (loop_options->caller_data, TRUE,
-          num_input_buffers, chunk_num_voxels, input_vector_length,
+          num_input_buffers, (int)chunk_num_voxels, input_vector_length,
           &input_buffers,
-          num_output_files, block_num_voxels, output_vector_length,
+          num_output_files, (int)block_num_voxels, output_vector_length,
           &output_buffers,
-          num_extra_buffers, chunk_num_voxels, output_vector_length,
+          num_extra_buffers, (int)chunk_num_voxels, output_vector_length,
           &extra_buffers,
           loop_options->loop_info);
 
@@ -1709,11 +1709,11 @@ PRIVATE int do_voxel_loop(Loop_Options *loop_options,
    if (loop_options->allocate_buffer_function != NULL) {
       loop_options->allocate_buffer_function
          (loop_options->caller_data, FALSE,
-          num_input_buffers, chunk_num_voxels, input_vector_length,
+          num_input_buffers, (int)chunk_num_voxels, input_vector_length,
           &input_buffers,
-          num_output_files, block_num_voxels, output_vector_length,
+          num_output_files, (int)block_num_voxels, output_vector_length,
           &output_buffers,
-          num_extra_buffers, chunk_num_voxels, output_vector_length,
+          num_extra_buffers, (int)chunk_num_voxels, output_vector_length,
           &extra_buffers,
           loop_options->loop_info);
    }
@@ -1797,10 +1797,10 @@ PRIVATE void setup_looping(Loop_Options *loop_options,
                 loop_options);
 
    /* Get vector lengths */
-   input_vector_length = get_vector_length(inmincid, loop_options);
+   input_vector_length = (int)get_vector_length(inmincid, loop_options);
    if (get_output_numfiles(loopfile_info) > 0)
       output_vector_length =
-         get_vector_length(get_output_mincid(loopfile_info, 0), NULL);
+         (int)get_vector_length(get_output_mincid(loopfile_info, 0), NULL);
    else
       output_vector_length = 0;
 
@@ -1891,6 +1891,8 @@ PRIVATE void initialize_file_and_index(Loop_Options *loop_options,
                                        int *dummy_index)
      /* ARGSUSED */
 {
+   (void)loop_options;
+   (void)loopfile_info;
    if (do_loop) {
       *ifile = 0;
       *dim_index = 0;
@@ -1927,6 +1929,8 @@ PRIVATE int finish_file_and_index(Loop_Options *loop_options,
                                   int dummy_index)
      /* ARGSUSED */
 {
+   (void)loop_options;
+   (void)dim_index;
    if (do_loop) {
       return (ifile < get_input_numfiles(loopfile_info));
    }

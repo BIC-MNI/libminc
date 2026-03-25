@@ -427,8 +427,8 @@ MNCAPI int miset_valid_range(int cdfid, int imgid, const double valid_range[])
    attname = MIvalid_range;
    switch (datatype) {
    case NC_FLOAT:
-      fval[0] = valid_range[0];
-      fval[1] = valid_range[1];
+      fval[0] = (float)valid_range[0];
+      fval[1] = (float)valid_range[1];
       status = ncattput(cdfid, imgid, attname, datatype, 2, fval);
       break;
    default:
@@ -507,7 +507,7 @@ MNCAPI int miget_image_range(int cdfid, double image_range[])
          if (miget_valid_range(cdfid, imgid, image_range) == MI_ERROR)
             MI_RETURN(MI_ERROR);
          no_range_found =
-            (datatype == NC_FLOAT  && image_range[1] == FLT_MAX) ||
+            (datatype == NC_FLOAT  && image_range[1] == (double)FLT_MAX) ||
             (datatype == NC_DOUBLE && image_range[1] == DBL_MAX);
       }
 
@@ -635,7 +635,7 @@ MNCAPI int miattput_pointer(int cdfid, int varid, const char *name, int ptrvarid
    MI_SAVE_ROUTINE_NAME("miattput_pointer");
 
    /* Set the first part of the string */
-   index=strlen(strcpy(pointer_string,MI_VARATT_POINTER_PREFIX));
+   index=(int)strlen(strcpy(pointer_string,MI_VARATT_POINTER_PREFIX));
 
    /* Get the name of the variable to which we should point */
    MI_CHK_ERR(ncvarinq(cdfid, ptrvarid, &(pointer_string[index]), NULL,
@@ -740,10 +740,10 @@ MNCAPI int miadd_child(int cdfid, int parent_varid, int child_varid)
       child_list_size=0;
 
    /* Allocate space for new child list */
-   if ((child_list = MALLOC(child_list_size+MAX_NC_NAME+
+   if ((child_list = MALLOC((size_t)child_list_size+MAX_NC_NAME+
                             strlen(MI_CHILD_SEPARATOR), char)) == NULL) {
        MI_LOG_ERROR(MI_MSG_OUTOFMEM,
-                     child_list_size+MAX_NC_NAME+strlen(MI_CHILD_SEPARATOR));
+                     (size_t)child_list_size+MAX_NC_NAME+strlen(MI_CHILD_SEPARATOR));
        MI_RETURN(MI_ERROR);
    }
 
@@ -762,7 +762,7 @@ MNCAPI int miadd_child(int cdfid, int parent_varid, int child_varid)
       /* Copy the child list element separator (only if there are other
          elements in the list */
       (void) strcpy(&child_list[child_list_size], MI_CHILD_SEPARATOR);
-      child_list_size += strlen(MI_CHILD_SEPARATOR);
+      child_list_size += (int)strlen(MI_CHILD_SEPARATOR);
    }
 
    /* Get pointer to name of new child */
@@ -777,7 +777,7 @@ MNCAPI int miadd_child(int cdfid, int parent_varid, int child_varid)
 
    /* Check for multiple copies of child */
    if (strstr(child_list, new_child) != new_child) {
-      child_list_size -= strlen(MI_CHILD_SEPARATOR);
+      child_list_size -= (int)strlen(MI_CHILD_SEPARATOR);
       child_list[child_list_size] = '\0';
    }
 
@@ -1375,7 +1375,7 @@ miappend_history(int fd, const char *tm_stamp)
      * will be appended, a terminating null character, and a possible
      * additional newline.
      */
-    att_val = malloc(att_len + strlen(tm_stamp) + 2);
+    att_val = malloc((size_t)att_len + strlen(tm_stamp) + 2);
 
     if (att_val == NULL) {
         return (MI_ERROR);

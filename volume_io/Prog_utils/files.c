@@ -57,8 +57,8 @@
 #endif
 
 
-static  VIO_BOOL  has_no_extension( VIO_STR );
-static  VIO_STR   compressed_endings[] = { ".z", ".Z", ".gz" };
+static  VIO_BOOL  has_no_extension( const char * );
+static  const char   *compressed_endings[] = { ".z", ".Z", ".gz" };
 
 #if !HAVE_STRERROR
 static char *strerror(int errnum)
@@ -732,8 +732,8 @@ VIOAPI  VIO_STR  expand_filename(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  VIO_BOOL  filename_extension_matches(
-    VIO_STR   filename,
-    VIO_STR   extension )
+    const char   *filename,
+    const char   *extension )
 {
     int       len, i;
     VIO_STR    filename_no_z, ending;
@@ -866,7 +866,7 @@ VIOAPI  VIO_STR  get_temporary_filename( void )
    * So I more-or-less emulate that behavior here.
    */
   const char pat_str[] = "/minc-XXXXXX";
-  char *tmpdir_ptr;
+  const char *tmpdir_ptr;
 
   if ((tmpdir_ptr = getenv("TMPDIR")) == NULL) {
     tmpdir_ptr = P_tmpdir;
@@ -1080,7 +1080,7 @@ VIOAPI  VIO_Status  open_file(
 
 VIOAPI  VIO_Status  open_file_with_default_suffix(
     const char          *filename,
-    VIO_STR             default_suffix,
+    const char          *default_suffix,
     VIO_IO_types           io_type,
     VIO_File_formats       file_format,
     FILE               **file )
@@ -1140,7 +1140,7 @@ VIOAPI  VIO_Status  open_file_with_default_suffix(
 ---------------------------------------------------------------------------- */
 
 static  VIO_BOOL  has_no_extension(
-    VIO_STR   filename )
+    const char   *filename )
 {
     VIO_STR   base_name;
     VIO_BOOL  dot_found;
@@ -1947,7 +1947,7 @@ VIOAPI  VIO_Status  output_boolean(
     VIO_BOOL         b )
 {
     VIO_Status   status;
-    VIO_STR   str;
+    const char   *str;
 
     status = VIO_OK;
 

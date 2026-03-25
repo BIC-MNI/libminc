@@ -35,7 +35,7 @@ static   const char      * const TAG_POINTS_STRING = "Points";
 @MODIFIED   :
 ---------------------------------------------------------------------------- */
 
-VIOAPI  VIO_STR  get_default_tag_file_suffix( void )
+VIOAPI  const char *get_default_tag_file_suffix( void )
 {
     return( "tag" );
 }

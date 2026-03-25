@@ -20,19 +20,19 @@
 
 /*--------------------- file format keywords ------------------------------ */
 
-static const VIO_STR      TRANSFORM_FILE_HEADER = "MNI Transform File";
-static const VIO_STR      TYPE_STRING = "Transform_Type";
-static const VIO_STR      LINEAR_TRANSFORM_STRING = "Linear_Transform";
-static const VIO_STR      LINEAR_TYPE = "Linear";
-static const VIO_STR      THIN_PLATE_SPLINE_STRING ="Thin_Plate_Spline_Transform";
-static const VIO_STR      INVERT_FLAG_STRING = "Invert_Flag";
-static const VIO_STR      TRUE_STRING = "True";
-static const VIO_STR      FALSE_STRING = "False";
-static const VIO_STR      N_DIMENSIONS_STRING = "Number_Dimensions";
-static const VIO_STR      POINTS_STRING = "Points";
-static const VIO_STR      DISPLACEMENTS_STRING = "Displacements";
-static const VIO_STR      GRID_TRANSFORM_STRING = "Grid_Transform";
-static const VIO_STR      DISPLACEMENT_VOLUME = "Displacement_Volume";
+static const char *const  TRANSFORM_FILE_HEADER = "MNI Transform File";
+static const char *const  TYPE_STRING = "Transform_Type";
+static const char *const  LINEAR_TRANSFORM_STRING = "Linear_Transform";
+static const char *const  LINEAR_TYPE = "Linear";
+static const char *const  THIN_PLATE_SPLINE_STRING ="Thin_Plate_Spline_Transform";
+static const char *const  INVERT_FLAG_STRING = "Invert_Flag";
+static const char *const  TRUE_STRING = "True";
+static const char *const  FALSE_STRING = "False";
+static const char *const  N_DIMENSIONS_STRING = "Number_Dimensions";
+static const char *const  POINTS_STRING = "Points";
+static const char *const  DISPLACEMENTS_STRING = "Displacements";
+static const char *const  GRID_TRANSFORM_STRING = "Grid_Transform";
+static const char *const  DISPLACEMENT_VOLUME = "Displacement_Volume";
 
 /* ----------------------------- MNI Header -----------------------------------
 @NAME       : get_default_transform_file_suffix
@@ -47,7 +47,7 @@ static const VIO_STR      DISPLACEMENT_VOLUME = "Displacement_Volume";
 @MODIFIED   :
 ---------------------------------------------------------------------------- */
 
-VIOAPI  VIO_STR  get_default_transform_file_suffix( void )
+VIOAPI  const char *get_default_transform_file_suffix( void )
 {
     return( "xfm" );
 }
@@ -182,7 +182,7 @@ static  void  output_one_transform(
         /*--- write out the volume filename to the transform file */
 /*        if( ! transform->displacement_volume_file )
         {*/
-          volume_filename_length = string_length(prefix_filename) + 100;
+          volume_filename_length = (size_t)string_length(prefix_filename) + 100;
           volume_filename = alloc_string( (size_t)volume_filename_length );
           snprintf( volume_filename, (size_t)volume_filename_length, "%s_grid_%d.mnc", prefix_filename,
                         *volume_count );

@@ -101,7 +101,7 @@
 #define MI_WIDTH_SUFFIX "-width"
 
 /* Epsilon for detecting fillvalues */
-#define FILLVALUE_EPSILON (10.0 * FLT_EPSILON)
+#define FILLVALUE_EPSILON (10.0 * (double)FLT_EPSILON)
 
 
 
@@ -158,12 +158,12 @@
       case MI_PRIV_UNSIGNED : \
          dvalue = MAX(0, dvalue); \
          dvalue = MIN(UCHAR_MAX, dvalue); \
-         *((unsigned char *) ptr) = ROUND(dvalue); \
+         *((unsigned char *) ptr) = (unsigned char)(ROUND(dvalue)); \
          break; \
       case MI_PRIV_SIGNED : \
          dvalue = MAX(SCHAR_MIN, dvalue); \
          dvalue = MIN(SCHAR_MAX, dvalue); \
-         *((signed char *) ptr) = ROUND(dvalue); \
+         *((signed char *) ptr) = (signed char)(ROUND(dvalue)); \
          break; \
       } \
       break; \
@@ -172,12 +172,12 @@
       case MI_PRIV_UNSIGNED : \
          dvalue = MAX(0, dvalue); \
          dvalue = MIN(USHRT_MAX, dvalue); \
-         *((unsigned short *) ptr) = ROUND(dvalue); \
+         *((unsigned short *) ptr) = (unsigned short)(ROUND(dvalue)); \
          break; \
       case MI_PRIV_SIGNED : \
          dvalue = MAX(SHRT_MIN, dvalue); \
          dvalue = MIN(SHRT_MAX, dvalue); \
-         *((signed short *) ptr) = ROUND(dvalue); \
+         *((signed short *) ptr) = (signed short)(ROUND(dvalue)); \
          break; \
       } \
       break; \
@@ -186,18 +186,18 @@
       case MI_PRIV_UNSIGNED : \
          dvalue = MAX(0, dvalue); \
          dvalue = MIN(UINT_MAX, dvalue); \
-         *((unsigned int *) ptr) = ROUND(dvalue); \
+         *((unsigned int *) ptr) = (unsigned int)(ROUND(dvalue)); \
          break; \
       case MI_PRIV_SIGNED : \
          dvalue = MAX(INT_MIN, dvalue); \
          dvalue = MIN(INT_MAX, dvalue); \
-         *((signed int *) ptr) = ROUND(dvalue); \
+         *((signed int *) ptr) = (signed int)(ROUND(dvalue)); \
          break; \
       } \
       break; \
    case NC_FLOAT : \
-      dvalue = MAX(-FLT_MAX,dvalue); \
-      *((float *) ptr) = MIN(FLT_MAX,dvalue); \
+      dvalue = MAX((double)-FLT_MAX,dvalue); \
+      *((float *) ptr) = (float)(MIN((double)FLT_MAX,dvalue)); \
       break; \
    case NC_DOUBLE : \
       *((double *) ptr) = dvalue; \

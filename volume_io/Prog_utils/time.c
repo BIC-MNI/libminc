@@ -168,13 +168,13 @@ VIOAPI  VIO_Real  current_realtime_seconds( void )
 ---------------------------------------------------------------------------- */
 
 VIOAPI  VIO_STR  format_time(
-    VIO_STR   format,
+    const char   *format,
     VIO_Real     seconds )
 {
     int      i;
-    static   char   *units[] = { "us", "ms", "sec", "min", "hrs",
-                                 "days", "years"
-                               };
+    static   const char   *units[] = { "us", "ms", "sec", "min", "hrs",
+                                       "days", "years"
+                                     };
     static   VIO_Real   scales[] = { 1000.0, 1000.0, 60.0, 60.0, 24.0, 365.0 };
     char     buffer[VIO_EXTREMELY_LARGE_STRING_SIZE];
     VIO_BOOL  negative;

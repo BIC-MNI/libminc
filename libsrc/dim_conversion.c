@@ -213,6 +213,8 @@ PRIVATE int MI_icv_get_dim(mi_icv_type *icvp, int cdfid, int varid)
    int subsc[MI_MAX_IMGDIMS]; /* Subscripts for fastest image dims */
    int dimvid[MI_MAX_IMGDIMS]; /* Variable ids for dimensions */
 
+   (void)varid;
+
    MI_SAVE_ROUTINE_NAME("MI_icv_get_dim");
 
    /* Check that the variable has at least icvp->user_num_imgdims dimensions */
@@ -384,16 +386,16 @@ PRIVATE int MI_get_dim_scale(mi_icv_type *icvp, int cdfid, int dimvid[])
          /* If growing */
          if (icvp->derv_dim_grow[idim]) {
             /* Get scale so that whole image fits in user array */
-            icvp->derv_dim_scale[idim] =
-               icvp->user_dim_size[idim] / icvp->var_dim_size[idim];
+            icvp->derv_dim_scale[idim] = (int)
+               (icvp->user_dim_size[idim] / icvp->var_dim_size[idim]);
          }
 
          /* Otherwise, shrinking. Things are complicated by the fact that
             the external variable must fit completely in the user's array */
          else {
 
-            icvp->derv_dim_scale[idim] = 1 +
-               (icvp->var_dim_size[idim] - 1) / icvp->user_dim_size[idim];
+            icvp->derv_dim_scale[idim] = (int)(1 +
+               (icvp->var_dim_size[idim] - 1) / icvp->user_dim_size[idim]);
          }
       }           /* if user wants resizing */
 
@@ -442,7 +444,7 @@ PRIVATE int MI_get_dim_scale(mi_icv_type *icvp, int cdfid, int dimvid[])
       /* If growing */
       if (icvp->derv_dim_grow[idim]) {
          /* Calculate remainder and split it in half */
-         icvp->derv_dim_off[idim] =
+         icvp->derv_dim_off[idim] = (int)
             ( user_dim_size -
              icvp->var_dim_size[idim] * icvp->derv_dim_scale[idim] )
                                       / 2;
@@ -451,7 +453,7 @@ PRIVATE int MI_get_dim_scale(mi_icv_type *icvp, int cdfid, int dimvid[])
          the external variable must fit completely in the user's array */
       else {
          /* Calculate remainder and split it in half */
-         icvp->derv_dim_off[idim] =
+         icvp->derv_dim_off[idim] = (int)
             ( user_dim_size - 1 -
              (icvp->var_dim_size[idim] - 1)
                               / icvp->derv_dim_scale[idim] ) / 2 ;

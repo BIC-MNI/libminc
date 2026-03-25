@@ -171,8 +171,11 @@ extern "C" {
 #endif /* __cplusplus */
 
 
+/* milog_init and milog_set_verbosity are declared in minc.h as MNCAPI */
+#ifndef MINC_H
 void milog_init(const char *);
 int milog_set_verbosity(int);
+#endif
 
 int milog_message(mimsgcode_t code, ...);
 int mi2log_message(const char *file,int line, mimsgcode_t code, ...);

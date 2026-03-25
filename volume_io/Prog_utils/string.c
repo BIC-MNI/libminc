@@ -17,7 +17,7 @@
 
 #include  <internal_volume_io.h>
 
-static const  VIO_STR  empty_string = "";
+static const char *const  empty_string = "";
 
 VIOAPI  VIO_STR  alloc_string(
     size_t   length )
@@ -52,8 +52,8 @@ VIOAPI  void  delete_string(
 }
 
 VIOAPI  VIO_STR  concat_strings(
-    VIO_STR   str1,
-    VIO_STR   str2 )
+    const char   *str1,
+    const char   *str2 )
 {
     VIO_STR  str;
 
@@ -98,7 +98,7 @@ VIOAPI  void  concat_char_to_string(
 
 VIOAPI  void  concat_to_string(
     VIO_STR   *string,
-    VIO_STR   str2 )
+    const char   *str2 )
 {
     VIO_STR  new_string;
 
@@ -171,8 +171,8 @@ VIOAPI  char  get_upper_case(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  VIO_BOOL  string_ends_in(
-    VIO_STR   string,
-    VIO_STR   ending )
+    const char   *string,
+    const char   *ending )
 {
     int      len_string, len_ending;
     VIO_BOOL  ending_present;
@@ -204,7 +204,7 @@ VIOAPI  VIO_BOOL  string_ends_in(
 ---------------------------------------------------------------------------- */
 
 VIOAPI    VIO_STR   strip_outer_blanks(
-    VIO_STR  str )
+    const char  *str )
 {
     VIO_STR  stripped;
     int  i, first_non_blank, last_non_blank, len;
@@ -257,7 +257,7 @@ VIOAPI    VIO_STR   strip_outer_blanks(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  int  find_character(
-    VIO_STR    string,
+    const char    *string,
     char      ch )
 {
     int   i;
@@ -317,7 +317,7 @@ VIOAPI  void  make_string_upper_case(
 ---------------------------------------------------------------------------- */
 
 VIOAPI  VIO_BOOL  blank_string(
-    VIO_STR   string )
+    const char   *string )
 {
     int      i;
     VIO_BOOL  blank;

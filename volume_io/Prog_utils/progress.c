@@ -62,7 +62,7 @@ VIOAPI  void  initialize_progress_report(
     VIO_progress_struct   *progress,
     VIO_BOOL           one_line_only,
     int               n_steps,
-    VIO_STR            title )
+    const char         *title )
 {
     progress->force_one_line = one_line_only;
     progress->first_msg_displayed = FALSE;

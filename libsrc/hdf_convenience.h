@@ -45,9 +45,7 @@ extern int hdf_dimrename(int fd, int dimid, const char *new_name);
 
 extern herr_t hdf_copy_attr(hid_t in_id, const char *attr_name, void *op_data);
 
-extern int hdf_open(const char *path, int mode);
-extern int hdf_create(const char *path, int mode, struct mi2opts *opts_ptr);
-extern int hdf_close(int fd);
+/* hdf_open, hdf_create, hdf_close are declared in minc_routines.h */
 extern int hdf_access(const char *path);
 extern int hdf_flush(int fd);
 

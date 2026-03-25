@@ -99,7 +99,7 @@ swapFloat(float f)
 
   sl.f = f;
 
-  sl.i = ntohl(sl.i);
+  sl.i = (int)ntohl((uint32_t)sl.i);
 
   return sl.f;
 }
@@ -120,9 +120,9 @@ input_next_slice(
   size_t n_bytes_per_voxel;
   znzFile fp = (znzFile) in_ptr->volume_file;
 
-  n_bytes_per_voxel = get_type_size(in_ptr->file_data_type);
-  n_voxels_in_slice = (in_ptr->sizes_in_file[0] *
-                       in_ptr->sizes_in_file[1]);
+  n_bytes_per_voxel = (size_t)get_type_size(in_ptr->file_data_type);
+  n_voxels_in_slice = ((size_t)in_ptr->sizes_in_file[0] *
+                       (size_t)in_ptr->sizes_in_file[1]);
   if (znzread(in_ptr->generic_slice_buffer,
               n_bytes_per_voxel,
               n_voxels_in_slice,

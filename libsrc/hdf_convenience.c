@@ -202,14 +202,14 @@ hdf_var_add(struct m2_file *file, const char *name, const char *path,
       new->fspc_id = H5Dget_space(new->dset_id);
       new->ndims = ndims;
       if (ndims != 0) {
-          new->dims = (hsize_t *) malloc(sizeof (hsize_t) * ndims);
+          new->dims = (hsize_t *) malloc(sizeof (hsize_t) * (size_t)ndims);
           if (new->dims != NULL) {
             int i;
             for (i = 0; i < ndims; i++) {
               new->dims[i] = dims[i];
             }
           } else {
-            MI_LOG_ERROR(MI_MSG_OUTOFMEM, sizeof(hsize_t) * ndims);
+            MI_LOG_ERROR(MI_MSG_OUTOFMEM, sizeof(hsize_t) * (size_t)ndims);
           }
       }
       else {
@@ -370,8 +370,8 @@ hdf_get_diminfo(hid_t dst_id, int *ndims, hsize_t dims[])
 static int
 hdf_size(hid_t spc_id, hid_t typ_id)
 {
-    int typ_size = H5Tget_size(typ_id);
-    int spc_size = H5Sget_simple_extent_npoints(spc_id);
+    int typ_size = (int)H5Tget_size(typ_id);
+    int spc_size = (int)H5Sget_simple_extent_npoints(spc_id);
 
     if (typ_size <= 0 || spc_size <= 0) {
 	MI_LOG_ERROR(MI_MSG_SNH);
@@ -455,10 +455,10 @@ hdf_attname(int fd, int varid, int attnum, char *name)
     }
 
     H5E_BEGIN_TRY {
-        att_id = H5Aopen_idx(loc_id, attnum);
+        att_id = H5Aopen_idx(loc_id, (unsigned int)attnum);
     } H5E_END_TRY;
     if (att_id >= 0) {
-        status = H5Aget_name(att_id, MAX_NC_NAME, name);
+        status = (int)H5Aget_name(att_id, MAX_NC_NAME, name);
         H5Aclose(att_id);
     }
     else {
@@ -578,10 +578,10 @@ hdf_attinq(int fd, int varid, const char *attnm, nc_type *type_ptr,
 
       if (length_ptr != NULL) {
         if (typ_class == H5T_STRING) {
-          *length_ptr = typ_size;
+          *length_ptr = (int)typ_size;
         }
         else {
-          *length_ptr = H5Sget_simple_extent_npoints(spc_id);
+          *length_ptr = (int)H5Sget_simple_extent_npoints(spc_id);
         }
       }
 
@@ -667,7 +667,7 @@ hdf_get_dimorder(struct m2_file *file, hid_t dst_id, int ndims, int *dims_ptr)
     }
     typ_id = H5Aget_type(att_id);
 
-    length = H5Tget_size(typ_id);
+    length = (int)H5Tget_size(typ_id);
     if (length > NC_MAX_NAME) {
         return (MI_ERROR);
     }
@@ -876,6 +876,9 @@ hdf_varinq(int fd, int varid, char *varnm_ptr, nc_type *type_ptr,
 int
 hdf_dimrename(int fd, int dimid, const char *new_name)
 {
+    (void)fd;
+    (void)dimid;
+    (void)new_name;
     MI_LOG_ERROR(MI_MSG_NOTIMPL, "dimrename");
     return (MI_NOERROR);
 }
@@ -930,6 +933,8 @@ hdf_set_length(hid_t dst_id, const char *dimnm, unsigned long length)
     hid_t att_id;
     hid_t aspc_id;
 
+    (void)dimnm;
+
     aspc_id = H5Screate(H5S_SCALAR);
     if (aspc_id >= 0) {
       H5E_BEGIN_TRY {
@@ -958,7 +963,7 @@ hdf_dimdef(int fd, const char *dimnm, long length)
         (dim = hdf_dim_add(file, dimnm, length)) != NULL) {
         struct m2_var *var = hdf_var_byname(file, dimnm);
         if (var != NULL) {
-            hdf_set_length(var->dset_id, dimnm, length);
+            hdf_set_length(var->dset_id, dimnm, (unsigned long)length);
         }
         status = dim->id;
     }
@@ -1147,7 +1152,7 @@ hdf_attput(int fd, int varid, const char *attnm, nc_type val_typ,
 
     if (val_typ == NC_CHAR) {
         ftyp_id = H5Tcopy(H5T_C_S1);
-        H5Tset_size(ftyp_id, val_len);
+        H5Tset_size(ftyp_id, (size_t)val_len);
         mtyp_id = H5Tcopy(ftyp_id);
         spc_id = H5Screate(H5S_SCALAR);
     }
@@ -1185,7 +1190,7 @@ hdf_attput(int fd, int varid, const char *attnm, nc_type val_typ,
             spc_id = H5Screate(H5S_SCALAR);
         }
         else {
-            hsize_t temp_size = val_len;
+            hsize_t temp_size = (hsize_t)val_len;
             spc_id = H5Screate_simple(1, &temp_size, NULL);
 
         }
@@ -1322,7 +1327,7 @@ hdf_vardef(int fd, const char *varnm, nc_type vartype, int ndims,
         if (status < 0) {
           return (status);
         }
-        dims[i] = length;
+        dims[i] = (hsize_t)length;
       }
 
     spc_id = H5Screate_simple(ndims, dims, NULL);
@@ -1367,13 +1372,13 @@ hdf_vardef(int fd, const char *varnm, nc_type vartype, int ndims,
                compression ratio, often better than gzip. */
 
             hsize_t val = 1;
-            int unit_size = nctypelen( vartype );
+            hsize_t unit_size = (hsize_t)nctypelen( vartype );
             for( i = ndims-1; i >= 0; i-- ) {
-                if( MI_MAX_VAR_BUFFER_SIZE > dims[i] * val * unit_size ) {
+                if( (hsize_t)MI_MAX_VAR_BUFFER_SIZE > dims[i] * val * unit_size ) {
                     chkdims[i] = dims[i];
                 } else {
                     chkdims[i] = MIN( dims[i],
-                                      (hsize_t)( MI_MAX_VAR_BUFFER_SIZE / ( val * unit_size ) ) );
+                                      (hsize_t)( (hsize_t)MI_MAX_VAR_BUFFER_SIZE / ( val * unit_size ) ) );
                 }
                 val *= chkdims[i];
             }
@@ -1381,12 +1386,12 @@ hdf_vardef(int fd, const char *varnm, nc_type vartype, int ndims,
             for (i = 0; i < ndims; i++) {
                 if( chunk_length >= MI2_CHUNK_MIN_SIZE ) {
                     if( chkdims[i] > (hsize_t)chunk_length ) {
-                        chkdims[i] = chunk_length;
+                        chkdims[i] = (hsize_t)chunk_length;
                     }
                 }
             }
 
-            H5Pset_deflate(prp_id, comp_level);
+            H5Pset_deflate(prp_id, (unsigned int)comp_level);
             H5Pset_chunk(prp_id, ndims, chkdims);
 
             if ( file->checksum ) {
@@ -1418,7 +1423,7 @@ hdf_vardef(int fd, const char *varnm, nc_type vartype, int ndims,
      * attribute now.
      */
     if ((dim = hdf_dim_byname(file, varnm)) != NULL) {
-        hdf_set_length(dst_id, varnm, dim->length);
+        hdf_set_length(dst_id, varnm, (unsigned long)dim->length);
     }
 
     /* Add the dimension order information.
@@ -1534,8 +1539,8 @@ hdf_varget(int fd, int varid, const long *start_ptr, const long *length_ptr,
   }
   else {
     for (i = 0; i < ndims; i++) {
-      fstart[i] = start_ptr[i];
-      count[i] = length_ptr[i];
+      fstart[i] = (hsize_t)start_ptr[i];
+      count[i] = (hsize_t)length_ptr[i];
     }
 
     status = H5Sselect_hyperslab(fspc_id, H5S_SELECT_SET, fstart, NULL, count,
@@ -1633,7 +1638,7 @@ hdf_varputg(int fd, int varid, const long *start,
 	}
     }
 
-    mystart = (hsize_t *)calloc(varp->ndims * 7, sizeof(hsize_t));
+    mystart = (hsize_t *)calloc((size_t)varp->ndims * 7, sizeof(hsize_t));
     if (mystart == NULL) {
         goto cleanup;
     }
@@ -1649,7 +1654,7 @@ hdf_varputg(int fd, int varid, const long *start,
      * Initialize I/O parameters.
      */
     for (idim = maxidim; idim >= 0; --idim) {
-	mystart[idim] = start != NULL ? start[idim] : 0;
+	mystart[idim] = start != NULL ? (hsize_t)start[idim] : 0;
 
 	/* Hmm - should this even _BE_ here? */
 	if (edges[idim] == 0) {
@@ -1658,7 +1663,7 @@ hdf_varputg(int fd, int varid, const long *start,
 	}
 
 	if (edges != NULL) {
-	    myedges[idim] = edges[idim];
+	    myedges[idim] = (hsize_t)edges[idim];
 	}
 	else {
 	    myedges[idim] = varp->dims[idim] - mystart[idim];
@@ -1682,8 +1687,8 @@ hdf_varputg(int fd, int varid, const long *start,
 	}
 
 	iocount[idim] = 1;
-	length[idim] = mymap[idim] * myedges[idim];
-	stop[idim] = mystart[idim] + myedges[idim] * mystride[idim];
+	length[idim] = (hsize_t)(mymap[idim] * (ptrdiff_t)myedges[idim]);
+	stop[idim] = mystart[idim] + (hsize_t)((ptrdiff_t)myedges[idim] * mystride[idim]);
     }
 
     /*
@@ -1740,9 +1745,9 @@ hdf_varputg(int fd, int varid, const long *start,
 	idim = maxidim;
     carry:
 	value = ((const char *)value) + mymap[idim];
-	mystart[idim] += mystride[idim];
+	mystart[idim] += (hsize_t)mystride[idim];
 	if (mystart[idim] == stop[idim]) {
-	    mystart[idim] = start[idim];
+	    mystart[idim] = (hsize_t)start[idim];
 	    value = ((const char *)value) - length[idim];
 	    if (--idim < 0)
 		break; /* normal return */
@@ -1810,7 +1815,7 @@ hdf_vargetg(int fd, int varid, const long *start,
 	}
     }
 
-    mystart = (long *)calloc(varp->ndims * 7, sizeof(long));
+    mystart = (long *)calloc((size_t)varp->ndims * 7, sizeof(long));
     if (mystart == NULL) {
 	return (MI_ERROR);
     }
@@ -1837,7 +1842,7 @@ hdf_vargetg(int fd, int varid, const long *start,
 	    myedges[idim] = edges[idim];
 	}
 	else {
-	    myedges[idim] = varp->dims[idim] - mystart[idim];
+	    myedges[idim] = (long)varp->dims[idim] - mystart[idim];
 	}
 
 	if (stride != NULL) {
@@ -1957,8 +1962,8 @@ hdf_varput(int fd, int varid, const long *start_ptr, const long *length_ptr,
   }
   else {
     for (i = 0; i < ndims; i++) {
-      fstart[i] = start_ptr[i];
-      count[i] = length_ptr[i];
+      fstart[i] = (hsize_t)start_ptr[i];
+      count[i] = (hsize_t)length_ptr[i];
     }
 
     status = H5Sselect_hyperslab(fspc_id, H5S_SELECT_SET, fstart, NULL, count,
@@ -2069,7 +2074,7 @@ hdf_varsize(int fd, int varid, long *size_ptr)
     H5Sget_simple_extent_dims(var->fspc_id, dims, NULL);
 
     for (i = 0; i < var->ndims; i++) {
-        size_ptr[i] = dims[i];
+        size_ptr[i] = (long)dims[i];
     }
     return (MI_NOERROR);
 }
@@ -2103,7 +2108,7 @@ herr_t hdf_copy_attr(hid_t in_id, const char *attr_name, void *op_data)
      goto cleanup;
    }
 
-   if ((val_ptr = malloc(hdf_size(spc_id, typ_id))) == NULL)
+   if ((val_ptr = malloc((size_t)hdf_size(spc_id, typ_id))) == NULL)
      goto cleanup;
 
    if (H5Aread(inatt_id, typ_id, val_ptr) < 0)
@@ -2135,7 +2140,7 @@ herr_t hdf_copy_attr(hid_t in_id, const char *attr_name, void *op_data)
 }
 
 static int
-hdf_open_dsets(struct m2_file *file, hid_t grp_id, char *cpath, int is_dim)
+hdf_open_dsets(struct m2_file *file, hid_t grp_id, const char *cpath, int is_dim)
 {
     hsize_t nobjs;
     hsize_t idx;
@@ -2225,7 +2230,7 @@ hdf_open(const char *path, int mode)
     H5Pset_libver_bounds (fpid, H5F_LIBVER_V18, H5F_LIBVER_V18);
 
     /*setup a bigger cache to work with typical chunking ( MI_MAX_VAR_BUFFER_SIZE )*/
-    H5Pset_cache(fpid, 0, 2503, miget_cfg_present(MICFG_MINC_FILE_CACHE)?miget_cfg_int(MICFG_MINC_FILE_CACHE)*100000:MI_MAX_VAR_BUFFER_SIZE*10, 1.0);
+    H5Pset_cache(fpid, 0, 2503, miget_cfg_present(MICFG_MINC_FILE_CACHE)?(size_t)miget_cfg_int(MICFG_MINC_FILE_CACHE)*100000:(size_t)MI_MAX_VAR_BUFFER_SIZE*10, 1.0);
 
     H5E_BEGIN_TRY {
 #ifdef HDF5_MMAP_TEST
@@ -2235,14 +2240,14 @@ hdf_open(const char *path, int mode)
             prp_id = H5Pcreate(H5P_FILE_ACCESS);
             H5Pset_libver_bounds (prp_id, H5F_LIBVER_V18, H5F_LIBVER_V18);
             H5Pset_fapl_mmap(prp_id, 8192, 1);
-            file_id = H5Fopen(path, mode & 0x7FFF, prp_id);
+            file_id = H5Fopen(path, (unsigned int)(mode & 0x7FFF), prp_id);
             H5Pclose(prp_id);
         }
         else {
-            file_id = H5Fopen(path, mode, fpid);
+            file_id = H5Fopen(path, (unsigned int)mode, fpid);
         }
 #else
-        file_id = H5Fopen(path, mode, fpid);
+        file_id = H5Fopen(path, (unsigned int)mode, fpid);
 #endif
     } H5E_END_TRY;
     H5Pclose( fpid );
@@ -2252,7 +2257,7 @@ hdf_open(const char *path, int mode)
     }
 
     file = hdf_id_add(file_id);	/* Add it to the list */
-    file->wr_ok = (mode & H5F_ACC_RDWR) != 0;
+    file->wr_ok = ((unsigned int)mode & H5F_ACC_RDWR) != 0;
 
     /* Open the image variables.
      */
@@ -2274,7 +2279,7 @@ hdf_open(const char *path, int mode)
                     struct m2_dim *dim = hdf_dim_add(file, MIvector_dimension,
                                                      H5Tget_nmembers(type_id));
                     dim->is_fake = 1;
-                    dims[ndims++] = H5Tget_nmembers(type_id);
+                    dims[ndims++] = (hsize_t)H5Tget_nmembers(type_id);
                     is_compound = 1;
                 }
                 H5Tclose(type_id);
@@ -2336,7 +2341,7 @@ hdf_create(const char *path, int cmode, struct mi2opts *opts_ptr)
     H5Pset_libver_bounds (fpid, H5F_LIBVER_V18, H5F_LIBVER_V18);
 
     /*setup a bigger cache to work with typical chunking ( MI_MAX_VAR_BUFFER_SIZE )*/
-    H5Pset_cache(fpid, 0, 2503, miget_cfg_present(MICFG_MINC_FILE_CACHE)?miget_cfg_int(MICFG_MINC_FILE_CACHE)*100000:MI_MAX_VAR_BUFFER_SIZE*10, 1.0);
+    H5Pset_cache(fpid, 0, 2503, miget_cfg_present(MICFG_MINC_FILE_CACHE)?(size_t)miget_cfg_int(MICFG_MINC_FILE_CACHE)*100000:(size_t)MI_MAX_VAR_BUFFER_SIZE*10, 1.0);
 
     /* Convert the MINC (NetCDF) mode to a HDF5 mode.
      */
@@ -2348,7 +2353,7 @@ hdf_create(const char *path, int cmode, struct mi2opts *opts_ptr)
     }
 
     H5E_BEGIN_TRY {
-        file_id = H5Fcreate(path, cmode, H5P_DEFAULT, fpid);
+        file_id = H5Fcreate(path, (unsigned int)cmode, H5P_DEFAULT, fpid);
     } H5E_END_TRY;
     if (file_id < 0) {
       fprintf(stderr, "Error creating HDF file '%s' with mode '%x', result %d\n", path, cmode, (int)file_id);

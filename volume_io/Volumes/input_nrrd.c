@@ -148,7 +148,7 @@ typedef struct nrrd_header {
  * replaced with ASCII NUL ('\0') characters.
  * \param str_ptr The string to modify.
  */
-void
+static void
 rstrip(char *str_ptr)
 {
   char *p = str_ptr;
@@ -853,7 +853,7 @@ nrrd_read_buffer(nrrd_header_t nrrd_ptr, unsigned char *data_ptr,
    */
   if ( nrrd_ptr->endian != nrrd_get_system_endian() )
   {
-    int i;
+    int bi;
     unsigned char temp;
 
     switch (nrrd_type_to_size( nrrd_ptr->type ))
@@ -863,41 +863,41 @@ nrrd_read_buffer(nrrd_header_t nrrd_ptr, unsigned char *data_ptr,
       break;
 
     case 2:
-      for (i = 0; i < (int) n_bytes_read; i += 2)
+      for (bi = 0; bi < (int) n_bytes_read; bi += 2)
       {
-        temp = data_ptr[i + 0];
-        data_ptr[i + 0] = data_ptr[i + 1];
-        data_ptr[i + 1] = temp;
+        temp = data_ptr[bi + 0];
+        data_ptr[bi + 0] = data_ptr[bi + 1];
+        data_ptr[bi + 1] = temp;
       }
       break;
 
     case 4:
-      for (i = 0; i < (int) n_bytes_read; i += 4)
+      for (bi = 0; bi < (int) n_bytes_read; bi += 4)
       {
-        temp = data_ptr[i + 0];
-        data_ptr[i + 0] = data_ptr[i + 3];
-        data_ptr[i + 3] = temp;
-        temp = data_ptr[i + 1];
-        data_ptr[i + 1] = data_ptr[i + 2];
-        data_ptr[i + 2] = temp;
+        temp = data_ptr[bi + 0];
+        data_ptr[bi + 0] = data_ptr[bi + 3];
+        data_ptr[bi + 3] = temp;
+        temp = data_ptr[bi + 1];
+        data_ptr[bi + 1] = data_ptr[bi + 2];
+        data_ptr[bi + 2] = temp;
       }
       break;
 
     case 8:
-      for (i = 0; i < (int) n_bytes_read; i += 8)
+      for (bi = 0; bi < (int) n_bytes_read; bi += 8)
       {
-        temp = data_ptr[i + 0];
-        data_ptr[i + 0] = data_ptr[i + 7];
-        data_ptr[i + 7] = temp;
-        temp = data_ptr[i + 1];
-        data_ptr[i + 1] = data_ptr[i + 6];
-        data_ptr[i + 6] = temp;
-        temp = data_ptr[i + 2];
-        data_ptr[i + 2] = data_ptr[i + 5];
-        data_ptr[i + 5] = temp;
-        temp = data_ptr[i + 3];
-        data_ptr[i + 3] = data_ptr[i + 4];
-        data_ptr[i + 4] = temp;
+        temp = data_ptr[bi + 0];
+        data_ptr[bi + 0] = data_ptr[bi + 7];
+        data_ptr[bi + 7] = temp;
+        temp = data_ptr[bi + 1];
+        data_ptr[bi + 1] = data_ptr[bi + 6];
+        data_ptr[bi + 6] = temp;
+        temp = data_ptr[bi + 2];
+        data_ptr[bi + 2] = data_ptr[bi + 5];
+        data_ptr[bi + 5] = temp;
+        temp = data_ptr[bi + 3];
+        data_ptr[bi + 3] = data_ptr[bi + 4];
+        data_ptr[bi + 4] = temp;
       }
       break;
 
@@ -1799,7 +1799,7 @@ initialize_nrrd_format_input(VIO_STR             filename,
   in_ptr->volume_file = (FILE *) fp;
   in_ptr->header_info = nrrd_ptr;
   in_ptr->generic_slice_buffer = malloc((size_t)n_voxels_in_slice *
-                                        nrrd_type_to_size(nrrd_ptr->type));
+                                        (size_t)nrrd_type_to_size(nrrd_ptr->type));
   if (in_ptr->generic_slice_buffer == NULL)
   {
     print_error("ERROR allocating slice buffer.\n");

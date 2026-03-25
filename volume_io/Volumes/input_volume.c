@@ -129,7 +129,7 @@ VIOAPI  VIO_Status  start_volume_input(
             n_dimensions = VIO_MAX_DIMENSIONS;
         }
 
-        if( dim_names == (VIO_STR *) NULL )
+        if( dim_names == NULL )
             dim_names = get_default_dim_names( n_dimensions );
 
         *volume = create_volume( n_dimensions, dim_names, volume_nc_data_type,

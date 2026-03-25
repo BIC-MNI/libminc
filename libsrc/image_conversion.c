@@ -176,7 +176,7 @@
 /* Private functions */
 PRIVATE int MI_icv_get_type(mi_icv_type *icvp, int cdfid, int varid);
 PRIVATE int MI_icv_get_vrange(mi_icv_type *icvp, int cdfid, int varid);
-PRIVATE double MI_get_default_range(char *what, nc_type datatype, int sign);
+PRIVATE double MI_get_default_range(const char *what, nc_type datatype, int sign);
 PRIVATE int MI_icv_get_norm(mi_icv_type *icvp, int cdfid, int varid);
 PRIVATE int MI_icv_access(int operation, mi_icv_type *icvp, long start[],
                           long count[], void *values);
@@ -396,7 +396,7 @@ MNCAPI int miicv_setdbl(int icvid, int icv_property, double value)
                                                icvp->user_sign);
       break;
    case MI_ICV_DO_RANGE:
-      icvp->user_do_range = value;
+      icvp->user_do_range = (int)value;
       break;
    case MI_ICV_VALID_MAX:
       icvp->user_vmax   = value;
@@ -405,10 +405,10 @@ MNCAPI int miicv_setdbl(int icvid, int icv_property, double value)
       icvp->user_vmin   = value;
       break;
    case MI_ICV_DO_NORM:
-      icvp->user_do_norm = value;
+      icvp->user_do_norm = (int)value;
       break;
    case MI_ICV_USER_NORM:
-      icvp->user_user_norm = value;
+      icvp->user_user_norm = (int)value;
       break;
    case MI_ICV_IMAGE_MAX:
       icvp->user_imgmax = value;
@@ -417,34 +417,34 @@ MNCAPI int miicv_setdbl(int icvid, int icv_property, double value)
       icvp->user_imgmin = value;
       break;
    case MI_ICV_DO_FILLVALUE:
-      icvp->user_do_fillvalue = value;
+      icvp->user_do_fillvalue = (int)value;
       break;
    case MI_ICV_FILLVALUE:
       icvp->user_fillvalue = value;
       break;
    case MI_ICV_DO_DIM_CONV:
-      icvp->user_do_dimconv = value;
+      icvp->user_do_dimconv = (int)value;
       break;
    case MI_ICV_DO_SCALAR:
-      icvp->user_do_scalar = value;
+      icvp->user_do_scalar = (int)value;
       break;
    case MI_ICV_XDIM_DIR:
-      ival = value;
+      ival = (int)value;
       icvp->user_xdim_dir = ((ival==MI_ICV_POSITIVE) ||
                              (ival==MI_ICV_NEGATIVE)) ? ival : MI_ICV_ANYDIR;
       break;
    case MI_ICV_YDIM_DIR:
-      ival = value;
+      ival = (int)value;
       icvp->user_ydim_dir = ((ival==MI_ICV_POSITIVE) ||
                              (ival==MI_ICV_NEGATIVE)) ? ival : MI_ICV_ANYDIR;
       break;
    case MI_ICV_ZDIM_DIR:
-      ival = value;
+      ival = (int)value;
       icvp->user_zdim_dir = ((ival==MI_ICV_POSITIVE) ||
                              (ival==MI_ICV_NEGATIVE)) ? ival : MI_ICV_ANYDIR;
       break;
    case MI_ICV_NUM_IMGDIMS:
-      ival = value;
+      ival = (int)value;
       if ((ival<0) || (ival>MI_MAX_IMGDIMS)) {
           MI_LOG_ERROR(MI_MSG_BADPROP, _("MI_ICV_NUM_IMGDIMS out of range"));
          MI_RETURN(MI_ERROR);
@@ -452,13 +452,13 @@ MNCAPI int miicv_setdbl(int icvid, int icv_property, double value)
       icvp->user_num_imgdims = ival;
       break;
    case MI_ICV_ADIM_SIZE:
-      icvp->user_dim_size[0] = value;
+      icvp->user_dim_size[0] = (long)value;
       break;
    case MI_ICV_BDIM_SIZE:
-      icvp->user_dim_size[1] = value;
+      icvp->user_dim_size[1] = (long)value;
       break;
    case MI_ICV_KEEP_ASPECT:
-      icvp->user_keep_aspect = value;
+      icvp->user_keep_aspect = (int)value;
       break;
    case MI_ICV_SIGN:
    case MI_ICV_MAXVAR:
@@ -472,7 +472,7 @@ MNCAPI int miicv_setdbl(int icvid, int icv_property, double value)
       if ((icv_property>=MI_ICV_DIM_SIZE) &&
           (icv_property<MI_ICV_DIM_SIZE+MI_MAX_IMGDIMS)) {
          idim = icv_property - MI_ICV_DIM_SIZE;
-         icvp->user_dim_size[idim] = value;
+         icvp->user_dim_size[idim] = (long)value;
       }
       else {
           MI_LOG_ERROR(MI_MSG_BADPROP, "Unknown code");
@@ -700,9 +700,9 @@ MNCAPI int miicv_inqdbl(int icvid, int icv_property, double *value)
    case MI_ICV_VARID:
       *value = icvp->varid; break;
    case MI_ICV_ADIM_SIZE:
-      *value = icvp->user_dim_size[0]; break;
+      *value = (double)icvp->user_dim_size[0]; break;
    case MI_ICV_BDIM_SIZE:
-      *value = icvp->user_dim_size[1]; break;
+      *value = (double)icvp->user_dim_size[1]; break;
    case MI_ICV_ADIM_STEP:
       *value = icvp->derv_dim_step[0]; break;
    case MI_ICV_BDIM_STEP:
@@ -725,7 +725,7 @@ MNCAPI int miicv_inqdbl(int icvid, int icv_property, double *value)
       if ((icv_property>=MI_ICV_DIM_SIZE) &&
           (icv_property<MI_ICV_DIM_SIZE+MI_MAX_IMGDIMS)) {
          idim = icv_property - MI_ICV_DIM_SIZE;
-         *value = icvp->user_dim_size[idim];
+         *value = (double)icvp->user_dim_size[idim];
       }
       else if ((icv_property>=MI_ICV_DIM_STEP) &&
                (icv_property<MI_ICV_DIM_STEP+MI_MAX_IMGDIMS)) {
@@ -771,7 +771,7 @@ MNCAPI int miicv_inqint(int icvid, int icv_property, int *value)
        MI_RETURN(MI_ERROR);
    }
 
-   *value = dvalue;
+   *value = (int)dvalue;
 
    MI_RETURN(MI_NOERROR);
 }
@@ -800,7 +800,7 @@ MNCAPI int miicv_inqlong(int icvid, int icv_property, long *value)
        MI_RETURN(MI_ERROR);
    }
 
-   *value = dvalue;
+   *value = (long)dvalue;
 
    MI_RETURN(MI_NOERROR);
 }
@@ -1094,7 +1094,7 @@ PRIVATE int MI_icv_get_vrange(mi_icv_type *icvp, int cdfid, int varid)
 @CREATED    : August 10, 1992 (Peter Neelin)
 @MODIFIED   :
 ---------------------------------------------------------------------------- */
-PRIVATE double MI_get_default_range(char *what, nc_type datatype, int sign)
+PRIVATE double MI_get_default_range(const char *what, nc_type datatype, int sign)
 {
    double range[2];
 
@@ -1141,6 +1141,8 @@ PRIVATE int MI_icv_get_norm(mi_icv_type *icvp, int cdfid, int varid)
    int imm;                   /* Counter for looping through max and min */
    double image_range[2];
    int idim, i;
+
+   (void)varid;
 
    MI_SAVE_ROUTINE_NAME("MI_icv_get_norm");
 
