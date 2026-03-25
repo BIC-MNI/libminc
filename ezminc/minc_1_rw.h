@@ -144,15 +144,15 @@ namespace minc
     {
       if(_last) return !_last;
 
-      for(int i=_ndims-_slice_dimensions-1;i>=0;i--)
+      for(int i=_ndims-static_cast<int>(_slice_dimensions)-1;i>=0;i--)
       {
-        _cur[i]++;
-        if(_cur[i]<static_cast<long>(_info[i].length))
+        _cur[static_cast<size_t>(i)]++;
+        if(_cur[static_cast<size_t>(i)]<static_cast<long>(_info[static_cast<size_t>(i)].length))
           break;
         if(!i)
           _last=true;
         else
-          _cur[i]=0;
+          _cur[static_cast<size_t>(i)]=0;
       }
       return !_last;
     }
@@ -186,7 +186,7 @@ namespace minc
     //! get the number of dimensions in one slice
     int slice_dimensions(void) const
     {
-      return _slice_dimensions;
+      return static_cast<int>(_slice_dimensions);
     }
 
     //! get the current slice index
@@ -199,46 +199,46 @@ namespace minc
     //! ( 0 - vector_dimension, 1 - x, 2- y , 3 -z , 4 - time)
     int ndim(int i) const
     {
-      int j=_map_to_std[i];
-      if(j>=0) return _info[j].length;
+      int j=_map_to_std[static_cast<size_t>(i)];
+      if(j>=0) return static_cast<int>(_info[static_cast<size_t>(j)].length);
       return 0;
     }
     //! get normalized dimension start coordinate (see ndim)
     double nstart(int i) const
     {
-      int j=_map_to_std[i];
-      if(j>=0) return _info[j].start;
+      int j=_map_to_std[static_cast<size_t>(i)];
+      if(j>=0) return _info[static_cast<size_t>(j)].start;
       return 0.0;
     }
 
     //! get normalized dimension spacing  (see ndim)
     double nspacing(int i) const
     {
-      int j=_map_to_std[i];
-      if(j>=0) return _info[j].step;
+      int j=_map_to_std[static_cast<size_t>(i)];
+      if(j>=0) return _info[static_cast<size_t>(j)].step;
       return 0.0;
     }
 
     //! get normalized dimension direction cosine component  (see ndim)
     double ndir_cos(int i,int j) const
     {
-      int k=_map_to_std[i];
-      if(k>=0) return _info[k].dir_cos[j];
+      int k=_map_to_std[static_cast<size_t>(i)];
+      if(k>=0) return _info[static_cast<size_t>(k)].dir_cos[j];
       return 0.0;
     }
 
     //! check if a normalized dimension has direction cosine information
     bool have_dir_cos(int i) const
     {
-      int k=_map_to_std[i];
-      if(k>=0) return _info[k].have_dir_cos;
+      int k=_map_to_std[static_cast<size_t>(i)];
+      if(k>=0) return _info[static_cast<size_t>(k)].have_dir_cos;
       return false;
     }
 
     //! map file dimensions into normalized dimensions
     int map_space(int i)
     {
-      return _map_to_std[i];
+      return _map_to_std[static_cast<size_t>(i)];
     }
 
     //metadate info handling function:

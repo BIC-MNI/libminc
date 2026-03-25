@@ -18,20 +18,20 @@ template<class TPixel> void make_rw_test(const char * filename,int slice_dim,nc_
 
   // generate info
   minc_info info(3);
-  int volume=1.0;
+  size_t volume=1;
 
-  for(int i=0;i<3;i++)
+  for(size_t i=0;i<3;i++)
   {
-    info[i].dim=dim_info::dimensions( dim_info::DIM_X+i);
+    info[i].dim=dim_info::dimensions( dim_info::DIM_X+static_cast<int>(i));
 
     info[i].length=10+i;
-    info[i].step  =i+0.1;
-    info[i].start =i-5.0;
+    info[i].step  =static_cast<double>(i)+0.1;
+    info[i].start =static_cast<double>(i)-5.0;
 
     info[i].have_dir_cos=true;
 
     for(int j=0;j<3;j++)
-      info[i].dir_cos[j]=(i==j?1.0:0.0);
+      info[i].dir_cos[j]=(i==static_cast<size_t>(j)?1.0:0.0);
 
     volume*=info[i].length;
   }
@@ -40,10 +40,10 @@ template<class TPixel> void make_rw_test(const char * filename,int slice_dim,nc_
   std::vector<TPixel> buffer(volume);
 
   if(typeid(TPixel)==typeid(float) || typeid(TPixel)==typeid(double))
-    for(int i=0;i<volume;i++)
-      buffer[i]=static_cast<TPixel>(random())*100.0/RAND_MAX;
+    for(size_t i=0;i<volume;i++)
+      buffer[i]=static_cast<TPixel>(static_cast<double>(random())*100.0/RAND_MAX);
   else
-    for(int i=0;i<volume;i++)
+    for(size_t i=0;i<volume;i++)
       buffer[i]=static_cast<TPixel>(random());
 
 
@@ -52,11 +52,11 @@ template<class TPixel> void make_rw_test(const char * filename,int slice_dim,nc_
   std::vector<short> short_attr(10);
   std::string  string_attr="Test string attribuite";
 
-  for(int i=0;i<10;i++)
+  for(size_t i=0;i<10;i++)
   {
-    double_attr[i]=i+0.1;
-    int_attr[i]=i*100;
-    short_attr[i]=i;
+    double_attr[i]=static_cast<double>(i)+0.1;
+    int_attr[i]=static_cast<int>(i)*100;
+    short_attr[i]=static_cast<short>(i);
   }
 
   //now let's write volume
@@ -103,7 +103,7 @@ template<class TPixel> void make_rw_test(const char * filename,int slice_dim,nc_
   if(string_attr_rd!=string_attr)
     REPORT_ERROR("Mismatched string attribute");
 
-  for(int i=0;i<10;i++)
+  for(size_t i=0;i<10;i++)
   {
     if(double_attr_rd[i]!=double_attr[i])
       REPORT_ERROR("Mismatched double attribute");
@@ -113,7 +113,7 @@ template<class TPixel> void make_rw_test(const char * filename,int slice_dim,nc_
       REPORT_ERROR("Mismatched short attribute");
   }
   // let's compare info
-  for(int i=0;i<3;i++)
+  for(size_t i=0;i<3;i++)
   {
     if(rdr.info()[i].dim!=info[i].dim)
       REPORT_ERROR("Mismatched dimension");
@@ -153,12 +153,12 @@ template<class TPixel> void make_rw_test(const char * filename,int slice_dim,nc_
 
   if(max_diff==0.0)
   {
-    for(int i=0;i<volume;i++)
+    for(size_t i=0;i<volume;i++)
       if(buffer[i]!=in_buffer[i])
         REPORT_ERROR("Data mismatched!");
   } else { //ALLOW rounding error
-    for(int i=0;i<volume;i++)
-      if(fabs((double)(buffer[i]-in_buffer[i]))>max_diff)
+    for(size_t i=0;i<volume;i++)
+      if(fabs(static_cast<double>(buffer[i]-in_buffer[i]))>max_diff)
       {
         std::cerr<<"Expected:"<<buffer[i]<<" got:"<<in_buffer[i]<<" @ "<<i<<std::endl;
         REPORT_ERROR("Data mismatched too much!");

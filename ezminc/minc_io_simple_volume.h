@@ -162,7 +162,7 @@ namespace minc
 
       simple_volume(int sx,int sy,int sz):_vol(0)
       {
-        _size=IDX<size_t>(sx,sy,sz);
+        _size=IDX<size_t>(static_cast<size_t>(sx),static_cast<size_t>(sy),static_cast<size_t>(sz));
         _allocate();
       }
 
@@ -174,7 +174,7 @@ namespace minc
 
       explicit simple_volume(const idx_i& s):_vol(0)
       {
-        _size=IDX<size_t>(s[0],s[1],s[2]);
+        _size=IDX<size_t>(static_cast<size_t>(s[0]),static_cast<size_t>(s[1]),static_cast<size_t>(s[2]));
         _allocate();
       }
 
@@ -219,7 +219,7 @@ namespace minc
 
       void resize(const idx_i& s)
       {
-        resize(IDX<size_t>(s[0],s[1],s[2]));
+        resize(IDX<size_t>(static_cast<size_t>(s[0]),static_cast<size_t>(s[1]),static_cast<size_t>(s[2])));
       }
 
       virtual ~simple_volume()
@@ -235,7 +235,7 @@ namespace minc
 
       T& operator()(int x,int y,int z)
       {
-        return _vol[(size_t)x+(size_t)y*_stride[1]+(size_t)z*_stride[2]];;
+        return _vol[static_cast<size_t>(x)+static_cast<size_t>(y)*_stride[1]+static_cast<size_t>(z)*_stride[2]];
       }
 
       T& operator()(const idx& i)
@@ -245,7 +245,7 @@ namespace minc
 
       T& operator()(const idx_i& i)
       {
-        return _vol[dot(IDX<size_t>(i[0],i[1],i[2]),_stride)];
+        return _vol[dot(IDX<size_t>(static_cast<size_t>(i[0]),static_cast<size_t>(i[1]),static_cast<size_t>(i[2])),_stride)];
       }
 
       const T& operator()(size_t x,size_t y,size_t z) const
@@ -285,7 +285,7 @@ namespace minc
 
       const T& get(const idx_i& i) const
       {
-        return _vol[dot(IDX<size_t>(i[0],i[1],i[2]),_stride)];
+        return _vol[dot(IDX<size_t>(static_cast<size_t>(i[0]),static_cast<size_t>(i[1]),static_cast<size_t>(i[2])),_stride)];
       }
 
       const T& safe_get(size_t x,size_t y,size_t z) const
@@ -296,9 +296,9 @@ namespace minc
 
       const T& safe_get(int x,int y,int z) const
       {
-        size_t xx=x<0?-x:x;
-        size_t yy=y<0?-y:y;
-        size_t zz=z<0?-z:z;
+        size_t xx=static_cast<size_t>(x<0?-x:x);
+        size_t yy=static_cast<size_t>(y<0?-y:y);
+        size_t zz=static_cast<size_t>(z<0?-z:z);
         check_index(xx,yy,zz);
         return _vol[xx+yy*_stride[1]+zz*_stride[2]];
       }
@@ -311,7 +311,7 @@ namespace minc
 
       const T& safe_get(idx_i i) const
       {
-        idx ii=IDX<size_t>(i[0]<0?-i[0]:i[1],i[1]<0?-i[1]:i[1],i[2]<0?-i[2]:i[2]);
+        idx ii=IDX<size_t>(static_cast<size_t>(i[0]<0?-i[0]:i[0]),static_cast<size_t>(i[1]<0?-i[1]:i[1]),static_cast<size_t>(i[2]<0?-i[2]:i[2]));
 
         check_index(ii);
         return get(ii);
@@ -324,13 +324,13 @@ namespace minc
         if(_y<0) _y=-_y;
         if(_z<0) _z=-_z;
 
-        size_t x=floor(_x);
-        size_t y=floor(_y);
-        size_t z=floor(_z);
+        size_t x=static_cast<size_t>(floor(static_cast<double>(_x)));
+        size_t y=static_cast<size_t>(floor(static_cast<double>(_y)));
+        size_t z=static_cast<size_t>(floor(static_cast<double>(_z)));
 
-        float dx=_x-x;
-        float dy=_y-y;
-        float dz=_z-z;
+        double dx=static_cast<double>(_x)-static_cast<double>(x);
+        double dy=static_cast<double>(_y)-static_cast<double>(y);
+        double dz=static_cast<double>(_z)-static_cast<double>(z);
 
 
         if(x>=(_size[0]-1)) x=_size[0]*2-3-x;
@@ -418,9 +418,9 @@ namespace minc
         if(jj<0) return false;
         if(kk<0) return false;
 
-        if(ii>=dim(0)) return false;
-        if(jj>=dim(1)) return false;
-        if(kk>=dim(2)) return false;
+        if(static_cast<size_t>(ii)>=dim(0)) return false;
+        if(static_cast<size_t>(jj)>=dim(1)) return false;
+        if(static_cast<size_t>(kk)>=dim(2)) return false;
         return true;
       }
 
@@ -564,7 +564,7 @@ namespace minc
         idx_i r;
 
         for(size_t i=0;i<ndims;i++)
-          r[i]=floor(ret[i]+0.5);
+          r[i]=static_cast<int>(floor(ret[i]+0.5));
 
         return r;
       }
@@ -576,7 +576,7 @@ namespace minc
         idx r;
 
         for(size_t i=0;i<ndims;i++)
-          r[i]=floor(ret[i]+0.5);
+          r[i]=static_cast<size_t>(floor(ret[i]+0.5));
 
         return r;
       }
@@ -591,7 +591,7 @@ namespace minc
       //!use provided buffer for storage
       void assign(const idx_i& s,T* array)
       {
-        _size=IDX<size_t>(s[0],s[1],s[2]);
+        _size=IDX<size_t>(static_cast<size_t>(s[0]),static_cast<size_t>(s[1]),static_cast<size_t>(s[2]));
         allocate(array);
       }
   };

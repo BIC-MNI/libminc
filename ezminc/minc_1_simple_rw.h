@@ -28,7 +28,7 @@ namespace minc
     if(rw.ndim(1)<=0||rw.ndim(2)<=0||rw.ndim(3)<=0||rw.ndim(4)>0)
       REPORT_ERROR("Need 3D minc file");
 
-    vol.resize(rw.ndim(1),rw.ndim(2),rw.ndim(3));
+    vol.resize(static_cast<size_t>(rw.ndim(1)),static_cast<size_t>(rw.ndim(2)),static_cast<size_t>(rw.ndim(3)));
 
     if(typeid(T)==typeid(unsigned char))
     {
@@ -141,29 +141,29 @@ namespace minc
     std::vector<size_t> strides(MAX_VAR_DIMS,0);
     size_t str=1;
 
-    for(size_t i=0;i<5;i++) //T is a special case
+    for(int i=0;i<5;i++) //T is a special case
     {
       if(rw.map_space(i)<0) continue;
-      strides[rw.map_space(i)]=str;
-      str*=rw.ndim(i);
+      strides[static_cast<size_t>(rw.map_space(i))]=str;
+      str*=static_cast<size_t>(rw.ndim(i));
     }
 
     if(rw.map_space(4)>=0)
-      strides[rw.map_space(4)]=0; //t dimension
+      strides[static_cast<size_t>(rw.map_space(4))]=0; //t dimension
 
     minc_input_iterator<T> in(rw);
     for(in.begin();!in.last();in.next())
     {
       size_t address=0;
       size_t slice=0;
-      for(int i=0;i<rw.dim_no();i++)
+      for(size_t i=0;i<static_cast<size_t>(rw.dim_no());i++)
       {
         if(strides[i]>0)
-          address+=in.cur()[i]*strides[i];
+          address+=static_cast<size_t>(in.cur()[i])*strides[i];
         else //
-          slice=in.cur()[i];
+          slice=static_cast<size_t>(in.cur()[i]);
       }
-      vol.frame(slice).c_buf()[address]=in.value();
+      vol.frame(static_cast<int>(slice)).c_buf()[address]=in.value();
     }
 
     //set coordinate transfer parameters
@@ -210,29 +210,29 @@ namespace minc
 
     std::vector<size_t> strides(MAX_VAR_DIMS,0);
     size_t str=1;
-    for(size_t i=0;i<4;i++)//T is a special
+    for(int i=0;i<4;i++)//T is a special
     {
       if(rw.map_space(i)<0) continue;
-      strides[rw.map_space(i)]=str;
-      str*=rw.ndim(i);
+      strides[static_cast<size_t>(rw.map_space(i))]=str;
+      str*=static_cast<size_t>(rw.ndim(i));
     }
 
     if(rw.map_space(4)>=0)
-      strides[rw.map_space(4)]=0; //t dimension
+      strides[static_cast<size_t>(rw.map_space(4))]=0; //t dimension
 
     minc_output_iterator<T> out(rw);
     for(out.begin();!out.last();out.next())
     {
       size_t address=0;
       size_t slice=0;
-      for(int i=0;i<rw.dim_no();i++)
+      for(size_t i=0;i<static_cast<size_t>(rw.dim_no());i++)
       {
         if(strides[i]>0)
-          address+=out.cur()[i]*strides[i];
+          address+=static_cast<size_t>(out.cur()[i])*strides[i];
         else //
-          slice=out.cur()[i];
+          slice=static_cast<size_t>(out.cur()[i]);
       }
-      out.value(vol.frame(slice).c_buf()[address]);
+      out.value(vol.frame(static_cast<int>(slice)).c_buf()[address]);
     }
   }
 
@@ -265,18 +265,18 @@ namespace minc
 
       }
 
-      for(int i=0;i<3;i++)
+      for(size_t i=0;i<3;i++)
       {
-        int ii=i+(is_vector?1:0);
-        info[ii].dim=dim_info::dimensions( dim_info::DIM_X+i);
+        size_t ii=i+(is_vector?1:0);
+        info[ii].dim=dim_info::dimensions( dim_info::DIM_X+static_cast<int>(i));
 
-        info[ii].length=vol.dim(i);
-        info[ii].step  =vol.step()[i];
-        info[ii].start =vol.start()[i];
+        info[ii].length=static_cast<size_t>(vol.dim(static_cast<int>(i)));
+        info[ii].step  =vol.step()[static_cast<int>(i)];
+        info[ii].start =vol.start()[static_cast<int>(i)];
         info[ii].have_dir_cos=true;
 
         for(int j=0;j<3;j++)
-          info[ii].dir_cos[j]=vol.direction_cosines(i)[j];
+          info[ii].dir_cos[j]=vol.direction_cosines(static_cast<int>(i))[j];
       }
 
       if(have_time)

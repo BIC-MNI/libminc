@@ -63,7 +63,7 @@ namespace minc
           i>static_cast<size_t>(_rw->dim_no()-_rw->slice_dimensions()-1);i--)
       {
         _cur[i]++;
-        if(_cur[i]<static_cast<long>(_rw->dim(i).length))
+        if(_cur[i]<static_cast<long>(_rw->dim(static_cast<unsigned int>(i)).length))
           break;
         if(i>static_cast<size_t>(_rw->dim_no()-_rw->slice_dimensions()))
           _cur[i]=0;
@@ -98,7 +98,7 @@ namespace minc
     void begin(void)
     {
       _cur.resize(MAX_VAR_DIMS,0);
-      _buf.resize(_rw->slice_len());
+      _buf.resize(static_cast<size_t>(_rw->slice_len()));
       _count=0;
       _rw->begin();
       _rw->read(&_buf[0]);
@@ -131,7 +131,7 @@ namespace minc
 
     minc_output_iterator(minc_1_writer& rw):_rw(&rw),_last(false),_count(0)
     {
-      _buf.resize(rw.slice_len());
+      _buf.resize(static_cast<size_t>(rw.slice_len()));
     }
 
     minc_output_iterator():_rw(NULL),_last(false),_count(0)
@@ -157,11 +157,12 @@ namespace minc
       _count++;
       for(int i=_rw->dim_no()-1;i>(_rw->dim_no()-_rw->slice_dimensions()-1);i--)
       {
-        _cur[i]++;
-        if(_cur[i]<static_cast<long>(_rw->dim(i).length))
+        size_t ui = static_cast<size_t>(i);
+        _cur[ui]++;
+        if(_cur[ui]<static_cast<long>(_rw->dim(static_cast<unsigned int>(i)).length))
           break;
         if(i>(_rw->dim_no()-_rw->slice_dimensions()))
-          _cur[i]=0;
+          _cur[ui]=0;
         else
         {
           //write slice into minc file
@@ -192,7 +193,7 @@ namespace minc
 
     void begin(void)
     {
-      _buf.resize(_rw->slice_len());
+      _buf.resize(static_cast<size_t>(_rw->slice_len()));
       _cur.resize(MAX_VAR_DIMS,0);
       _count=0;
       _rw->begin();
@@ -210,11 +211,11 @@ namespace minc
   {
     std::vector<size_t> strides(MAX_VAR_DIMS,0);
     size_t str=1;
-    for(size_t i=0;i<5;i++)
+    for(int i=0;i<5;i++)
     {
       if(rw.map_space(i)<0) continue;
-      strides[rw.map_space(i)]=str;
-      str*=rw.ndim(i);
+      strides[static_cast<size_t>(rw.map_space(i))]=str;
+      str*=static_cast<size_t>(rw.ndim(i));
     }
 
     minc_input_iterator<T> in(rw);
@@ -222,7 +223,7 @@ namespace minc
     {
       size_t address=0;
       for(size_t i=0;i<static_cast<size_t>(rw.dim_no());i++)
-        address+=in.cur()[i]*strides[i];
+        address+=static_cast<size_t>(in.cur()[i])*strides[i];
 
       volume[address]=in.value();
     }
@@ -233,11 +234,11 @@ namespace minc
   {
     std::vector<size_t> strides(MAX_VAR_DIMS,0);
     size_t str=1;
-    for(size_t i=0;i<5;i++)
+    for(int i=0;i<5;i++)
     {
       if(rw.map_space(i)<0) continue;
-      strides[rw.map_space(i)]=str;
-      str*=rw.ndim(i);
+      strides[static_cast<size_t>(rw.map_space(i))]=str;
+      str*=static_cast<size_t>(rw.ndim(i));
     }
 
     minc_output_iterator<T> out(rw);
@@ -245,7 +246,7 @@ namespace minc
     {
       size_t address=0;
       for(size_t i=0;i<static_cast<size_t>(rw.dim_no());i++)
-        address+=out.cur()[i]*strides[i];
+        address+=static_cast<size_t>(out.cur()[i])*strides[i];
 
       out.value(volume[address]);
     }
@@ -259,17 +260,17 @@ namespace minc
     const size_t dimorder[]={0,4,1,2,3};
     for(size_t i=0;i<5;i++)
     {
-      if(rw.map_space(dimorder[i])<0|| !rw.ndim(dimorder[i]) ) continue;
-      strides[rw.map_space(dimorder[i])]=str;
-      str*=rw.ndim(dimorder[i]);
+      if(rw.map_space(static_cast<int>(dimorder[i]))<0|| !rw.ndim(static_cast<int>(dimorder[i])) ) continue;
+      strides[static_cast<size_t>(rw.map_space(static_cast<int>(dimorder[i])))]=str;
+      str*=static_cast<size_t>(rw.ndim(static_cast<int>(dimorder[i])));
     }
 
     minc_input_iterator<T> in(rw);
     for(in.begin();!in.last();in.next())
     {
       size_t address=0;
-      for(int i=0;i<rw.dim_no();i++)
-        address+=in.cur()[i]*strides[i];
+      for(size_t i=0;i<static_cast<size_t>(rw.dim_no());i++)
+        address+=static_cast<size_t>(in.cur()[i])*strides[i];
 
       volume[address]=in.value();
     }
@@ -283,16 +284,16 @@ namespace minc
     const size_t dimorder[]={0,4,1,2,3};
     for(size_t i=0;i<5;i++)
     {
-      if(rw.map_space(dimorder[i])<0 || !rw.ndim(dimorder[i]) ) continue;
-      strides[rw.map_space(dimorder[i])]=str;
-      str*=rw.ndim(dimorder[i]);
+      if(rw.map_space(static_cast<int>(dimorder[i]))<0 || !rw.ndim(static_cast<int>(dimorder[i])) ) continue;
+      strides[static_cast<size_t>(rw.map_space(static_cast<int>(dimorder[i])))]=str;
+      str*=static_cast<size_t>(rw.ndim(static_cast<int>(dimorder[i])));
     }
     minc_output_iterator<T> out(rw);
     for(out.begin();!out.last();out.next())
     {
       size_t address=0;
-      for(int i=0;i<rw.dim_no();i++)
-        address+=out.cur()[i]*strides[i];
+      for(size_t i=0;i<static_cast<size_t>(rw.dim_no());i++)
+        address+=static_cast<size_t>(out.cur()[i])*strides[i];
 
       out.value(volume[address]);
     }

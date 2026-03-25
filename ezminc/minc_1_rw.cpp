@@ -27,7 +27,7 @@ namespace minc
   dim_info::dim_info(int l, double sta,
                      double spa,dimensions d,
                      bool hd):
-      length(l),step(spa),start(sta),have_dir_cos(hd),dim(d)
+      length(static_cast<size_t>(l)),step(spa),start(sta),have_dir_cos(hd),dim(d)
   {
     switch(dim)
     {
@@ -158,7 +158,7 @@ namespace minc
         start[i]=0;
         count[i]=dims[i];
       }
-      std::vector<double> r(_var_length);
+      std::vector<double> r(static_cast<size_t>(_var_length));
 
       if(ncvarget(_mincid, varid, start,count,&r[0])!=MI_ERROR)
         return r;
@@ -361,7 +361,7 @@ namespace minc
       //ncopts=op;
       return std::vector<int>(0);
     }
-    std::vector<int> r(att_length);
+    std::vector<int> r(static_cast<size_t>(att_length));
     miattget(_mincid, varid, att_name, NC_INT, att_length,&r[0], NULL) ;
     //ncopts=op;
     return r;
@@ -380,7 +380,7 @@ namespace minc
       //ncopts=op;
       return std::vector<double>(0);
     }
-    std::vector<double> r(att_length);
+    std::vector<double> r(static_cast<size_t>(att_length));
     miattget(_mincid, varid, att_name, NC_DOUBLE, att_length,&r[0], NULL) ;
     //ncopts=op;
     return r;
@@ -398,7 +398,7 @@ namespace minc
       //ncopts=op;
       return std::vector<short>(0);
     }
-    std::vector<short> r(att_length);
+    std::vector<short> r(static_cast<size_t>(att_length));
     miattget(_mincid, varid, att_name, NC_SHORT, att_length,&r[0], NULL) ;
     //ncopts=op;
     return r;
@@ -416,7 +416,7 @@ namespace minc
       //ncopts=op;
       return std::vector<unsigned char>(0);
     }
-    std::vector<unsigned char> r(att_length);
+    std::vector<unsigned char> r(static_cast<size_t>(att_length));
     miattget(_mincid, varid, att_name, NC_BYTE, att_length,&r[0], NULL) ;
     //ncopts=op;
     return r;
@@ -530,51 +530,52 @@ namespace minc
     //dir_cos.SetIdentity();
     CHECK_MINC_CALL(miget_image_range(_mincid, _image_range));
     //go through dimensions , calculating parameters for reshaping into ZYX array if needed
-    _info.resize(_ndims);
-    _world_matrix.resize(_ndims*4,0.0);
-    _voxel_matrix.resize(_ndims*4,0);
+    _info.resize(static_cast<size_t>(_ndims));
+    _world_matrix.resize(static_cast<size_t>(_ndims)*4,0.0);
+    _voxel_matrix.resize(static_cast<size_t>(_ndims)*4,0);
     //_dir_cos.resize(_ndims*_ndims,0.0);
 
     for(int i=_ndims-1;i>=0;i--)
     {
+      size_t ui = static_cast<size_t>(i);
       //_world_matrix[i*(_ndims+1)]=1.0;
       //_voxel_matrix[i*(_ndims+1)]=1.0;
       char dimname[MAX_NC_NAME];
       long dimlength;
       //get dimensions info
       CHECK_MINC_CALL(ncdiminq(_mincid, mdims[i], dimname, &dimlength));
-      _info[i].name=dimname;
-      _info[i].length=dimlength;
-      _info[i].have_dir_cos=false;
+      _info[ui].name=dimname;
+      _info[ui].length=static_cast<size_t>(dimlength);
+      _info[ui].have_dir_cos=false;
       int axis=-1;
 
       if(!strcmp(dimname,MIxspace))
       {
         _dims[0]=dimlength;axis=0;
-        _info[i].dim=dim_info::DIM_X;
+        _info[ui].dim=dim_info::DIM_X;
         _map_to_std[1]=i;
       } else if(!strcmp(dimname,MIyspace)) {
         _dims[1]=dimlength;axis=1;
-        _info[i].dim=dim_info::DIM_Y;
+        _info[ui].dim=dim_info::DIM_Y;
         _map_to_std[2]=i;
       } else if(!strcmp(dimname,MIzspace)) {
         _dims[2]=dimlength;axis=2;
-        _info[i].dim=dim_info::DIM_Z;
+        _info[ui].dim=dim_info::DIM_Z;
         _map_to_std[3]=i;
       } else if(!strcmp(dimname,MIvector_dimension)) {
          axis=-1;
-        _info[i].dim=dim_info::DIM_VEC;
+        _info[ui].dim=dim_info::DIM_VEC;
         _map_to_std[0]=i;
       } else if(!strcmp(dimname,MItime)) {
          axis=3;
-        _info[i].dim=dim_info::DIM_TIME;
+        _info[ui].dim=dim_info::DIM_TIME;
         _map_to_std[4]=i;
       } else  {
-        _info[i].dim=dim_info::DIM_UNKNOWN;
+        _info[ui].dim=dim_info::DIM_UNKNOWN;
         REPORT_ERROR ("Unknown dimension");
       }
 
-      if(_info[i].dim!=dim_info::DIM_VEC)
+      if(_info[ui].dim!=dim_info::DIM_VEC)
       {
         //ncopts = 0;
         int dimid = ncvarid(_mincid, dimname);
@@ -583,49 +584,49 @@ namespace minc
 
         // Get dimension attributes
         //ncopts = 0;
-        miattget1(_mincid, dimid, MIstep, NC_DOUBLE, &_info[i].step);
-        if(_info[i].step == 0.0)
-           _info[i].step = 1.0;
-        miattget1(_mincid, dimid, MIstart, NC_DOUBLE, &_info[i].start);
+        miattget1(_mincid, dimid, MIstep, NC_DOUBLE, &_info[ui].step);
+        if(_info[ui].step == 0.0)
+           _info[ui].step = 1.0;
+        miattget1(_mincid, dimid, MIstart, NC_DOUBLE, &_info[ui].start);
 
-        if(_positive_directions && _info[i].step<0.0)
+        if(_positive_directions && _info[ui].step<0.0)
         {
-          _info[i].start+=_info[i].step*(dimlength-1);
-          _info[i].step=-_info[i].step;
+          _info[ui].start+=_info[ui].step*static_cast<double>(dimlength-1);
+          _info[ui].step=-_info[ui].step;
         }
 
-        if(miattget(_mincid, dimid, MIdirection_cosines, NC_DOUBLE, 3, &_info[i].dir_cos[0], NULL)!= MI_ERROR)
+        if(miattget(_mincid, dimid, MIdirection_cosines, NC_DOUBLE, 3, &_info[ui].dir_cos[0], NULL)!= MI_ERROR)
         {
-          _info[i].have_dir_cos=true;
+          _info[ui].have_dir_cos=true;
 
           /* Normalize the direction cosine */
-          double len=sqrt(_info[i].dir_cos[0]*_info[i].dir_cos[0]+
-                          _info[i].dir_cos[1]*_info[i].dir_cos[1]+
-                          _info[i].dir_cos[2]*_info[i].dir_cos[2]);
+          double len=sqrt(_info[ui].dir_cos[0]*_info[ui].dir_cos[0]+
+                          _info[ui].dir_cos[1]*_info[ui].dir_cos[1]+
+                          _info[ui].dir_cos[2]*_info[ui].dir_cos[2]);
 
           if(len>1e-6 && fabs(len-1.0)>1e-6) //TODO: use some epsiolon here?
           {
             for(int a=0;a<3;a++)
-              _info[i].dir_cos[a]/=len;
+              _info[ui].dir_cos[a]/=len;
           }
 
         }
         // fill voxel matrix
-        _voxel_matrix[i*4+axis]=1;
+        _voxel_matrix[static_cast<size_t>(i*4+axis)]=1;
       } else { //vectors don't have spatial component!
-        _info[i].start=0;
-        _info[i].step=0.0;
-        _info[i].dir_cos[0]=_info[i].dir_cos[1]=_info[i].dir_cos[2]=0.0;
-        _info[i].have_dir_cos=false;
+        _info[ui].start=0;
+        _info[ui].step=0.0;
+        _info[ui].dir_cos[0]=_info[ui].dir_cos[1]=_info[ui].dir_cos[2]=0.0;
+        _info[ui].have_dir_cos=false;
       }
 
       //fill world matrix
       for(int a=0;a<3;a++)
-        _world_matrix[i*4+a]=_info[i].dir_cos[a]*_info[i].step;
+        _world_matrix[static_cast<size_t>(i*4+a)]=_info[ui].dir_cos[a]*_info[ui].step;
       if(axis==3) //time
-        _world_matrix[i*4+3]=_info[i].step;
+        _world_matrix[static_cast<size_t>(i*4+3)]=_info[ui].step;
       else
-        _world_matrix[i*4+3]=0.0;
+        _world_matrix[static_cast<size_t>(i*4+3)]=0.0;
     }
     //ncopts = NC_VERBOSE | NC_FATAL;
 
@@ -638,22 +639,23 @@ namespace minc
       int mmax_dims[MAX_VAR_DIMS];
       ncvarinq(_mincid, _imgid, NULL, NULL, &nmax_dims, mmax_dims, NULL);
       if(nmax_dims>0)
-        _slice_dimensions=_ndims-nmax_dims;
+        _slice_dimensions=static_cast<size_t>(_ndims-nmax_dims);
     }
 
-    if(_slice_dimensions<=0)
+    if(static_cast<int>(_slice_dimensions)<=0)
     {
-      if(_info[_ndims-1].dim==dim_info::DIM_VEC || _info[_ndims-1].dim==dim_info::DIM_TIME)
-        _slice_dimensions=std::min(_ndims,3);
+      if(_info[static_cast<size_t>(_ndims-1)].dim==dim_info::DIM_VEC || _info[static_cast<size_t>(_ndims-1)].dim==dim_info::DIM_TIME)
+        _slice_dimensions=static_cast<size_t>(std::min(_ndims,3));
       else
-        _slice_dimensions=std::min(_ndims,2);
+        _slice_dimensions=static_cast<size_t>(std::min(_ndims,2));
     }
     std::fill(_slab.begin(),_slab.end(),1);
     _slab_len=1;
     for(size_t i=0;i<_slice_dimensions;i++)
     {
-      _slab[_ndims-i-1]=_info[_ndims-i-1].length;
-      _slab_len*=_info[_ndims-i-1].length;
+      size_t idx = static_cast<size_t>(_ndims) - i - 1;
+      _slab[idx]=static_cast<long>(_info[idx].length);
+      _slab_len*=static_cast<int>(_info[idx].length);
     }
   }
 
@@ -707,41 +709,43 @@ namespace minc
 #endif
     if(_mincid<0) REPORT_ERROR("Error opening minc file for writing");
 
-    _ndims=_info.size();
+    _ndims=static_cast<int>(_info.size());
     _datatype=datatype;
-    _slice_dimensions=slice_dimensions;
+    _slice_dimensions=static_cast<size_t>(slice_dimensions);
     _is_signed=_s;
     fill(_map_to_std.begin(),_map_to_std.end(),-1);
     for(int i=_ndims-1;i>=0;i--)
     {
+      size_t ui = static_cast<size_t>(i);
       //just a precaution
-      switch(_info[i].dim)
+      switch(_info[ui].dim)
       {
-        case dim_info::DIM_X:_info[i].name=MIxspace;_map_to_std[1]=i;break;
-        case dim_info::DIM_Y:_info[i].name=MIyspace;_map_to_std[2]=i;break;
-        case dim_info::DIM_Z:_info[i].name=MIzspace;_map_to_std[3]=i;break;
-        case dim_info::DIM_TIME:_info[i].name=MItime;_map_to_std[4]=i;break;
+        case dim_info::DIM_X:_info[ui].name=MIxspace;_map_to_std[1]=i;break;
+        case dim_info::DIM_Y:_info[ui].name=MIyspace;_map_to_std[2]=i;break;
+        case dim_info::DIM_Z:_info[ui].name=MIzspace;_map_to_std[3]=i;break;
+        case dim_info::DIM_TIME:_info[ui].name=MItime;_map_to_std[4]=i;break;
         default:
-        case dim_info::DIM_VEC:_info[i].name=MIvector_dimension;_map_to_std[0]=i;break;
+        case dim_info::DIM_VEC:_info[ui].name=MIvector_dimension;_map_to_std[0]=i;break;
         //default: REPORT_ERROR("Unknown Dimension!");
       }
-      CHECK_MINC_CALL(mdims[i]=ncdimdef(_mincid, _info[i].name.c_str(), _info[i].length));
-      if(_info[i].dim!=dim_info::DIM_VEC)
+      CHECK_MINC_CALL(mdims[i]=ncdimdef(_mincid, _info[ui].name.c_str(), _info[ui].length));
+      if(_info[ui].dim!=dim_info::DIM_VEC)
       {
         int dimid;
-        CHECK_MINC_CALL(dimid=micreate_std_variable(_mincid,_info[i].name.c_str(),NC_INT, 0, NULL));
-        CHECK_MINC_CALL(miattputdbl(_mincid, dimid, MIstep,_info[i].step));
-        CHECK_MINC_CALL(miattputdbl(_mincid, dimid, MIstart,_info[i].start));
+        CHECK_MINC_CALL(dimid=micreate_std_variable(_mincid,_info[ui].name.c_str(),NC_INT, 0, NULL));
+        CHECK_MINC_CALL(miattputdbl(_mincid, dimid, MIstep,_info[ui].step));
+        CHECK_MINC_CALL(miattputdbl(_mincid, dimid, MIstart,_info[ui].start));
 
-        if(_info[i].have_dir_cos)
-          CHECK_MINC_CALL(ncattput(_mincid, dimid, MIdirection_cosines,NC_DOUBLE, 3, _info[i].dir_cos));
+        if(_info[ui].have_dir_cos)
+          CHECK_MINC_CALL(ncattput(_mincid, dimid, MIdirection_cosines,NC_DOUBLE, 3, _info[ui].dir_cos));
       }
     }
     _slab_len=1;
     for(size_t i=0;i<_slice_dimensions;i++)
     {
-      _slab[_ndims-i-1]=_info[_ndims-i-1].length;
-      _slab_len*=_info[_ndims-i-1].length;
+      size_t idx = static_cast<size_t>(_ndims) - i - 1;
+      _slab[idx]=static_cast<long>(_info[idx].length);
+      _slab_len*=static_cast<int>(_info[idx].length);
     }
 
     _icmax=_icmin=MI_ERROR;
@@ -837,23 +841,23 @@ namespace minc
           _set_image_range=false;
           _set_slice_range=true;
 
-          CHECK_MINC_CALL(_icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, _ndims-_slice_dimensions, mdims));
-          CHECK_MINC_CALL(_icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, _ndims-_slice_dimensions, mdims));
+          CHECK_MINC_CALL(_icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, _ndims-static_cast<int>(_slice_dimensions), mdims));
+          CHECK_MINC_CALL(_icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, _ndims-static_cast<int>(_slice_dimensions), mdims));
         break;
 
       case NC_BYTE:
         _set_image_range=false;
         _set_slice_range=true;
 
-        CHECK_MINC_CALL(_icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, _ndims-_slice_dimensions, mdims));
-        CHECK_MINC_CALL(_icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, _ndims-_slice_dimensions, mdims));
+        CHECK_MINC_CALL(_icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, _ndims-static_cast<int>(_slice_dimensions), mdims));
+        CHECK_MINC_CALL(_icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, _ndims-static_cast<int>(_slice_dimensions), mdims));
         break;
       case NC_INT:
         _set_image_range=false;
         _set_slice_range=true;
 
-        CHECK_MINC_CALL(_icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, _ndims-_slice_dimensions, mdims));
-        CHECK_MINC_CALL(_icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, _ndims-_slice_dimensions, mdims));
+        CHECK_MINC_CALL(_icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, _ndims-static_cast<int>(_slice_dimensions), mdims));
+        CHECK_MINC_CALL(_icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, _ndims-static_cast<int>(_slice_dimensions), mdims));
         break;
 
       default:
@@ -913,23 +917,23 @@ namespace minc
           _set_image_range=false;
           _set_slice_range=true;
 
-          CHECK_MINC_CALL(_icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, _ndims-_slice_dimensions, mdims));
-          CHECK_MINC_CALL(_icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, _ndims-_slice_dimensions, mdims));
+          CHECK_MINC_CALL(_icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, _ndims-static_cast<int>(_slice_dimensions), mdims));
+          CHECK_MINC_CALL(_icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, _ndims-static_cast<int>(_slice_dimensions), mdims));
         break;
 
       case NC_BYTE:
         _set_image_range=false;
         _set_slice_range=true;
 
-        CHECK_MINC_CALL(_icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, _ndims-_slice_dimensions, mdims));
-        CHECK_MINC_CALL(_icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, _ndims-_slice_dimensions, mdims));
+        CHECK_MINC_CALL(_icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, _ndims-static_cast<int>(_slice_dimensions), mdims));
+        CHECK_MINC_CALL(_icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, _ndims-static_cast<int>(_slice_dimensions), mdims));
         break;
       case NC_INT:
         _set_image_range=false;
         _set_slice_range=true;
 
-        CHECK_MINC_CALL(_icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, _ndims-_slice_dimensions, mdims));
-        CHECK_MINC_CALL(_icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, _ndims-_slice_dimensions, mdims));
+        CHECK_MINC_CALL(_icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, _ndims-static_cast<int>(_slice_dimensions), mdims));
+        CHECK_MINC_CALL(_icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, _ndims-static_cast<int>(_slice_dimensions), mdims));
         break;
 
       default:
@@ -971,7 +975,7 @@ namespace minc
     _write_prepared=true;
   }
 
-  void minc_1_writer::setup_write_short(bool n)
+  void minc_1_writer::setup_write_short(bool /*n*/)
   {
     CHECK_MINC_CALL(_icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, 0, NULL));
     CHECK_MINC_CALL(_icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, 0, NULL));
@@ -997,7 +1001,7 @@ namespace minc
     _write_prepared=true;
   }
 
-  void minc_1_writer::setup_write_ushort(bool n)
+  void minc_1_writer::setup_write_ushort(bool /*n*/)
   {
     CHECK_MINC_CALL(_icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, 0, NULL));
     CHECK_MINC_CALL(_icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, 0, NULL));
@@ -1021,7 +1025,7 @@ namespace minc
     _write_prepared=true;
   }
 
-  void minc_1_writer::setup_write_byte(bool n)
+  void minc_1_writer::setup_write_byte(bool /*n*/)
   {
     CHECK_MINC_CALL(_icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, 0, NULL));
     CHECK_MINC_CALL(_icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, 0, NULL));
@@ -1046,7 +1050,7 @@ namespace minc
     _write_prepared=true;
   }
 
-  void minc_1_writer::setup_write_int(bool n)
+  void minc_1_writer::setup_write_int(bool /*n*/)
   {
     CHECK_MINC_CALL(_icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, 0, NULL));
     CHECK_MINC_CALL(_icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, 0, NULL));
@@ -1072,7 +1076,7 @@ namespace minc
     _write_prepared=true;
   }
 
-  void minc_1_writer::setup_write_uint(bool n)
+  void minc_1_writer::setup_write_uint(bool /*n*/)
   {
     CHECK_MINC_CALL(_icmax=micreate_std_variable(_mincid, MIimagemax, NC_DOUBLE, 0, NULL));
     CHECK_MINC_CALL(_icmin=micreate_std_variable(_mincid, MIimagemin, NC_DOUBLE, 0, NULL));
@@ -1085,7 +1089,7 @@ namespace minc
 
     /* Set range of values */ //TODO: set this to something sensible?
     CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_VALID_MIN, 0));
-    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_VALID_MAX, UINT_MAX));
+    CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_VALID_MAX, static_cast<int>(UINT_MAX)));
 
     /* No normalization so that pixels are scaled to the slice */
     CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_DO_NORM, false));
@@ -1171,7 +1175,7 @@ namespace minc
     _read_prepared=true;
   }
 
-  void minc_1_reader::setup_read_short(bool n)
+  void minc_1_reader::setup_read_short(bool /*n*/)
   {
     if(_metadate_only)
       REPORT_ERROR("Minc file in metadate only mode!");
@@ -1196,7 +1200,7 @@ namespace minc
     _read_prepared=true;
   }
 
-  void minc_1_reader::setup_read_ushort(bool n)
+  void minc_1_reader::setup_read_ushort(bool /*n*/)
   {
     if(_metadate_only)
       REPORT_ERROR("Minc file in metadate only mode!");
@@ -1221,7 +1225,7 @@ namespace minc
     _read_prepared=true;
   }
 
-  void minc_1_reader::setup_read_byte(bool n)
+  void minc_1_reader::setup_read_byte(bool /*n*/)
   {
     if(_metadate_only)
       REPORT_ERROR("Minc file in metadate only mode!");
@@ -1243,7 +1247,7 @@ namespace minc
     _read_prepared=true;
   }
 
-  void minc_1_reader::setup_read_int(bool n)
+  void minc_1_reader::setup_read_int(bool /*n*/)
   {
     if(_metadate_only)
       REPORT_ERROR("Minc file in metadate only mode!");
@@ -1265,7 +1269,7 @@ namespace minc
     _read_prepared=true;
   }
 
-  void minc_1_reader::setup_read_uint(bool n)
+  void minc_1_reader::setup_read_uint(bool /*n*/)
   {
     if(_metadate_only)
       REPORT_ERROR("Minc file in metadate only mode!");
@@ -1310,8 +1314,8 @@ namespace minc
         float *tmp=(float*)buffer;
         for(int i=0;i<_slab_len;i++)
         {
-          if(r_min>tmp[i]) r_min=tmp[i];//irmin=i;
-          if(r_max<tmp[i]) r_max=tmp[i];//irmax=i;
+          if(r_min>static_cast<double>(tmp[i])) r_min=static_cast<double>(tmp[i]);//irmin=i;
+          if(r_max<static_cast<double>(tmp[i])) r_max=static_cast<double>(tmp[i]);//irmax=i;
         }
       } else if(_io_datatype==NC_DOUBLE) {
           double *tmp=(double*)buffer;
@@ -1454,8 +1458,8 @@ namespace minc
     if ((ncattinq(_mincid, NC_GLOBAL, MIhistory, &datatype,&att_length) == MI_ERROR) ||
         (datatype != NC_CHAR))
       att_length = 0;
-    att_length += strlen(append_history) + 1;
-    char* str = new char[att_length];
+    att_length += static_cast<int>(strlen(append_history)) + 1;
+    char* str = new char[static_cast<size_t>(att_length)];
     str[0] = '\0';
     miattgetstr(_mincid, NC_GLOBAL, MIhistory, att_length+1,str);
     //ncopts=NC_VERBOSE | NC_FATAL;
@@ -1483,26 +1487,26 @@ namespace minc
 
   void minc_1_base::insert(const char *varname,const char *attname,const char* val)
   {
-    ncattput(_mincid, create_var_id(varname),attname, NC_CHAR, strlen(val) + 1, val);
+    ncattput(_mincid, create_var_id(varname),attname, NC_CHAR, static_cast<int>(strlen(val)) + 1, val);
   }
 
   void minc_1_base::insert(const char *varname,const char *attname,const std::vector<double> &val)
   {
-    ncattput(_mincid, create_var_id(varname),attname, NC_DOUBLE, val.size(), &val[0]);
+    ncattput(_mincid, create_var_id(varname),attname, NC_DOUBLE, static_cast<int>(val.size()), &val[0]);
   }
 
   void minc_1_base::insert(const char *varname,const char *attname,const std::vector<int> &val)
   {
-    ncattput(_mincid, create_var_id(varname),attname, NC_INT, val.size(), &val[0]);
+    ncattput(_mincid, create_var_id(varname),attname, NC_INT, static_cast<int>(val.size()), &val[0]);
   }
 
   void minc_1_base::insert(const char *varname,const char *attname,const std::vector<short> &val)
   {
-    ncattput(_mincid, create_var_id(varname),attname, NC_SHORT, val.size(), &val[0]);
+    ncattput(_mincid, create_var_id(varname),attname, NC_SHORT, static_cast<int>(val.size()), &val[0]);
   }
 
   void minc_1_base::insert(const char *varname,const char *attname,const std::vector<unsigned char> &val)
   {
-    ncattput(_mincid, create_var_id(varname),attname, NC_BYTE, val.size(), &val[0]);
+    ncattput(_mincid, create_var_id(varname),attname, NC_BYTE, static_cast<int>(val.size()), &val[0]);
   }
 }

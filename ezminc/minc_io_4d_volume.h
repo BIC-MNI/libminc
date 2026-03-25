@@ -34,8 +34,8 @@ namespace minc
 
       void allocate(int n,const idx& sz)
       {
-        _volumes.resize(n);
-        for(int i=0;i<n;i++)
+        _volumes.resize(static_cast<size_t>(n));
+        for(size_t i=0;i<static_cast<size_t>(n);i++)
         {
           _volumes[i].resize(sz);
         }
@@ -47,7 +47,7 @@ namespace minc
 
       int dim(int i) const
       {
-        return _volumes[0].dim(i);
+        return static_cast<int>(_volumes[0].dim(static_cast<size_t>(i)));
       }
 
       vect voxel_to_world(const idx& iii) const
@@ -73,42 +73,42 @@ namespace minc
 
       T& at(int x,int y,int z,int t)
       {
-        return _volumes[t].at(x,y,z);
+        return _volumes[static_cast<size_t>(t)].at(x,y,z);
       }
 
       const T& get(int x,int y,int z,int t) const
       {
-        return _volumes[t].get(x,y,z);
+        return _volumes[static_cast<size_t>(t)].get(x,y,z);
       }
 
       void set(int x,int y,int z,int t,const T& v)
       {
-        _volumes[t].set(x,y,z,v);
+        _volumes[static_cast<size_t>(t)].set(x,y,z,v);
       }
 
       T& at(const idx& i,int t)
       {
-        return _volumes[t].at(i);
+        return _volumes[static_cast<size_t>(t)].at(i);
       }
 
       const T& get(const idx& i,int t) const
       {
-        return _volumes[t].get(i);
+        return _volumes[static_cast<size_t>(t)].get(i);
       }
 
       void set(const idx& i,int t,const T& v)
       {
-        _volumes[t].set(i,v);
+        _volumes[static_cast<size_t>(t)].set(i,v);
       }
 
       volume& frame(int t)
       {
-        return _volumes[t];
+        return _volumes[static_cast<size_t>(t)];
       }
 
       const volume& frame(int t) const
       {
-        return _volumes[t];
+        return _volumes[static_cast<size_t>(t)];
       }
 
       vect& start(void)

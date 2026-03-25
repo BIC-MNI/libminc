@@ -17,14 +17,14 @@ int main(int argc,char **argv)
     rdr.open(argv[1],true);
     rdr.setup_read_float();
     simple_volume<float> vol;
-    vol.resize(rdr.ndim(1),rdr.ndim(2),rdr.ndim(3));
+    vol.resize(static_cast<size_t>(rdr.ndim(1)),static_cast<size_t>(rdr.ndim(2)),static_cast<size_t>(rdr.ndim(3)));
     load_non_standard_volume<float>(rdr,vol.c_buf());
     //rdr.close();
     for(size_t z=0;z<vol.dim(2);z++)
       for(size_t y=0;y<vol.dim(1);y++)
         for(size_t x=0;x<vol.dim(0);x++)
         {
-          vol(x,y,z)=x+y+z;
+          vol(x,y,z)=static_cast<float>(x+y+z);
         }
     minc_1_writer wrt;
     wrt.open(argv[2],rdr.info(),3,NC_FLOAT,false);

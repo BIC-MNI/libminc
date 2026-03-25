@@ -23,7 +23,7 @@ namespace minc
   template<int dim,class I=int> class fixed_vec
   {
   protected:
-    I c[dim];
+    I c[static_cast<unsigned int>(dim)];
   public:
     //! default constructor, does nothing (i.e data is uninitilized)
     fixed_vec() {}
