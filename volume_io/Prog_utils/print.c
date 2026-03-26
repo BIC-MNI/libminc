@@ -114,6 +114,8 @@ VIOAPI  void  pop_print_function( void )
 ---------------------------------------------------------------------------- */
 
 /* VARARGS */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
 VIOAPI  void  print( const char *format, ... )
 {
     va_list  ap;
@@ -128,6 +130,7 @@ VIOAPI  void  print( const char *format, ... )
     else
         (*(print_function[top_of_stack])) ( print_buffer );
 }
+#pragma GCC diagnostic pop
 
 /* ----------------------------- MNI Header -----------------------------------
 @NAME       : set_print_error_function

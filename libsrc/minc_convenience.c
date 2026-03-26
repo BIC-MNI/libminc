@@ -270,8 +270,8 @@ MNCAPI int miget_default_range(nc_type datatype, int is_signed,
       default_range[1] = (is_signed) ? SCHAR_MAX : UCHAR_MAX;
       break;
    case NC_FLOAT:
-      default_range[0] = -FLT_MAX;
-      default_range[1] = FLT_MAX;
+      default_range[0] = (double)-FLT_MAX;
+      default_range[1] = (double)FLT_MAX;
       break;
    case NC_DOUBLE:
       default_range[0] = -DBL_MAX;
@@ -378,8 +378,8 @@ MNCAPI int miget_valid_range(int cdfid, int imgid, double valid_range[])
       }
       break;
    case NC_FLOAT:
-      valid_range[0] = (float) valid_range[0];
-      valid_range[1] = (float) valid_range[1];
+      valid_range[0] = (double)(float) valid_range[0];
+      valid_range[1] = (double)(float) valid_range[1];
       break;
    }
 
@@ -572,8 +572,8 @@ MNCAPI int miget_image_range(int cdfid, double image_range[])
    /* Handle possible rounding errors in having double image-min/max for
       float image type */
    if (datatype == NC_FLOAT) {
-      image_range[0] = (float) image_range[0];
-      image_range[1] = (float) image_range[1];
+      image_range[0] = (double)(float) image_range[0];
+      image_range[1] = (double)(float) image_range[1];
    }
 
    MI_RETURN(MI_NOERROR);

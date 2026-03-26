@@ -245,7 +245,10 @@ VIOAPI  Minc_file  initialize_minc2_output(
     int                 n_volume_dims;
     int                 d, vol_index, n_range_dims;
 #pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
 #pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
+#pragma GCC diagnostic ignored "-Wincompatible-pointer-types-discards-qualifiers"
     static  VIO_STR     default_dim_names[] = { MIzspace, MIyspace, MIxspace };
 #pragma GCC diagnostic pop
     VIO_STR             *vol_dimension_names;
@@ -1127,7 +1130,7 @@ static  VIO_Status  output_the_volume2(
 {
     VIO_Status        status;
     int               d, n_volume_dims, sizes[VIO_MAX_DIMENSIONS];
-    int               slab_size, n_slab, this_count;
+    int               n_slab, this_count;
     int               vol_index, step, n_steps;
     int               to_volume_index[MAX_VAR_DIMS];
     int               to_file_index[VIO_MAX_DIMENSIONS];
@@ -1209,7 +1212,6 @@ static  VIO_Status  output_the_volume2(
        chunking dimensions for compression (for efficiency) */
 
     file->n_slab_dims = 0;
-    slab_size = 1;
     n_steps = 1;
 
     for( d = file->n_file_dimensions-1; d >= 0; d-- ) {
@@ -1218,7 +1220,6 @@ static  VIO_Status  output_the_volume2(
       if( to_volume_index[d] != INVALID_AXIS ) {
         count[d] = volume_count[to_volume_index[d]];
         file->n_slab_dims++;  /* integral number of complete dimensions */
-        slab_size *= (int)count[d];
       }
     }
 

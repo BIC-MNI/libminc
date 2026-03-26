@@ -365,6 +365,8 @@ int mi2log_message ( const char *file,int line, mimsgcode_t code, ... )
   return r;
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
 int v_mi2log_message(const char *file, int line, mimsgcode_t code, va_list ap)
 {
   int lvl;
@@ -400,6 +402,7 @@ int v_mi2log_message(const char *file, int line, mimsgcode_t code, va_list ap)
 
   return ( MI_ERROR );  /* Just for convenience */
 }
+#pragma GCC diagnostic pop
 
 /*MINC2 error reporting*/
 

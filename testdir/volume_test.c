@@ -233,7 +233,10 @@ test2(void)
   int read_sizes[VIO_MAX_DIMENSIONS] = { 1, 1, 1, 1, 1 };
   int i, j, k;
 #pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
 #pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
+#pragma GCC diagnostic ignored "-Wincompatible-pointer-types-discards-qualifiers"
   char *dim_names[] = {
     MIzspace, MIyspace, MIxspace, MItime, MIvector_dimension
   };

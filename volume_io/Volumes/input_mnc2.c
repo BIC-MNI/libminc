@@ -52,7 +52,7 @@ static  Minc_file  initialize_minc_input_from_minc2_id(
 {
     minc_file_struct    *file;
     int                 n_vol_dims;
-    int                 i, slab_size, prev_sizes[MAX_VAR_DIMS];
+    int                 i, prev_sizes[MAX_VAR_DIMS];
     mitype_t            prev_minc_type;
     VIO_BOOL            different;
     VIO_BOOL            range_specified;
@@ -178,6 +178,7 @@ static  Minc_file  initialize_minc_input_from_minc2_id(
       {
         slices_count*=(int)dimension_size[d];
       }
+      (void)slices_count;
       slice_start=(misize_t *)calloc((size_t)n_slice_dimensions,sizeof(misize_t));
       miget_slice_range(file->minc2id,slice_start,(size_t)n_slice_dimensions,&volume_max,&volume_min);
 
@@ -492,11 +493,9 @@ static  Minc_file  initialize_minc_input_from_minc2_id(
        chunking dimensions for compression */
 
     file->n_slab_dims = 0;
-    slab_size = 1;
 
     for( d = file->n_file_dimensions-1; d >= 0; d-- ) {
       if( file->to_volume_index[d] != INVALID_AXIS ) {
-        slab_size *= (int)file->sizes_in_file[d];
         file->n_slab_dims++;  /* integral number of complete dimensions */
       }
     }
@@ -841,7 +840,7 @@ static int input_slab(
                       volume_start[0], volume_start[1], volume_start[2],
                       volume_start[3], volume_start[4] );
 
-    return input_minc2_hyperslab( file,
+    return (int)input_minc2_hyperslab( file,
                                   get_multidim_data_type(&volume->array),
                                   get_multidim_n_dimensions(&volume->array),
                                   array_sizes, array_data_ptr, to_volume,

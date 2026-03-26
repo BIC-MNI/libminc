@@ -289,6 +289,7 @@ int main(void)
     TESTRPT("milist_start failed", r);
   }
   milist_finish(hlist);
+  (void)count;
 
   printf("copy all attributes in the provided path in the new volume\n");
   if((r = micopy_attr(hvol,"/OPT",hvol1))<0)

@@ -182,7 +182,7 @@ mgh_header_to_linear_transform(const struct mgh_header *hdr_ptr,
   {
     for (j = 0; j < MGH_N_SPATIAL; j++)
     {
-      mgh_xform[i][j] = hdr_ptr->dircos[j][i] * hdr_ptr->spacing[i];
+      mgh_xform[i][j] = (double)hdr_ptr->dircos[j][i] * (double)hdr_ptr->spacing[i];
     }
   }
 
@@ -611,7 +611,7 @@ initialize_mgh_format_input(VIO_STR             filename,
     float min_value, max_value;
 
     mgh_scan_for_voxel_range(in_ptr, n_voxels_in_slice, &min_value, &max_value);
-    set_volume_voxel_range(volume, min_value, max_value);
+    set_volume_voxel_range(volume, (VIO_Real)min_value, (VIO_Real)max_value);
   }
   return VIO_OK;
 }
@@ -731,7 +731,7 @@ input_more_mgh_format_file(
             value = (int)ntohl((uint32_t)((int *)data_ptr)[data_ind++]);
             break;
           case VIO_FLOAT:
-            value = swapFloat(((float *)data_ptr)[data_ind++]);
+            value = (double)swapFloat(((float *)data_ptr)[data_ind++]);
             break;
           default:
             handle_internal_error( "input_more_mgh_format_file" );

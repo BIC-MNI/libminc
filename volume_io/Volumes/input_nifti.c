@@ -207,7 +207,7 @@ nifti_image_to_minc_attributes(nifti_image *nii_ptr,
       for (j = 0; j < 4; j++)
       {
         int volume_axis = (j < VIO_N_DIMENSIONS) ? mnc_index_from_file[j] : j;
-        Transform_elem(mnc_xform, i, volume_axis) = nii_xfm.m[i][j];
+        Transform_elem(mnc_xform, i, volume_axis) = (double)nii_xfm.m[i][j];
       }
     }
 
@@ -258,8 +258,8 @@ nifti_image_to_minc_attributes(nifti_image *nii_ptr,
     mnc_steps[3] = (double)nii_ptr->dt / 1000000.0;
     break;
   default:                      /* Either seconds or unknown. */
-    mnc_starts[3] = nii_ptr->toffset;
-    mnc_steps[3] = nii_ptr->dt;
+    mnc_starts[3] = (double)nii_ptr->toffset;
+    mnc_steps[3] = (double)nii_ptr->dt;
     break;
   }
 
@@ -591,7 +591,7 @@ input_more_nifti_format_file(
   int            i;
   int            total_slices;
   int            n_dimensions = get_volume_n_dimensions( volume );
-  int            vio_data_type = get_volume_data_type( volume );
+  VIO_Data_types vio_data_type = get_volume_data_type( volume );
 
   for_less(i, 0, VIO_MAX_DIMENSIONS)
     indices[i] = 0;
@@ -732,7 +732,7 @@ input_more_nifti_format_file(
       case DT_FLOAT32:
         for_less( temp_ind, 0, in_ptr->sizes_in_file[0] )
         {
-          value = ((float *) data_ptr)[data_ind++];
+          value = (double)((float *) data_ptr)[data_ind++];
           value = (value - value_offset) / value_scale;
           temp_buffer[temp_ind] = value;
         }

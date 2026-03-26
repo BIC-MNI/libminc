@@ -115,7 +115,7 @@ namespace minc
     {
       return "";
     }
-    char* str = new char[att_length+1];
+    char* str = new char[static_cast<size_t>(att_length)+1];
     str[0] = '\0';
     miattgetstr(_mincid, NC_GLOBAL, MIhistory, att_length+1,str);
     std::string r(str);
@@ -211,7 +211,7 @@ namespace minc
     if(ncvarinq(_mincid, var_id, NULL, NULL, &vardims, NULL, NULL)!=MI_ERROR)
     {
       if(vardims==0) return 1;
-      int *dims=new int[vardims];
+      int *dims=new int[static_cast<size_t>(vardims)];
       if(ncvarinq(_mincid, var_id, NULL, NULL, NULL, dims, NULL)!=MI_ERROR)
       {
         long varlength=1;
@@ -288,7 +288,7 @@ namespace minc
       //ncopts=op;
       return "";
     }
-    char* str = new char[att_length+1];
+    char* str = new char[static_cast<size_t>(att_length)+1];
     str[0] = '\0';
     miattgetstr(_mincid, varid, att_name, att_length+1, str);
     //ncopts=op;
@@ -760,7 +760,7 @@ namespace minc
         _is_signed=1;
         break;
       case NC_FLOAT:
-        vrange[0]=-FLT_MAX;vrange[1]=FLT_MAX;
+        vrange[0]=static_cast<double>(-FLT_MAX);vrange[1]=static_cast<double>(FLT_MAX);
         _is_signed=1;
         break;
       case NC_SHORT:
@@ -871,8 +871,8 @@ namespace minc
       CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_TYPE,      NC_FLOAT));
       CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_DO_NORM,   true));
       CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_USER_NORM, true));
-      CHECK_MINC_CALL(miicv_setdbl(_icvid, MI_ICV_VALID_MIN, -FLT_MAX));
-      CHECK_MINC_CALL(miicv_setdbl(_icvid, MI_ICV_VALID_MAX, FLT_MAX));
+      CHECK_MINC_CALL(miicv_setdbl(_icvid, MI_ICV_VALID_MIN, static_cast<double>(-FLT_MAX)));
+      CHECK_MINC_CALL(miicv_setdbl(_icvid, MI_ICV_VALID_MAX, static_cast<double>(FLT_MAX)));
       _calc_min_max=true;
 
     } else { //do something smart here?
@@ -880,8 +880,8 @@ namespace minc
       CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_TYPE, NC_FLOAT));
       CHECK_MINC_CALL(miicv_setint(_icvid, MI_ICV_DO_NORM, false));
       //miicv_setint(_icvid, MI_ICV_USER_NORM, false);
-      CHECK_MINC_CALL(miicv_setdbl(_icvid, MI_ICV_VALID_MIN, -FLT_MAX));
-      CHECK_MINC_CALL(miicv_setdbl(_icvid, MI_ICV_VALID_MAX, FLT_MAX));
+      CHECK_MINC_CALL(miicv_setdbl(_icvid, MI_ICV_VALID_MIN, static_cast<double>(-FLT_MAX)));
+      CHECK_MINC_CALL(miicv_setdbl(_icvid, MI_ICV_VALID_MAX, static_cast<double>(FLT_MAX)));
       _calc_min_max=true;
 
     }

@@ -1,5 +1,8 @@
 /* Suppress warnings for string literal to char* assignments required by MINC API */
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
 #pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
+#pragma GCC diagnostic ignored "-Wincompatible-pointer-types-discards-qualifiers"
 #define _GNU_SOURCE 1
 #include "config.h"
 #include <stdio.h>

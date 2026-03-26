@@ -260,7 +260,7 @@ static int test2(void)
                     return (1);
                 }
 
-                if (fcmpl.real != (i * 100) + j || fcmpl.imag != k) {
+                if (fcmpl.real != (float)((i * 100) + j) || fcmpl.imag != (float)k) {
                     fprintf(stderr, "value mismatch for complex voxel\n");
                     return (1);
                 }

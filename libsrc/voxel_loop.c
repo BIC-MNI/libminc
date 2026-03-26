@@ -1659,8 +1659,8 @@ PRIVATE int do_voxel_loop(Loop_Options *loop_options,
          /* Force truncation of valid_range to match float image */
          if ((ncvarinq(outmincid, imgid, NULL, &file_datatype, NULL, NULL,
                        NULL) != MI_ERROR) && (file_datatype == NC_FLOAT)) {
-            valid_range[0] = (float) valid_range[0];
-            valid_range[1] = (float) valid_range[1];
+            valid_range[0] = (double)(float) valid_range[0];
+            valid_range[1] = (double)(float) valid_range[1];
          }
 
          (void) miset_valid_range(outmincid, imgid, valid_range);

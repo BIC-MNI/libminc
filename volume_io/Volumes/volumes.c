@@ -24,7 +24,10 @@
 /* String literals are const char* but VIO_STR is char*; suppress the
    unavoidable qualifier warning for these static initializations. */
 #pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
 #pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
+#pragma GCC diagnostic ignored "-Wincompatible-pointer-types-discards-qualifiers"
 #pragma GCC diagnostic ignored "-Wcast-qual"
 VIO_STR   XYZ_dimension_names[] = { MIxspace, MIyspace, MIzspace };
 VIO_STR   File_order_dimension_names[] = { "", "", "", "", "" };
@@ -78,7 +81,10 @@ static  VIO_STR  convert_spatial_axis_to_dim_name(
     switch( axis )
     {
 #pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
 #pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
+#pragma GCC diagnostic ignored "-Wincompatible-pointer-types-discards-qualifiers"
     case VIO_X:  return( MIxspace );
     case VIO_Y:  return( MIyspace );
     case VIO_Z:  return( MIzspace );
@@ -2807,7 +2813,7 @@ VIOAPI  VIO_Volume  copy_volume_new_type(
             }
             break;
         case NC_FLOAT:
-            value = ((float *) src)[i];
+            value = (double)((float *) src)[i];
             break;
 
         case NC_DOUBLE:

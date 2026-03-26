@@ -705,7 +705,9 @@ static void miswap2 ( unsigned char *tmp_ptr )
 
 /** Generic HDF5 integer-to-double converter.
 */
-
+/* HDF5 guarantees buffer alignment for type conversion callbacks */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
 static herr_t mi2_int_to_dbl ( hid_t src_id,
                                hid_t dst_id,
                                H5T_cdata_t *cdata,
@@ -909,9 +911,13 @@ static herr_t mi2_int_to_dbl ( hid_t src_id,
 
   return ( 0 );
 }
+#pragma GCC diagnostic pop
 
 /** Generic HDF5 double-to-integer converter.
 */
+/* HDF5 guarantees buffer alignment for type conversion callbacks */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
 static herr_t mi2_dbl_to_int ( hid_t src_id,
                                hid_t dst_id,
                                H5T_cdata_t *cdata,
@@ -1335,6 +1341,7 @@ static herr_t mi2_dbl_to_int ( hid_t src_id,
 
   return ( 0 );
 }
+#pragma GCC diagnostic pop
 
 
 /** Initialize some critical pieces of the library.  For now all this does

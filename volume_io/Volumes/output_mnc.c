@@ -348,7 +348,10 @@ VIOAPI  Minc_file  initialize_minc_output(
     int                 n_volume_dims;
     int                 d, vol_index, n_range_dims;
 #pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
 #pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
+#pragma GCC diagnostic ignored "-Wincompatible-pointer-types-discards-qualifiers"
     static  VIO_STR      default_dim_names[] = { MIzspace, MIyspace, MIxspace };
 #pragma GCC diagnostic pop
     VIO_STR              *vol_dimension_names;
@@ -637,7 +640,10 @@ VIOAPI  VIO_Status  copy_auxiliary_data_from_open_minc_file(
     int     i, src_min_id, src_max_id, src_root_id;
     VIO_Status  status;
 #pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
 #pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
+#pragma GCC diagnostic ignored "-Wincompatible-pointer-types-discards-qualifiers"
     VIO_STR  excluded_list[] = {
                                   MIxspace,
                                   MIyspace,

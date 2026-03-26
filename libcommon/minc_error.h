@@ -201,7 +201,15 @@ void MI_log_sys_error1(const char *p1);
 #endif /* __cplusplus */
 
 
+/* ##__VA_ARGS__ is a GNU extension to swallow the comma when __VA_ARGS__
+   is empty. Clang warns about it; suppress in the header since this pattern
+   is intentional and there is no portable C11 alternative. */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
 #define MI_LOG_ERROR(code,...) mi2log_message(__FILE__, __LINE__, code, ##__VA_ARGS__ )
+#pragma GCC diagnostic pop
 #define MI_CHECK_HDF_CALL(var,call) {if((var)<0) MI_LOG_ERROR(MI2_MSG_HDF5,call);}
 #define MI_CHECK_HDF_CALL_RET(var,call) {if((var)<0) return MI_LOG_ERROR(MI2_MSG_HDF5,call);}
 

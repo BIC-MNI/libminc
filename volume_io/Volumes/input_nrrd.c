@@ -307,7 +307,7 @@ nrrd_str_to_type(const char *str_ptr)
   }
   else
   {
-    return -1;
+    return (nrrd_type_t)-1;
   }
 }
 
@@ -371,7 +371,7 @@ nrrd_str_to_encoding(const char *str_ptr)
   }
   else
   {
-    return -1;
+    return (nrrd_encoding_t)-1;
   }
 }
 
@@ -516,7 +516,7 @@ nrrd_kind_to_str(nrrd_kind_t nrrd_kind)
  * \param str_ptr The NRRD kind string for this dimension.
  * \returns An integer representation of the kind.
  */
-static int
+static nrrd_kind_t
 nrrd_str_to_kind(const char *str_ptr)
 {
   if (!strcasecmp(str_ptr, "domain"))
@@ -650,7 +650,7 @@ nrrd_str_to_kind(const char *str_ptr)
   }
   else
   {
-    return -1;
+    return (nrrd_kind_t)-1;
   }
 }
 
@@ -730,7 +730,7 @@ nrrd_print_header(FILE *fp, nrrd_header_t nrrd_ptr)
  * NRRD_ENDIAN_BIG on big-endian architectures.
  */
 static nrrd_endian_t
-nrrd_get_system_endian()
+nrrd_get_system_endian(void)
 {
   union
   {
@@ -776,6 +776,8 @@ nrrd_read_buffer(nrrd_header_t nrrd_ptr, unsigned char *data_ptr,
     /* This is crufty and slow, but then we don't expect to see any
      * large images with ASCII encoding, do we??
      */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
     n_bytes_per_item = nrrd_type_to_size(nrrd_ptr->type);
     n_items = n_bytes / n_bytes_per_item;
     n_converted = 1;
@@ -826,6 +828,7 @@ nrrd_read_buffer(nrrd_header_t nrrd_ptr, unsigned char *data_ptr,
       if (n_converted > 0)
         n_bytes_read += n_bytes_per_item * n_converted;
     }
+#pragma GCC diagnostic pop
     break;
 
   case NRRD_ENCODING_GZIP:
@@ -959,7 +962,7 @@ nrrd_find_data_range(nrrd_header_t nrrd_ptr, FILE *fp,
         tmp = ((uint32_t *)buffer)[i];
         break;
       case NRRD_TYPE_FLOAT32:
-        tmp = ((float32_t *)buffer)[i];
+        tmp = (double)((float32_t *)buffer)[i];
         break;
       case NRRD_TYPE_FLOAT64:
         tmp = ((float64_t *)buffer)[i];
@@ -1493,9 +1496,9 @@ nrrd_to_minc_attributes(nrrd_header_t nrrd_ptr,
       {
         for (j = 0; j < 3; j++)
         {
-          Transform_elem(mnc_xform, axis, j) = nrrd_ptr->space_directions[i][j];
+          Transform_elem(mnc_xform, axis, j) = (double)nrrd_ptr->space_directions[i][j];
         }
-        Transform_elem(mnc_xform, axis, 3) = nrrd_ptr->space_origin[axis];
+        Transform_elem(mnc_xform, axis, 3) = (double)nrrd_ptr->space_origin[axis];
       }
     }
   }
@@ -1847,7 +1850,7 @@ input_more_nrrd_format_file(VIO_Volume          volume,
   int            i, j;
   int            total_slices;
   int            n_dimensions = get_volume_n_dimensions( volume );
-  int            vio_data_type = get_volume_data_type( volume );
+  VIO_Data_types vio_data_type = get_volume_data_type( volume );
   int            *inner_index;
   int            j_max;
 
@@ -1944,7 +1947,7 @@ input_more_nrrd_format_file(VIO_Volume          volume,
             value = (double)((int64_t *) data_ptr)[data_ind++];
             break;
           case NRRD_TYPE_FLOAT32:
-            value = ((float *) data_ptr)[data_ind++];
+            value = (double)((float *) data_ptr)[data_ind++];
             break;
           case NRRD_TYPE_FLOAT64:
             value = ((double *) data_ptr)[data_ind++];
