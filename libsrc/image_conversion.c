@@ -251,6 +251,7 @@ MNCAPI int miicv_create(void)
       MI_RETURN(MI_ERROR);
    }
    icvp=minc_icv_list[new_icv];
+   memset(icvp, 0, sizeof(*icvp));
 
    /* Fill in defaults */
 
