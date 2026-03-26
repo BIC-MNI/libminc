@@ -121,19 +121,19 @@ static hid_t _hdf_open(const char *path, int mode)
 
   prp_id = H5Pcreate(H5P_FILE_ACCESS);
   H5Pset_libver_bounds(prp_id, H5F_LIBVER_V18, H5F_LIBVER_V18);
-  H5Pset_cache(prp_id, 0, 2503, miget_cfg_present(MICFG_MINC_FILE_CACHE)?miget_cfg_int(MICFG_MINC_FILE_CACHE)*100000:_MI1_MAX_VAR_BUFFER_SIZE*10, 1.0);
+  H5Pset_cache(prp_id, 0, 2503, miget_cfg_present(MICFG_MINC_FILE_CACHE)?(size_t)miget_cfg_int(MICFG_MINC_FILE_CACHE)*100000:(size_t)_MI1_MAX_VAR_BUFFER_SIZE*10, 1.0);
 
   H5E_BEGIN_TRY {
 #ifdef HDF5_MMAP_TEST
     if (mode & 0x8000) {
 
       H5Pset_fapl_mmap(prp_id, 8192, 1);
-      fd = H5Fopen(path, mode & 0x7FFF, prp_id);
+      fd = H5Fopen(path, (unsigned)mode & 0x7FFF, prp_id);
     } else {
-      fd = H5Fopen(path, mode, prp_id);
+      fd = H5Fopen(path, (unsigned)mode, prp_id);
     }
 #else
-    fd = H5Fopen(path, mode, prp_id);
+    fd = H5Fopen(path, (unsigned)mode, prp_id);
 #endif
   } H5E_END_TRY;
 
@@ -225,10 +225,10 @@ static hid_t _hdf_create(const char *path, int cmode)
   /* Limit filetype to 1.8.x */
   H5Pset_libver_bounds(fpid, H5F_LIBVER_V18, H5F_LIBVER_V18);
 
-  H5Pset_cache(fpid, 0, 2503, miget_cfg_present(MICFG_MINC_FILE_CACHE)?miget_cfg_int(MICFG_MINC_FILE_CACHE)*100000:_MI1_MAX_VAR_BUFFER_SIZE*100, 1.0);
+  H5Pset_cache(fpid, 0, 2503, miget_cfg_present(MICFG_MINC_FILE_CACHE)?(size_t)miget_cfg_int(MICFG_MINC_FILE_CACHE)*100000:(size_t)_MI1_MAX_VAR_BUFFER_SIZE*100, 1.0);
 
   H5E_BEGIN_TRY {
-    fd = H5Fcreate(path, cmode, H5P_DEFAULT, fpid);
+    fd = H5Fcreate(path, (unsigned)cmode, H5P_DEFAULT, fpid);
   } H5E_END_TRY;
 
   if (fd < 0) {
@@ -469,7 +469,7 @@ int micreate_volume(const char *filename, int number_of_dimensions,
   hid_t dataset_id = -1;
   hid_t dataset_width = -1;
   hid_t dataspace_id = -1;
-  char *name;
+  const char *name;
   size_t size;
   hsize_t hdf_size[MI2_MAX_VAR_DIMS];
   mihandle_t handle;
@@ -610,8 +610,8 @@ int micreate_volume(const char *filename, int number_of_dimensions,
   */
   if (volume_class != MI_CLASS_LABEL &&
       volume_class != MI_CLASS_UNIFORM_RECORD) {
-    size_t size = H5Tget_size(handle->ftype_id);
-    char *tmp = calloc(1, size);
+    size_t fill_size = H5Tget_size(handle->ftype_id);
+    char *tmp = calloc(1, fill_size);
     H5Pset_fill_value(hdf_plist, handle->ftype_id, tmp);
     free(tmp);
   }
@@ -634,7 +634,7 @@ int micreate_volume(const char *filename, int number_of_dimensions,
       /* Create an array, hdf_size, containing the size of each chunk
       */
       for ( i=0; i < number_of_dimensions; i++) {
-        hdf_size[i] = create_props->edge_lengths[i];
+        hdf_size[i] = (hsize_t)create_props->edge_lengths[i];
         /* If the size of each chunk is greater than the size of
           the corresponding dimension, set the chunk size to the
           dimension size
@@ -664,7 +664,7 @@ int micreate_volume(const char *filename, int number_of_dimensions,
     MI_CHECK_HDF_CALL_RET(stat = H5Pset_chunk(hdf_plist, number_of_dimensions, hdf_size),"H5Pset_chunk")
 
     /* Sets compression method and compression level */
-    MI_CHECK_HDF_CALL_RET(stat = H5Pset_deflate(hdf_plist, create_props->zlib_level),"H5Pset_deflate")
+    MI_CHECK_HDF_CALL_RET(stat = H5Pset_deflate(hdf_plist, (unsigned)create_props->zlib_level),"H5Pset_deflate")
 
 
     if (create_props->checksum )
@@ -756,13 +756,14 @@ int micreate_volume(const char *filename, int number_of_dimensions,
           to the dataset.
         */
         size = strlen(dimensions[i]->name) + 6 + 1;
-        name = malloc(size);
-        strcpy(name, dimensions[i]->name);
-        strcat(name, "-width");
+        {
+          char *width_name = malloc(size);
+          strcpy(width_name, dimensions[i]->name);
+          strcat(width_name, "-width");
 
-        /* Create dataset dimension_name-width */
-        dataset_width = H5Dcreate2(grp_id, name, H5T_IEEE_F64LE,
-                                   dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+          /* Create dataset dimension_name-width */
+          dataset_width = H5Dcreate2(grp_id, width_name, H5T_IEEE_F64LE,
+                                     dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
         /* Return an Id for the dataspace of the dataset dataset_width */
         MI_CHECK_HDF_CALL_RET(fspc_id = H5Dget_space(dataset_width),"H5Dget_space")
 
@@ -785,7 +786,8 @@ int micreate_volume(const char *filename, int number_of_dimensions,
                           1, &dimensions[i]->length);
         /* Close the specified dataset */
         H5Dclose(dataset_width);
-        free(name);
+        free(width_name);
+        }
       }
     }
 
@@ -896,11 +898,11 @@ int micreate_volume(const char *filename, int number_of_dimensions,
     Note, each volume handle is associated with an array of
     dimension handles in the order that they were create (i.e, file order)
   */
-  handle->dim_handles = (midimhandle_t *)malloc(number_of_dimensions *
+  handle->dim_handles = (midimhandle_t *)malloc((size_t)number_of_dimensions *
                         sizeof(midimhandle_t));
 
   if (handle->dim_handles == NULL) {
-    return MI_LOG_ERROR(MI2_MSG_OUTOFMEM,number_of_dimensions * sizeof(midimhandle_t));
+    return MI_LOG_ERROR(MI2_MSG_OUTOFMEM,(size_t)number_of_dimensions * sizeof(midimhandle_t));
   }
 
   /* Once the space for all dimension handles is created
@@ -988,7 +990,7 @@ int micreate_volume(const char *filename, int number_of_dimensions,
     /* Allocate space for an array which holds the size of each chunk
     and fill the array with the appropriiate chunk sizes.
     */
-    props_handle->edge_lengths = (int *)malloc(create_props->max_lengths*sizeof(int));
+    props_handle->edge_lengths = (int *)malloc((size_t)create_props->max_lengths*sizeof(int));
     for (i=0; i<create_props->max_lengths; i++) {
       props_handle->edge_lengths[i] = create_props->edge_lengths[i];
     }
@@ -1171,9 +1173,9 @@ static int _miget_irregular_spacing(mihandle_t hvol, midimhandle_t hdim)
 
   n_points = H5Sget_simple_extent_npoints(dspc_id);
 
-  hdim->offsets = malloc(n_points * sizeof(double));
+  hdim->offsets = malloc((size_t)n_points * sizeof(double));
   if (hdim->offsets == NULL)
-    return MI_LOG_ERROR(MI2_MSG_OUTOFMEM, n_points * sizeof(double));
+    return MI_LOG_ERROR(MI2_MSG_OUTOFMEM, (size_t)n_points * sizeof(double));
 
   /* Read the raw data to buffer (dimensions[i]->offsets)
      from the dataset.
@@ -1195,9 +1197,9 @@ static int _miget_irregular_spacing(mihandle_t hvol, midimhandle_t hdim)
       return 0;
     }
   }
-  hdim->widths = malloc(n_points * sizeof(double));
+  hdim->widths = malloc((size_t)n_points * sizeof(double));
   if (hdim->widths == NULL)
-    return MI_LOG_ERROR(MI2_MSG_OUTOFMEM, n_points * sizeof(double));
+    return MI_LOG_ERROR(MI2_MSG_OUTOFMEM, (size_t)n_points * sizeof(double));
 
   MI_CHECK_HDF_CALL_RET(status = H5Dread(dset_id, H5T_NATIVE_DOUBLE,
                                          H5S_ALL, H5S_ALL, H5P_DEFAULT,
@@ -1421,12 +1423,12 @@ int miopen_volume(const char *filename, int mode, mihandle_t *volume)
 
   /* READ EACH OF THE DIMENSIONS
   */
-  handle->dim_handles = (midimhandle_t *)malloc(n_dimensions *
+  handle->dim_handles = (midimhandle_t *)malloc((size_t)n_dimensions *
                         sizeof(midimhandle_t));
 
   if(handle->dim_handles == NULL) {
     free(handle);
-    return MI_LOG_ERROR(MI2_MSG_OUTOFMEM, n_dimensions * sizeof(midimhandle_t));
+    return MI_LOG_ERROR(MI2_MSG_OUTOFMEM, (size_t)n_dimensions * sizeof(midimhandle_t));
   }
 
   /* Get the attribute (dimorder) from the image dataset */
@@ -1511,9 +1513,9 @@ int miopen_volume(const char *filename, int mode, mihandle_t *volume)
     handle->mtype_id = H5Tcreate(H5T_COMPOUND,
                                  H5Tget_size(handle->ftype_id));
     for (i = 0; i < H5Tget_nmembers(handle->ftype_id); i++) {
-      hid_t tmp_id = H5Tget_member_type(handle->ftype_id, i);
-      size_t tmp_off = H5Tget_member_offset(handle->ftype_id, i);
-      char *tmp_nm = H5Tget_member_name(handle->ftype_id, i);
+      hid_t tmp_id = H5Tget_member_type(handle->ftype_id, (unsigned)i);
+      size_t tmp_off = H5Tget_member_offset(handle->ftype_id, (unsigned)i);
+      char *tmp_nm = H5Tget_member_name(handle->ftype_id, (unsigned)i);
       hid_t tmp2_id = H5Tget_native_type(tmp_id, H5T_DIR_ASCEND);
       H5Tinsert(handle->mtype_id, tmp_nm, tmp_off, tmp2_id);
 

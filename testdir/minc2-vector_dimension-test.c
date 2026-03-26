@@ -128,7 +128,7 @@ int main ( void )
   printf ( " FILE ORDER --> zspace, yspace, xspace, vector_dimension \n" );
   for ( i = 0; i < 3; i++ ) {
     printf ( "Vector Component %d \n", i + 1 );
-    coords[3] = i;
+    coords[3] = (misize_t)i;
     r = miget_voxel_value_hyperslab ( vol, MI_TYPE_UBYTE, coords, count, Atmp );
     if ( r < 0 ) {
       TESTRPT ( "Failed to operate hyperslab function", r );
@@ -163,7 +163,7 @@ int main ( void )
   printf ( "APPARENT ORDER SET \n" );
   for ( i = 0; i < 3; i++ ) {
     printf ( "Vector Component %d \n", i + 1 );
-    coords[0] = i;
+    coords[0] = (misize_t)i;
     r = miget_voxel_value_hyperslab ( vol, MI_TYPE_UBYTE, coords, count, Atmp );
     if ( r < 0 ) {
       TESTRPT ( "Failed to operate hyperslab function", r );

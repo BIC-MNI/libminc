@@ -69,7 +69,7 @@ static void create_test_file ( void )
   /* Set random values to slice min and max for slice scaling*/
   start[0] = start[1] = start[2] = 0;
   for ( i = 0; i < CZ; i++ ) {
-    start[0] = i;
+    start[0] = (misize_t)i;
     min += 0.1;
     max += 0.1;
     miset_slice_range ( hvol, start, 3, max, min );

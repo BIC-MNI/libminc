@@ -134,7 +134,7 @@ static int create_3D_image ( const char *fname )
   /* Set random values to slice min and max for slice scaling*/
   start[0] = start[1] = start[2] = 0;
   for ( i = 0; i < CY; i++ ) {
-    start[0] = i;
+    start[0] = (misize_t)i;
     min += 0.1;
     max += 0.1;
     r = miset_slice_range ( hvol, start, NDIMS , max, min );
@@ -207,9 +207,9 @@ static int create_4D_image ( const char *fname )
   start[0] = start[1] = start[2] = start[3] = 0;
   for ( i = 0; i < CX; i++ ) {
 
-    start[0] = i;
+    start[0] = (misize_t)i;
     for ( j = 0; j < CU; j++ ) {
-      start[1] = j;
+      start[1] = (misize_t)j;
       min += -0.1;
       max += 0.1;
       r = miset_slice_range ( hvol, start, NDIMS + 1 , max, min );

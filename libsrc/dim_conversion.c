@@ -478,7 +478,7 @@ PRIVATE int MI_get_dim_scale(mi_icv_type *icvp, int cdfid, int dimvid[])
       (void) miattget1(cdfid, dimvid[idim], MIstart, NC_DOUBLE, &dimstart);
       /* Flip dimstart if needed */
       if (icvp->derv_dim_flip[idim])
-         dimstart -= dimstep * (icvp->var_dim_size[idim]-1);
+         dimstart -= dimstep * (double)(icvp->var_dim_size[idim]-1);
       /* Calculate start position */
       icvp->derv_dim_start[idim] = dimstart +
          (icvp->derv_dim_step[idim] - dimstep) / 2.0 -
@@ -517,7 +517,7 @@ PRIVATE int MI_get_dim_bufsize_step(mi_icv_type *icvp, int subsc[])
    /* Check for converting vector to scalar */
    icvp->derv_do_bufsize_step = (icvp->var_is_vector && icvp->user_do_scalar);
    if (icvp->derv_do_bufsize_step)
-      icvp->derv_bufsize_step[icvp->var_ndims-1] = icvp->var_vector_size;
+      icvp->derv_bufsize_step[icvp->var_ndims-1] = (int)icvp->var_vector_size;
 
    /* Check each dimension to see if we need to worry about the variable
       buffer size. This only occurs if we are shrinking the dimension from
@@ -550,6 +550,8 @@ PRIVATE int MI_icv_get_dim_conversion(mi_icv_type *icvp, int subsc[])
      /* ARGSUSED */
 {
    int idim;
+
+   (void)subsc;
 
    MI_SAVE_ROUTINE_NAME("MI_icv_get_dim_conversion");
 
@@ -814,6 +816,9 @@ PRIVATE int MI_icv_dimconv_init(int operation, mi_icv_type *icvp,
    long pixcount;
    int var_fd, usr_fd, dshift;
    long ipix;
+
+   (void)start;
+   (void)count;
 
    MI_SAVE_ROUTINE_NAME("MI_icv_dimconv_init");
 

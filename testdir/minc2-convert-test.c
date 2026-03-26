@@ -94,13 +94,13 @@ main(void)
     for (i = 0; i < CX; i++) {
         for (j = 0; j < CY; j++) {
             for (k = 0; k < CZ; k++) {
-                coords[0] = i;
-                coords[1] = j;
-                coords[2] = k;
+                coords[0] = (misize_t)i;
+                coords[1] = (misize_t)j;
+                coords[2] = (misize_t)k;
 
-                voxel[0] = coords[0];
-                voxel[1] = coords[1];
-                voxel[2] = coords[2];
+                voxel[0] = (double)coords[0];
+                voxel[1] = (double)coords[1];
+                voxel[2] = (double)coords[2];
 
                 miconvert_voxel_to_world(hvol, voxel, world);
 

@@ -23,9 +23,9 @@ int main ( int argc, char **argv )
       return 1;
     } else {
       for ( i = 0; i < CZ; i++ ) {
-        coords[0] = i;         /*Z*/
-        coords[1] = rand()%CX; /*X*/
-        coords[2] = rand()%CY; /*Y*/
+        coords[0] = (misize_t)i;         /*Z*/
+        coords[1] = (misize_t)(rand()%CX); /*X*/
+        coords[2] = (misize_t)(rand()%CY); /*Y*/
 
         r = miget_slice_min ( hvol, coords, 3, &min );
         if ( r < 0 ) {

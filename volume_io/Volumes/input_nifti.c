@@ -44,7 +44,7 @@ nifti_find_data_range(nifti_image *nii_ptr,
   *min_value_ptr = DBL_MAX;
   *max_value_ptr = -DBL_MAX;
 
-  n_voxels_per_chunk = CHUNK_SIZE / nii_ptr->nbyper;
+  n_voxels_per_chunk = (size_t)(CHUNK_SIZE / nii_ptr->nbyper);
 
   if ( nii_ptr->datatype == DT_RGB24 )
   {
@@ -63,7 +63,7 @@ nifti_find_data_range(nifti_image *nii_ptr,
        * the bytes and voxels actually loaded.
        */
       n_voxels_per_chunk = nii_ptr->nvox - i;
-      n_bytes_to_read = n_voxels_per_chunk * nii_ptr->nbyper;
+      n_bytes_to_read = n_voxels_per_chunk * (size_t)nii_ptr->nbyper;
     }
     else
     {
@@ -250,12 +250,12 @@ nifti_image_to_minc_attributes(nifti_image *nii_ptr,
   switch (nii_ptr->time_units)
   {
   case NIFTI_UNITS_MSEC:
-    mnc_starts[3] = nii_ptr->toffset / 1000.0;
-    mnc_steps[3] = nii_ptr->dt / 1000.0;
+    mnc_starts[3] = (double)nii_ptr->toffset / 1000.0;
+    mnc_steps[3] = (double)nii_ptr->dt / 1000.0;
     break;
   case NIFTI_UNITS_USEC:
-    mnc_starts[3] = nii_ptr->toffset / 1000000.0;
-    mnc_steps[3] = nii_ptr->dt / 1000000.0;
+    mnc_starts[3] = (double)nii_ptr->toffset / 1000000.0;
+    mnc_steps[3] = (double)nii_ptr->dt / 1000000.0;
     break;
   default:                      /* Either seconds or unknown. */
     mnc_starts[3] = nii_ptr->toffset;
@@ -282,7 +282,7 @@ nifti_skip_header(znzFile zfp, nifti_image *nii_ptr)
   // A negative offset means that it is relative to the end-of-file.
   if (nii_ptr->iname_offset < 0)
   {
-    size_t filesize = nifti_get_filesize(nii_ptr->iname);
+    size_t filesize = (size_t)nifti_get_filesize(nii_ptr->iname);
     if ( filesize <= 0 )            // Empty image file?
     {
       return VIO_ERROR;
@@ -291,9 +291,9 @@ nifti_skip_header(znzFile zfp, nifti_image *nii_ptr)
   }
   else
   {
-    ioff = nii_ptr->iname_offset;
+    ioff = (size_t)nii_ptr->iname_offset;
   }
-  znzseek(zfp, ioff, SEEK_SET);
+  znzseek(zfp, (off_t)ioff, SEEK_SET);
   return VIO_OK;
 }
 
@@ -453,7 +453,7 @@ initialize_nifti_format_input(VIO_STR             filename,
     if (axis < 3)
     {
       int volume_axis = in_ptr->axis_index_from_file[axis];
-      sizes[volume_axis] = in_ptr->sizes_in_file[axis];
+      sizes[volume_axis] = (int)in_ptr->sizes_in_file[axis];
       steps[axis] = mnc_steps[volume_axis];
       starts[axis] = mnc_starts[volume_axis];
 
@@ -461,7 +461,7 @@ initialize_nifti_format_input(VIO_STR             filename,
     }
     else
     {
-      sizes[axis] = in_ptr->sizes_in_file[axis];
+      sizes[axis] = (int)in_ptr->sizes_in_file[axis];
       steps[axis] = mnc_steps[axis];
       starts[axis] = mnc_starts[axis];
     }
@@ -519,8 +519,8 @@ initialize_nifti_format_input(VIO_STR             filename,
    */
   if (nii_ptr->scl_slope > 0)
   {
-    min_real = (min_voxel * nii_ptr->scl_slope) + nii_ptr->scl_inter;
-    max_real = (max_voxel * nii_ptr->scl_slope) + nii_ptr->scl_inter;
+    min_real = (min_voxel * (double)nii_ptr->scl_slope) + (double)nii_ptr->scl_inter;
+    max_real = (max_voxel * (double)nii_ptr->scl_slope) + (double)nii_ptr->scl_inter;
   }
   else
   {
@@ -554,7 +554,7 @@ initialize_nifti_format_input(VIO_STR             filename,
   in_ptr->slice_index = 0;
   in_ptr->volume_file = (FILE *) zfp;
   in_ptr->header_info = nii_ptr;
-  in_ptr->generic_slice_buffer = malloc(n_voxels_in_slice * nii_ptr->nbyper);
+  in_ptr->generic_slice_buffer = malloc((size_t)n_voxels_in_slice * (size_t)nii_ptr->nbyper);
   if (in_ptr->generic_slice_buffer == NULL)
   {
     return VIO_ERROR;
@@ -598,7 +598,7 @@ input_more_nifti_format_file(
 
   total_slices = 1;
   for_less( i, 2, n_dimensions )
-    total_slices *= in_ptr->sizes_in_file[i];
+    total_slices *= (int)in_ptr->sizes_in_file[i];
 
   if ( in_ptr->slice_index < total_slices )
   {
@@ -606,14 +606,14 @@ input_more_nifti_format_file(
     size_t     n_bytes_read;
     int        sizes[VIO_MAX_DIMENSIONS] = {1, 1, 1, 1, 1};
 
-    sizes[in_ptr->axis_index_from_file[0]] = in_ptr->sizes_in_file[0];
+    sizes[in_ptr->axis_index_from_file[0]] = (int)in_ptr->sizes_in_file[0];
     sizes[in_ptr->axis_index_from_file[1]] = 1;
 
-    n_bytes_per_slice = (in_ptr->sizes_in_file[0] *
-                         in_ptr->sizes_in_file[1] *
-                         nii_ptr->nbyper);
+    n_bytes_per_slice = ((size_t)in_ptr->sizes_in_file[0] *
+                         (size_t)in_ptr->sizes_in_file[1] *
+                         (size_t)nii_ptr->nbyper);
 
-    VIO_Real *temp_buffer = malloc(in_ptr->sizes_in_file[0] *
+    VIO_Real *temp_buffer = malloc((size_t)in_ptr->sizes_in_file[0] *
                                    sizeof(VIO_Real));
 
     /* If the memory for the volume has not been allocated yet,
@@ -658,15 +658,15 @@ input_more_nifti_format_file(
       /* If a vector dimension is present, convert the slice index into
        * a vector, time, and slice coordinate.
        */
-      indices[in_ptr->axis_index_from_file[4]] = i / (in_ptr->sizes_in_file[3] * in_ptr->sizes_in_file[2]);
-      i %= (in_ptr->sizes_in_file[3] * in_ptr->sizes_in_file[2]);
+      indices[in_ptr->axis_index_from_file[4]] = (int)(i / (in_ptr->sizes_in_file[3] * in_ptr->sizes_in_file[2]));
+      i %= (int)(in_ptr->sizes_in_file[3] * in_ptr->sizes_in_file[2]);
       /* fall through */
     case 4:
       /* If a time dimension is present, convert the slice index into
        * both a time and slice coordinate using the number of slices.
        */
-      indices[in_ptr->axis_index_from_file[3]] = i / in_ptr->sizes_in_file[2];
-      i %= in_ptr->sizes_in_file[2];
+      indices[in_ptr->axis_index_from_file[3]] = (int)(i / in_ptr->sizes_in_file[2]);
+      i %= (int)in_ptr->sizes_in_file[2];
       /* fall through */
     default:
       indices[in_ptr->axis_index_from_file[2]] = i;
@@ -766,7 +766,7 @@ input_more_nifti_format_file(
            */
           if (nii_ptr->intent_code == NIFTI_INTENT_NONE)
           {
-            int n = n_bytes_per_slice / 3;
+            int n = (int)(n_bytes_per_slice / 3);
             unsigned char r = ((unsigned char *)data_ptr)[data_ind + (n * 0)];
             unsigned char g = ((unsigned char *)data_ptr)[data_ind + (n * 1)];
             unsigned char b = ((unsigned char *)data_ptr)[data_ind + (n * 2)];

@@ -529,7 +529,7 @@ static  void   evaluate_grid_volume(
             end[d] = 1;
         } else {
             pos = voxel[d] - bound;
-            start[d] = VIO_FLOOR( pos );
+            start[d] = (int)VIO_FLOOR( pos );
             if( start[d] < 0 ) {
                 start[d] = 0;
             } else if( start[d]+degrees_continuity+1 >= sizes[d] ) {

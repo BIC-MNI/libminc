@@ -35,7 +35,7 @@ check_dims(mihandle_t vol, midimhandle_t dim[])
     for (i = 0; i < CT; i++) {
         double tmp = -1;
 
-        r = miget_dimension_offsets(dim[0], 1, i, &tmp);
+        r = miget_dimension_offsets(dim[0], 1, (misize_t)i, &tmp);
         if (r < 0) {
             TESTRPT("failed", r);
         }
@@ -159,7 +159,7 @@ int main(void)
 
     for (i = 0; i < CT; i++) {
         offset = (i * i) + 100.0;
-        r = miset_dimension_offsets(dim[0], 1, i, &offset);
+        r = miset_dimension_offsets(dim[0], 1, (misize_t)i, &offset);
         if (r < 0) {
             TESTRPT("failed", r);
         }
@@ -167,7 +167,7 @@ int main(void)
 
     for (i = 0; i < CT; i++) {
         offset = 30.0 + i;
-        r = miset_dimension_widths(dim[0], 1, i, &offset);
+        r = miset_dimension_widths(dim[0], 1, (misize_t)i, &offset);
         if (r < 0) {
             TESTRPT("failed", r);
         }
@@ -238,11 +238,11 @@ int main(void)
         for (j = 0; j < CY; j++) {
             for (k = 0; k < CZ; k++) {
                 coords[0] = 0;
-                coords[1] = i;
-                coords[2] = j;
-                coords[3] = k;
+                coords[1] = (misize_t)i;
+                coords[2] = (misize_t)j;
+                coords[3] = (misize_t)k;
 
-                voxel = (i*10000)+(j*100)+k;
+                voxel = (unsigned)((i*10000)+(j*100)+k);
                 r = miset_voxel_value_hyperslab(vol,
                                                 MI_TYPE_UINT,
                                                 coords,
@@ -289,7 +289,7 @@ int main(void)
     r = miget_volume_dimensions(vol, MI_DIMCLASS_ANY, 0,
                                 MI_DIMORDER_FILE, NDIMS, dim);
     for (i = 0; i < CT; i++) {
-        r = miget_dimension_offsets(dim[0], 1, i, &offset);
+        r = miget_dimension_offsets(dim[0], 1, (misize_t)i, &offset);
         if (r < 0) {
             TESTRPT("failed", r);
         }
@@ -299,7 +299,7 @@ int main(void)
     }
 
     for (i = 0; i < CT; i++) {
-        r = miget_dimension_widths(dim[0], MI_ORDER_FILE, 1, i, &offset);
+        r = miget_dimension_widths(dim[0], MI_ORDER_FILE, 1, (misize_t)i, &offset);
         if (r < 0) {
             TESTRPT("failed", r);
         }

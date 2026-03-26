@@ -421,7 +421,7 @@ VIOAPI  VIO_Status  input_volume(
         while( input_more_of_volume( *volume, &input_info, &amount_done ) )
         {
             update_progress_report( &progress,
-                                    VIO_ROUND( (VIO_Real) FACTOR * amount_done));
+                                    (int)VIO_ROUND( (VIO_Real) FACTOR * amount_done));
         }
 
         if (amount_done < 1.0)

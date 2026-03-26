@@ -33,8 +33,8 @@
 
 static struct {
    nc_type type;
-   char *sign;
-   char *ctype;
+   const char *sign;
+   const char *ctype;
 
 } types[]= { { NC_BYTE,   MI_UNSIGNED, "byte" },
 	     { NC_BYTE,   MI_SIGNED,   "byte" },
@@ -81,8 +81,8 @@ int main(int argc, char **argv)
          img2=ncvardef(cdf, "image2", types[jtype].type, 1, dim);
          (void) miattputstr(cdf, img2, MIsigntype, types[jtype].sign);
          image[0]=10.0;
-         image[1]=2.0*(-FLT_MAX);
-         image[2]=2.0*FLT_MAX;
+         image[1]=2.0*(-(double)FLT_MAX);
+         image[2]=2.0*(double)FLT_MAX;
          image[3]=3.2;
          image[4]=3.7;
          image[5]=(-3.2);

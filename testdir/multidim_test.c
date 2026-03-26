@@ -268,6 +268,8 @@ main(int argc, char **argv)
 {
   // these sizes affect which types we can use lower down.
   int sizes[] = { 13, 16, 17, 11, 23 };
+  (void)argc;
+  (void)argv;
   int errors = 0;
 
   printf("Testing multidim_arrays...\n");

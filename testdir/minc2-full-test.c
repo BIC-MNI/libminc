@@ -108,9 +108,9 @@ static int test1(int do_real)
     for (i = 0; i < CX; i++) {
         for (j = 0; j < CY; j++) {
            for (k = 0; k < CZ; k++) {
-                coords[0] = i;
-                coords[1] = j;
-                coords[2] = k;
+                coords[0] = (misize_t)i;
+                coords[1] = (misize_t)j;
+                coords[2] = (misize_t)k;
 
                 if (do_real) {
                     r = miset_real_value(hvol, coords, ND, 1.0);
@@ -224,12 +224,12 @@ static int test2(void)
     for (i = 0; i < CCX; i++) {
         for (j = 0; j < CCY; j++) {
             for (k = 0; k < CCZ; k++) {
-                coords[0] = i;
-                coords[1] = j;
-                coords[2] = k;
+                coords[0] = (misize_t)i;
+                coords[1] = (misize_t)j;
+                coords[2] = (misize_t)k;
 
-                fcmpl.real = (i * 100) + j;
-                fcmpl.imag = k;
+                fcmpl.real = (float)((i * 100) + j);
+                fcmpl.imag = (float)k;
                 r = miset_voxel_value_hyperslab(hvol,
                                                 MI_TYPE_FCOMPLEX,
                                                 coords,
@@ -246,9 +246,9 @@ static int test2(void)
     for (i = 0; i < CCX; i++) {
         for (j = 0; j < CCY; j++) {
             for (k = 0; k < CCZ; k++) {
-                coords[0] = i;
-                coords[1] = j;
-                coords[2] = k;
+                coords[0] = (misize_t)i;
+                coords[1] = (misize_t)j;
+                coords[2] = (misize_t)k;
 
                 r = miget_voxel_value_hyperslab(hvol,
                                                 MI_TYPE_FCOMPLEX,
@@ -283,6 +283,8 @@ int
 main(int argc, char **argv)
 {
     int errors;
+    (void)argc;
+    (void)argv;
 
     errors = 0;
     errors += test1(0);

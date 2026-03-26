@@ -390,11 +390,11 @@ minc_load_data(char *path, void *dataptr, int datatype,
     j = 0;
     for (i = 0; i < MI_S_NDIMS; i++) {
         if (dim_len[i] > 0) {
-            ucount[j++] = dim_len[i];
+            ucount[j++] = (size_t)dim_len[i];
         }
     }
 
-    restructure_array(var_ndims, dataptr, ucount, nctypelen(nctype),
+    restructure_array((size_t)var_ndims, dataptr, ucount, (size_t)nctypelen(nctype),
                       map, dir);
 
     miicv_detach(icv);
@@ -414,10 +414,10 @@ minc_load_data(char *path, void *dataptr, int datatype,
               &p_file->file_natts, NULL);
 
     p_file->file_atts = (struct att_info *) malloc(sizeof (struct att_info) *
-                                                   p_file->file_natts);
+                                                   (size_t)p_file->file_natts);
 
     p_file->file_vars = (struct var_info *) malloc(sizeof (struct var_info) *
-                                                   p_file->file_nvars);
+                                                   (size_t)p_file->file_nvars);
 
     for (i = 0; i < p_file->file_natts; i++) {
         p_att = &p_file->file_atts[i];
@@ -428,7 +428,7 @@ minc_load_data(char *path, void *dataptr, int datatype,
                  &p_att->att_type,
                  &p_att->att_len);
 
-        p_att->att_val = malloc(p_att->att_len * nctypelen(p_att->att_type));
+        p_att->att_val = malloc((size_t)p_att->att_len * (size_t)nctypelen(p_att->att_type));
 
         ncattget(fd, NC_GLOBAL, p_att->att_name, p_att->att_val);
     }
@@ -443,7 +443,7 @@ minc_load_data(char *path, void *dataptr, int datatype,
                  p_var->var_dims,
                  &p_var->var_natts);
 
-        p_var->var_atts = malloc(p_var->var_natts *
+        p_var->var_atts = malloc((size_t)p_var->var_natts *
                                  sizeof (struct att_info));
 
         if (ncdimid(fd, p_var->var_name) >= 0) {
@@ -459,7 +459,7 @@ minc_load_data(char *path, void *dataptr, int datatype,
                      &p_att->att_type,
                      &p_att->att_len);
 
-            p_att->att_val = malloc(p_att->att_len * nctypelen(p_att->att_type));
+            p_att->att_val = malloc((size_t)p_att->att_len * (size_t)nctypelen(p_att->att_type));
             ncattget(fd, i, p_att->att_name, p_att->att_val);
         }
     }
@@ -752,11 +752,11 @@ find_minmax(void *dataptr, long datacount, int datatype, double *min,
         {
             float *f_ptr = dataptr;
             while (datacount--) {
-                if (*f_ptr > *max) {
-                    *max = *f_ptr;
+                if ((double)*f_ptr > *max) {
+                    *max = (double)*f_ptr;
                 }
-                if (*f_ptr < *min) {
-                    *min = *f_ptr;
+                if ((double)*f_ptr < *min) {
+                    *min = (double)*f_ptr;
                 }
                 f_ptr++;
             }
@@ -1023,9 +1023,9 @@ minc_transform_to_world(const long voxel[], const int spatial_axes[3],
   double input[4];
   double output[4];
 
-  input[0] = voxel[spatial_axes[0]];
-  input[1] = voxel[spatial_axes[1]];
-  input[2] = voxel[spatial_axes[2]];
+  input[0] = (double)voxel[spatial_axes[0]];
+  input[1] = (double)voxel[spatial_axes[1]];
+  input[2] = (double)voxel[spatial_axes[2]];
   input[3] = 1;
 
   for (i = 0; i < 4; i++) {

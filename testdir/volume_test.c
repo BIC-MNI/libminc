@@ -522,6 +522,7 @@ int
 main(int argc, char **argv)
 {
   int errors = 0;
+  (void)argc;
 
   set_print_error_function( test_error );
 

@@ -586,8 +586,10 @@ MNCAPI int miicv_put(int icvid, long start[], long count[], void *values);
 MNCAPI int miicv_attach(int icvid, int cdfid, int varid);
 
 /* From minc_error.c */
+#ifndef MINC_ERROR_H
 MNCAPI void milog_init(const char *);
 MNCAPI int milog_set_verbosity(int);
+#endif
 
 /* from minc_format_convert.h*/
 MNCAPI int minc_format_convert(const char *input,const char *output);

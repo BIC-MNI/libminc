@@ -183,7 +183,7 @@ int main(void)
     if (fltarr[r] != (float) tstarr[r]) {
 	    TESTRPT("miget_attr_values mismatch", r);
 	    fprintf(stderr, "fltarr[%d] = %f, tstarr[%d] = %f\n",
-              r, fltarr[r], r, tstarr[r]);
+              r, (double)fltarr[r], r, (double)tstarr[r]);
     }
   }
 

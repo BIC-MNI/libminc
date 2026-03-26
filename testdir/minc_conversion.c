@@ -101,7 +101,7 @@ static int test1(struct testinfo *ip, struct dimdef *dims, int ndims)
   /* Create the image-max variable.
    */
   printf("%s:%d\n",__FILE__,__LINE__);
-  ip->maxid = micreate_std_variable(ip->fd, (char*)MIimagemax, NC_DOUBLE, 0, NULL);
+  ip->maxid = micreate_std_variable(ip->fd, MIimagemax, NC_DOUBLE, 0, NULL);
   if (ip->maxid < 0) {
     FUNC_ERROR("micreate_std_variable");
   }
@@ -109,13 +109,13 @@ static int test1(struct testinfo *ip, struct dimdef *dims, int ndims)
   /* Create the image-min variable.
    */
   printf("%s:%d\n",__FILE__,__LINE__);
-  ip->minid = micreate_std_variable(ip->fd, (char*)MIimagemin, NC_DOUBLE, 0, NULL);
+  ip->minid = micreate_std_variable(ip->fd, MIimagemin, NC_DOUBLE, 0, NULL);
   if (ip->minid < 0) {
     FUNC_ERROR("micreate_std_variable");
   }
 
   printf("%s:%d\n",__FILE__,__LINE__);
-  ip->imgid = micreate_std_variable(ip->fd, (char*)MIimage, NC_FLOAT, ndims, ip->dim);
+  ip->imgid = micreate_std_variable(ip->fd, MIimage, NC_FLOAT, ndims, ip->dim);
   if (ip->imgid < 0) {
     FUNC_ERROR("micreate_std_variable");
   }
@@ -129,6 +129,7 @@ static int test2(struct testinfo *ip, struct dimdef *dims, int ndims)
   int stat;
   long coords[3];
   double flt;
+  (void)ndims;
 
   printf("test2\n");
   stat = miattputdbl(ip->fd, ip->imgid, MIvalid_max, (XSIZE * 10000.0));
@@ -160,7 +161,7 @@ static int test2(struct testinfo *ip, struct dimdef *dims, int ndims)
   for (i = 0; i < dims[TST_X].length; i++) {
     for (j = 0; j < dims[TST_Y].length; j++) {
       for (k = 0; k < dims[TST_Z].length; k++) {
-        float tmp = (i * 10000.0f) + (j * 100.0f) + k;
+        float tmp = (float)(i * 10000) + (float)(j * 100) + (float)k;
 
         coords[TST_X] = i;
         coords[TST_Y] = j;
@@ -198,7 +199,7 @@ test3(struct testinfo *ip, struct dimdef *dims, int ndims)
 
   total = 1;
   for (i = 0; i < ndims; i++) {
-    total *= dims[i].length;
+    total *= (size_t)dims[i].length;
   }
 
   buf_ptr = malloc(total * sizeof (float));
@@ -269,9 +270,9 @@ test3(struct testinfo *ip, struct dimdef *dims, int ndims)
   for (i = 0; i < dims[TST_X].length; i++) {
     for (j = 0; j < dims[TST_Y].length; j++) {
       for (k = 0; k < dims[TST_Z].length; k++) {
-        float tmp = (i * 10000.0f) + (j * 100.0f) + k;
+        float tmp = (float)(i * 10000) + (float)(j * 100) + (float)k;
         if (*flt_ptr != tmp ) {
-          fprintf(stderr, "1. Data error at (%d,%d,%d) %f != %f\n", i,j,k, *flt_ptr, tmp);
+          fprintf(stderr, "1. Data error at (%d,%d,%d) %f != %f\n", i,j,k, (double)*flt_ptr, (double)tmp);
           errors++;
         }
         flt_ptr++;
@@ -304,7 +305,9 @@ static void test4(struct testinfo *ip, struct dimdef *dims, int ndims)
   int r;
   /*Now we are going to work with the volume using apparent dimension order*/
   midimhandle_t my_dim[3];
-  static char *my_dimorder[] = {MIxspace,MIyspace,MIzspace};
+  static char *my_dimorder[] = {(char*)MIxspace,(char*)MIyspace,(char*)MIzspace};
+  (void)dims;
+  (void)ndims;
   misize_t my_sizes[3];
   misize_t my_start[3];
   misize_t my_count[3];
@@ -374,10 +377,10 @@ static void test4(struct testinfo *ip, struct dimdef *dims, int ndims)
   for (i = 0; i < my_count[0]; i++) {
     for (j = 0; j < my_count[1]; j++) {
       for (k = 0; k < my_count[2]; k++) {
-        float tmp = (i * 10000) + (j * 100) + k;
+        float tmp = (float)(i * 10000) + (float)(j * 100) + (float)k;
 
-        if (*flt_ptr != (float) tmp ) {
-          fprintf(stderr, "2. Data error at (%llu,%llu,%llu) %f != %f\n", i,j,k, *flt_ptr, tmp);
+        if (*flt_ptr != tmp ) {
+          fprintf(stderr, "2. Data error at (%llu,%llu,%llu) %f != %f\n", i,j,k, (double)*flt_ptr, (double)tmp);
           errors++;
         }
         flt_ptr++;
@@ -397,6 +400,8 @@ static void test4(struct testinfo *ip, struct dimdef *dims, int ndims)
 int main(int argc, char **argv)
 {
   struct testinfo info;
+  (void)argc;
+  (void)argv;
 
   test1(&info, dimtab1, 3);
 
@@ -420,7 +425,7 @@ int main(int argc, char **argv)
   else
     printf("Errors: %ld!\n",errors);
 
-  return (errors);
+  return (int)(errors);
 }
 
 

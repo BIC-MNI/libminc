@@ -75,7 +75,7 @@ static int create_real_as_int_image(const char* fname)
   /* Set random values to slice min and max for slice scaling*/
   start[0] =start[1]=start[2]=0;
   for (i=0; i < CY; i++) {
-    start[0] = i;
+    start[0] = (misize_t)i;
     min += -0.1;
     max += 0.1;
     r = miset_slice_range(hvol,start,NDIMS , max, min);
@@ -140,7 +140,7 @@ static int create_real_as_float_image(const char* fname)
   if( r!= MI_NOERROR )    TESTRPT("micreate_volume_image",r);
 
   for (i = 0; i < CY*CX*CZ; i++) {
-    buf[i] =  i * 0.001f;
+    buf[i] =  (float)i * 0.001f;
   }
 
   start[0] = start[1] = start[2] = 0;
@@ -151,7 +151,7 @@ static int create_real_as_float_image(const char* fname)
   /* Set random values to slice min and max for slice scaling*/
   start[0] =start[1]=start[2]=0;
   for (i=0; i < CY; i++) {
-    start[0] = i;
+    start[0] = (misize_t)i;
     min += -0.1;
     max += 0.1;
     r = miset_slice_range(hvol,start,NDIMS , max, min);

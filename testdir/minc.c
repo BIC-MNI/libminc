@@ -57,7 +57,7 @@ int main(void)
    (void) miattputstr(cdf, img, MIsigntype, MI_SIGNED);
    for (j=0; j<count[0]; j++) {
       for (i=0; i<count[1]; i++) {
-         ioff=(j*count[1]+i)*count[2];
+         ioff=(int)((j*count[1]+i)*count[2]);
          for (k=0; k<count[2]; k++)
             image[ioff+k]=ioff+k+10;
       }

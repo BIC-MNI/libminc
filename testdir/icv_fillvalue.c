@@ -26,7 +26,7 @@ int main(int argc, char **argv)
 {
    int icv, mincid, img, i;
    static int dim[MAX_VAR_DIMS];
-   static struct { long len; char *name;} diminfo[] = {
+   static struct { long len; const char *name;} diminfo[] = {
        { 4, MIyspace },
        { 5, MIxspace}
    };

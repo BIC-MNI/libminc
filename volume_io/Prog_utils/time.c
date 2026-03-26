@@ -200,7 +200,10 @@ VIOAPI  VIO_STR  format_time(
 
     if( negative )  seconds = -seconds;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
     (void) snprintf( buffer, sizeof(buffer), format, seconds, units[i] );
+#pragma GCC diagnostic pop
 
     return( create_string( buffer ) );
 }

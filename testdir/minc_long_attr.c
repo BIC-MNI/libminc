@@ -116,14 +116,14 @@ static int test1(struct testinfo *ip, struct dimdef *dims, int ndims)
     FUNC_ERROR("micreate_std_variable");
   }
 
-  ip->test_group = ncvardef(ip->fd,(char*)"test",NC_INT,0,0);/* micreate_group_variable(ip->fd,(char*)"test");*/
+  ip->test_group = ncvardef(ip->fd,"test",NC_INT,0,0);/* micreate_group_variable(ip->fd,(char*)"test");*/
   if(ip->test_group<0)
   {
     FUNC_ERROR("micreate_group_variable");
   }
 
-  ip->large_attribute=calloc(ip->attribute_size,sizeof(char));
-  memset(ip->large_attribute,'X',ip->attribute_size-1);
+  ip->large_attribute=calloc((size_t)ip->attribute_size,sizeof(char));
+  memset(ip->large_attribute,'X',(size_t)ip->attribute_size-1);
 
   ip->test_attribute = ncattput(ip->fd, ip->test_group, "test", NC_CHAR, ip->attribute_size, ip->large_attribute);
 
@@ -137,6 +137,7 @@ static int test2(struct testinfo *ip, struct dimdef *dims, int ndims)
   int stat;
   long coords[3];
   float flt;
+  (void)ndims;
 
   stat = miattputdbl(ip->fd, ip->imgid, MIvalid_max, (XSIZE * 10000.0));
   if (stat < 0) {
@@ -204,7 +205,7 @@ test3(struct testinfo *ip, struct dimdef *dims, int ndims)
 
   total = 1;
   for (i = 0; i < ndims; i++) {
-    total *= dims[i].length;
+    total *= (size_t)dims[i].length;
   }
 
   buf_ptr = malloc(total * sizeof (int));
@@ -254,12 +255,12 @@ test3(struct testinfo *ip, struct dimdef *dims, int ndims)
   if(att_length!=ip->attribute_size)
     FUNC_ERROR("Wrong attribute length!");
 
-  att=malloc(att_length);
+  att=malloc((size_t)att_length);
 
   if(miattgetstr(ip->fd, varid, "test", att_length, att)==NULL)
     FUNC_ERROR("miattgetstr");
 
-  if(memcmp(att,ip->large_attribute,att_length)!=0)
+  if(memcmp(att,ip->large_attribute,(size_t)att_length)!=0)
     FUNC_ERROR("Attribute contents mismath!");
 
   free(att);
@@ -295,7 +296,7 @@ int main(int argc, char **argv)
   free(info.name);		/* Free the temporary filename */
 
   free(info.large_attribute);   /* free large_attribute*/
-  return (errors);
+  return (int)(errors);
 }
 
 

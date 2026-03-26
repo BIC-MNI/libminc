@@ -19,7 +19,7 @@ static int error_cnt=0;
 #define NDIMS 3
 
 
-static int create_3D_image ( size_t attribute_size,char *test_file )
+static int create_3D_image ( size_t attribute_size, const char *test_file )
 {
   int r;
   double start_values[NDIMS] = { -6.96, -12.453,  -9.48};
@@ -80,7 +80,7 @@ static int create_3D_image ( size_t attribute_size,char *test_file )
   /* Set random values to slice min and max for slice scaling*/
   start[0] = start[1] = start[2] = 0;
   for ( i = 0; i < CY; i++ ) {
-    start[0] = i;
+    start[0] = (misize_t)i;
     min += 0.1;
     max += 0.1;
     r = miset_slice_range ( hvol, start, NDIMS , max, min );
@@ -100,7 +100,7 @@ static int create_3D_image ( size_t attribute_size,char *test_file )
 }
 
 
-static int test_3D_image ( size_t attribute_size,char *test_file )
+static int test_3D_image ( size_t attribute_size, const char *test_file )
 {
   int r;
   mihandle_t hvol;
@@ -159,17 +159,17 @@ static int test_3D_image ( size_t attribute_size,char *test_file )
 int main ( int argc, char **argv )
 {
   int attribute_size=100000;
-  char *test_file="3D_image_a.mnc";
+  const char *test_file="3D_image_a.mnc";
   if(argc>1)
     attribute_size=atoi(argv[1]);
   if(argc>2)
     test_file=argv[2];
 
   printf ( "Creating 3D image with attribute %d ! (%s)\n", attribute_size, test_file );
-  if( create_3D_image(attribute_size, test_file)<0)
+  if( create_3D_image((size_t)attribute_size, test_file)<0)
     TESTRPT("create_3D_image",0);
 
-  if( test_3D_image(attribute_size, test_file)<0)
+  if( test_3D_image((size_t)attribute_size, test_file)<0)
     TESTRPT("test_3D_image",0);
 
   if ( error_cnt != 0 ) {

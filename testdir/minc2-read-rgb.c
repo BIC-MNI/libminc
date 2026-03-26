@@ -20,7 +20,7 @@ static double calculate_mean_f(float *array,misize_t length)
     avg+=(double)(array[i]);
   }
 
-  return avg/length;
+  return avg/(double)length;
 }
 
 static double calculate_mean_s(short *array,misize_t length)
@@ -30,7 +30,7 @@ static double calculate_mean_s(short *array,misize_t length)
   for(i=0;i<length;i++)
     avg+=(double)(array[i]);
 
-  return avg/length;
+  return avg/(double)length;
 }
 
 static double calculate_mean_d(double *array,misize_t length)
@@ -40,7 +40,7 @@ static double calculate_mean_d(double *array,misize_t length)
   for(i=0;i<length;i++)
     avg+=array[i];
 
-  return avg/length;
+  return avg/(double)length;
 }
 
 
@@ -113,10 +113,10 @@ int main ( int argc, char **argv )
     );
 
   /*Allocate memory buffers*/
-  dim=  malloc(sizeof(midimhandle_t)*ndim);
-  sizes=malloc(sizeof(misize_t)*ndim);
-  origin=malloc(sizeof(double)*ndim);
-  step=malloc(sizeof(double)*ndim);
+  dim=  malloc(sizeof(midimhandle_t)*(size_t)ndim);
+  sizes=malloc(sizeof(misize_t)*(size_t)ndim);
+  origin=malloc(sizeof(double)*(size_t)ndim);
+  step=malloc(sizeof(double)*(size_t)ndim);
 
   /* get the apparent dimensions and their sizes */
   r = miget_volume_dimensions ( vol, MI_DIMCLASS_ANY ,
@@ -126,12 +126,12 @@ int main ( int argc, char **argv )
     TESTRPT("Error getting number of dimensions\n" ,r );
   }
 
-  r = miget_dimension_sizes ( dim, ndim, sizes );
+  r = miget_dimension_sizes ( dim, (misize_t)ndim, sizes );
   if ( r <0 ) {
     TESTRPT("Error getting dimension sizes\n" ,r );
   }
 
-  r = miget_dimension_separations(dim,MI_ORDER_FILE,ndim,step);
+  r = miget_dimension_separations(dim,MI_ORDER_FILE,(misize_t)ndim,step);
   if ( r <0 ) {
     TESTRPT("Error getting dimension steps\n" ,r );
   }

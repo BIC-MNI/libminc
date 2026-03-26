@@ -725,6 +725,9 @@ static herr_t mi2_int_to_dbl ( hid_t src_id,
   size_t dst_cnt;
   size_t src_cnt;
   int src_swap;
+  (void)bkg_stride;
+  (void)bkg_ptr;
+  (void)dset_xfer_plist;
   int dst_swap;
 
   switch ( cdata->command ) {
@@ -928,6 +931,9 @@ static herr_t mi2_dbl_to_int ( hid_t src_id,
   size_t dst_cnt;
   size_t src_cnt;
   int src_swap;
+  (void)bkg_stride;
+  (void)bkg_ptr;
+  (void)dset_xfer_plist;
   int dst_swap;
 
   switch ( cdata->command ) {
@@ -1359,6 +1365,9 @@ static herr_t mi2_int_to_int ( hid_t src_id,
   unsigned char *dst_ptr;
   size_t dst_cnt;
   size_t dst_sz;
+  (void)bkg_stride;
+  (void)bkg_ptr;
+  (void)dset_xfer_plist;
 
   switch ( cdata->command ) {
   case H5T_CONV_INIT:
@@ -1488,9 +1497,9 @@ static void midownsample_slice ( double *in_ptr, double *out_ptr, hsize_t isize[
           for ( z = 0; z < scale; z++ ) {
             size_t x1, y1, z1;
             double t;
-            x1 = x;
-            y1 = y + ( j * scale );
-            z1 = z + ( k * scale );
+            x1 = (size_t)x;
+            y1 = (size_t)y + ( j * (hsize_t)scale );
+            z1 = (size_t)z + ( k * (hsize_t)scale );
             t = in_ptr[ ( ( x1 * isize[1] ) + y1 ) * isize[2] + z1];
             d += t;
           }
@@ -1516,6 +1525,7 @@ static void miconvert_hyperslab_to_voxel ( mihandle_t volume, hsize_t start[],
   * converter yet.  That is why it is not public.
   */
   double real_min, real_max;  /* Minimum and maximum values */
+  (void)start;
   hsize_t index;
   hsize_t total;
   double voxel_range, voxel_offset;
@@ -1599,7 +1609,7 @@ static void miconvert_hyperslab_to_real ( mihandle_t volume, hsize_t start[],
 
   /* Get the initial real minimum & maximum.
   */
-  r = miget_slice_range ( volume, pos, volume->number_of_dims,
+  r = miget_slice_range ( volume, pos, (size_t)volume->number_of_dims,
                           &real_max, &real_min );
 
   if ( r == MI_ERROR ) {
@@ -1624,7 +1634,7 @@ static void miconvert_hyperslab_to_real ( mihandle_t volume, hsize_t start[],
 
       if ( pos[i] >= count[i] ) {
         pos[i] = start[i];
-        r = miget_slice_range ( volume, pos, volume->number_of_dims,
+        r = miget_slice_range ( volume, pos, (size_t)volume->number_of_dims,
                                 &real_max, &real_min );
 
         if ( r == MI_ERROR ) {
@@ -1716,7 +1726,7 @@ minc_update_thumbnail ( mihandle_t volume, hid_t loc_id, int igrp, int ogrp )
   /* Calculate the size of the new thumbnail.
   */
   for ( i = 0; i < ndims; i++ ) {
-    osize[i] = isize[i] / scale;
+    osize[i] = isize[i] / (hsize_t)scale;
 
     if ( osize[i] == 0 ) { /* Too small? */
       return ( MI_ERROR );
@@ -1776,13 +1786,13 @@ minc_update_thumbnail ( mihandle_t volume, hid_t loc_id, int igrp, int ogrp )
 
   /* Calculate the input buffer size - scale slices.
   */
-  in_bytes = scale * isize[1] * isize[2] * sizeof ( double );
+  in_bytes = (size_t)scale * isize[1] * isize[2] * sizeof ( double );
   in_ptr = malloc ( in_bytes );
 
   out_bytes = osize[1] * osize[2] * sizeof ( double );
   out_ptr = malloc ( out_bytes );
 
-  count[0] = scale;
+  count[0] = (hsize_t)scale;
   count[1] = isize[1];
   count[2] = isize[2];
   imspc_id = H5Screate_simple ( ndims, count, NULL );
@@ -1797,10 +1807,10 @@ minc_update_thumbnail ( mihandle_t volume, hid_t loc_id, int igrp, int ogrp )
   */
   for ( slice = 0; slice < osize[0]; slice++ ) {
 
-    start[0] = slice * scale;
+    start[0] = slice * (hsize_t)scale;
     start[1] = 0;
     start[2] = 0;
-    count[0] = scale;
+    count[0] = (hsize_t)scale;
     count[1] = isize[1];
     count[2] = isize[2];
 
@@ -1911,7 +1921,7 @@ minc_update_thumbnails ( mihandle_t volume )
 double *
 alloc1d ( int n )
 {
-  return ( ( double * ) malloc ( sizeof ( double ) * n ) );
+  return ( ( double * ) malloc ( sizeof ( double ) * (size_t)n ) );
 }
 
 double **
@@ -1920,14 +1930,14 @@ alloc2d ( int n, int m )
   double **mat;
   int i;
 
-  mat = ( double ** ) malloc ( n * sizeof ( double * ) );
+  mat = ( double ** ) malloc ( (size_t)n * sizeof ( double * ) );
 
   if ( mat == NULL ) {
     return NULL;
   }
 
   for ( i = 0; i < n; i++ ) {
-    mat[i] = ( double * ) malloc ( m * sizeof ( double ) );
+    mat[i] = ( double * ) malloc ( (size_t)m * sizeof ( double ) );
 
     if ( mat[i] == NULL ) {
       free(mat);
@@ -2026,6 +2036,7 @@ int
 add_minimal_minc_attributes(hid_t hdf_file, hid_t dset_id)
 {
   int result;
+  (void)hdf_file;
 
   result = miset_attr_at_loc ( dset_id, MIvartype, MI_TYPE_STRING, strlen ( MI_GROUP ), MI_GROUP );
 
@@ -2040,6 +2051,7 @@ int
 add_standard_minc_attributes(hid_t hdf_file, hid_t dset_id)
 {
   int result;
+  (void)hdf_file;
   result = miset_attr_at_loc ( dset_id, MIvarid, MI_TYPE_STRING, strlen ( MI_STDVAR ), MI_STDVAR );
 
   if ( result < 0 ) {

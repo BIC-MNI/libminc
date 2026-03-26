@@ -58,8 +58,8 @@ test_icv_vector(int cflag, nc_type voxel_type)
   int numdims = N_DIM;
   long coord[N_DIM];
   long count[N_DIM];
-  short int *ivalue = malloc(N_ELEMENTS * sizeof(short int));
-  double *dvalue = malloc(N_ELEMENTS * sizeof(double));
+  short int *ivalue = malloc((size_t)N_ELEMENTS * sizeof(short int));
+  double *dvalue = malloc((size_t)N_ELEMENTS * sizeof(double));
   int i, j, k, v;
   char filename[256];
   int return_val;
@@ -119,7 +119,7 @@ test_icv_vector(int cflag, nc_type voxel_type)
       for (k = 0; k < NX; k++) {
         for (v = 0; v < NV; v++) {
           int c = TINDV(i, j, k, v);
-          ivalue[c] = TVAL(i, j, k, v);
+          ivalue[c] = (short)TVAL(i, j, k, v);
         }
       }
     }

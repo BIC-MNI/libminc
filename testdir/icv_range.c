@@ -28,15 +28,15 @@
 int main(int argc, char **argv)
 {
    int icv, cdfid, img, max, min;
-   static char *typenm[]={"short", "double"};
-   static char *boolnm[] = {"true", "false"};
+   static const char *typenm[]={"short", "double"};
+   static const char *boolnm[] = {"true", "false"};
    static nc_type intypes[] = {NC_SHORT, NC_DOUBLE};
    static int norms[] = {TRUE, FALSE};
    static nc_type outtypes[] = {NC_SHORT, NC_DOUBLE};
    static int maxpresent[] = {TRUE, FALSE};
    static int valpresent[] = {TRUE, FALSE};
    static int dim[MAX_VAR_DIMS];
-   static struct { long len; char *name;} diminfo[] = {
+   static struct { long len; const char *name;} diminfo[] = {
       { 3, MIzspace },
       { 1, MIyspace },
       { 1, MIxspace }

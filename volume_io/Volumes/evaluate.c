@@ -235,9 +235,9 @@ static void trilinear_interpolate_rgb(
 
     outside_value = convert_value_to_voxel( volume, outside_value );
 
-    i = VIO_FLOOR( x );
-    j = VIO_FLOOR( y );
-    k = VIO_FLOOR( z );
+    i = (int)VIO_FLOOR( x );
+    j = (int)VIO_FLOOR( y );
+    k = (int)VIO_FLOOR( z );
 
     c = 0;
     for_less( dx, i, i+2 )
@@ -401,11 +401,11 @@ static void trilinear_interpolate(
     {
         outside_value = convert_value_to_voxel( volume, outside_value );
 
-        i = VIO_FLOOR( x );
-        j = VIO_FLOOR( y );
-        k = VIO_FLOOR( z );
-        l = VIO_FLOOR( t );
-        m = VIO_FLOOR( v );
+        i = (int)VIO_FLOOR( x );
+        j = (int)VIO_FLOOR( y );
+        k = (int)VIO_FLOOR( z );
+        l = (int)VIO_FLOOR( t );
+        m = (int)VIO_FLOOR( v );
 
         c = 0;
         switch (ndim) {
@@ -1007,7 +1007,7 @@ VIOAPI  int   evaluate_volume(
         {
             interp_dims[n_interp_dims] = d;
             pos = voxel[d] - bound;
-            start[d] =       VIO_FLOOR( pos );
+            start[d] =       (int)VIO_FLOOR( pos );
             fraction[n_interp_dims] = pos - (VIO_Real) start[d];
 
             if( voxel[d] == (VIO_Real) sizes[d] - 1.0 - bound )

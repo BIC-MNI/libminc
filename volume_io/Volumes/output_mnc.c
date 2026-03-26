@@ -347,7 +347,7 @@ VIOAPI  Minc_file  initialize_minc_output(
     int                 volume_sizes[VIO_MAX_DIMENSIONS];
     int                 n_volume_dims;
     int                 d, vol_index, n_range_dims;
-    static  VIO_STR      default_dim_names[] = { MIzspace, MIyspace, MIxspace };
+    static  VIO_STR      default_dim_names[] = { (VIO_STR)MIzspace, (VIO_STR)MIyspace, (VIO_STR)MIxspace };
     VIO_STR              *vol_dimension_names;
     minc_output_options default_options;
 
@@ -634,15 +634,15 @@ VIOAPI  VIO_Status  copy_auxiliary_data_from_open_minc_file(
     int     i, src_min_id, src_max_id, src_root_id;
     VIO_Status  status;
     VIO_STR  excluded_list[] = {
-                                  MIxspace,
-                                  MIyspace,
-                                  MIzspace,
-                                  MItime,
-                                  MItfrequency,
-                                  MIxfrequency,
-                                  MIyfrequency,
-                                  MIzfrequency,
-                                  MIvector_dimension
+                                  (VIO_STR)MIxspace,
+                                  (VIO_STR)MIyspace,
+                                  (VIO_STR)MIzspace,
+                                  (VIO_STR)MItime,
+                                  (VIO_STR)MItfrequency,
+                                  (VIO_STR)MIxfrequency,
+                                  (VIO_STR)MIyfrequency,
+                                  (VIO_STR)MIzfrequency,
+                                  (VIO_STR)MIvector_dimension
                                };
 
     if( file->ignoring_because_cached )

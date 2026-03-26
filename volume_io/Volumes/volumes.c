@@ -21,16 +21,16 @@
 #include  <limits.h>
 #include  <float.h>
 
-VIO_STR   XYZ_dimension_names[] = { MIxspace, MIyspace, MIzspace };
-VIO_STR   File_order_dimension_names[] = { "", "", "", "", "" };
+VIO_STR   XYZ_dimension_names[] = { (VIO_STR)MIxspace, (VIO_STR)MIyspace, (VIO_STR)MIzspace };
+VIO_STR   File_order_dimension_names[] = { (VIO_STR)"", (VIO_STR)"", (VIO_STR)"", (VIO_STR)"", (VIO_STR)"" };
 
 static  VIO_STR  default_dimension_names[VIO_MAX_DIMENSIONS][VIO_MAX_DIMENSIONS] =
 {
-    { MIxspace },
-    { MIyspace, MIxspace },
-    { MIzspace, MIyspace, MIxspace },
-    { "", MIzspace, MIyspace, MIxspace },
-    { "", "", MIzspace, MIyspace, MIxspace }
+    { (VIO_STR)MIxspace },
+    { (VIO_STR)MIyspace, (VIO_STR)MIxspace },
+    { (VIO_STR)MIzspace, (VIO_STR)MIyspace, (VIO_STR)MIxspace },
+    { (VIO_STR)"", (VIO_STR)MIzspace, (VIO_STR)MIyspace, (VIO_STR)MIxspace },
+    { (VIO_STR)"", (VIO_STR)"", (VIO_STR)MIzspace, (VIO_STR)MIyspace, (VIO_STR)MIxspace }
 };
 
 /* ----------------------------- MNI Header -----------------------------------
@@ -71,9 +71,9 @@ static  VIO_STR  convert_spatial_axis_to_dim_name(
 {
     switch( axis )
     {
-    case VIO_X:  return( MIxspace );
-    case VIO_Y:  return( MIyspace );
-    case VIO_Z:  return( MIzspace );
+    case VIO_X:  return( (VIO_STR)MIxspace );
+    case VIO_Y:  return( (VIO_STR)MIyspace );
+    case VIO_Z:  return( (VIO_STR)MIzspace );
     default:  handle_internal_error(
         "convert_spatial_axis_to_dim_name" ); break;
     }

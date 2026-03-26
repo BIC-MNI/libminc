@@ -144,6 +144,7 @@ test2(struct testinfo *ip, struct dimdef *dims, int ndims)
   int stat;
   long coords[3];
   float flt;
+  (void)ndims;
 
   stat = miattputdbl(ip->fd, ip->imgid, MIvalid_max, (XSIZE * 10000.0));
   if (stat < 0) {
@@ -206,7 +207,7 @@ test3(struct testinfo *ip, struct dimdef *dims, int ndims)
 
   total = 1;
   for (i = 0; i < ndims; i++) {
-    total *= dims[i].length;
+    total *= (size_t)dims[i].length;
   }
 
   buf_ptr = malloc(total * sizeof (int));
@@ -266,7 +267,7 @@ test4(struct testinfo *ip, struct dimdef *dims, int ndims)
 
   total = 1;
   for (i = 0; i < ndims; i++) {
-    total *= dims[i].length;
+    total *= (size_t)dims[i].length;
   }
 
   buf_ptr = malloc(total * sizeof (float));
@@ -349,10 +350,10 @@ test4(struct testinfo *ip, struct dimdef *dims, int ndims)
   for (i = 0; i < dims[TST_X].length; i++) {
     for (j = 0; j < dims[TST_Y].length; j++) {
       for (k = 0; k < dims[TST_Z].length; k++) {
-	float tmp = (i * 10000) + (j * 100) + k;
-	if (*flt_ptr != (float) tmp * 10.0) {
+	float tmp = (float)((i * 10000) + (j * 100) + k);
+	if ((double)*flt_ptr != (double)tmp * 10.0) {
 	  fprintf(stderr, "2. Data error at (%d,%d,%d) %f != %f\n",
-		  i,j,k, *flt_ptr, tmp);
+		  i,j,k, (double)*flt_ptr, (double)tmp);
 	  errors++;
 	}
 	flt_ptr++;
@@ -404,11 +405,12 @@ test5(struct testinfo *ip, struct dimdef *dims, int ndims)
   int i, j, k;
   int stat;
   int icv;
+  (void)ndims;
 
   total = 1;
-  total *= dims[TST_X].length;
-  total *= dims[TST_Y].length + YBOOST;
-  total *= dims[TST_Z].length + ZBOOST;
+  total *= (size_t)dims[TST_X].length;
+  total *= (size_t)(dims[TST_Y].length + YBOOST);
+  total *= (size_t)(dims[TST_Z].length + ZBOOST);
 
   buf_ptr = malloc(total * sizeof (int));
 
@@ -641,7 +643,7 @@ test7(struct testinfo *ip, struct dimdef *dims, int ndims)
 
   total = 1;
   for (i = 0; i < ndims; i++) {
-    total *= dims[i].length;
+    total *= (size_t)dims[i].length;
   }
 
   buf_ptr = malloc(total * sizeof (float));
@@ -738,6 +740,8 @@ main(int argc, char **argv)
 {
   int stat;
   struct testinfo info;
+  (void)argc;
+  (void)argv;
 
   milog_init("mincapi");      /* Disable error messages completely. */
   milog_set_verbosity(0);
@@ -796,7 +800,7 @@ main(int argc, char **argv)
   else {
       fprintf(stderr, "%ld error%s\n", errors, (errors == 1) ? "" : "s");
   }
-  return (errors);
+  return (int)(errors);
 }
 
 
@@ -851,9 +855,9 @@ void icv_tests(void)
       }
       break;
     case NC_FLOAT:
-      if (min != -FLT_MAX || max != FLT_MAX) {
+      if (min != (double)-FLT_MAX || max != (double)FLT_MAX) {
 	fprintf(stderr, "Type %d min %g max %g, header min %g max %g\n",
-		i, min, max, FLT_MIN, FLT_MAX);
+		i, min, max, (double)FLT_MIN, (double)FLT_MAX);
 	errors++;
       }
       break;
@@ -901,7 +905,7 @@ void icv_tests(void)
       }
       break;
     case NC_FLOAT:
-      if (min != -FLT_MAX || max != FLT_MAX) {
+      if (min != (double)-FLT_MAX || max != (double)FLT_MAX) {
 	fprintf(stderr, "Type %d min %g max %g\n", i, min, max);
 	errors++;
       }

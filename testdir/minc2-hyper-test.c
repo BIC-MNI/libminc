@@ -41,7 +41,7 @@ create_and_test_image(const char *name,
   misize_t count[NDIMS];
   double dtemp[CX][CY][CZ];
   int i,j,k;
-  char *dimnames[] = {"zspace", "xspace", "yspace"};
+  char *dimnames[] = {(char*)"zspace", (char*)"xspace", (char*)"yspace"};
   int error_cnt = 0;
 
   result = micreate_dimension("xspace", MI_DIMCLASS_SPATIAL,
@@ -86,7 +86,7 @@ create_and_test_image(const char *name,
   for (i = 0; i < CX; i++) {
     for (j = 0; j < CY; j++) {
       for (k = 0; k < CZ; k++) {
-        stmp2[i][j][k] = (short)((i*XP)+(j*YP)+(k*ZP));
+        stmp2[i][j][k] = (unsigned short)((i*XP)+(j*YP)+(k*ZP));
       }
     }
   }
@@ -258,9 +258,9 @@ create_and_test_image(const char *name,
       for (k = 0; (k + 2) < CY; k += 2) {
         unsigned short stmp3[3][2][2];
 
-        start[0] = i;
-        start[1] = j;
-        start[2] = k;
+        start[0] = (misize_t)i;
+        start[1] = (misize_t)j;
+        start[2] = (misize_t)k;
 
         result = miget_voxel_value_hyperslab(hvol, MI_TYPE_USHORT,
                                              start, count, stmp3);
@@ -390,7 +390,7 @@ test1(void)
         for (i = 0; i < CZ; i++) {
             for (j = 0; j < CX; j++) {
                 for (k = 0; k < CY; k++) {
-                    short t = stemp[i][j][k];
+                    short t = (short)stemp[i][j][k];
                     if (t != (j*XP)+(k*YP)+(i*ZP)) {
                         printf("%d != %d: ", t, (j*XP)+(k*YP)+(i*ZP));
                         TESTRPT("Value error!", 0);
@@ -415,13 +415,13 @@ test1(void)
         for (i = 0; i < CZ; i++) {
             for (j = 0; j < CX; j++) {
                 for (k = 0; k < CY; k++) {
-                    short t = stemp[i][j][k] ^ 0x5555;
+                    short t = (short)(stemp[i][j][k] ^ 0x5555);
                     if (t != (j*XP)+(k*YP)+(i*ZP)) {
                         printf("%d != %d: ", t, (j*XP)+(k*YP)+(i*ZP));
                         TESTRPT("Value error!", 0);
                         break;
                     }
-                    stemp[i][j][k] = t;
+                    stemp[i][j][k] = (unsigned short)t;
                 }
             }
         }
@@ -455,7 +455,7 @@ test1(void)
         for (i = 0; i < CX; i++) {
             for (j = 0; j < CY; j++) {
                 for (k = 0; k < CZ; k++) {
-                    short t = stmp2[i][j][k];
+                    short t = (short)stmp2[i][j][k];
                     if (t != (i*XP)+(j*YP)+(k*ZP)) {
                         printf("%d != %d: ", t, (i*XP)+(j*YP)+(k*ZP));
                         TESTRPT("Value error!", 0);
@@ -613,7 +613,7 @@ test3(void)
     int itemp[CZ][CX][CY];
     int i,j,k;
     midimhandle_t hdims[NDIMS];
-    char *dimnames[] = {"zspace", "xspace", "yspace"};
+    char *dimnames[] = {(char*)"zspace", (char*)"xspace", (char*)"yspace"};
     int error_cnt = 0;
 
     printf("Testing hyperslab operations with multi-resolution image.\n");
@@ -811,9 +811,9 @@ test3(void)
             for (k = 0; (k + 2) < CY; k += 2) {
                 unsigned short stmp3[3][2][2];
 
-                start[0] = i;
-                start[1] = j;
-                start[2] = k;
+                start[0] = (misize_t)i;
+                start[1] = (misize_t)j;
+                start[2] = (misize_t)k;
 
                 result = miget_voxel_value_hyperslab(hvol, MI_TYPE_USHORT,
                                                      start, count, stmp3);

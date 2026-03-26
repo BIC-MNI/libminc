@@ -107,9 +107,9 @@ static int create_label_image ( void )
   for ( i = 0; i < CX; i++ ) {
     for ( j = 0; j < CY ; j++ ) {
       for ( k = 0; k < CZ ; k++ ) {
-        coords[0] = i;
-        coords[1] = j;
-        coords[2] = k;
+        coords[0] = (misize_t)i;
+        coords[1] = (misize_t)j;
+        coords[2] = (misize_t)k;
         if ( counter == 1 ) {
           miset_voxel_value ( hvol, coords, 3, 0xffffff );
 

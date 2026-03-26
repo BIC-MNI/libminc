@@ -170,7 +170,7 @@ mgh_header_to_linear_transform(const struct mgh_header *hdr_ptr,
   {
     for (j = 0; j < MGH_N_COMPONENTS; j++)
     {
-      printf("%c_%c %8.4f ", "xyzc"[j], "ras"[i], hdr_ptr->dircos[j][i]);
+      printf("%c_%c %8.4f ", "xyzc"[j], "ras"[i], (double)hdr_ptr->dircos[j][i]);
     }
     printf("\n");
   }
@@ -205,7 +205,7 @@ mgh_header_to_linear_transform(const struct mgh_header *hdr_ptr,
     }
     else
     {
-      mgh_xform[i][MGH_N_COMPONENTS - 1] = hdr_ptr->dircos[MGH_N_COMPONENTS - 1][i] - temp;
+      mgh_xform[i][MGH_N_COMPONENTS - 1] = (double)hdr_ptr->dircos[MGH_N_COMPONENTS - 1][i] - temp;
     }
   }
 
@@ -279,14 +279,14 @@ mgh_header_from_file(znzFile fp, struct mgh_header *hdr_ptr)
   /* Successfully read all of the data. Now we have to convert it to the
    * machine's byte ordering.
    */
-  hdr_ptr->version = ntohl(hdr_ptr->version);
+  hdr_ptr->version = (int)ntohl((uint32_t)hdr_ptr->version);
   for (i = 0; i < MGH_MAX_DIMS; i++)
   {
-    hdr_ptr->sizes[i] = ntohl(hdr_ptr->sizes[i]);
+    hdr_ptr->sizes[i] = (int)ntohl((uint32_t)hdr_ptr->sizes[i]);
   }
-  hdr_ptr->type = ntohl(hdr_ptr->type);
-  hdr_ptr->dof = ntohl(hdr_ptr->dof);
-  hdr_ptr->goodRASflag = ntohs(hdr_ptr->goodRASflag);
+  hdr_ptr->type = (int)ntohl((uint32_t)hdr_ptr->type);
+  hdr_ptr->dof = (int)ntohl((uint32_t)hdr_ptr->dof);
+  hdr_ptr->goodRASflag = (short)ntohs((uint16_t)hdr_ptr->goodRASflag);
 
   if (hdr_ptr->version != 1)
   {
@@ -343,14 +343,14 @@ mgh_scan_for_voxel_range(volume_input_struct *in_ptr,
   int i;
   void *data_ptr;
   long int data_offset = znztell((znzFile) fp);
-  int total_slices = in_ptr->sizes_in_file[2];
+  int total_slices = (int)in_ptr->sizes_in_file[2];
 
   if (in_ptr->sizes_in_file[3] > 1)
   {
     /* If there is a time dimension, incorporate that into our slice
      * count.
      */
-    total_slices *= in_ptr->sizes_in_file[3];
+    total_slices *= (int)in_ptr->sizes_in_file[3];
   }
 
   if (data_offset < 0)
@@ -369,11 +369,11 @@ mgh_scan_for_voxel_range(volume_input_struct *in_ptr,
         break;
 
       case VIO_SIGNED_SHORT:
-        value = ntohs(((short *)data_ptr)[i]);
+        value = (float)(short)ntohs((uint16_t)((short *)data_ptr)[i]);
         break;
 
       case VIO_SIGNED_INT:
-        value = ntohl(((int *)data_ptr)[i]);
+        value = (float)(int)ntohl((uint32_t)((int *)data_ptr)[i]);
         break;
 
       case VIO_FLOAT:
@@ -546,7 +546,7 @@ initialize_mgh_format_input(VIO_STR             filename,
   {
     int volume_axis = volume->spatial_axes[axis];
     int file_axis = in_ptr->axis_index_from_file[volume_axis];
-    sizes[file_axis] = in_ptr->sizes_in_file[volume_axis];
+    sizes[file_axis] = (int)in_ptr->sizes_in_file[volume_axis];
     set_volume_direction_cosine(volume, volume_axis, mnc_dircos[volume_axis]);
   }
 #if DEBUG
@@ -579,7 +579,7 @@ initialize_mgh_format_input(VIO_STR             filename,
 
   /* If we are a 4D image, we need to copy the size here.
    */
-  sizes[3] = in_ptr->sizes_in_file[3];
+  sizes[3] = (int)in_ptr->sizes_in_file[3];
   set_volume_sizes( volume, sizes );
 
   n_bytes_per_voxel = get_type_size( in_ptr->file_data_type );
@@ -592,7 +592,7 @@ initialize_mgh_format_input(VIO_STR             filename,
 
   /* Allocate the slice buffer. */
 
-  in_ptr->generic_slice_buffer = malloc(n_voxels_in_slice * n_bytes_per_voxel);
+  in_ptr->generic_slice_buffer = malloc((size_t)n_voxels_in_slice * (size_t)n_bytes_per_voxel);
   if (in_ptr->generic_slice_buffer == NULL)
   {
     return VIO_ERROR;
@@ -643,14 +643,14 @@ input_more_mgh_format_file(
   int            *inner_index, indices[VIO_MAX_DIMENSIONS];
   void           *data_ptr;
   int            data_ind;
-  int            total_slices = in_ptr->sizes_in_file[2];
+  int            total_slices = (int)in_ptr->sizes_in_file[2];
 
   if (in_ptr->sizes_in_file[3] > 1)
   {
     /* If there is a time dimension, incorporate that into our slice
      * count.
      */
-    total_slices *= in_ptr->sizes_in_file[3];
+    total_slices *= (int)in_ptr->sizes_in_file[3];
   }
 
   if ( in_ptr->slice_index < total_slices )
@@ -701,8 +701,8 @@ input_more_mgh_format_file(
       /* If a time dimension is present, convert the slice index into
        * both a time and slice coordinate using the number of slices.
        */
-      indices[in_ptr->axis_index_from_file[3]] = in_ptr->slice_index / in_ptr->sizes_in_file[2];
-      indices[in_ptr->axis_index_from_file[2]] = in_ptr->slice_index % in_ptr->sizes_in_file[2];
+      indices[in_ptr->axis_index_from_file[3]] = (int)(in_ptr->slice_index / in_ptr->sizes_in_file[2]);
+      indices[in_ptr->axis_index_from_file[2]] = (int)(in_ptr->slice_index % in_ptr->sizes_in_file[2]);
     }
     else
     {
@@ -725,10 +725,10 @@ input_more_mgh_format_file(
             value = ((unsigned char *)data_ptr)[data_ind++];
             break;
           case VIO_SIGNED_SHORT:
-            value = ntohs(((short *)data_ptr)[data_ind++]);
+            value = (short)ntohs((uint16_t)((short *)data_ptr)[data_ind++]);
             break;
           case VIO_SIGNED_INT:
-            value = ntohl(((int *)data_ptr)[data_ind++]);
+            value = (int)ntohl((uint32_t)((int *)data_ptr)[data_ind++]);
             break;
           case VIO_FLOAT:
             value = swapFloat(((float *)data_ptr)[data_ind++]);

@@ -240,11 +240,13 @@ static int mi_h5_files = 0;
 @CREATED    : January 20, 1995 (Peter Neelin)
 @MODIFIED   :
 ---------------------------------------------------------------------------- */
-PRIVATE int execute_decompress_command(char *command, const char *infile,
+PRIVATE int execute_decompress_command(const char *command, const char *infile,
                                        char *outfile, int header_only)
 {
    char whole_command[1024];
    int status;
+
+   (void)header_only;
 
 
 #if !(HAVE_WORKING_FORK && HAVE_SYSTEM && HAVE_POPEN)
@@ -377,7 +379,7 @@ MNCAPI char *miexpand_file(const char *path, char *tempfile, int header_only,
       extension). Loop through the list of extensions. */
    compfile = NULL;
    if ((first_ncerr == NC_SYSERR) && (compress_type == UNKNOWN)) {
-      compfile = MALLOC(strlen(path) + max_compression_code_length + 2, char);
+      compfile = MALLOC(strlen(path) + (size_t)max_compression_code_length + 2, char);
       for (iext=0; iext < complist_length; iext++) {
          (void) strcat(strcpy(compfile, path),
                        compression_code_list[iext].extension);
@@ -1031,7 +1033,7 @@ MNCAPI int miattputstr(int cdfid, int varid, const char *name, const char *value
     MI_SAVE_ROUTINE_NAME("miattputstr");
 
     status = ncattput(cdfid, varid, name, NC_CHAR,
-                       strlen(value) + 1, value);
+                       (int)(strlen(value) + 1), value);
     if (status < 0) {
 	MI_LOG_ERROR(MI_MSG_WRITEATTR, name);
     }
@@ -1615,6 +1617,9 @@ PRIVATE int MI_vcopy_action(int ndims, long start[], long count[],
    mi_vcopy_type *ptr;       /* Pointer to data from micopy_var_values */
    int status;
 
+   (void)ndims;
+   (void)nvalues;
+
    MI_SAVE_ROUTINE_NAME("MI_vcopy_action");
 
    ptr=(mi_vcopy_type *) caller_data;
@@ -1808,7 +1813,7 @@ micreate_tempfile(void)
    * So I more-or-less emulate that behavior here.
    */
   const char pat_str[] = "/minc-XXXXXX";
-  char *tmpdir_ptr;
+  const char *tmpdir_ptr;
 
   if ((tmpdir_ptr = getenv("TMPDIR")) == NULL) {
     tmpdir_ptr = P_tmpdir;

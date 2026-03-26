@@ -33,7 +33,7 @@ check_high_water_mark(void)
   struct rusage usage;
   if (getrusage(RUSAGE_SELF, &usage) < 0)
     return 0;
-  return usage.ru_maxrss;
+  return (int)usage.ru_maxrss;
 }
 
 static int
@@ -51,20 +51,20 @@ hdf5_check_objects(mihandle_t hvol)
 
   cnt = H5Fget_obj_count(fid, H5F_OBJ_ALL);
 
-  if (cnt <= 0) return cnt;
+  if (cnt <= 0) return (int)cnt;
 
   printf("%ld object(s) open\n", (long)cnt);
 
-  objs = malloc(cnt * sizeof(hid_t));
+  objs = malloc((size_t)cnt * sizeof(hid_t));
 
-  howmany = H5Fget_obj_ids(fid, H5F_OBJ_ALL, cnt, objs);
+  howmany = (int)H5Fget_obj_ids(fid, H5F_OBJ_ALL, (size_t)cnt, objs);
 
   printf("open objects:\n");
 
   for (i = 0; i < howmany; i++ ) {
     anobj = objs[i];
     ot = H5Iget_type(anobj);
-    status = H5Iget_name(anobj, name, 1024);
+    status = (herr_t)H5Iget_name(anobj, name, 1024);
     printf(" %d: type %d, name %s %d\n",i,ot,name, status);
   }
 
@@ -94,7 +94,7 @@ leak_loop(mihandle_t hvol, int n, int check_p)
   double *buffer;
   int result;
   int hwm = check_high_water_mark();
-  int obj = H5Fget_obj_count(hvol->hdf_id, H5F_OBJ_ALL);
+  int obj = (int)H5Fget_obj_count(hvol->hdf_id, H5F_OBJ_ALL);
   int new_hwm;
   int new_obj;
   int j, k;
@@ -110,7 +110,7 @@ leak_loop(mihandle_t hvol, int n, int check_p)
     n_voxels *= CHUNK_LENGTH;
   }
 
-  buffer = (double *) malloc( n_voxels * sizeof(double));
+  buffer = (double *) malloc( (size_t)n_voxels * sizeof(double));
 
   for (i = 0; i < n; i += k) {
     for (j = 0; j < k; j++) {
@@ -151,7 +151,7 @@ leak_loop(mihandle_t hvol, int n, int check_p)
     }
 
     new_hwm = check_high_water_mark();
-    new_obj = H5Fget_obj_count(hvol->hdf_id, H5F_OBJ_ALL);
+    new_obj = (int)H5Fget_obj_count(hvol->hdf_id, H5F_OBJ_ALL);
 
     if (check_p && new_hwm > hwm) {
       double delta_hwm = new_hwm - hwm;
@@ -232,7 +232,7 @@ create_test_image ( const char *filename )
   if (r < 0)
     return r;
 
-  buf = ( uint16_t * ) malloc ( nvoxels * sizeof ( uint16_t ) );
+  buf = ( uint16_t * ) malloc ( (size_t)nvoxels * sizeof ( uint16_t ) );
   if (buf == 0) {
     return -1;
   }
@@ -250,7 +250,7 @@ create_test_image ( const char *filename )
 
   start[0] = start[1] = start[2] = 0;
   for ( i = 0; i < DIM_LENGTH; i++ ) {
-    start[0] = i;
+    start[0] = (misize_t)i;
     min_real -= 17.0;
     max_real += 17.0;
     r = miset_slice_range( hvol, start, N_DIMS, max_real, min_real );
@@ -268,6 +268,7 @@ main(int argc, char *argv[])
   int result = -1;
   mihandle_t hvol;
   int ndims;
+  (void)argc;
   midimhandle_t dimensions[N_DIMS];
   misize_t sizes[N_DIMS];
   char filename[1024];
@@ -303,7 +304,7 @@ main(int argc, char *argv[])
     fprintf(stderr, "ERROR getting volume dimensions (%d).\n", result);
     return -1;
   }
-  result = miget_dimension_sizes(dimensions, ndims, sizes);
+  result = miget_dimension_sizes(dimensions, (misize_t)ndims, sizes);
   if (result != MI_NOERROR) {
     fprintf(stderr, "ERROR getting dimension sizes.\n");
     return -1;
