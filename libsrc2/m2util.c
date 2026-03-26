@@ -2199,6 +2199,13 @@ scaled_maximal_pivoting_gaussian_elimination_real ( int n,
   a = alloc2d ( n, n );
   solution = alloc2d ( n, n_values );
 
+  if ( row == NULL || a == NULL || solution == NULL ) {
+    free2d ( n, a );
+    free2d ( n, solution );
+    free ( row );
+    return ( 0 );
+  }
+
   for ( i = 0; i < n; i++ ) {
     for ( j = 0; j < n; j++ )
       a[i][j] = coefs[i][j];
@@ -2239,6 +2246,12 @@ invert_4x4_matrix ( double matrix[4][4], /**< Input matrix */
 
   mtmp = alloc2d ( 4, 4 );
   itmp = alloc2d ( 4, 4 );
+
+  if ( mtmp == NULL || itmp == NULL ) {
+    free2d ( 4, mtmp );
+    free2d ( 4, itmp );
+    return ( 0 );
+  }
 
   /* Start off with the identity matrix. */
   for ( i = 0; i < 4; i++ ) {
