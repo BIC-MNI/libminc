@@ -100,6 +100,7 @@ MNCAPI void nd_begin_looping(long start[], long current[], int ndims)
 MNCAPI int nd_end_of_loop(long current[], long end[], int ndims)
      /* ARGSUSED */
 {
+   (void)ndims;
    return (current[0] >= end[0]);
 }
 

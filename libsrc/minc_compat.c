@@ -304,7 +304,7 @@ MI2attcopy(int infd, int invarid, const char *name, int outfd,
             status = MI_NOERROR;
         }
         else {
-            val_ptr = malloc(MI2typelen(att_type) * att_length);
+            val_ptr = malloc((size_t)MI2typelen(att_type) * (size_t)att_length);
             if (val_ptr == NULL) {
                 return (MI_ERROR);
             }

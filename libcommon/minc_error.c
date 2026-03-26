@@ -276,7 +276,10 @@ void MI_log_pkg_error3(int p1, const char *p2, const char *p3)
 {
   (void)p1;
   (void) fprintf(stderr, "%s: ", minc_routine_name);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
   (void) fprintf(stderr, p2, p3);
+#pragma GCC diagnostic pop
   (void) fputc('\n', stderr);
   (void) fflush(stderr);
 }

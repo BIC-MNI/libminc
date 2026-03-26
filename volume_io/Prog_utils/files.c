@@ -1145,7 +1145,10 @@ static  VIO_BOOL  has_no_extension(
     VIO_STR   base_name;
     VIO_BOOL  dot_found;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-qual"
     base_name = remove_directories_from_filename( (VIO_STR)filename );
+#pragma GCC diagnostic pop
 
     dot_found = (find_character( base_name, '.' ) >= 0);
 

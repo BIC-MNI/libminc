@@ -48,10 +48,10 @@ namespace minc
       {
         _stride[0]=1;
         size_t total=_size[0];
-        for(size_t i=1;i<ndims;i++)
+        for(int i=1;i<ndims;i++)
         {
-          _stride[i]=_size[i-1]*_stride[i-1];
-          total*=_size[i];
+          _stride[static_cast<size_t>(i)]=_size[static_cast<size_t>(i)-1]*_stride[static_cast<size_t>(i)-1];
+          total*=_size[static_cast<size_t>(i)];
         }
         _count=total;
         if(data)
@@ -180,7 +180,7 @@ namespace minc
 
       simple_volume():_vol(0),_count(0),_free_memory(false)
       {
-        for(size_t i=0;i<ndims;i++)
+        for(int i=0;i<ndims;i++)
         {
           _size[i]=0;
           _step[i]=0.0;
@@ -363,7 +363,7 @@ namespace minc
 
       size_t dim(size_t i) const
       {
-        return _size[i];
+        return _size[static_cast<int>(i)];
       }
 
       const size_t* dims() const

@@ -305,7 +305,10 @@ static void test4(struct testinfo *ip, struct dimdef *dims, int ndims)
   int r;
   /*Now we are going to work with the volume using apparent dimension order*/
   midimhandle_t my_dim[3];
-  static char *my_dimorder[] = {(char*)MIxspace,(char*)MIyspace,(char*)MIzspace};
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
+  static char *my_dimorder[] = {MIxspace,MIyspace,MIzspace};
+#pragma GCC diagnostic pop
   (void)dims;
   (void)ndims;
   misize_t my_sizes[3];

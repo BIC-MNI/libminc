@@ -234,7 +234,7 @@ ParseArgv(int *argcPtr, char **argv, ArgvInfo *argTable, int flags)
       infoPtr = matchPtr;
       switch (infoPtr->type) {
       case ARGV_CONSTANT:
-         *((int *) infoPtr->dst) = (intptr_t) infoPtr->src;
+         *((int *) infoPtr->dst) = (int)(intptr_t) infoPtr->src;
          break;
       case ARGV_INT:
          nargs = (uintptr_t) infoPtr->src;
@@ -444,7 +444,7 @@ PrintUsage(ArgvInfo *argTable, int flags)
          FPRINTF(stderr, "\n %s:", infoPtr->key);
          /* Write out padding after the key, followed by the help text.
           */
-         numSpaces = (int) (width + 1 - strlen(infoPtr->key));
+         numSpaces = width + 1 - (int)strlen(infoPtr->key);
          FPRINTF(stderr, "%*s %s", numSpaces, "", infoPtr->help);
          switch (infoPtr->type) {
          case ARGV_INT: {

@@ -21,17 +21,23 @@
 #include  <limits.h>
 #include  <float.h>
 
-VIO_STR   XYZ_dimension_names[] = { (VIO_STR)MIxspace, (VIO_STR)MIyspace, (VIO_STR)MIzspace };
-VIO_STR   File_order_dimension_names[] = { (VIO_STR)"", (VIO_STR)"", (VIO_STR)"", (VIO_STR)"", (VIO_STR)"" };
+/* String literals are const char* but VIO_STR is char*; suppress the
+   unavoidable qualifier warning for these static initializations. */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
+#pragma GCC diagnostic ignored "-Wcast-qual"
+VIO_STR   XYZ_dimension_names[] = { MIxspace, MIyspace, MIzspace };
+VIO_STR   File_order_dimension_names[] = { "", "", "", "", "" };
 
 static  VIO_STR  default_dimension_names[VIO_MAX_DIMENSIONS][VIO_MAX_DIMENSIONS] =
 {
-    { (VIO_STR)MIxspace },
-    { (VIO_STR)MIyspace, (VIO_STR)MIxspace },
-    { (VIO_STR)MIzspace, (VIO_STR)MIyspace, (VIO_STR)MIxspace },
-    { (VIO_STR)"", (VIO_STR)MIzspace, (VIO_STR)MIyspace, (VIO_STR)MIxspace },
-    { (VIO_STR)"", (VIO_STR)"", (VIO_STR)MIzspace, (VIO_STR)MIyspace, (VIO_STR)MIxspace }
+    { MIxspace },
+    { MIyspace, MIxspace },
+    { MIzspace, MIyspace, MIxspace },
+    { "", MIzspace, MIyspace, MIxspace },
+    { "", "", MIzspace, MIyspace, MIxspace }
 };
+#pragma GCC diagnostic pop
 
 /* ----------------------------- MNI Header -----------------------------------
 @NAME       : get_default_dim_names

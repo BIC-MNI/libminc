@@ -268,6 +268,7 @@ PRIVATE int MI_var_action(int ndims, long var_start[], long var_count[],
                           long nvalues, void *var_buffer, void *caller_data)
      /* ARGSUSED */
 {
+   (void)ndims;
    mi_varaccess_type *ptr;   /* Pointer to data from MI_varaccess */
    int status;               /* Status returned by function call */
 
@@ -619,7 +620,7 @@ SEMIPRIVATE int MI_convert_type(long number_of_values,
       If not, just copy the memory */
    if ((intype==outtype) && (insgn==outsgn) && !do_scale && !do_fillvalue) {
          (void) memcpy(outvalues, invalues,
-                       (size_t) number_of_values*inincr);
+                       (size_t) number_of_values*(size_t)inincr);
    }
 
    /* Otherwise, loop through */

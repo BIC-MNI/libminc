@@ -728,7 +728,7 @@ namespace minc
         case dim_info::DIM_VEC:_info[ui].name=MIvector_dimension;_map_to_std[0]=i;break;
         //default: REPORT_ERROR("Unknown Dimension!");
       }
-      CHECK_MINC_CALL(mdims[i]=ncdimdef(_mincid, _info[ui].name.c_str(), _info[ui].length));
+      CHECK_MINC_CALL(mdims[i]=ncdimdef(_mincid, _info[ui].name.c_str(), static_cast<long>(_info[ui].length)));
       if(_info[ui].dim!=dim_info::DIM_VEC)
       {
         int dimid;
