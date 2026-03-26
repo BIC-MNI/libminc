@@ -77,9 +77,12 @@ static  VIO_STR  convert_spatial_axis_to_dim_name(
 {
     switch( axis )
     {
-    case VIO_X:  return( (VIO_STR)MIxspace );
-    case VIO_Y:  return( (VIO_STR)MIyspace );
-    case VIO_Z:  return( (VIO_STR)MIzspace );
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
+    case VIO_X:  return( MIxspace );
+    case VIO_Y:  return( MIyspace );
+    case VIO_Z:  return( MIzspace );
+#pragma GCC diagnostic pop
     default:  handle_internal_error(
         "convert_spatial_axis_to_dim_name" ); break;
     }

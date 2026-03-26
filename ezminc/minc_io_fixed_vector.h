@@ -207,14 +207,14 @@ namespace minc
 
     fixed_vec( const fixed_vec& b )
     {
-      for(unsigned int i=0;i<static_cast<unsigned int>(dim);i++)
+      for(int i=0;i<dim;i++)
         c[i]=b[i];
     }
 
     //! assignment operator, copies contents
     fixed_vec<dim,I>& operator=(const fixed_vec<dim,I>& b)
     {
-      for(unsigned int i=0;i<static_cast<unsigned int>(dim);i++)
+      for(int i=0;i<dim;i++)
         c[i]=b[i];
       return *this;
     }

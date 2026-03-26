@@ -1,3 +1,5 @@
+/* Suppress warnings for string literal to char* assignments required by MINC2 API */
+#pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
 #include <stdio.h>
 #include <stdlib.h>
 #include "minc2.h"

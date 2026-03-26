@@ -244,7 +244,10 @@ VIOAPI  Minc_file  initialize_minc2_output(
     int                 volume_sizes[VIO_MAX_DIMENSIONS];
     int                 n_volume_dims;
     int                 d, vol_index, n_range_dims;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
     static  VIO_STR     default_dim_names[] = { MIzspace, MIyspace, MIxspace };
+#pragma GCC diagnostic pop
     VIO_STR             *vol_dimension_names;
     minc_output_options default_options;
     mitype_t            file_minc_datatype;

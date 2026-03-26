@@ -1498,8 +1498,8 @@ static void midownsample_slice ( double *in_ptr, double *out_ptr, hsize_t isize[
             size_t x1, y1, z1;
             double t;
             x1 = (size_t)x;
-            y1 = (size_t)y + (hsize_t)( j * (hsize_t)scale );
-            z1 = (size_t)z + (hsize_t)( k * (hsize_t)scale );
+            y1 = (hsize_t)y + j * (hsize_t)scale;
+            z1 = (hsize_t)z + k * (hsize_t)scale;
             t = in_ptr[ ( ( x1 * isize[1] ) + y1 ) * isize[2] + z1];
             d += t;
           }

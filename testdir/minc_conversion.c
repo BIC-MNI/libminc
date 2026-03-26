@@ -1,3 +1,5 @@
+/* Suppress warnings for string literal to char* assignments required by MINC API */
+#pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
 #define _GNU_SOURCE 1
 #include "config.h"
 #include <stdio.h>
@@ -305,10 +307,7 @@ static void test4(struct testinfo *ip, struct dimdef *dims, int ndims)
   int r;
   /*Now we are going to work with the volume using apparent dimension order*/
   midimhandle_t my_dim[3];
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
   static char *my_dimorder[] = {MIxspace,MIyspace,MIzspace};
-#pragma GCC diagnostic pop
   (void)dims;
   (void)ndims;
   misize_t my_sizes[3];

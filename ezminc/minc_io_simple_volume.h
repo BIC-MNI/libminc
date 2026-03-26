@@ -50,8 +50,8 @@ namespace minc
         size_t total=_size[0];
         for(int i=1;i<ndims;i++)
         {
-          _stride[static_cast<size_t>(i)]=_size[static_cast<size_t>(i)-1]*_stride[static_cast<size_t>(i)-1];
-          total*=_size[static_cast<size_t>(i)];
+          _stride[i]=_size[i-1]*_stride[i-1];
+          total*=_size[i];
         }
         _count=total;
         if(data)

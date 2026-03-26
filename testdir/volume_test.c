@@ -232,9 +232,12 @@ test2(void)
   int sizes[VIO_MAX_DIMENSIONS] = { 172, 256, 256, 3, 3 };
   int read_sizes[VIO_MAX_DIMENSIONS] = { 1, 1, 1, 1, 1 };
   int i, j, k;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
   char *dim_names[] = {
     MIzspace, MIyspace, MIxspace, MItime, MIvector_dimension
   };
+#pragma GCC diagnostic pop
 
   v1 = create_volume(5, dim_names, NC_SHORT, TRUE, 0, 10000);
 
