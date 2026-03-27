@@ -296,6 +296,8 @@ MNCAPI int miicv_create(void)
    /* Values that can be read by user */
    icvp->derv_imgmax = MI_DEFAULT_MAX;
    icvp->derv_imgmin = MI_DEFAULT_MIN;
+   icvp->derv_usr_float = FALSE;
+   icvp->derv_var_float = FALSE;
    for (idim=0; idim<MI_MAX_IMGDIMS; idim++) {
       icvp->derv_dim_step[idim] = 0.0;
       icvp->derv_dim_start[idim] = 0.0;

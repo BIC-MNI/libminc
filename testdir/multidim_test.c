@@ -5,7 +5,7 @@
 static int
 test1(void)
 {
-  VIO_multidim_array array;
+  VIO_multidim_array array = {0};
   int sizes[TEST1_N_DIMENSIONS] = { 1, 1, 1 };
   int read_sizes[VIO_MAX_DIMENSIONS] = { 5, 5, 5, 5, 5 };
   int i;
