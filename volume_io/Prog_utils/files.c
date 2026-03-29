@@ -1234,6 +1234,8 @@ VIOAPI  VIO_STR  extract_directory(
     VIO_STR  expanded, directory;
 
     expanded = expand_filename( filename );
+    if( expanded == NULL )
+        return( create_string( "." ) );
 
     slash_index = string_length(expanded) - 1;
 
@@ -1285,6 +1287,8 @@ VIOAPI  VIO_STR  get_absolute_filename(
        absolute (begins with '/'), then prefix the directory to the filename */
 
     expanded = expand_filename( filename );
+    if( expanded == NULL )
+        return( create_string( NULL ) );
 
     if( string_length( directory ) > 0 && expanded[0] != '/' )
     {
@@ -1642,7 +1646,7 @@ VIOAPI  VIO_Status  input_possibly_quoted_string(
     FILE            *file,
     VIO_STR          *str )
 {
-    VIO_BOOL  quoted;
+    VIO_BOOL  quoted = FALSE;
     char     ch, quote;
     VIO_Status   status;
 
@@ -1673,7 +1677,7 @@ VIOAPI  VIO_Status  input_possibly_quoted_string(
         status = input_character( file, &ch );
     }
 
-    if( !quoted )
+    if( !quoted && status == VIO_OK )
         (void) unget_character( file, ch );
 
     if( status != VIO_OK )
