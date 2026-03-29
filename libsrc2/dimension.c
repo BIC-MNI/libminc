@@ -97,6 +97,7 @@ int micopy_dimension ( midimhandle_t dim_ptr, midimhandle_t *new_dim_ptr )
     handle->offsets = ( double * ) malloc ( dim_ptr->length * sizeof ( double ) );
 
     if ( handle->offsets == NULL ) {
+      free(handle->name);
       free(handle);
       return ( MI_ERROR );
     }
@@ -133,6 +134,10 @@ int micopy_dimension ( midimhandle_t dim_ptr, midimhandle_t *new_dim_ptr )
     handle->widths = ( double * ) malloc ( dim_ptr->length * sizeof ( double ) );
 
     if ( handle->widths == NULL ) {
+      free(handle->name);
+      free(handle->offsets);
+      free(handle->units);
+      free(handle);
       return ( MI_ERROR );
     }
 
@@ -275,6 +280,8 @@ int micreate_dimension(const char *name, midimclass_t dimclass, midimattr_t attr
     break;
   case MI_DIMCLASS_ANY:
   default:
+    free(handle->comments);
+    free(handle->name);
     free(handle);
     return MI_ERROR;
   }
@@ -284,6 +291,13 @@ int micreate_dimension(const char *name, midimclass_t dimclass, midimattr_t attr
 
   if ( attr & MI_DIMATTR_NOT_REGULARLY_SAMPLED ) {
     handle->widths = ( double * ) malloc ( length * sizeof ( double ) );
+
+    if ( handle->widths == NULL ) {
+      free(handle->comments);
+      free(handle->name);
+      free(handle);
+      return ( MI_ERROR );
+    }
 
     for ( i = 0; i < length; i++ ) {
 
@@ -482,6 +496,8 @@ int miset_apparent_dimension_order ( mihandle_t volume, int array_length,
    */
   if ( volume->dim_indices == NULL ) {
     volume->dim_indices = ( int * ) malloc ( volume->number_of_dims * sizeof ( int ) );
+    if ( volume->dim_indices == NULL )
+      return ( MI_ERROR );
     memset ( volume->dim_indices, -1, sizeof ( volume->number_of_dims ) );
   }
 
@@ -576,6 +592,8 @@ int miset_apparent_dimension_order_by_name ( mihandle_t volume, int array_length
    */
   if ( volume->dim_indices == NULL ) {
     volume->dim_indices = ( int * ) malloc ( volume->number_of_dims * sizeof ( int ) );
+    if ( volume->dim_indices == NULL )
+      return ( MI_ERROR );
     memset ( volume->dim_indices, -1, sizeof ( volume->number_of_dims ) );
   }
 
