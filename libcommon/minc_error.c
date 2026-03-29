@@ -381,7 +381,6 @@ int v_mi2log_message(const char *file, int line, mimsgcode_t code, va_list ap)
     }
     fprintf ( _MI2_log.fp, "%s:%d (from %s): ", file, line, minc_routine_name );
     vfprintf ( _MI2_log.fp, fmt, ap );
-    va_end ( ap );
     fprintf ( _MI2_log.fp, "\n" );
     fflush ( _MI2_log.fp );
   }
