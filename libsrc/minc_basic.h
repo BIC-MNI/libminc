@@ -119,6 +119,7 @@
          dvalue = (double) *((unsigned char *) ptr); break; \
       case MI_PRIV_SIGNED : \
          dvalue = (double) *((signed char *) ptr); break; \
+      default: dvalue = 0; break; \
       } \
       break; \
    case NC_SHORT : \
@@ -127,6 +128,7 @@
          dvalue = (double) *((unsigned short *) ptr); break; \
       case MI_PRIV_SIGNED : \
          dvalue = (double) *((signed short *) ptr); break; \
+      default: dvalue = 0; break; \
       } \
       break; \
    case NC_INT : \
@@ -135,6 +137,7 @@
          dvalue = (double) *((unsigned int *) ptr); break; \
       case MI_PRIV_SIGNED : \
          dvalue = (double) *((signed int  *) ptr); break; \
+      default: dvalue = 0; break; \
       } \
       break; \
    case NC_FLOAT : \
@@ -148,6 +151,7 @@
          "Attempt to convert NC_NAT value to double"); \
       dvalue = 0; \
       break; \
+   default: dvalue = 0; break; \
    }
 
 #define MI_FROM_DOUBLE(dvalue, type, sign, ptr) \
@@ -165,6 +169,7 @@
          dvalue = MIN(SCHAR_MAX, dvalue); \
          *((signed char *) ptr) = ROUND(dvalue); \
          break; \
+      default: break; \
       } \
       break; \
    case NC_SHORT : \
@@ -179,6 +184,7 @@
          dvalue = MIN(SHRT_MAX, dvalue); \
          *((signed short *) ptr) = ROUND(dvalue); \
          break; \
+      default: break; \
       } \
       break; \
    case NC_INT : \
@@ -193,6 +199,7 @@
          dvalue = MIN(INT_MAX, dvalue); \
          *((signed int *) ptr) = ROUND(dvalue); \
          break; \
+      default: break; \
       } \
       break; \
    case NC_FLOAT : \
@@ -207,6 +214,7 @@
          "Attempt to convert to NC_NAT from double"); \
       dvalue = 0; \
       break; \
+   default: break; \
    }
 
 /**/

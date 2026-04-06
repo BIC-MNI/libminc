@@ -1345,12 +1345,12 @@ PRIVATE int MI_icv_access(int operation, mi_icv_type *icvp, long start[],
                                         for allocating variable buffer
                                         (NULL if we don't care) */
    long chunk_count[MAX_VAR_DIMS];   /* Number of elements to get for chunk */
-   long chunk_start[MAX_VAR_DIMS];   /* Starting index for getting a chunk */
+   long chunk_start[MAX_VAR_DIMS] = {0};   /* Starting index for getting a chunk */
    long chunk_size;                  /* Size of chunk in bytes */
    void *chunk_values;               /* Pointer to next chunk to get */
    long var_start[MAX_VAR_DIMS];     /* Coordinates of first var element */
    long var_count[MAX_VAR_DIMS];     /* Edge lengths in variable */
-   long var_end[MAX_VAR_DIMS];       /* Coordinates of last var element */
+   long var_end[MAX_VAR_DIMS] = {0};       /* Coordinates of last var element */
    int firstdim;
    int idim, ndims;
 

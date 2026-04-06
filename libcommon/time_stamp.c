@@ -114,6 +114,8 @@ char *time_stamp(int argc, char *argv[])
         length += 2;            /* we will need quotes! */
    }
    str = malloc(length);
+   if (str == NULL)
+      return NULL;
 
    /* Copy the time and separator */
    (void) strcpy(str, the_time);

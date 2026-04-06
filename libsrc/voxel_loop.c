@@ -1183,6 +1183,7 @@ PRIVATE void update_history(int mincid, char *arg_string)
 
    /* Allocate a string and get the old history */
    string = MALLOC(att_length, char);
+   if (string == NULL) return;
    string[0] = '\0';
    (void) miattgetstr(mincid, NC_GLOBAL, MIhistory, att_length,
                       string);
@@ -2007,6 +2008,7 @@ PRIVATE Loopfile_Info *initialize_loopfile_info(int num_input_files,
 
    /* Allocate structure */
    loopfile_info = MALLOC(1, Loopfile_Info);
+   if (loopfile_info == NULL) return NULL;
 
    /* Save clobber info */
    if (loop_options->clobber) {
@@ -2029,6 +2031,7 @@ PRIVATE Loopfile_Info *initialize_loopfile_info(int num_input_files,
    /* Save input file names (just copy pointers, not strings) */
    if (num_input_files > 0) {
       loopfile_info->input_files = MALLOC(num_input_files, char *);
+      if (loopfile_info->input_files == NULL) { FREE(loopfile_info); return NULL; }
       for (ifile=0; ifile < num_input_files; ifile++)
          loopfile_info->input_files[ifile] = input_files[ifile];
    }
@@ -2038,6 +2041,7 @@ PRIVATE Loopfile_Info *initialize_loopfile_info(int num_input_files,
    /* Save output file names (just copy pointers, not strings) */
    if (num_output_files > 0) {
       loopfile_info->output_files = MALLOC(num_output_files, char *);
+      if (loopfile_info->output_files == NULL) { FREE(loopfile_info); return NULL; }
       for (ifile=0; ifile < num_output_files; ifile++)
          loopfile_info->output_files[ifile] = output_files[ifile];
    }
@@ -2061,6 +2065,9 @@ PRIVATE Loopfile_Info *initialize_loopfile_info(int num_input_files,
    num_free_files -= num_files;
    loopfile_info->output_mincid = MALLOC(num_files, int);
    loopfile_info->output_icvid = MALLOC(num_files, int);
+   if (loopfile_info->output_mincid == NULL || loopfile_info->output_icvid == NULL) {
+      FREE(loopfile_info); return NULL;
+   }
    for (ifile=0; ifile < num_files; ifile++) {
       loopfile_info->output_mincid[ifile] = MI_ERROR;
       loopfile_info->output_icvid[ifile] = MI_ERROR;
@@ -2084,6 +2091,9 @@ PRIVATE Loopfile_Info *initialize_loopfile_info(int num_input_files,
    num_free_files -= num_files;
    loopfile_info->input_mincid = MALLOC(num_files, int);
    loopfile_info->input_icvid = MALLOC(num_files, int);
+   if (loopfile_info->input_mincid == NULL || loopfile_info->input_icvid == NULL) {
+      FREE(loopfile_info); return NULL;
+   }
    for (ifile=0; ifile < num_files; ifile++) {
       loopfile_info->input_mincid[ifile] = MI_ERROR;
       loopfile_info->input_icvid[ifile] = MI_ERROR;
@@ -2732,6 +2742,7 @@ MNCAPI Loop_Options *create_loop_options(void)
 
    /* Allocate structure */
    loop_options = MALLOC(1, Loop_Options);
+   if (loop_options == NULL) return NULL;
 
    /* Fill in the defaults */
    loop_options->clobber = FALSE;
@@ -3227,6 +3238,7 @@ PRIVATE Loop_Info *create_loop_info(void)
 
    /* Allocate structure */
    loop_info = MALLOC(1, Loop_Info);
+   if (loop_info == NULL) return NULL;
 
    /* Fill in the defaults */
    initialize_loop_info(loop_info);

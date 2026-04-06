@@ -179,6 +179,7 @@ static  Minc_file  initialize_minc_input_from_minc2_id(
         slices_count*=dimension_size[d];
       }
       slice_start=(misize_t *)calloc(n_slice_dimensions,sizeof(misize_t));
+      if(slice_start==NULL) return NULL;
       miget_slice_range(file->minc2id,slice_start,n_slice_dimensions,&volume_max,&volume_min);
 
       do
