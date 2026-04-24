@@ -215,6 +215,9 @@ set(MINC2 "1")
 
 if(NIFTI_FOUND AND NOT LIBMINC_EXTERNALLY_CONFIGURED)
     set(LIBMINC_NIFTI_SUPPORT ON)
+endif()
+
+if(LIBMINC_NIFTI_SUPPORT)
     set(LIBMINC_NIFTI_SOURCES
       volume_io/Volumes/input_nifti.c
       volume_io/Volumes/input_mgh.c
