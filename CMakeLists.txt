@@ -64,6 +64,7 @@ if(NOT LIBMINC_EXTERNALLY_CONFIGURED)
   option(LIBMINC_USE_SYSTEM_NIFTI        "Use system NIfTI-1 library" OFF)
 
   option(LIBMINC_USE_ASAN                "Build with Address Sanitizer" OFF)
+  option(LIBMINC_USE_UBSAN               "Build with UndefinedBehavior Sanitizer" OFF)
 
   if(DEFINED LIB_SUFFIX)
     message(WARNING "LIB_SUFFIX is deprecated, use the standard CMAKE_INSTALL_LIBDIR instead")
@@ -120,9 +121,14 @@ if(CMAKE_BUILD_TYPE MATCHES Debug)
 endif()
 
 if(LIBMINC_USE_ASAN)
-  add_compile_options(-fno-omit-frame-pointer -fsanitize=address)
-  add_link_options(-fno-omit-frame-pointer -fsanitize=address)
-endif()
+   add_compile_options(-fno-omit-frame-pointer -fsanitize=address)
+   add_link_options(-fno-omit-frame-pointer -fsanitize=address)
+ endif()
+
+ if(LIBMINC_USE_UBSAN)
+   add_compile_options(-fno-omit-frame-pointer -fsanitize=undefined)
+   add_link_options(-fno-omit-frame-pointer -fsanitize=undefined)
+ endif()
 
 
 # check for prereqs
