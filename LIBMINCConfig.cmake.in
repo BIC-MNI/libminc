@@ -43,7 +43,15 @@ find_dependency(ZLIB REQUIRED)
 if(NOT HDF5_DIR)
   set(HDF5_DIR "@HDF5_DIR@")
 endif()
-find_dependency(HDF5 REQUIRED CONFIG COMPONENTS C)
+# Only resolve HDF5 once its CMake package actually exists. The minc-toolkit
+# superbuild INCLUDE()s this generated file during its own configure step, BEFORE
+# the HDF5 ExternalProject has built, so the package isn't there yet — the superbuild
+# provides HDF5 itself in that phase. Real downstream consumers (ITK, end users)
+# include this after HDF5 is installed, so the package is present and config mode
+# pins the correct libraries (never the system HDF5).
+if(EXISTS "${HDF5_DIR}/hdf5-config.cmake")
+  find_dependency(HDF5 REQUIRED CONFIG COMPONENTS C)
+endif()
 
 if(HAVE_MINC1)
   # NetCDF is required when MINC1 support was enabled
