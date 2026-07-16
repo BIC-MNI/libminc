@@ -257,6 +257,9 @@ set(minc_common_HEADERS
   libcommon/time_stamp.h
   libcommon/minc_common_defs.h
   volume_io/Include/volume_io.h # VF: WTF?
+  # Consumers (bicpl, conglomerate, ...) include <internal_volume_io.h>
+  # directly, so it has to be installed alongside volume_io.h.
+  volume_io/Include/internal_volume_io.h
 )
 
 set(minc1_LIB_SRCS
@@ -398,8 +401,41 @@ if(NOT HDF5_LIBRARY AND HDF5_LIBRARIES)
     set(HDF5_LIBRARY ${HDF5_LIBRARIES})
 endif()
 
-get_filename_component(HDF5_LIBRARY_NAME "${HDF5_LIBRARY}" NAME)
-get_filename_component(ZLIB_LIBRARY_NAME "${ZLIB_LIBRARY}" NAME)
+# Entries for the exported *_CONFIG library lists.
+#
+# Consumers link these bare entries with link_directories(LIBMINC_LIBRARY_DIRS),
+# which only covers libminc's own install prefix. That works for dependencies
+# staged into that prefix (the minc-toolkit superbuild builds its own HDF5), and
+# keeping them as plain names is what makes such an install relocatable. But a
+# system dependency lives elsewhere, and a plain name the linker cannot find
+# fails the consumer's build ("ld: library 'hdf5' not found" on macOS/Homebrew,
+# "DSO missing from command line" on Debian, whose HDF5 is libhdf5_serial under
+# /usr/lib/*/hdf5/serial). Keep the absolute path for those.
+# A dependency variable may hold several entries (module-mode FindHDF5 reports
+# e.g. libhdf5.so;libsz.so;libz.so;libdl.a;libm.so), and an entry may be an
+# absolute path or a plain -l name, so map each entry individually.
+macro(libminc_config_lib_entry _out _lib)
+  set(${_out} )
+  foreach(_entry ${${_lib}})
+    if(IS_ABSOLUTE "${_entry}")
+      file(RELATIVE_PATH _rel "${CMAKE_INSTALL_PREFIX}" "${_entry}")
+      if(_rel MATCHES "^\\.\\." OR NOT CMAKE_INSTALL_PREFIX)
+        list(APPEND ${_out} "${_entry}")                  # outside the prefix
+      else()
+        get_filename_component(_name "${_entry}" NAME)    # staged with libminc
+        list(APPEND ${_out} "${_name}")
+      endif()
+    else()
+      list(APPEND ${_out} "${_entry}")   # already a plain -l name
+    endif()
+  endforeach()
+  unset(_entry)
+  unset(_rel)
+  unset(_name)
+endmacro()
+
+libminc_config_lib_entry(HDF5_LIBRARY_NAME HDF5_LIBRARY)
+libminc_config_lib_entry(ZLIB_LIBRARY_NAME ZLIB_LIBRARY)
 
 # Backward-compat: keep flat library list variables populated
 set(LIBMINC_LIBRARIES        ${LIBMINC_LIBRARY} ${HDF5_LIBRARY} ${NIFTI_LIBRARIES} ${ZLIB_LIBRARY})
@@ -514,7 +550,7 @@ if(LIBMINC_MINC1_SUPPORT)
   # NetCDF must be PUBLIC because libsrc/minc.h includes <netcdf.h>
   target_include_directories(${LIBMINC_LIBRARY} PUBLIC $<BUILD_INTERFACE:${NETCDF_INCLUDE_DIR}>)
   target_link_libraries(${LIBMINC_LIBRARY} PUBLIC ${NETCDF_LIBRARY})
-  get_filename_component(NETCDF_LIBRARY_NAME "${NETCDF_LIBRARY}" NAME)
+  libminc_config_lib_entry(NETCDF_LIBRARY_NAME NETCDF_LIBRARY)
 else()
   set(NETCDF_LIBRARY_NAME )
 endif()
@@ -638,8 +674,35 @@ if(LIBMINC_IS_TOP_LEVEL OR LIBMINC_EXTERNALLY_CONFIGURED)
 
   # config for install dir
   set(LIBMINC_USE_FILE_CONFIG     "\${LIBMINC_INSTALL_PREFIX}/${LIBMINC_INSTALL_LIB_DIR}/cmake/Use${LIBMINC_EXTERNAL_LIB_PREFIX}LIBMINC.cmake" )
+  # minc.h includes <hdf5.h>, and volume_io pulls in netcdf.h with MINC1
+  # support, so a consumer needs those include dirs too. They are only added
+  # when they live outside the install prefix (a system HDF5/NetCDF); a
+  # dependency staged into the prefix is already covered by the line above.
   set(LIBMINC_INCLUDE_DIRS_CONFIG "\${LIBMINC_INSTALL_PREFIX}/include" )
+  foreach(_dep_inc ${HDF5_INCLUDE_DIRS} ${NETCDF_INCLUDE_DIR})
+    if(_dep_inc AND EXISTS "${_dep_inc}")
+      file(RELATIVE_PATH _rel "${CMAKE_INSTALL_PREFIX}" "${_dep_inc}")
+      if(_rel MATCHES "^\\.\\.")
+        list(APPEND LIBMINC_INCLUDE_DIRS_CONFIG "${_dep_inc}")
+      endif()
+    endif()
+  endforeach()
+  unset(_dep_inc)
+  unset(_rel)
+  # Dependencies reported as plain -l names (h5cc-based FindHDF5, Homebrew)
+  # need their directory on the link line, or the consumer fails with
+  # "ld: library 'hdf5' not found".
   set(LIBMINC_LIBRARY_DIRS_CONFIG "\${LIBMINC_INSTALL_PREFIX}/${LIBMINC_INSTALL_LIB_DIR}" )
+  foreach(_dep_dir ${HDF5_LIBRARY_DIRS} ${NETCDF_LIBRARY_DIRS})
+    if(_dep_dir AND EXISTS "${_dep_dir}")
+      file(RELATIVE_PATH _rel "${CMAKE_INSTALL_PREFIX}" "${_dep_dir}")
+      if(_rel MATCHES "^\\.\\.")
+        list(APPEND LIBMINC_LIBRARY_DIRS_CONFIG "${_dep_dir}")
+      endif()
+    endif()
+  endforeach()
+  unset(_dep_dir)
+  unset(_rel)
   set(LIBMINC_STATIC_LIBRARIES_CONFIG   "" )
   set(VOLUME_IO_LIBRARY_STATIC "")
 

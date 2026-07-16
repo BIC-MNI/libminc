@@ -51,6 +51,13 @@ endif()
 # pins the correct libraries (never the system HDF5).
 if(EXISTS "${HDF5_DIR}/hdf5-config.cmake")
   find_dependency(HDF5 REQUIRED CONFIG COMPONENTS C)
+elseif(NOT TARGET hdf5-shared AND NOT TARGET hdf5-static)
+  # No HDF5 CMake package available (e.g. Debian/Ubuntu's serial HDF5 layout
+  # provides only module-mode discovery). Resolve quietly via FindHDF5 so the
+  # legacy include/library dir variables below can be populated; if this also
+  # fails (superbuild configure phase, where HDF5 is provided later), the
+  # behaviour is unchanged from before.
+  find_package(HDF5 QUIET COMPONENTS C)
 endif()
 
 if(HAVE_MINC1)
