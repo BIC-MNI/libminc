@@ -1,80 +1,131 @@
 name: CMake
 
+# Build + run the ctest suite on every push and pull request, across the
+# same option matrix as before (shared/static, MINC1 on/off, NIFTI on/off)
+# plus a Fedora container job for RPM-world coverage.
 on:
   push:
-    branches: 
-      - develop
-      - master
+    branches: ['**']
   pull_request:
-    branches: 
-      - develop
-      - master
+
+permissions:
+  contents: read
+
+# A newer push to the same ref cancels an in-progress run.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
 
 env:
-  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
   CTEST_OUTPUT_ON_FAILURE: ON
-  CTEST_PARALLEL_LEVEL: 2
+  CTEST_PARALLEL_LEVEL: 4
 
 jobs:
   ####################
-  # Linux / macOS
+  # Linux / macOS runners
   ####################
-  Unix:
-    name: ${{ matrix.os }} ${{ matrix.build-params.WITH_MINC1 == 'ON' && 'MINC_1_2' || 'MINC_1'}} ${{ matrix.build-params.tests == 'ON' && 'tests' || ''}} ${{ matrix.build-params.USE_NIFTI == 'ON' && 'NIFTI' || ''}} ${{ matrix.config }}
+  unix:
+    name: ${{ matrix.os }} ${{ matrix.build-params.WITH_MINC1 == 'ON' && 'MINC_1_2' || 'MINC_1' }} ${{ matrix.build-params.USE_NIFTI == 'ON' && 'NIFTI' || '' }} ${{ matrix.build-params.static == 'ON' && 'static' || 'shared' }}
     runs-on: ${{ matrix.os }}
-
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-22.04, ubuntu-24.04, macos-14, macos-15]
-        config: [Release]
-        build-params: 
-          - {static:  ON, WITH_MINC1:  ON, tests:  ON, USE_NIFTI: OFF }
-          - {static: OFF, WITH_MINC1: OFF, tests:  ON, USE_NIFTI: OFF }
-          - {static:  ON, WITH_MINC1:  ON, tests:  ON, USE_NIFTI:  ON }
+        build-params:
+          - {static:  ON, WITH_MINC1:  ON, USE_NIFTI: OFF}
+          - {static: OFF, WITH_MINC1: OFF, USE_NIFTI: OFF}
+          - {static:  ON, WITH_MINC1:  ON, USE_NIFTI:  ON}
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 10
+      - uses: actions/checkout@v7
 
-    - name: Install dependencies  (Linux)
-      if: runner.os == 'Linux'
-      run: |
-        sudo apt update
-        sudo apt install -y libhdf5-dev libnetcdf-dev
+      - name: Install dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libhdf5-dev libnetcdf-dev
 
-    - name: Install dependencies (macOS)
-      if: runner.os == 'macOS'
-      run: |
-          HOMEBREW_NO_AUTO_UPDATE=1 brew install hdf5 netcdf
+      - name: Install dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: HOMEBREW_NO_AUTO_UPDATE=1 brew install hdf5 netcdf
 
-    - name: ccache
-      uses: hendrikmuhs/ccache-action@v1.2
-      with:
-        key: ${{ matrix.os }}-${{ matrix.config }}-${{ matrix.build-params.static }}-${{ matrix.build-params.WITH_MINC1 }}-${{ matrix.build-params.USE_NIFTI }}
-        max-size: 1G
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ${{ matrix.os }}-${{ matrix.build-params.static }}-${{ matrix.build-params.WITH_MINC1 }}-${{ matrix.build-params.USE_NIFTI }}
+          max-size: 1G
 
-    - name: Configure CMake 
-      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
-      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-      run: |
-        cmake -B ${{github.workspace}}/build \
-          -DCMAKE_C_COMPILER_LAUNCHER=ccache \
-          -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-          -DCMAKE_BUILD_TYPE=${{ matrix.config }} \
-          -DLIBMINC_BUILD_SHARED_LIBS:BOOL=${{ matrix.build-params.static == 'ON' && 'OFF' || 'ON' }} \
-          -DLIBMINC_MINC1_SUPPORT:BOOL=${{ matrix.build-params.WITH_MINC1 }} \
-          -DLIBMINC_USE_NIFTI:BOOL=${{ matrix.build-params.USE_NIFTI }} \
-          -DBUILD_TESTING:BOOL=${{ matrix.build-params.tests }} 
+      - name: Configure
+        run: |
+          cmake -B build \
+            -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+            -DCMAKE_BUILD_TYPE="$BUILD_TYPE" \
+            -DLIBMINC_BUILD_SHARED_LIBS:BOOL=${{ matrix.build-params.static == 'ON' && 'OFF' || 'ON' }} \
+            -DLIBMINC_MINC1_SUPPORT:BOOL=${{ matrix.build-params.WITH_MINC1 }} \
+            -DLIBMINC_USE_NIFTI:BOOL=${{ matrix.build-params.USE_NIFTI }} \
+            -DBUILD_TESTING:BOOL=ON
 
-    - name: Build
-      working-directory: ${{github.workspace}}/build
-      # Build your program with the given configuration
-      run: make -j2
+      - name: Build
+        run: cmake --build build -j4
 
-    - name: Test
-      working-directory: ${{github.workspace}}/build
-      run: ctest --parallel 4 --verbose
-      
+      - name: Test
+        working-directory: build
+        run: ctest --parallel 4 --output-on-failure
+
+  ####################
+  # Fedora container
+  ####################
+  fedora:
+    name: fedora:44 ${{ matrix.build-params.WITH_MINC1 == 'ON' && 'MINC_1_2' || 'MINC_1' }} ${{ matrix.build-params.USE_NIFTI == 'ON' && 'NIFTI' || '' }} ${{ matrix.build-params.static == 'ON' && 'static' || 'shared' }}
+    runs-on: ubuntu-latest
+    container: 'fedora:44'
+    strategy:
+      fail-fast: false
+      matrix:
+        build-params:
+          - {static:  ON, WITH_MINC1:  ON, USE_NIFTI: OFF}
+          - {static: OFF, WITH_MINC1: OFF, USE_NIFTI: OFF}
+          - {static:  ON, WITH_MINC1:  ON, USE_NIFTI:  ON}
+    env:
+      CCACHE_DIR: /root/.ccache
+      CCACHE_MAXSIZE: 1G
+    steps:
+      - name: Install dependencies
+        run: |
+          dnf install -y gcc gcc-c++ cmake make git ccache \
+            hdf5-devel netcdf-devel zlib-devel perl
+
+      - name: Allow git to read the workspace owned by the runner user
+        run: git config --global --add safe.directory '*'
+
+      - uses: actions/checkout@v7
+
+      - uses: actions/cache@v6
+        with:
+          path: /root/.ccache
+          key: ccache-fedora44-${{ matrix.build-params.static }}-${{ matrix.build-params.WITH_MINC1 }}-${{ matrix.build-params.USE_NIFTI }}-${{ github.sha }}
+          restore-keys: |
+            ccache-fedora44-${{ matrix.build-params.static }}-${{ matrix.build-params.WITH_MINC1 }}-${{ matrix.build-params.USE_NIFTI }}-
+
+      - name: Configure
+        run: |
+          cmake -B build \
+            -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+            -DCMAKE_BUILD_TYPE="$BUILD_TYPE" \
+            -DLIBMINC_BUILD_SHARED_LIBS:BOOL=${{ matrix.build-params.static == 'ON' && 'OFF' || 'ON' }} \
+            -DLIBMINC_MINC1_SUPPORT:BOOL=${{ matrix.build-params.WITH_MINC1 }} \
+            -DLIBMINC_USE_NIFTI:BOOL=${{ matrix.build-params.USE_NIFTI }} \
+            -DBUILD_TESTING:BOOL=ON
+
+      - name: Build
+        run: cmake --build build -j4
+
+      - name: Test
+        working-directory: build
+        run: ctest --parallel 4 --output-on-failure
