@@ -77,6 +77,10 @@ macro(build_nifti install_prefix staging_prefix)
             -DMACOSX_RPATH:BOOL=ON
             -DCMAKE_INSTALL_RPATH:PATH=${install_prefix}/${CMAKE_INSTALL_LIBDIR}
             -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
+            # nifti_clib defaults its library dir to plain "lib"; force it to
+            # match this project's CMAKE_INSTALL_LIBDIR (lib64 on RPM distros)
+            # so NIFTI_LIBRARY/ZNZ_LIBRARY below point at the staged files.
+            -DNIFTI_INSTALL_LIBRARY_DIR:PATH=${CMAKE_INSTALL_LIBDIR}
             "-DCMAKE_CXX_FLAGS_RELEASE:STRING=${NIFTI_CMAKE_CXX_FLAGS_RELEASE}"
             "-DCMAKE_C_FLAGS_RELEASE:STRING=${NIFTI_CMAKE_C_FLAGS_RELEASE}"
             "-DCMAKE_CXX_FLAGS_DEBUG:STRING=${NIFTI_CMAKE_CXX_FLAGS_DEBUG}"
