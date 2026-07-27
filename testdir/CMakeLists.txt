@@ -279,13 +279,16 @@ if(LIBMINC_NIFTI_SUPPORT)
     set_tests_properties(nifti_readback PROPERTIES ENVIRONMENT "${MINC_TEST_ENVIRONMENT}")
   endif()
 
-  # RED/GREEN invariant: the nifti implementation linked into libminc consumers
-  # must be exported as minc_nifti_* and NOT as the bare, ITK-colliding names.
-  if(CMAKE_NM)
+  # RED/GREEN invariant: libminc's nifti implementation must be exported as
+  # minc_nifti_* and NOT the bare, ITK-colliding names. Inspect the libniftiio.a
+  # archive (NIFTI_LIBRARY) rather than a linked executable: an archive retains
+  # its defined symbols unstripped on every platform, so the check is portable
+  # across GNU/ELF and Apple/Mach-O nm (which prefixes C symbols with '_').
+  if(CMAKE_NM AND NIFTI_LIBRARY)
     add_test(NAME nifti_mangle_symbols
              COMMAND ${CMAKE_COMMAND}
                -DNM=${CMAKE_NM}
-               -DTARGET=$<TARGET_FILE:nifti_readback>
+               -DTARGET=${NIFTI_LIBRARY}
                -P ${CMAKE_CURRENT_SOURCE_DIR}/check_nifti_mangled.cmake)
   endif()
 endif()
