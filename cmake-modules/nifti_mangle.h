@@ -1,0 +1,129 @@
+#ifndef MINC_NIFTI_MANGLE_H
+#define MINC_NIFTI_MANGLE_H
+/*
+ * nifti_mangle.h -- prefix every exported nifti_clib (v3.0.0) symbol with
+ * "minc_" so libminc's private copy of niftiio/znzlib cannot collide at link
+ * time with ITK's own bundled niftiio (ITK has no ITK_USE_SYSTEM_NIFTI switch,
+ * so any tool linking both libminc's minc2 and ITK would otherwise get
+ * "multiple definition of nifti_image_read" etc.).
+ *
+ * This is the zlib Z_PREFIX pattern: the nifti build compiles its sources with
+ * these #defines active (via nifti1_io.h / znzlib.h self-including this header),
+ * so definitions AND every consumer's calls are renamed consistently and
+ * transparently. ITK builds its own copy from unpatched headers -> unprefixed.
+ *
+ * Auto-generated from `nm -g --defined-only libniftiio.a libznz.a` of the
+ * pinned nifti_clib v3.0.0. Regenerate if the nifti_clib version is bumped.
+ */
+#define Xznzclose minc_Xznzclose
+#define disp_nifti_1_header minc_disp_nifti_1_header
+#define is_nifti_file minc_is_nifti_file
+#define is_valid_nifti_type minc_is_valid_nifti_type
+#define nifti_add_extension minc_nifti_add_extension
+#define nifti_compiled_with_zlib minc_nifti_compiled_with_zlib
+#define nifti_convert_nhdr2nim minc_nifti_convert_nhdr2nim
+#define nifti_convert_nim2nhdr minc_nifti_convert_nim2nhdr
+#define nifti_copy_extensions minc_nifti_copy_extensions
+#define nifti_copy_nim_info minc_nifti_copy_nim_info
+#define nifti_datatype_from_string minc_nifti_datatype_from_string
+#define nifti_datatype_is_valid minc_nifti_datatype_is_valid
+#define nifti_datatype_sizes minc_nifti_datatype_sizes
+#define nifti_datatype_string minc_nifti_datatype_string
+#define nifti_datatype_to_string minc_nifti_datatype_to_string
+#define nifti_disp_lib_hist minc_nifti_disp_lib_hist
+#define nifti_disp_lib_version minc_nifti_disp_lib_version
+#define nifti_disp_matrix_orient minc_nifti_disp_matrix_orient
+#define nifti_disp_type_list minc_nifti_disp_type_list
+#define nifti_extension_size minc_nifti_extension_size
+#define nifti_fileexists minc_nifti_fileexists
+#define nifti_find_file_extension minc_nifti_find_file_extension
+#define nifti_findhdrname minc_nifti_findhdrname
+#define nifti_findimgname minc_nifti_findimgname
+#define nifti_free_NBL minc_nifti_free_NBL
+#define nifti_free_extensions minc_nifti_free_extensions
+#define nifti_get_filesize minc_nifti_get_filesize
+#define nifti_get_intlist minc_nifti_get_intlist
+#define nifti_get_volsize minc_nifti_get_volsize
+#define nifti_hdr_looks_good minc_nifti_hdr_looks_good
+#define nifti_image_free minc_nifti_image_free
+#define nifti_image_from_ascii minc_nifti_image_from_ascii
+#define nifti_image_infodump minc_nifti_image_infodump
+#define nifti_image_load minc_nifti_image_load
+#define nifti_image_load_bricks minc_nifti_image_load_bricks
+#define nifti_image_open minc_nifti_image_open
+#define nifti_image_read minc_nifti_image_read
+#define nifti_image_read_bricks minc_nifti_image_read_bricks
+#define nifti_image_to_ascii minc_nifti_image_to_ascii
+#define nifti_image_unload minc_nifti_image_unload
+#define nifti_image_write minc_nifti_image_write
+#define nifti_image_write_bricks minc_nifti_image_write_bricks
+#define nifti_image_write_hdr_img minc_nifti_image_write_hdr_img
+#define nifti_image_write_hdr_img2 minc_nifti_image_write_hdr_img2
+#define nifti_intent_string minc_nifti_intent_string
+#define nifti_is_complete_filename minc_nifti_is_complete_filename
+#define nifti_is_gzfile minc_nifti_is_gzfile
+#define nifti_is_inttype minc_nifti_is_inttype
+#define nifti_is_valid_datatype minc_nifti_is_valid_datatype
+#define nifti_is_valid_ecode minc_nifti_is_valid_ecode
+#define nifti_make_new_header minc_nifti_make_new_header
+#define nifti_make_new_nim minc_nifti_make_new_nim
+#define nifti_make_orthog_mat44 minc_nifti_make_orthog_mat44
+#define nifti_makebasename minc_nifti_makebasename
+#define nifti_makehdrname minc_nifti_makehdrname
+#define nifti_makeimgname minc_nifti_makeimgname
+#define nifti_mat33_colnorm minc_nifti_mat33_colnorm
+#define nifti_mat33_determ minc_nifti_mat33_determ
+#define nifti_mat33_inverse minc_nifti_mat33_inverse
+#define nifti_mat33_mul minc_nifti_mat33_mul
+#define nifti_mat33_polar minc_nifti_mat33_polar
+#define nifti_mat33_rownorm minc_nifti_mat33_rownorm
+#define nifti_mat44_inverse minc_nifti_mat44_inverse
+#define nifti_mat44_to_orientation minc_nifti_mat44_to_orientation
+#define nifti_mat44_to_quatern minc_nifti_mat44_to_quatern
+#define nifti_nim_has_valid_dims minc_nifti_nim_has_valid_dims
+#define nifti_nim_is_valid minc_nifti_nim_is_valid
+#define nifti_orientation_string minc_nifti_orientation_string
+#define nifti_quatern_to_mat44 minc_nifti_quatern_to_mat44
+#define nifti_read_ascii_image minc_nifti_read_ascii_image
+#define nifti_read_buffer minc_nifti_read_buffer
+#define nifti_read_collapsed_image minc_nifti_read_collapsed_image
+#define nifti_read_header minc_nifti_read_header
+#define nifti_read_subregion_image minc_nifti_read_subregion_image
+#define nifti_set_allow_upper_fext minc_nifti_set_allow_upper_fext
+#define nifti_set_debug_level minc_nifti_set_debug_level
+#define nifti_set_filenames minc_nifti_set_filenames
+#define nifti_set_iname_offset minc_nifti_set_iname_offset
+#define nifti_set_skip_blank_ext minc_nifti_set_skip_blank_ext
+#define nifti_set_type_from_names minc_nifti_set_type_from_names
+#define nifti_short_order minc_nifti_short_order
+#define nifti_simple_init_nim minc_nifti_simple_init_nim
+#define nifti_slice_string minc_nifti_slice_string
+#define nifti_strdup minc_nifti_strdup
+#define nifti_swap_16bytes minc_nifti_swap_16bytes
+#define nifti_swap_2bytes minc_nifti_swap_2bytes
+#define nifti_swap_4bytes minc_nifti_swap_4bytes
+#define nifti_swap_8bytes minc_nifti_swap_8bytes
+#define nifti_swap_Nbytes minc_nifti_swap_Nbytes
+#define nifti_swap_as_analyze minc_nifti_swap_as_analyze
+#define nifti_test_datatype_sizes minc_nifti_test_datatype_sizes
+#define nifti_type_and_names_match minc_nifti_type_and_names_match
+#define nifti_units_string minc_nifti_units_string
+#define nifti_update_dims_from_array minc_nifti_update_dims_from_array
+#define nifti_validfilename minc_nifti_validfilename
+#define nifti_write_all_data minc_nifti_write_all_data
+#define nifti_write_ascii_image minc_nifti_write_ascii_image
+#define nifti_write_buffer minc_nifti_write_buffer
+#define nifti_xform_string minc_nifti_xform_string
+#define old_swap_nifti_header minc_old_swap_nifti_header
+#define swap_nifti_header minc_swap_nifti_header
+#define valid_nifti_brick_list minc_valid_nifti_brick_list
+#define valid_nifti_extensions minc_valid_nifti_extensions
+#define znzopen minc_znzopen
+#define znzputs minc_znzputs
+#define znzread minc_znzread
+#define znzrewind minc_znzrewind
+#define znzseek minc_znzseek
+#define znztell minc_znztell
+#define znzwrite minc_znzwrite
+
+#endif /* MINC_NIFTI_MANGLE_H */

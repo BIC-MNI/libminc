@@ -1,3 +1,7 @@
+# Directory of this module (and the co-located mangle header / patch script),
+# captured at include time so it resolves correctly from inside the macro.
+set(BUILDNIFTI_MODULE_DIR "${CMAKE_CURRENT_LIST_DIR}")
+
 macro(build_nifti install_prefix staging_prefix)
 
   if(CMAKE_EXTRA_GENERATOR)
@@ -68,6 +72,13 @@ macro(build_nifti install_prefix staging_prefix)
     BINARY_DIR NIFTI-build
     URL "https://github.com/NIFTI-Imaging/nifti_clib/archive/refs/tags/v3.0.0.tar.gz"
     URL_HASH SHA256=fe6cb1076974df01844f3f4dab1aa844953b3bc1d679126c652975158573d03d
+    # Mangle all exported nifti/znz symbols to a minc_ prefix so libminc's copy
+    # cannot collide with ITK's own bundled niftiio (ITK has no
+    # ITK_USE_SYSTEM_NIFTI switch). See PatchNiftiMangle.cmake / nifti_mangle.h.
+    PATCH_COMMAND ${CMAKE_COMMAND}
+        -DSRC=<SOURCE_DIR>
+        -DMANGLE=${BUILDNIFTI_MODULE_DIR}/nifti_mangle.h
+        -P ${BUILDNIFTI_MODULE_DIR}/PatchNiftiMangle.cmake
     CMAKE_GENERATOR ${CMAKE_GEN}
     CMAKE_ARGS
             -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}

@@ -257,3 +257,36 @@ set_property(TEST minc2-slice-test APPEND PROPERTY DEPENDS minc2-create-test-ima
 set_property(TEST minc2-valid-test APPEND PROPERTY DEPENDS minc2-create-test-images-valid)
 set_property(TEST minc2-valid-test APPEND PROPERTY DEPENDS minc2-create-test-images-2-valid)
 
+
+# --- NIfTI symbol-mangling tests ---------------------------------------------
+# These guard the fix that renames libminc's bundled nifti_clib symbols to a
+# `minc_` prefix so they cannot collide with ITK's own bundled niftiio.
+if(LIBMINC_NIFTI_SUPPORT)
+  # locate an 'nm' for the symbol-inspection test
+  if(NOT CMAKE_NM)
+    find_program(CMAKE_NM nm)
+  endif()
+
+  add_executable(nifti_readback nifti_readback.c)
+  target_include_directories(nifti_readback PRIVATE ${NIFTI_INCLUDE_DIR})
+  target_link_libraries(nifti_readback ${LIBMINC_LIBRARY} ${NIFTI_LIBRARIES})
+
+  # Functional guard: write a .nii via nifti_clib, read it back via libminc.
+  # Must pass before AND after mangling (proves the rename kept NIfTI working).
+  add_test(NAME nifti_readback
+           COMMAND nifti_readback ${CMAKE_CURRENT_BINARY_DIR}/nifti_readback_tmp.nii)
+  if(MINC_TEST_ENVIRONMENT)
+    set_tests_properties(nifti_readback PROPERTIES ENVIRONMENT "${MINC_TEST_ENVIRONMENT}")
+  endif()
+
+  # RED/GREEN invariant: the nifti implementation linked into libminc consumers
+  # must be exported as minc_nifti_* and NOT as the bare, ITK-colliding names.
+  if(CMAKE_NM)
+    add_test(NAME nifti_mangle_symbols
+             COMMAND ${CMAKE_COMMAND}
+               -DNM=${CMAKE_NM}
+               -DTARGET=$<TARGET_FILE:nifti_readback>
+               -P ${CMAKE_CURRENT_SOURCE_DIR}/check_nifti_mangled.cmake)
+  endif()
+endif()
+
