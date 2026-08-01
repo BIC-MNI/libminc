@@ -283,7 +283,10 @@ if(LIBMINC_NIFTI_SUPPORT)
   # archive (NIFTI_LIBRARY) rather than a linked executable: an archive retains
   # its defined symbols unstripped on every platform, so the check is portable
   # across GNU/ELF and Apple/Mach-O nm (which prefixes C symbols with '_').
-  if(CMAKE_NM AND NIFTI_LIBRARY)
+  #
+  # Only the bundled build is mangled -- a system nifti is whatever the distro
+  # shipped -- so this invariant does not apply under LIBMINC_USE_SYSTEM_NIFTI.
+  if(CMAKE_NM AND NIFTI_LIBRARY AND NOT LIBMINC_USE_SYSTEM_NIFTI)
     add_test(NAME nifti_mangle_symbols
              COMMAND ${CMAKE_COMMAND}
                -DNM=${CMAKE_NM}
