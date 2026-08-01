@@ -268,8 +268,7 @@ if(LIBMINC_NIFTI_SUPPORT)
   endif()
 
   add_executable(nifti_readback nifti_readback.c)
-  target_include_directories(nifti_readback PRIVATE ${NIFTI_INCLUDE_DIR})
-  target_link_libraries(nifti_readback ${LIBMINC_LIBRARY} ${NIFTI_LIBRARIES})
+  target_link_libraries(nifti_readback ${LIBMINC_LIBRARY} NIFTI::niftiio)
 
   # Functional guard: write a .nii via nifti_clib, read it back via libminc.
   # Must pass before AND after mangling (proves the rename kept NIfTI working).
