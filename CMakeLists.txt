@@ -389,6 +389,12 @@ if(LIBMINC_NIFTI_SUPPORT)
     # Targets link NIFTI::niftiio; the paths/names below only feed the exported
     # *_CONFIG lists further down. find_package(NIFTI CONFIG) supplies the
     # targets but no path variables, so read them back off the targets.
+    #
+    # LOCATION, not IMPORTED_LOCATION: nifti_clib's installed NIFTITargets
+    # records only per-configuration IMPORTED_LOCATION_<CFG> (RELEASE), so
+    # IMPORTED_LOCATION reads as NOTFOUND while LOCATION resolves through
+    # IMPORTED_CONFIGURATIONS whatever CMAKE_BUILD_TYPE is. CMP0026 forbids
+    # LOCATION on build targets, not on imported ones.
     if(NOT NIFTI_LIBRARY)
       get_target_property(NIFTI_LIBRARY NIFTI::niftiio LOCATION)
       get_target_property(ZNZ_LIBRARY   NIFTI::znz     LOCATION)

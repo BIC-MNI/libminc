@@ -132,24 +132,34 @@ set(NIFTI_FOUND       ON)
 # came from here or from find_package(NIFTI CONFIG). The config package itself
 # is not usable at this point: ExternalProject builds at build time, long after
 # the consumers are configured.
-# Build ordering is not carried by these targets -- keep the explicit
-# add_dependencies(<target> NIFTI) calls at the call sites.
-file(MAKE_DIRECTORY ${NIFTI_INCLUDE_DIR}) # imported INTERFACE include dirs must exist at configure time
+#
+# add_dependencies() on the imported target is what orders a consumer of it
+# after the ExternalProject that produces the archive.
+file(MAKE_DIRECTORY "${NIFTI_INCLUDE_DIR}" "${ZNZ_INCLUDE_DIR}") # imported INTERFACE include dirs must exist at configure time
+
+# nifti_clib links a math library only where one exists -- see its own
+# NIFTI_SYSTEM_MATH_LIB, empty on WIN32 -- so do not hardcode m.
+set(NIFTI_INTERFACE_LIBS NIFTI::znz)
+if(UNIX)
+  list(APPEND NIFTI_INTERFACE_LIBS m)
+endif()
 
 if(NOT TARGET NIFTI::znz)
   add_library(NIFTI::znz STATIC IMPORTED GLOBAL)
   set_target_properties(NIFTI::znz PROPERTIES
-    IMPORTED_LOCATION "${ZNZ_LIBRARY}"
+    IMPORTED_LOCATION             "${ZNZ_LIBRARY}"
     INTERFACE_INCLUDE_DIRECTORIES "${ZNZ_INCLUDE_DIR}"
-    INTERFACE_LINK_LIBRARIES "${ZLIB_LIBRARY}")
+    INTERFACE_LINK_LIBRARIES      ZLIB::ZLIB)
+  add_dependencies(NIFTI::znz NIFTI)
 endif()
 
 if(NOT TARGET NIFTI::niftiio)
   add_library(NIFTI::niftiio STATIC IMPORTED GLOBAL)
   set_target_properties(NIFTI::niftiio PROPERTIES
-    IMPORTED_LOCATION "${NIFTI_LIBRARY}"
+    IMPORTED_LOCATION             "${NIFTI_LIBRARY}"
     INTERFACE_INCLUDE_DIRECTORIES "${NIFTI_INCLUDE_DIR}"
-    INTERFACE_LINK_LIBRARIES "NIFTI::znz;m")
+    INTERFACE_LINK_LIBRARIES      "${NIFTI_INTERFACE_LIBS}")
+  add_dependencies(NIFTI::niftiio NIFTI)
 endif()
 
 endmacro()
