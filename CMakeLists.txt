@@ -606,10 +606,21 @@ set_target_properties(${LIBMINC_LIBRARY}
   POSITION_INDEPENDENT_CODE ON
 )
 
-# Scope INSTALL_RPATH to the target instead of global CMAKE_INSTALL_RPATH
+# Scope INSTALL_RPATH to the target instead of global CMAKE_INSTALL_RPATH.
+#
+# Resolve it relative to the loaded object rather than baking in
+# CMAKE_INSTALL_PREFIX: libminc and the libraries it links against install to
+# the same directory, so $ORIGIN is that directory, and an install that is
+# later moved still resolves. The absolute form silently kept pointing at the
+# configure-time prefix, which is a dangling path once the tree is relocated.
+if(APPLE)
+  set(LIBMINC_INSTALL_RPATH "@loader_path")
+else()
+  set(LIBMINC_INSTALL_RPATH "$ORIGIN")
+endif()
 set_target_properties(${LIBMINC_LIBRARY}
  PROPERTIES
-  INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}"
+  INSTALL_RPATH "${LIBMINC_INSTALL_RPATH}"
 )
 
 if(LIBMINC_MINC1_SUPPORT)
