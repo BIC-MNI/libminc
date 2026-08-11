@@ -1,11 +1,11 @@
 #ifndef MINC_NIFTI_MANGLE_H
 #define MINC_NIFTI_MANGLE_H
 /*
- * nifti_mangle.h -- prefix every exported nifti_clib (v3.0.0) symbol with
- * "minc_" so libminc's private copy of niftiio/znzlib cannot collide at link
- * time with ITK's own bundled niftiio (ITK has no ITK_USE_SYSTEM_NIFTI switch,
- * so any tool linking both libminc's minc2 and ITK would otherwise get
- * "multiple definition of nifti_image_read" etc.).
+ * nifti_mangle.h -- prefix every exported nifti_clib symbol with "minc_" so
+ * libminc's private copy of niftiio/znzlib cannot collide at link time with
+ * ITK's own bundled niftiio (ITK has no ITK_USE_SYSTEM_NIFTI switch, so any
+ * tool linking both libminc's minc2 and ITK would otherwise get "multiple
+ * definition of nifti_image_read" etc.).
  *
  * This is the zlib Z_PREFIX pattern: the nifti build compiles its sources with
  * these #defines active (via nifti1_io.h / znzlib.h self-including this header),
@@ -13,7 +13,9 @@
  * transparently. ITK builds its own copy from unpatched headers -> unprefixed.
  *
  * Auto-generated from `nm -g --defined-only libniftiio.a libznz.a` of the
- * pinned nifti_clib v3.0.0. Regenerate if the nifti_clib version is bumped.
+ * nifti_clib commit pinned in BuildNIFTI.cmake. Regenerate when that pin moves:
+ * take the defined global symbols (nm type T/D/B/R/G), LC_ALL=C sort -u them,
+ * and emit one "#define <sym> minc_<sym>" line per symbol.
  */
 #define Xznzclose minc_Xznzclose
 #define disp_nifti_1_header minc_disp_nifti_1_header
@@ -34,7 +36,6 @@
 #define nifti_disp_lib_version minc_nifti_disp_lib_version
 #define nifti_disp_matrix_orient minc_nifti_disp_matrix_orient
 #define nifti_disp_type_list minc_nifti_disp_type_list
-#define nifti_extension_size minc_nifti_extension_size
 #define nifti_fileexists minc_nifti_fileexists
 #define nifti_find_file_extension minc_nifti_find_file_extension
 #define nifti_findhdrname minc_nifti_findhdrname
@@ -57,8 +58,10 @@
 #define nifti_image_unload minc_nifti_image_unload
 #define nifti_image_write minc_nifti_image_write
 #define nifti_image_write_bricks minc_nifti_image_write_bricks
+#define nifti_image_write_bricks_status minc_nifti_image_write_bricks_status
 #define nifti_image_write_hdr_img minc_nifti_image_write_hdr_img
 #define nifti_image_write_hdr_img2 minc_nifti_image_write_hdr_img2
+#define nifti_image_write_status minc_nifti_image_write_status
 #define nifti_intent_string minc_nifti_intent_string
 #define nifti_is_complete_filename minc_nifti_is_complete_filename
 #define nifti_is_gzfile minc_nifti_is_gzfile
@@ -92,6 +95,7 @@
 #define nifti_set_allow_upper_fext minc_nifti_set_allow_upper_fext
 #define nifti_set_debug_level minc_nifti_set_debug_level
 #define nifti_set_filenames minc_nifti_set_filenames
+#define nifti_set_fix_floats minc_nifti_set_fix_floats
 #define nifti_set_iname_offset minc_nifti_set_iname_offset
 #define nifti_set_skip_blank_ext minc_nifti_set_skip_blank_ext
 #define nifti_set_type_from_names minc_nifti_set_type_from_names

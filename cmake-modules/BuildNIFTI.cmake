@@ -70,8 +70,12 @@ macro(build_nifti install_prefix staging_prefix)
   ExternalProject_Add(NIFTI
     SOURCE_DIR NIFTI
     BINARY_DIR NIFTI-build
-    URL "https://github.com/NIFTI-Imaging/nifti_clib/archive/refs/tags/v3.0.0.tar.gz"
-    URL_HASH SHA256=fe6cb1076974df01844f3f4dab1aa844953b3bc1d679126c652975158573d03d
+    # nifti_clib upstream (NIFTI-Imaging) has been dormant since v3.0.0 (2020);
+    # the ITK fork is the maintained line and carries the bug fixes ITK ships.
+    # It has no tags, so the pin is a commit SHA. Regenerate nifti_mangle.h
+    # (recipe in its header) whenever this pin moves.
+    URL "https://github.com/InsightSoftwareConsortium/nifti_clib/archive/f24a607843c1fe4726ad774d0476bdf36bc11f2a.tar.gz"
+    URL_HASH SHA256=1829700c16ac0679487d9b7eb1d8d63a5d8a045e990d4b37b38f4760499aea16
     # Mangle all exported nifti/znz symbols to a minc_ prefix so libminc's copy
     # cannot collide with ITK's own bundled niftiio (ITK has no
     # ITK_USE_SYSTEM_NIFTI switch). See PatchNiftiMangle.cmake / nifti_mangle.h.
@@ -122,6 +126,41 @@ set(NIFTI_INCLUDE_DIR ${staging_prefix}/${install_prefix}/include/nifti )
 set(ZNZ_LIBRARY       ${staging_prefix}/${install_prefix}/${CMAKE_INSTALL_LIBDIR}/libznz.a )
 set(ZNZ_INCLUDE_DIR   ${staging_prefix}/${install_prefix}/include/nifti )
 set(NIFTI_FOUND       ON)
+
+# Mirror the NIFTI::niftiio / NIFTI::znz imported targets that nifti_clib's own
+# NIFTIConfig.cmake would provide, so consumers link the same way whether NIFTI
+# came from here or from find_package(NIFTI CONFIG). The config package itself
+# is not usable at this point: ExternalProject builds at build time, long after
+# the consumers are configured.
+#
+# add_dependencies() on the imported target is what orders a consumer of it
+# after the ExternalProject that produces the archive.
+file(MAKE_DIRECTORY "${NIFTI_INCLUDE_DIR}" "${ZNZ_INCLUDE_DIR}") # imported INTERFACE include dirs must exist at configure time
+
+# nifti_clib links a math library only where one exists -- see its own
+# NIFTI_SYSTEM_MATH_LIB, empty on WIN32 -- so do not hardcode m.
+set(NIFTI_INTERFACE_LIBS NIFTI::znz)
+if(UNIX)
+  list(APPEND NIFTI_INTERFACE_LIBS m)
+endif()
+
+if(NOT TARGET NIFTI::znz)
+  add_library(NIFTI::znz STATIC IMPORTED GLOBAL)
+  set_target_properties(NIFTI::znz PROPERTIES
+    IMPORTED_LOCATION             "${ZNZ_LIBRARY}"
+    INTERFACE_INCLUDE_DIRECTORIES "${ZNZ_INCLUDE_DIR}"
+    INTERFACE_LINK_LIBRARIES      ZLIB::ZLIB)
+  add_dependencies(NIFTI::znz NIFTI)
+endif()
+
+if(NOT TARGET NIFTI::niftiio)
+  add_library(NIFTI::niftiio STATIC IMPORTED GLOBAL)
+  set_target_properties(NIFTI::niftiio PROPERTIES
+    IMPORTED_LOCATION             "${NIFTI_LIBRARY}"
+    INTERFACE_INCLUDE_DIRECTORIES "${NIFTI_INCLUDE_DIR}"
+    INTERFACE_LINK_LIBRARIES      "${NIFTI_INTERFACE_LIBS}")
+  add_dependencies(NIFTI::niftiio NIFTI)
+endif()
 
 endmacro()
 
