@@ -89,7 +89,11 @@ if(NOT LIBMINC_EXTERNALLY_CONFIGURED)
    if (LIBMINC_USE_SYSTEM_NIFTI)
      # nifti_clib ships its own CMake package (NIFTI::niftiio / NIFTI::znz);
      # config mode is the only supported way to find it.
-     find_package(NIFTI CONFIG)
+     #
+     # REQUIRED: asking for the system copy and silently getting the bundled
+     # one instead is what issue #102 reported. Point CMAKE_PREFIX_PATH at the
+     # nifti_clib install if it is not on the default search path.
+     find_package(NIFTI CONFIG REQUIRED)
    else()
      include(ExternalProject)
      include(BuildNIFTI)
