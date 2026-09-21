@@ -4,6 +4,9 @@
 #   Modern imported targets:
 #     LIBMINC::minc2   — the core minc2 + volume_io library
 #     LIBMINC::minc_io — the C++ ezminc wrapper (if built)
+#     LIBMINC::nifti   — NIfTI as libminc carries it (if LIBMINC_NIFTI_SUPPORT).
+#                        Link it to call nifti_* / znz* yourself: it gives the
+#                        headers that rename them to libminc's minc_* symbols.
 #
 #   Legacy variables (backward compatibility):
 #     LIBMINC_FOUND
@@ -64,6 +67,19 @@ if(HAVE_MINC1)
   # NetCDF is required when MINC1 support was enabled
   list(APPEND CMAKE_MODULE_PATH "${LIBMINC_CMAKE_DIR}")
   find_dependency(NETCDF REQUIRED)
+endif()
+
+# A static minc2 links NIFTI::niftiio, and so does LIBMINC::nifti with a system
+# nifti. Resolve it from the NIFTI package libminc was built with. Skipped when
+# the targets already exist (the minc-toolkit superbuild defines them itself)
+# or the package is not there yet (the superbuild's own configure step).
+if(LIBMINC_NIFTI_SUPPORT AND NOT TARGET NIFTI::niftiio)
+  if(NOT NIFTI_DIR)
+    set(NIFTI_DIR "@LIBMINC_NIFTI_DIR_CONFIG@")
+  endif()
+  if(EXISTS "${NIFTI_DIR}/NIFTIConfig.cmake")
+    find_dependency(NIFTI CONFIG)
+  endif()
 endif()
 
 # ----- Import the exported targets -----
