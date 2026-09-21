@@ -279,16 +279,21 @@ if(LIBMINC_NIFTI_SUPPORT)
     set_tests_properties(nifti_readback PROPERTIES ENVIRONMENT "${MINC_TEST_ENVIRONMENT}")
   endif()
 
-  # RED/GREEN invariant: libminc's nifti implementation must be exported as
-  # minc_nifti_* and NOT the bare, ITK-colliding names. Inspect the libniftiio.a
-  # archive (NIFTI_LIBRARY) rather than a linked executable: an archive retains
-  # its defined symbols unstripped on every platform, so the check is portable
-  # across GNU/ELF and Apple/Mach-O nm (which prefixes C symbols with '_').
-  if(CMAKE_NM AND NIFTI_LIBRARY)
+  # Invariant: every symbol of libminc's nifti implementation must be exported
+  # as minc_* and none under a bare, collision-prone name. Inspect the
+  # libniftiio.a / libznz.a archives rather than a linked executable: an archive
+  # retains its defined symbols unstripped on every platform, so the check is
+  # portable across GNU/ELF and Apple/Mach-O nm (which prefixes C symbols with '_').
+  if(CMAKE_NM AND NIFTI_LIBRARY AND ZNZ_LIBRARY)
     add_test(NAME nifti_mangle_symbols
              COMMAND ${CMAKE_COMMAND}
                -DNM=${CMAKE_NM}
                -DTARGET=${NIFTI_LIBRARY}
+               -P ${CMAKE_CURRENT_SOURCE_DIR}/check_nifti_mangled.cmake)
+    add_test(NAME znz_mangle_symbols
+             COMMAND ${CMAKE_COMMAND}
+               -DNM=${CMAKE_NM}
+               -DTARGET=${ZNZ_LIBRARY}
                -P ${CMAKE_CURRENT_SOURCE_DIR}/check_nifti_mangled.cmake)
   endif()
 endif()

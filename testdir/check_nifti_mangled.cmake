@@ -1,18 +1,20 @@
 # check_nifti_mangled.cmake
 #
-# Asserts that libminc's built-in NIfTI implementation is exported under the
-# mangled `minc_` prefix and NOT under the bare `nifti_*` names that collide
-# with ITK's own bundled niftiio.  Run against the built libniftiio.a archive
-# (NIFTI_LIBRARY): an archive always retains its defined symbols unstripped on
-# every platform, unlike a linked/possibly-stripped executable.
+# Asserts that every symbol libminc's built-in NIfTI exports carries the
+# `minc_` prefix, so none of them can collide with another NIfTI copy in the
+# same program (ITK bundles one). Run once per archive, libniftiio.a and
+# libznz.a: an archive always retains its defined symbols unstripped on every
+# platform, unlike a linked/possibly-stripped executable.
 #
-# Portable across GNU/ELF and Apple/Mach-O `nm`:
-#   - Mach-O prefixes C symbols with a leading '_' (so `_minc_nifti_image_read`
-#     vs GNU's `minc_nifti_image_read`); the patterns allow an optional `_`.
-#   - A trailing boundary keeps `nifti_image_read` from matching inside
-#     `nifti_image_read_bricks`.
+# Checking every symbol, not a sample, is the point: when the nifti_clib pin
+# moved, three new exports slipped past nifti_mangle.h while a check of
+# nifti_image_read alone kept passing.
 #
-# Expects: -DNM=<nm tool>  -DTARGET=<path to libniftiio.a>
+# Portable across GNU/ELF and Apple/Mach-O `nm`: Mach-O prefixes C symbols
+# with a leading '_' (`_minc_nifti_image_read`), so the patterns allow an
+# optional `_`. S is Mach-O's type for data outside __text/__data/__bss.
+#
+# Expects: -DNM=<nm tool>  -DTARGET=<path to libniftiio.a or libznz.a>
 
 if(NOT EXISTS "${TARGET}")
   message(FATAL_ERROR "check_nifti_mangled: target not found: ${TARGET}")
@@ -27,25 +29,25 @@ if(NOT _rc EQUAL 0)
   message(FATAL_ERROR "check_nifti_mangled: nm failed: ${_err}")
 endif()
 
-# A defined text symbol named exactly `nifti_image_read` (bare, i.e. not the
-# minc_-mangled form) means the collision-prone symbol is still exported -> the
-# RED state.  `_?` tolerates Mach-O's leading underscore; the trailing class
-# excludes `nifti_image_read_bricks` etc.  The `_minc_` form is not matched
-# because `[ \t]+_?nifti_image_read` requires whitespace right before the name.
-if(_syms MATCHES "[ \t][TtDd][ \t]+_?nifti_image_read[ \t\r\n]" OR
-   _syms MATCHES "[ \t][TtDd][ \t]+_?nifti_image_read$")
+# Every defined global symbol, as " T name" entries.
+string(REGEX MATCHALL "[ \t][TDBRS][ \t]+_?[A-Za-z_][A-Za-z0-9_]*" _globals "${_syms}")
+
+set(_bare ${_globals})
+list(FILTER _bare EXCLUDE REGEX "[ \t]_?minc_")
+if(_bare)
+  string(REGEX REPLACE "[ \t][TDBRS][ \t]+" "" _bare "${_bare}")
   message(FATAL_ERROR
-    "check_nifti_mangled: FOUND unmangled 'nifti_image_read' -- libminc still "
-    "exports the ITK-colliding NIfTI symbols. Expected the minc_-prefixed form.")
+    "check_nifti_mangled: symbols without the minc_ prefix in ${TARGET}: ${_bare}\n"
+    "Add them to cmake-modules/nifti_mangle.h (see the recipe in its header).")
 endif()
 
-# The mangled symbol must be present as a defined text symbol, proving the
-# prefix was applied (guards against a false pass where nifti wasn't built).
-if(NOT (_syms MATCHES "[ \t][TtDd][ \t]+_?minc_nifti_image_read[ \t\r\n]" OR
-        _syms MATCHES "[ \t][TtDd][ \t]+_?minc_nifti_image_read$"))
+# Guards against a false pass on an archive that holds no NIfTI code at all,
+# e.g. a slim-LTO object whose IR sections were stripped.
+if(NOT _globals)
   message(FATAL_ERROR
-    "check_nifti_mangled: did NOT find defined 'minc_nifti_image_read' -- the "
-    "mangled NIfTI implementation is not present in ${TARGET}.")
+    "check_nifti_mangled: no minc_ symbols in ${TARGET} -- the mangled NIfTI "
+    "implementation is not present.")
 endif()
 
-message(STATUS "check_nifti_mangled: OK -- nifti exported as minc_nifti_*, no bare nifti_image_read")
+list(LENGTH _globals _n)
+message(STATUS "check_nifti_mangled: OK -- all ${_n} symbols in ${TARGET} carry the minc_ prefix")
