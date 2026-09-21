@@ -67,6 +67,12 @@ macro(build_nifti install_prefix staging_prefix)
   set(NIFTI_CMAKE_C_FLAGS   "-fPIC ${CMAKE_C_FLAGS} -I${ZLIB_INCLUDE_DIR}")
 
 
+  set(NIFTI_LIBRARY     ${staging_prefix}/${install_prefix}/${CMAKE_INSTALL_LIBDIR}/libniftiio.a )
+  set(NIFTI_INCLUDE_DIR ${staging_prefix}/${install_prefix}/include/nifti )
+  set(ZNZ_LIBRARY       ${staging_prefix}/${install_prefix}/${CMAKE_INSTALL_LIBDIR}/libznz.a )
+  set(ZNZ_INCLUDE_DIR   ${staging_prefix}/${install_prefix}/include/nifti )
+  set(NIFTI_FOUND       ON)
+
   ExternalProject_Add(NIFTI
     SOURCE_DIR NIFTI
     BINARY_DIR NIFTI-build
@@ -90,7 +96,7 @@ macro(build_nifti install_prefix staging_prefix)
             -DCMAKE_INSTALL_PREFIX:PATH=${install_prefix}
             # nifti_clib defaults its library dir to plain "lib"; force it to
             # match this project's CMAKE_INSTALL_LIBDIR (lib64 on RPM distros)
-            # so NIFTI_LIBRARY/ZNZ_LIBRARY below point at the staged files.
+            # so NIFTI_LIBRARY/ZNZ_LIBRARY above point at the staged files.
             -DNIFTI_INSTALL_LIBRARY_DIR:PATH=${CMAKE_INSTALL_LIBDIR}
             "-DCMAKE_CXX_FLAGS_RELEASE:STRING=${NIFTI_CMAKE_CXX_FLAGS_RELEASE}"
             "-DCMAKE_C_FLAGS_RELEASE:STRING=${NIFTI_CMAKE_C_FLAGS_RELEASE}"
@@ -113,15 +119,14 @@ macro(build_nifti install_prefix staging_prefix)
             -DUSE_NIFTICDF_CODE:BOOL=OFF
             -DNIFTI_INSTALL_NO_DOCS:BOOL=ON
 
-    INSTALL_COMMAND $(MAKE) install DESTDIR=${staging_prefix}
+    # Not $(MAKE): that is Makefile syntax, and Ninja rejects it as a bad
+    # $-escape. The install scripts read DESTDIR from the environment.
+    INSTALL_COMMAND ${CMAKE_COMMAND} -E env DESTDIR=${staging_prefix}
+                    ${CMAKE_COMMAND} --build <BINARY_DIR> --target install
+    # Ninja must know which step makes the archives that minc2 links.
+    BUILD_BYPRODUCTS "${NIFTI_LIBRARY}" "${ZNZ_LIBRARY}"
     INSTALL_DIR ${staging_prefix}/${install_prefix}
   )
-
-set(NIFTI_LIBRARY     ${staging_prefix}/${install_prefix}/${CMAKE_INSTALL_LIBDIR}/libniftiio.a )
-set(NIFTI_INCLUDE_DIR ${staging_prefix}/${install_prefix}/include/nifti )
-set(ZNZ_LIBRARY       ${staging_prefix}/${install_prefix}/${CMAKE_INSTALL_LIBDIR}/libznz.a )
-set(ZNZ_INCLUDE_DIR   ${staging_prefix}/${install_prefix}/include/nifti )
-set(NIFTI_FOUND       ON)
 
 endmacro()
 

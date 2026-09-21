@@ -588,6 +588,11 @@ if(UNIX)
     endif()
     if(LIBMINC_NIFTI_SUPPORT)
       target_include_directories(${LIBMINC_LIBRARY_STATIC} PRIVATE ${NIFTI_INCLUDE_DIR})
+      # As for minc2 above: input_nifti.c needs the headers the bundled
+      # NIfTI build stages, so compile nothing here before it has run.
+      if(TARGET NIFTI)
+        add_dependencies(${LIBMINC_LIBRARY_STATIC} NIFTI)
+      endif()
     endif()
     target_link_libraries(${LIBMINC_LIBRARY_STATIC}
       PRIVATE ${NIFTI_LIBRARIES}
