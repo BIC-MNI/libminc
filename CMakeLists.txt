@@ -87,7 +87,13 @@ if(NOT LIBMINC_EXTERNALLY_CONFIGURED)
 
   if(LIBMINC_USE_NIFTI)
    if (LIBMINC_USE_SYSTEM_NIFTI)
-     find_package(NIFTI)
+     # nifti_clib ships its own CMake package (NIFTI::niftiio / NIFTI::znz);
+     # config mode is the only supported way to find it.
+     #
+     # REQUIRED: asking for the system copy and silently getting the bundled
+     # one instead is what issue #102 reported. Point CMAKE_PREFIX_PATH at the
+     # nifti_clib install if it is not on the default search path.
+     find_package(NIFTI CONFIG REQUIRED)
    else()
      include(ExternalProject)
      include(BuildNIFTI)
@@ -384,17 +390,32 @@ else()
 endif()
 
 if(LIBMINC_NIFTI_SUPPORT)
+    # Targets link NIFTI::niftiio; the paths/names below only feed the exported
+    # *_CONFIG lists further down. find_package(NIFTI CONFIG) supplies the
+    # targets but no path variables, so read them back off the targets.
+    #
+    # LOCATION, not IMPORTED_LOCATION: nifti_clib's installed NIFTITargets
+    # records only per-configuration IMPORTED_LOCATION_<CFG> (RELEASE), so
+    # IMPORTED_LOCATION reads as NOTFOUND while LOCATION resolves through
+    # IMPORTED_CONFIGURATIONS whatever CMAKE_BUILD_TYPE is. CMP0026 forbids
+    # LOCATION on build targets, not on imported ones.
+    if(NOT NIFTI_LIBRARY)
+      get_target_property(NIFTI_LIBRARY NIFTI::niftiio LOCATION)
+      get_target_property(ZNZ_LIBRARY   NIFTI::znz     LOCATION)
+    endif()
     set(NIFTI_LIBRARIES
         ${NIFTI_LIBRARY} ${ZNZ_LIBRARY}
     )
     get_filename_component(NIFTI_LIBRARY_NAME "${NIFTI_LIBRARY}" NAME)
     get_filename_component(ZNZ_LIBRARY_NAME "${ZNZ_LIBRARY}" NAME)
+    set(NIFTI_LINK_TARGET NIFTI::niftiio)
 else()
     set(NIFTI_LIBRARIES )
     set(NIFTI_LIBRARY )
     set(ZNZ_LIBRARY )
     set(NIFTI_LIBRARY_NAME )
     set(ZNZ_LIBRARY_NAME )
+    set(NIFTI_LINK_TARGET )
 endif()
 
 if(NOT HDF5_LIBRARY AND HDF5_LIBRARIES)
@@ -526,13 +547,6 @@ if(LIBMINC_BUILD_EZMINC)
   )
 endif()
 
-if(LIBMINC_NIFTI_SUPPORT)
-  target_include_directories(${LIBMINC_LIBRARY}
-    PRIVATE
-      ${NIFTI_INCLUDE_DIR}
-  )
-endif()
-
 # --- Target-scoped link dependencies (with visibility) ---
 # Note: HDF5 must be PUBLIC because public headers (minc2.h) include <hdf5.h>
 # and downstream code (including tests) may call HDF5 functions directly.
@@ -540,7 +554,7 @@ endif()
 # on their link line (a static archive does not resolve these internally).
 target_link_libraries(${LIBMINC_LIBRARY}
   PRIVATE
-    ${NIFTI_LIBRARIES}
+    ${NIFTI_LINK_TARGET}
   PUBLIC
     ${HDF5_LIBRARY}
     ZLIB::ZLIB
@@ -586,11 +600,8 @@ if(UNIX)
       target_include_directories(${LIBMINC_LIBRARY_STATIC} PUBLIC $<BUILD_INTERFACE:${NETCDF_INCLUDE_DIR}>)
       target_link_libraries(${LIBMINC_LIBRARY_STATIC} PUBLIC ${NETCDF_LIBRARY})
     endif()
-    if(LIBMINC_NIFTI_SUPPORT)
-      target_include_directories(${LIBMINC_LIBRARY_STATIC} PRIVATE ${NIFTI_INCLUDE_DIR})
-    endif()
     target_link_libraries(${LIBMINC_LIBRARY_STATIC}
-      PRIVATE ${NIFTI_LIBRARIES}
+      PRIVATE ${NIFTI_LINK_TARGET}
       PUBLIC ${HDF5_LIBRARY} ZLIB::ZLIB m ${CMAKE_DL_LIBS} ${RT_LIBRARY}
     )
     set_target_properties(${LIBMINC_LIBRARY_STATIC} PROPERTIES
