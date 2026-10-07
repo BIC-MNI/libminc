@@ -35,7 +35,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, ubuntu-24.04, macos-14, macos-15]
+        os: [ubuntu-22.04, ubuntu-24.04, macos-15, macos-26]
         build-params:
           - {static:  ON, WITH_MINC1:  ON, USE_NIFTI: OFF}
           - {static: OFF, WITH_MINC1: OFF, USE_NIFTI: OFF}
